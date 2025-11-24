@@ -22,3 +22,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+artisan
+composer.json
+composer.lock
+package.json
+phpunit.xml
+readme.node_modules
+vite.config.js
+/vendor

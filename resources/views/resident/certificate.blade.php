@@ -1,1 +1,1 @@
-<h1>certificate</h1>
+<h1>certificate {{ $resident->firstName }}</h1>
