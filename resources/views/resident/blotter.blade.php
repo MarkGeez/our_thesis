@@ -1,6 +1,4 @@
-<!--laravel part-->
-    
-    
+
     <head>
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
 
