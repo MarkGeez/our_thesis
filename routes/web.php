@@ -7,12 +7,25 @@ use App\Http\Controllers\ResidentController;
 use Illuminate\Support\Facades\Route;
 
 
+use App\Http\Middleware\secret;
+use Illuminate\Auth\Events\Login;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
 
 Route::get('login', [AuthController::class,'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.attempt');
 
 Route::get('register', [RegistrationController::class,'showRegister'])->name('register');
 Route::post('register', [RegistrationController::class, 'register'])->name('register.attempt');
+
+
+Route::get('/', function () {
+    return view('index'); 
+});
+
 
 
 Route::middleware(['auth', 'role.redirect'])->group(function(){
@@ -26,6 +39,9 @@ Route::middleware(['auth', 'role.redirect'])->group(function(){
         Route::get('/service', [ResidentController::class,'service'])->name(name: 'resident.service');
         Route::get('/complaint', [ResidentController::class,'complaint'])->name(name: 'resident.complaint');
         Route::get('/feedback', [ResidentController::class,'feedback'])->name(name: 'resident.feedback');
+
+        Route::get('/aboutus', [ResidentController::class,'aboutus'])->name(name: 'resident.aboutus');
+        Route::get('/contactus', [ResidentController::class,'contactus'])->name(name: 'resident.contactus');
 
 
 
