@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->text('description');
             $table->string('landLine');
-            $table->email('email');
+            $table->string('email');
             $table->string('ContactNo');
             $table->foreignId('user_id')->constrained();
         });
