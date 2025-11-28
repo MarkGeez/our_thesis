@@ -14,17 +14,13 @@ return new class extends Migration
         Schema::create('contact_us', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->text('description');
-            $table->string('landLine');
-            $table->string('email');
+            $table->string(column: 'email');
             $table->string('ContactNo');
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('editedBy')->constrained('users');
+           
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('contact_us');

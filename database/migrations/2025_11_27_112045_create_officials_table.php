@@ -15,19 +15,14 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             
-            // This references the 'users' table (assumed to be correct)
             $table->foreignId('user_id')->constrained();
             
-            // This attempts to reference the 'positions' table
             $table->foreignId('position_id')->unique()->constrained();
             
             $table->text('description');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('officials');

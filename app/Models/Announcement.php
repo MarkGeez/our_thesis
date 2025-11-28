@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model
 {
-    /** @use HasFactory<\Database\Factories\AnnouncementFactory> */
+    
 
     protected $fillable = ['title', 'image', 'details', 
     'eventTime', 'eventEnd', 'postedAt', 'archiveTime'];

@@ -68,4 +68,9 @@ class ResidentController extends Controller
         $resident = $this->authorizeResident($id);
         return view('resident.feedback', compact('resident'));
     }
+
+    public function contactus($id){
+        $resident = $this->authorizeResident($id);
+        return view('resident.contactus', compact('resident'));
+    }
 }
