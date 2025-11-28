@@ -33,4 +33,3 @@
 <script src="{{ asset('template/js/script.js') }}"></script>
 
 
-
