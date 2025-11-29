@@ -24,7 +24,7 @@
                             </button>
                             <ul class="users-item-dropdown nav-user-dropdown dropdown">
                                 <li class="user-info text-center">
-                                    <h3 class="user-name mb-2">{{ $resident->firstName }}</h3>
+                                    <h3 class="user-name mb-2">{{ auth()->user()->firstName }}</h3>
                                     <p class="text-secondary user-role text-muted small">Resident</p>
                                 </li>
                                 <hr>

@@ -14,39 +14,13 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $role): Response
     {
-        if(Auth::check()){
-            $user= Auth::user();
-
-            switch ($user->role) {
-                case 'admin':
-                    if(!$request->is("admin/{$user->id}/*")){
-                        return redirect("/admin/{$user->id}/dashboard");
-                    }
-                    break;
-                case 'subadmin':
-                    if(!$request->is("subadmin/{$user->id}/*")){
-                        return redirect("/subadmin/{$user->id}/dashboard");
-                    }
-                    break;
-
-                case 'resident':
-                    if (!$request->is("resident/{$user->id}/*")) {
-                    return redirect("/resident/{$user->id}/dashboard");
-                    }
-                    break;
-                case 'non-resident':
-                    if(!$request->is("non-resident{$user->id}/*")){
-                        return redirect("/non-resident/{$user->id}/dashboard");
-                    }
-                    
-
-            }
-
-
-            
+        if(!auth()->user()|| auth()->user()->role !== $role){
+            abort(404);
         }
+
+
         return $next($request);
     }
 }

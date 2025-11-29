@@ -14,15 +14,27 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    private function redirect(): RedirectResponse{
-        $credential = Auth::user();
+    private function redirect(): RedirectResponse
+{
+    $user = Auth::user();
 
-        if($credential->role === "resident"){
-            return redirect("resident/{$credential->id}/dashboard");
-        }
+    switch ($user->role) {
+        case 'admin':
+            return redirect("/admin/dashboard");
 
-        return redirect("/");
+        case 'subadmin':
+            return redirect("/subadmin/dashboard");
+
+        case 'resident':
+            return redirect("/resident/dashboard");
+
+        case 'non-resident':
+            return redirect("/non-resident/dashboard");
+
+        default:
+            return redirect("/");
     }
+}
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([

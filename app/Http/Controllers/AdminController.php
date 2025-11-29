@@ -6,5 +6,11 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    //
+    public function admin(){
+        auth()->user();
+    }
+
+    public function dashboard(){
+        return view("admin.dashboard", ["admin" => $this->admin()]);
+    }
 }

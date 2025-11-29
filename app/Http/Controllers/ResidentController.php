@@ -3,74 +3,74 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Announcement;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class ResidentController extends Controller
 {
-    private function authorizeResident($id)
+    public function dashboard(): View
     {
-        if (auth()->user()->id != $id) {
-            abort(403, "Cant access someone's dashboard");
-        }
-
-        return auth()->user();
+        $announcements = Announcement::where('archiveTime', '>', now())
+            ->orderBy('created_at', 'desc')
+            ->get();
+   
+        $resident = Auth::user();
+            
+        return view("resident.dashboard", compact('announcements', 'resident'));
     }
-
-    public function dashboard($id)
+    
+    public function profile(): View
     {
-        $resident = $this->authorizeResident($id); 
-        return view('resident.dashboard', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.profile", compact('resident'));
     }
-
-    public function profile($id)
+    
+    public function blotter(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.profile', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.blotter", compact('resident'));
     }
-
-    public function announcement($id)
+    
+    public function certificate(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.announcement', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.certificate", compact('resident'));
     }
-
-    public function blotter($id)
+    
+    public function clearance(): View
     {
-        $resident = $this->authorizeResident($id); 
-        return view('resident.blotter', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.clearance", compact('resident'));
     }
-
-    public function certificate($id)
+    
+    public function service(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.certificate', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.service", compact('resident'));
     }
-
-    public function clearance($id)
+    
+    public function complaint(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.clearance', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.complaint", compact('resident'));
     }
-
-    public function service($id)
+    
+    public function feedback(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.service', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.feedback", compact('resident'));
     }
-
-    public function complaint($id)
+    
+    public function aboutus(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.complaint', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.aboutus", compact('resident'));
     }
-
-    public function feedback($id)
+    
+    public function contactus(): View
     {
-        $resident = $this->authorizeResident($id);
-        return view('resident.feedback', compact('resident'));
-    }
-
-    public function contactus($id){
-        $resident = $this->authorizeResident($id);
-        return view('resident.contactus', compact('resident'));
+        $resident = Auth::user();
+        return view("resident.contactus", compact('resident'));
     }
 }
