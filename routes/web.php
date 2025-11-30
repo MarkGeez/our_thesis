@@ -31,40 +31,34 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
-        Route::get('/dashboard', [ResidentController::class,'dashboard'])->name(name: 'dashboard');
-        Route::get('/profile', [ResidentController::class,'profile'])->name(name: 'profile');
-        Route::get('/blotter', [ResidentController::class,'blotter'])->name(name: 'blotter');
-        Route::get('/certificate', [ResidentController::class,'certificate'])->name(name: 'certificate');
-        Route::get('/clearance', [ResidentController::class,'clearance'])->name(name: 'clearance');
-        Route::get('/service', [ResidentController::class,'service'])->name(name: 'service');
-        Route::get('/complaint', [ResidentController::class,'complaint'])->name(name: 'complaint');
-        Route::get('/feedback', [ResidentController::class,'feedback'])->name(name: 'feedback');
-        Route::get('/aboutus', [ResidentController::class,'aboutus'])->name(name: 'aboutus');
-        Route::get('/contactus', [ResidentController::class,'contactus'])->name(name: 'contactus');
-
-
-
+        Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
+        Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
+        Route::get('/blotter', [ResidentController::class,'blotter'])->name('blotter');
+        Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
+        Route::get('/clearance', [ResidentController::class,'clearance'])->name('clearance');
+        Route::get('/service', [ResidentController::class,'service'])->name('service');
+        Route::get('/complaint', [ResidentController::class,'complaint'])->name('complaint');
+        Route::get('/feedback', [ResidentController::class,'feedback'])->name('feedback');
+        Route::get('/aboutus', [ResidentController::class,'aboutus'])->name('aboutus');
+        Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
     });
-
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function(){
-    Route::prefix('/admin/{$id}')->group(function(){
-        Route::get('/dashboard', [ResidentController::class,'dashboard'])->name(name: 'admin.dashboard');
-        Route::get('/profile', action: [ResidentController::class,'profile'])->name(name: 'admin.profile');
-        Route::get('/blotter', [ResidentController::class,'blotter'])->name(name: 'resident.blotter');
-        Route::get('/certificate', [ResidentController::class,'certificate'])->name(name: 'admin.certificate');
-        Route::get('/clearance', [ResidentController::class,'clearance'])->name(name: 'admin.clearance');
-        Route::get('/service', [ResidentController::class,'service'])->name(name: 'admin.service');
-        Route::get('/complaint', [ResidentController::class,'complaint'])->name(name: 'admin.complaint');
-        Route::get('/feedback', [ResidentController::class,'feedback'])->name(name: 'admin.feedback');
-        Route::get('/aboutus', [ResidentController::class,'aboutus'])->name(name: 'admin.aboutus');
-        Route::get('/contactus', [ResidentController::class,'contactus'])->name(name: 'admin.contactus');
+    Route::prefix('admin')->name("admin.")->group(function(){
+        Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
+        Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
+        Route::get('/blotter', [ResidentController::class,'blotter'])->name('blotter');
+        Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
+        Route::get('/clearance', [ResidentController::class,'clearance'])->name('clearance');
+        Route::get('/service', [ResidentController::class,'service'])->name('service');
+        Route::get('/complaint', [ResidentController::class,'complaint'])->name('complaint');
+        Route::get('/feedback', [ResidentController::class,'feedback'])->name('feedback');
+        Route::get('/aboutus', [ResidentController::class,'aboutus'])->name('aboutus');
+        Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
 
-
-        Route::get('create-announcement', [AnnouncementController::class, 'showAnnouncementForm']);
-        Route::post('create-announcement', action: [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');; 
-
+        Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('showAnnouncements');
+        Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
     });
 });
 

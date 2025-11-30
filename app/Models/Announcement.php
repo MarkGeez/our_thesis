@@ -10,6 +10,10 @@ class Announcement extends Model
     
 
     protected $fillable = ['title', 'image', 'details', 
-    'eventTime', 'eventEnd', 'postedAt', 'archiveTime'];
+    'eventTime', 'eventEnd', 'postedAt', 'user_id'];
     use HasFactory;
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

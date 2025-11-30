@@ -20,9 +20,8 @@ return new class extends Migration
             $table->longText('details');
             $table->date('eventTime')->nullable();
             $table->date('eventEnd')->nullable();
-            $table->timestamp('postedAt')->useCurrent();
-            $table->date('archiveTime');
-            $table->foreignId('user_id')->constrained();
+            $table->timestamps();
+            $table->foreignId(column: 'user_id')->constrained();
 
 
         });

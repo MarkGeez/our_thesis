@@ -11,9 +11,7 @@ class ResidentController extends Controller
 {
     public function dashboard(): View
     {
-        $announcements = Announcement::where('archiveTime', '>', now())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $announcements= Announcement::with('user:id,firstName,lastName')->latest()->get();
    
         $resident = Auth::user();
             
@@ -73,4 +71,6 @@ class ResidentController extends Controller
         $resident = Auth::user();
         return view("resident.contactus", compact('resident'));
     }
+
+
 }

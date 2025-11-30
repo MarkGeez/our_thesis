@@ -8,5 +8,12 @@
 </head>
 <body>
     <h1>admin</h1>
+    @foreach($announcement as $announcements)
+    <div>
+        <H1>{{ $announcement->title }}</H1>
+        <p>{{ $announcement->details }}</p>
+        <p> {{ $announcement->user->firstName . ',' . $announcement->user->lastName }}</p>
+    </div>
+    @endforeach
 </body>
 </html>

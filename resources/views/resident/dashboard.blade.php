@@ -24,14 +24,29 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <!-- Welcome Section -->
+                            
                             <div class="card mb-4">
                                 <div class="card-body">
                                     <h3 class="card-title">Welcome back, {{ auth()->user()->firstName }}!</h3>
                                     <p class="card-text">Here's what's happening in your community.</p>
                                 </div>
+
                             </div>
 
+                            @foreach($announcements as $announcement)
+                            <div>
+                                <H1>Title:{{ $announcement->title }}</H1>
+                                @if($announcement->image)
+                                    <img style="height:340px; width:620px;" 
+                                    src="{{ asset('storage/' . $announcement->image) }}" 
+                                    alt="{{ $announcement->title }}">
+                                @endif
+                                <h6>Details:{{ $announcement->details }}</h6>
+                                <h6>Event Time:{{ $announcement->eventTime }}</h6>
+                                <h6>Event End:{{ $announcement->eventEnd }}</h6>
+                                <h6>Posted By: {{ $announcement->user->firstName . ',' . $announcement->user->lastName }}</h6>
+                            </div>
+                            @endforeach
                            
                           
                         </div>
