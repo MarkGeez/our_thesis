@@ -23,40 +23,40 @@ class AdminController extends Controller
         return view("admin.profile", compact('admin'));
     }
     
-    public function blotter(): View
+    public function blotterRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.blotter", compact('admin'));
+        return view("admin.blotterRequest", compact('admin'));
     }
     
-    public function certificate(): View
+    public function certificateRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.certificate", compact('admin'));
+        return view("admin.certificateRequest", compact('admin'));
     }
     
-    public function clearance(): View
+    public function clearanceRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.clearance", compact('admin'));
+        return view("admin.clearanceRequest", compact('admin'));
     }
     
-    public function service(): View
+    public function serviceRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.service", compact('admin'));
+        return view("admin.serviceRequest", compact('admin'));
     }
     
-    public function complaint(): View
+    public function complaintRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.complaint", compact('admin'));
+        return view("admin.complaintRequest", compact('admin'));
     }
     
-    public function feedback(): View
+    public function feedbackRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.feedback", compact('admin'));
+        return view("admin.feedbackRequest", compact('admin'));
     }
     
     public function aboutus(): View
@@ -70,11 +70,64 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.contactus", compact('admin'));
     }
-    public function showAnnouncementForm(): View
+    public function settings(): View
+    {
+        $admin = Auth::user();
+        return view("admin.settings", compact('admin'));
+    }
+    public function barangayOfficials(): View
+    {
+        $admin = Auth::user();
+        return view("admin.barangayOfficials", compact('admin'));
+    }
+     public function census(): View
+    {
+        $admin = Auth::user();
+        return view("admin.census", compact('admin'));
+    }
+     public function users(): View
+    {
+        $admin = Auth::user();
+        return view("admin.users", compact('admin'));
+    }
+     public function reports(): View
+    {
+        $admin = Auth::user();
+        return view("admin.reports", compact('admin'));
+    }
+    public function adminBlotter(): View
 {
-    return view('admin.create-announcement', [
-        'admin' => auth()->user(),
-    ]);
+    $admin = Auth::user();
+    return view("admin.adminBlotter", compact('admin'));
 }
+
+
+     public function adminCertificate(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminCertificate", compact('admin'));
+    }
+         public function adminServices(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminServices", compact('admin'));
+    }
+         public function adminComplaint(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminComplaint", compact('admin'));
+    }
+        
+     public function activityLogs(): View
+    {
+        $admin = Auth::user();
+        return view("admin.activityLogs", compact('admin'));
+    }
+    public function showAnnouncementForm(): View
+    {
+        return view('admin.create-announcement', [
+            'admin' => auth()->user(),
+        ]);
+    }
 
 }

@@ -67,18 +67,19 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 })();
 
-// ...existing code...
   (function () {
     var showCatBtns = document.querySelectorAll('.show-cat-btn');
 
-    if (showCatBtns) {
+    if (showCatBtns && showCatBtns.length) {
       showCatBtns.forEach(function (showCatBtn) {
         var catSubMenu = showCatBtn.nextElementSibling;
         showCatBtn.addEventListener('click', function (e) {
           e.preventDefault();
+          if (!catSubMenu) return; // nothing to toggle
           catSubMenu.classList.toggle('visible');
-          var catBtnToRotate = document.querySelector('.category__btn');
-          catBtnToRotate.classList.toggle('rotated');
+          // only rotate the button inside the clicked item (avoid global query and null errors)
+          var catBtnToRotate = showCatBtn.querySelector('.category__btn') || document.querySelector('.category__btn');
+          if (catBtnToRotate) catBtnToRotate.classList.toggle('rotated');
         });
       });
     }

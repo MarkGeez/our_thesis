@@ -28,7 +28,7 @@
                 </li>
             </ul>
 
-            <span class="system-menu__title">system</span>
+            <span class="system-menu__title">Personal</span>
 
             <ul class="sidebar-body-menu">
 
@@ -39,70 +39,123 @@
                     </a>
                 </li>
                 <li>
-                    <a class="{{ Request::routeIs('admin.residentside') ? 'active' : '' }}"
-                       href="{{ route('admin.residentside') }}">
-                        <span class="icon"><i class="fa-solid fa-user"></i></span>Resident Side
-                        <span class="category__btn transparent-btn" title="Open list">
-                            <span class="sr-only">Open list</span>
-                            <span class="icon arrow-down" aria-hidden="true"></span>
-                        </span>
+                    <!-- make this the toggle the script looks for and avoid malformed blade syntax -->
+                    <a class="show-cat-btn" href="#">
+                         E-Barangay Services
+                         <span class="category__btn transparent-btn" title="Open list">
+                             <span class="sr-only">Open list</span>
+                             <span class="icon arrow-down" aria-hidden="true"></span>
+                         </span>
+                     </a>
+                     <ul class="cat-sub-menu">
+                        <li>
+                           <a class="{{ Request::routeIs('admin.adminBlotter') ? 'active' : '' }}" href="{{ route('admin.adminBlotter') }}">
+                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter
+                            </a>
+
+                        </li>
+                        <li>
+                           <a class="{{ Request::routeIs('admin.admin-certificate') ? 'active' : '' }}"
+                       href="{{ route('admin.adminCertificate') }}">
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>Documents
                     </a>
-                    <ul class="cat-sub-menu">
-                        <li>
-                            <a href="posts.html">All Posts</a>
+
+                    </a>
                         </li>
                         <li>
-                            <a href="new-post.html">Add new post</a>
+                           <a class="{{ Request::routeIs('admin.admin-services') ? 'active' : '' }}"
+                       href="{{ route('admin.adminServices') }}">
+                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>Services
+                    </a>
+
+                    </a>
                         </li>
+                        <li>
+                           <a class="{{ Request::routeIs('admin.admin-complaint') ? 'active' : '' }}"
+                       href="{{ route('admin.adminComplaint') }}">
+                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>Complaints
+                    </a>
                     </ul>
                 </li>
-
+                <span class="system-menu__title">manage system</span>
                 <li>
                     <a class="{{ Request::routeIs('admin.create-announcement') ? 'active' : '' }}"
                        href="{{ route('admin.create-announcement') }}">
                         <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
                     </a>
                 </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.census') ? 'active' : '' }}"
+                       href="{{ route('admin.census') }}">
+                        <span class="icon"><i class="fa-solid fa-address-book"></i></i></span>Census
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.users') ? 'active' : '' }}"
+                       href="{{ route('admin.users') }}">
+                        <span class="icon"><i class="fa-solid fa-users"></i></i></span>Users
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.barangay-officials') ? 'active' : '' }}"
+                       href="{{ route('admin.barangayOfficials') }}">
+                        <span class="icon"><i class="fa-solid fa-users-cog"></i></i></span>Officials
+                    </a>
+                </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.blotter') ? 'active' : '' }}"
-                       href="{{ route('admin.blotter' )}}">
+                    <a class="{{ Request::routeIs('admin.blotterRequest') ? 'active' : '' }}"
+                       href="{{ route('admin.blotterRequest' )}}">
                         <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
                     </a>
                 </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.certificate') ? 'active' : '' }}"
-                       href="{{ route('admin.certificate') }}">
+                    <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
+                       href="{{ route('admin.certificateRequest') }}">
                         <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Document Requests
                     </a>
                 </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.service') ? 'active' : '' }}"
-                       href="{{ route('admin.service') }}">
+                    <a class="{{ Request::routeIs('admin.serviceRequest') ? 'active' : '' }}"
+                       href="{{ route('admin.serviceRequest') }}">
                         <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>Service Requests
                     </a>
                 </li>
-
-                <li>
-                    <a class="{{ Request::routeIs('admin.complaint') ? 'active' : '' }}"
-                       href="{{ route('admin.complaint') }}">
+                 <li>
+                    <a class="{{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
+                       href="{{ route('admin.complaintRequest') }}">
                         <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints
                     </a>
                 </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.feedback') ? 'active' : '' }}"
-                       href="{{ route('admin.feedback') }}">
+                    <a class="{{ Request::routeIs('admin.reports') ? 'active' : '' }}"
+                       href="{{ route('admin.reports') }}">
+                        <span class="icon"><i class="fa-solid fa-clipboard-list"></i></i></span>Reports
+                    </a>
+                </li>
+
+               
+
+                <li>
+                    <a class="{{ Request::routeIs('admin.feedbackRequest') ? 'active' : '' }}"
+                       href="{{ route('admin.feedbackRequest') }}">
                         <span class="icon"><i class="fa-solid fa-comment-dots"></i></span>Feedback
                     </a>
                 </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.feedback') ? 'active' : '' }}"
-                       href="{{ route('admin.feedback') }}">
-                        <span class="icon"><i class="fa-solid fa-comment-dots"></i></span>Settings
+                    <a class="{{ Request::routeIs('admin.activityLogs') ? 'active' : '' }}"
+                       href="{{ route('admin.activityLogs') }}">
+                        <span class="icon"><i class="fa-solid fa-history"></i></span>Activity Logs
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.settings') ? 'active' : '' }}"
+                       href="{{ route('admin.settings') }}">
+                        <span class="icon"><i class="fa-solid fa-gear"></i></span>Settings
                     </a>
                 </li>
 

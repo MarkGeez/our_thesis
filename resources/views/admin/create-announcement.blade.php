@@ -98,7 +98,7 @@
     <br><br>
 
     <label for="image">Upload An Image</label>
-    <input type="file" name="image" id="image" required>
+    <input type="file" name="image" id="image" accept="image/*" >
     <br><br>
     @error('image')
         <span>{{ $message }}</span>

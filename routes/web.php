@@ -49,16 +49,25 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
     Route::prefix('admin')->name("admin.")->group(function(){
         Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [AdminController::class,'profile'])->name('profile');
-        Route::get('/blotter', [AdminController::class,'blotter'])->name('blotter');
-        Route::get('/certificate', [AdminController::class,'certificate'])->name('certificate');
-        Route::get('/clearance', [AdminController::class,'clearance'])->name('clearance');
-        Route::get('/service', [AdminController::class,'service'])->name('service');
-        Route::get('/complaint', [AdminController::class,'complaint'])->name('complaint');
-        Route::get('/feedback', [AdminController::class,'feedback'])->name('feedback');
+        Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
+        Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
+        Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
+        Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
+        Route::get('/complaintRequest', [AdminController::class,'complaintRequest'])->name('complaintRequest');
+        Route::get('/feedbackRequest', [AdminController::class,'feedbackRequest'])->name('feedbackRequest');
         Route::get('/aboutus', [AdminController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [AdminController::class,'contactus'])->name('contactus');
-        
-        
+        Route::get('/settings', [AdminController::class,'settings'])->name('settings');
+        Route::get('/barangayOfficials', [AdminController::class,'barangayOfficials'])->name('barangayOfficials');
+        Route::get('/census', [AdminController::class,'census'])->name('census');
+        Route::get('/users', [AdminController::class,'users'])->name('users');
+        Route::get('/activityLogs', [AdminController::class,'activityLogs'])->name('activityLogs');
+        Route::get('/reports', [AdminController::class,'reports'])->name('reports');
+        Route::get('/adminBlotter', [AdminController::class,'adminBlotter'])->name('adminBlotter');
+        Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
+        Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
+        Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
+
          Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
        });
