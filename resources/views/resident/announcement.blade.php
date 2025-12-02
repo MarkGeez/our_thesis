@@ -22,7 +22,8 @@
            
     @include('resident.resident-header', ['resident' => $resident])
             <main class="main users chart-page" id="skip-target">
-                
+                <!--Dito lalagay main content-->
+
             </main>
 
 </div>

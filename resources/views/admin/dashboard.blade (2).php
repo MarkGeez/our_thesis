@@ -14,18 +14,33 @@
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
    
-    @include('resident.resident-sidebar', ['resident' => $resident])
+    @include('admin.admin-sidebar', ['admin' => $admin])
 
 
 
 <div class="main-wrapper">
            
-    @include('resident.resident-header', ['resident' => $resident])
+    @include('admin.admin-header', ['admin' => $admin])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
 
-
-            </main>
+    <h1>admin</h1>
+    @foreach($announcement as $ann)
+    <div>
+-        <h1>{{ $ann->title }}</h1>
+-        <p>{{ $ann->details }}</p>
+-        <p> {{ $ann->user->firstName . ',' . $ann->user->lastName }}</p>
++        <h1>{{ $ann->title }}</h1>
++        @if($ann->image)
++            <img src="{{ asset('storage/'.$ann->image) }}" alt="{{ $ann->title }}" style="max-width:300px; height:auto; display:block; margin-bottom:8px;">
++        @else
++            <img src="{{ asset('template/img/default-announcement.png') }}" alt="No image" style="max-width:300px; height:auto; display:block; margin-bottom:8px;">
++        @endif
++        <p>{{ $ann->details }}</p>
++        <p>{{ $ann->user->firstName }}, {{ $ann->user->lastName }}</p>
+    </div>
+    @endforeach
+ </main>
 
 </div>
 </div> 
@@ -33,5 +48,4 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-
 

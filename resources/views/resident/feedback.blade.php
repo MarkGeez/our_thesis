@@ -47,7 +47,7 @@
            
     @include('resident.resident-header', ['resident' => $resident])
             <main class="main users chart-page" id="skip-target">
-                <!--Dito lalagay main content-->
+               <!--Dito lalagay main content-->
 
                 <div class="container">
           <h1 class="main-title">Feedback</h1>
