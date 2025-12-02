@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\Models\Announcement;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -72,3 +73,6 @@ class AdminController extends Controller
         return view("admin.contactus", compact('admin'));
     }
 }
+
+
+

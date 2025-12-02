@@ -139,7 +139,7 @@
         <form action="{{ route('login.attempt') }}" method="post">
             @csrf
             @if(session('status'))
-                <div class="text-danger small mb-2">{{ session('status') }}</div>
+                <div class="bg-warning text-dark small mb-2 rounded p-2">{{ session('status') }}</div>
             @endif
 
             <div class="input-with-icon">

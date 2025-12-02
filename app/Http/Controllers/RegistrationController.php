@@ -53,7 +53,9 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('status', 'Registration successful! Please wait for approval before logging in.');
+
+            ->with('status', 'Registration successful! Awaiting Administrator Review to Access Our Services');
+
     }
     
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,3 +48,11 @@ class AnnouncementController extends Controller
       
     }
 }
+=======
+use Illuminate\Http\Request;
+
+class AnnouncementController extends Controller
+{
+    //
+}
+>>>>>>> 6907953ec8fca8116e7cac447c3c752414da0ef4
