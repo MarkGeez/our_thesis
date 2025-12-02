@@ -38,6 +38,24 @@
                         <span class="icon"><i class="fa-solid fa-user"></i></span>Profile
                     </a>
                 </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.residentside') ? 'active' : '' }}"
+                       href="{{ route('admin.residentside') }}">
+                        <span class="icon"><i class="fa-solid fa-user"></i></span>Resident Side
+                        <span class="category__btn transparent-btn" title="Open list">
+                            <span class="sr-only">Open list</span>
+                            <span class="icon arrow-down" aria-hidden="true"></span>
+                        </span>
+                    </a>
+                    <ul class="cat-sub-menu">
+                        <li>
+                            <a href="posts.html">All Posts</a>
+                        </li>
+                        <li>
+                            <a href="new-post.html">Add new post</a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li>
                     <a class="{{ Request::routeIs('admin.create-announcement') ? 'active' : '' }}"
