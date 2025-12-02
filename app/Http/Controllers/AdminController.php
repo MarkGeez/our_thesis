@@ -17,6 +17,7 @@ class AdminController extends Controller
         return view("admin.dashboard", compact('announcement', 'admin'));
     }
     
+    
     public function profile(): View
     {
         $admin = Auth::user();

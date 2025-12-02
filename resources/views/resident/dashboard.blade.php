@@ -32,7 +32,7 @@
                                 </div>
 
                             </div>
-
+                            <h1>📢ANNOUNCEMENTS!!!</h1>
                             @foreach($announcements as $announcement)
                             <div>
                                 <H1>Title:{{ $announcement->title }}</H1>
