@@ -72,7 +72,18 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.contactus", compact('admin'));
     }
+<<<<<<< HEAD
 }
 
 
 
+=======
+    public function showAnnouncementForm(): View
+{
+    return view('admin.create-announcement', [
+        'admin' => auth()->user(),
+    ]);
+}
+
+}
+>>>>>>> 78dadefa1cd5c8a0665f3a9f8d70f912354b5996
