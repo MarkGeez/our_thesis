@@ -81,7 +81,7 @@
                             
                             <div class="card mb-4">
                                 <div class="card-body">
-                                    <h3 class="card-title">Welcome back, {{ auth()->user()->firstName }}!</h3>
+                                    <h3 class="card-title">Welcome back, {{ ucfirst(auth()->user()->firstName) }}!</h3>
                                     <p class="card-text">Here's what's happening in your community.</p>
                                 </div>
 
@@ -107,7 +107,7 @@
                 @endif
 
                 <div class="announcement-meta">
-                    Posted by {{ $announcement->user->firstName }} {{ $announcement->user->lastName }}
+                    Posted by {{ ucfirst($announcement->user->firstName) }} {{ ucfirst($announcement->user->lastName) }}
                 </div>
             </div>
         </div>

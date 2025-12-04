@@ -38,6 +38,16 @@
                         <span class="icon"><i class="fa-solid fa-user"></i></span>Profile
                     </a>
                 </li>
+
+                @php
+    $servicesActive = Request::routeIs(
+        'admin.adminBlotter*',
+        'admin.adminCertificate*',
+        'admin.adminServices*',
+        'admin.adminComplaint*',
+        
+    );
+@endphp
                 <li>
                     <!-- make this the toggle the script looks for and avoid malformed blade syntax -->
                     <a class="show-cat-btn" href="#">
@@ -49,13 +59,13 @@
                      </a>
                      <ul class="cat-sub-menu">
                         <li>
-                           <a class="{{ Request::routeIs('admin.adminBlotter') ? 'active' : '' }}" href="{{ route('admin.adminBlotter') }}">
+                           <a class="{{ Request::routeIs('admin.adminBlotter*') ? 'active' : '' }}" href="{{ route('admin.adminBlotter') }}">
                                 <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter
                             </a>
 
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('admin.admin-certificate') ? 'active' : '' }}"
+                           <a class="{{ Request::routeIs('admin.adminCertificate*') ? 'active' : '' }}"
                        href="{{ route('admin.adminCertificate') }}">
                         <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>Documents
                     </a>
@@ -63,7 +73,7 @@
                     </a>
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('admin.admin-services') ? 'active' : '' }}"
+                           <a class="{{ Request::routeIs('admin.adminServices*') ? 'active' : '' }}"
                        href="{{ route('admin.adminServices') }}">
                         <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>Services
                     </a>
@@ -71,7 +81,7 @@
                     </a>
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('admin.admin-complaint') ? 'active' : '' }}"
+                           <a class="{{ Request::routeIs('admin.adminComplaint*') ? 'active' : '' }}"
                        href="{{ route('admin.adminComplaint') }}">
                         <span class="icon"><i class="fa-solid fa-comments"></i></i></span>Complaints
                     </a>
@@ -164,3 +174,23 @@
         </div>
     </div>
 </aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const active = document.querySelector('.sidebar .active');
+    if (!active) return;
+
+    // ensure parent submenu is open
+    const submenu = active.closest('.cat-sub-menu');
+    if (submenu) {
+        submenu.style.display = 'block';
+        const toggle = submenu.previousElementSibling;
+        if (toggle) toggle.classList.add('active');
+    }
+
+    // scroll active item into view (center)
+    try {
+        active.scrollIntoView({ behavior: 'auto', block: 'center' });
+    } catch (e) { /* ignore */ }
+});
+</script>

@@ -93,7 +93,7 @@
        <div class="announcement-text">
          <h3>{{ $announcements->title }}</h3>
 
-         <p>{{ $announcements->details }}</p>
+         <p class="mt-3">{{ $announcements->details }}</p>
 
          @if($announcements->eventTime || $announcements->eventEnd)
            <p class="mt-2"><strong>Event Start:</strong> {{ $announcements->eventTime }}</p>
@@ -101,7 +101,7 @@
          @endif
 
          <div class="announcement-meta">
-           Posted by {{ $announcements->user->firstName }} {{ $announcements->user->lastName }}
+           Posted by {{ ucfirst($announcements->user->firstName) }} {{ ucfirst($announcements->user->lastName) }}
          </div>
        </div>
      </div>
