@@ -70,6 +70,9 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
 
          Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
+        Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
+        Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
+
        });
 });
 

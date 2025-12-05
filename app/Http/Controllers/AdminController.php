@@ -103,37 +103,4 @@ class AdminController extends Controller
     return view("admin.adminBlotter", compact('admin'));
 }
 
-<<<<<<< HEAD
 }
-=======
-
-     public function adminCertificate(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminCertificate", compact('admin'));
-    }
-         public function adminServices(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminServices", compact('admin'));
-    }
-         public function adminComplaint(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminComplaint", compact('admin'));
-    }
-        
-     public function activityLogs(): View
-    {
-        $admin = Auth::user();
-        return view("admin.activityLogs", compact('admin'));
-    }
-    public function showAnnouncementForm(): View
-    {
-        return view('admin.create-announcement', [
-            'admin' => auth()->user(),
-        ]);
-    }
-
-}
->>>>>>> f54c290f0ba724f4655e264294db60b35e66ed26

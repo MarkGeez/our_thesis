@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +12,42 @@ class AnnouncementController extends Controller
 {
     public function showAnnouncementForm(): View
     {
-        
         return view("admin.create-announcement");
     }
+
+    public function showEdit($id):View{
+        $announcement = Announcement::findOrFail($id);
+        return view("admin.edit-announcement", compact("announcement"));
+    }
+
+    public function update(Request $request, $id){
+        $announcement = Announcement::find($id);
+
+       
+        $request->validate([
+            "title" => "string|max:255|required", 
+            "details" => "required|string", 
+            "eventTime" => "nullable|date",
+            "eventEnd" => "nullable|date|after_or_equal:eventTime", 
+        ]);
+       
+       
+       
+
+        $announcement->title= $request->title;
+        
+        $announcement->details= $request->details;
+        $announcement->eventTime= $request->eventTime;
+        $announcement->eventEnd= $request->eventEnd;
+
+        $announcement->save();
+
+        return redirect()->route("admin.dashboard")->with("success", "Announcement updated successfully");
+
+
+    }
+
+  
 
     public function createAnnouncement(Request $request): RedirectResponse
     {
@@ -41,18 +73,9 @@ class AnnouncementController extends Controller
             "eventEnd" => $request->eventEnd,
         ]);
 
-        // Add the missing return statement
-        return redirect()->back()->with('success', 'Announcement created successfully!');
+        return redirect()->route('admin.dashboard')->with('success', 'Announcement created successfully!');
         
 
       
     }
 }
-=======
-use Illuminate\Http\Request;
-
-class AnnouncementController extends Controller
-{
-    //
-}
->>>>>>> 6907953ec8fca8116e7cac447c3c752414da0ef4

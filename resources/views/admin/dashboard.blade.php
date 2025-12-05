@@ -79,17 +79,23 @@
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
     <div class="main-container">
-  <h2 style="color:#007BFF; margin-left: 20px;">Latest Announcements</h2>
+    @if(session("success"))
+      <h6>{{ session("success") }}</h6>
+    @endif
+  <h2 style="color:#007BFF; margin-left: 20px;">Latest Announcements </h2>
 
 
    <div class="announcements-grid">
      @foreach($announcement as $announcements)
      <div class="announcement-card">
 
-       <img 
+      @if($announcements->image)
+        <img 
          src="{{ $announcements->image ? asset('storage/'.$announcements->image) : asset('template/img/default-announcement.png') }}"
          alt="{{ $announcements->title }}"
        >
+      @endif
+       
        <div class="announcement-text">
          <h3>{{ $announcements->title }}</h3>
 
@@ -101,7 +107,10 @@
          @endif
 
          <div class="announcement-meta">
-           Posted by {{ ucfirst($announcements->user->firstName) }} {{ ucfirst($announcements->user->lastName) }}
+           Posted by: {{ ucfirst($announcements->user->firstName) }}, {{ ucfirst($announcements->user->lastName) }}
+         </div>
+         <div>
+          <button><a href="{{ url("admin/edit-announcement/".$announcements->id) }}">Edit announcement</a></button>
          </div>
        </div>
      </div>
