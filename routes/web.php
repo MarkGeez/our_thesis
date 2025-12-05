@@ -61,12 +61,7 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         
          Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
-<<<<<<< HEAD
-    
-    });
-=======
        });
->>>>>>> 78dadefa1cd5c8a0665f3a9f8d70f912354b5996
 });
 
 

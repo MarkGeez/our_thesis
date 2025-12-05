@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create("blotter", function(Blueprint $table){
             
             $table->id(); 
-            $table->foreignId('plaintiffId')->constrained('users'); 
+            $table->foreignId('plaintiffId')->nullable()->constrained('users'); 
             $table->string('plaintiffAddress', 255)->nullable();
             $table->integer('plaintiffContactNumber')->nullable();
             $table->string('plaintiffName', 255);
@@ -34,10 +34,8 @@ return new class extends Migration
             $table->mediumText('proof')->nullable(); 
             $table->longText('blotterDescription');
             $table->string('schedule', 255)->nullable(); 
-            
-           
+            $table->foreignId('encodedBy')->nullable()->constrained('users');
             $table->string('action');
-            
             $table->enum('status', ['PENDING', 'SCHEDULED', 'RESOLVED', 'CLOSED'])
                     ->default('PENDING');
 
