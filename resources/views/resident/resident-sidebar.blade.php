@@ -51,7 +51,7 @@
                 <li>
                     <a class="{{ Request::routeIs('resident.certificate') ? 'active' : '' }}"
                        href="{{ route('resident.certificate') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Certificate
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Documents
                     </a>
                 </li>
 
