@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
@@ -73,6 +74,7 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
         Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
         Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
+        route::get('/archive', [ArchiveController::class, 'showArchive'])->name('archive');
 
        });
 });

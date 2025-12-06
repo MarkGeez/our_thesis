@@ -116,11 +116,18 @@
     @endif
     </td>
             <td>{{ $announcement->details }}</td>
-            <td>{{ $announcement->eventTime ? date("M-d-Y", strtotime($announcement->eventTime)). 'at' . date("g:i A", strtotime($announcement->eventTime)): "no start date" }}</td>
+<td>{{ $announcement->eventStart ? $announcement->eventStart->format('M-d-Y H:i') : '' }}</td>
             <td>{{ $announcement->eventEnd ? date("M-d-Y", strtotime($announcement->eventEnd)). 'at' . date("g:i A", strtotime($announcement->eventEnd)) : "no end date" }}</td>
             <td>{{ $announcement->postedAt }}</td>
             <td> {{ ucfirst($announcement->user->firstName) }}, {{ ucfirst($announcement->user->lastName) }}</td>
             <td colspan="2"><a class="btn btn-info" href="{{ url('admin/edit-announcement/'. $announcement->id) }}">Edit</a></td>
+            <td>
+                <form action="{{ route('admin.announcement.archive', $announcement->id) }}" method="post">
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn btn-danger" onclick="return confirm('archive this announcement?')">Archive</button>
+    </form>
+            </td>
         </tr>
         @endforeach
     </tbody>
