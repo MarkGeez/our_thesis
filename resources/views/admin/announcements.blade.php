@@ -88,6 +88,8 @@
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
+                <h1>active annnouncements</h1>
+                <a class="btn btn-info" href="{{ url('admin/create-announcement') }}">create announcement</a>
 
     <table>
     <thead>
@@ -118,7 +120,7 @@
             <td>{{ $announcement->eventEnd ? date("M-d-Y", strtotime($announcement->eventEnd)). 'at' . date("g:i A", strtotime($announcement->eventEnd)) : "no end date" }}</td>
             <td>{{ $announcement->postedAt }}</td>
             <td> {{ ucfirst($announcement->user->firstName) }}, {{ ucfirst($announcement->user->lastName) }}</td>
-            <td colspan="2"><a href="{{ url('admin/edit-announcement/'. $announcement->id) }}">Edit</a></td>
+            <td colspan="2"><a class="btn btn-info" href="{{ url('admin/edit-announcement/'. $announcement->id) }}">Edit</a></td>
         </tr>
         @endforeach
     </tbody>

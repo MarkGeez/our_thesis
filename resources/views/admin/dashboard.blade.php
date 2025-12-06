@@ -82,7 +82,8 @@
     @if(session("success"))
       <h6>{{ session("success") }}</h6>
     @endif
-  <h2 style="color:#007BFF; margin-left: 20px;">Latest Announcements </h2>
+  <h2 style="color:#007BFF; margin-left: 20px;">Latest Announcements  <a class="btn btn-info" href="{{ url('admin/create-announcement') }}">create announcement</a>
+</h2>
 
 
    <div class="announcements-grid">
