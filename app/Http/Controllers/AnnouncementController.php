@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ArchiveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,5 +78,14 @@ class AnnouncementController extends Controller
         
 
       
+    }
+
+    public function archive($id, ArchiveService $archiveService){
+        $announcement = Announcement::findOrFail($id);
+
+        $archiveService->archive($announcement, "Old announcement");
+
+        return redirect()->route("admin.announcements")->with('success',"Announcement archived successfully");
+
     }
 }

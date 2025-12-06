@@ -28,7 +28,7 @@ return new class extends Migration
             $table->enum('parent',['yes', 'no', 'single']);
             $table->enum('enrolled', ['yes', 'no']);
             $table->string('educationalAttainment')->nullable();
-            $table->foreignId('religionList')->constrained('religionList');
+            $table->foreignId('religionList')->constrained('religions');
             $table->enum('headOfFamily', ['yes','no']);
             $table->foreignId('EncodedBy')->constrained('users');
 

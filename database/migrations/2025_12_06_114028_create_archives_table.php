@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
+        Schema::create('archives', function (Blueprint $table) {
             $table->id();
+            $table->string('record_type');
+            $table->unsignedBigInteger('record_id');
+            $table->json('data')->nullable();
+            $table->foreignId('archived_by')->constrained('users');
+            $table->text('reason')->nullable();
             $table->timestamps();
-
-            $table->string('title', 100);
-            $table->string('image', 255)->nullable();
-            $table->longText('details');
-            $table->date('eventTime')->nullable();
-            $table->date('eventEnd')->nullable();
-            $table->foreignId(column: 'user_id')->constrained();
-
-
         });
     }
 
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::dropIfExists('archives');
     }
 };
