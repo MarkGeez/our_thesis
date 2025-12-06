@@ -67,8 +67,8 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
         Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
         Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
-
-         Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
+        Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
+        Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
         Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
         Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');

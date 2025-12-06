@@ -54,7 +54,11 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.complaintRequest", compact('admin'));
     }
-    
+    public function announcements(){
+        $admin = Auth::user();
+        $announcements = Announcement::with('user:id,firstName,lastName')->latest()->get();
+        return view('admin.announcements', compact('admin', 'announcements'));
+    }
     public function feedbackRequest(): View
     {
         $admin = Auth::user();

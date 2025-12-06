@@ -89,8 +89,8 @@
                 </li>
                 <span class="system-menu__title">manage system</span>
                 <li>
-                    <a class="{{ Request::routeIs('admin.create-announcement') ? 'active' : '' }}"
-                       href="{{ route('admin.create-announcement') }}">
+                    <a class="{{ Request::routeIs('admin.announcements') ? 'active' : '' }}"
+                       href="{{ route('admin.announcements') }}">
                         <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
                     </a>
                 </li>

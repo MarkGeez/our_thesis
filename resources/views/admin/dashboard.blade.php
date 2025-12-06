@@ -91,7 +91,7 @@
 
       @if($announcements->image)
         <img 
-         src="{{ $announcements->image ? asset('storage/'.$announcements->image) : asset('template/img/default-announcement.png') }}"
+         src="{{ $announcements->image ? asset('storage/'.$announcements->image) : "no image uploaded" }}"
          alt="{{ $announcements->title }}"
        >
       @endif

@@ -66,6 +66,11 @@
     background-color: #0056b3;
 }
 
+.announcementImage{
+    height: 120px;
+    width:220px;
+}
+
 
     </style>
 </head>
@@ -84,61 +89,43 @@
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
 
-<div class="announcement-form">
-    <div id="localSuccessMessage" style="display:none;max-width:600px;margin:20px auto;padding:12px;background:#d4edda;color:#155724;border-radius:6px;border:1px solid #c3e6cb;text-align:center;"> Announcement posted successfully. </div>
-<H1 >EDIT ANNOUNCEMENT</H1>
-<a  class="btn btn-danger" href="{{ route('admin.dashboard') }}">Cancel</a>
+    <table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Image</th>
+            <th>Details</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Created At:</th>
+            <th>Uploaded By:</th>
+            <th>Actions:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($announcements as $announcement)
+        <tr>
+            <td>{{ $announcement->title }}</td>
+            <td>
+    @if($announcement->image)
+        <img class="announcementImage" src="{{ asset('storage/'. $announcement->image) }}" alt="">
+    @else
+        No image uploaded  
+    @endif
+    </td>
+            <td>{{ $announcement->details }}</td>
+            <td>{{ $announcement->eventTime ? date("M-d-Y", strtotime($announcement->eventTime)). 'at' . date("g:i A", strtotime($announcement->eventTime)): "no start date" }}</td>
+            <td>{{ $announcement->eventEnd ? date("M-d-Y", strtotime($announcement->eventEnd)). 'at' . date("g:i A", strtotime($announcement->eventEnd)) : "no end date" }}</td>
+            <td>{{ $announcement->postedAt }}</td>
+            <td> {{ ucfirst($announcement->user->firstName) }}, {{ ucfirst($announcement->user->lastName) }}</td>
+            <td colspan="2"><a href="{{ url('admin/edit-announcement/'. $announcement->id) }}">Edit</a></td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+<h1>Announcement Archive</h1>
 
 
-    
-
-<form action="{{ route('admin.update.announcement', $announcement->id) }}" method="post" enctype="multipart/form-data">
-    @csrf
-    @method('put')
-    
-    <label for="title">Enter a title</label>
-    <input type="text" name="title" id="title" value="{{ $announcement->title }}" required>
-    @error('title')
-        <span>{{ $message }}</span>
-    @enderror
-    <br><br>
-
-    
-    <label for="details">Add extra details</label>
-    <textarea name="details" id="details" cols="40" rows="10" >{{ old('details', $announcement->details) }}</textarea>
-    @error('details')
-        <span>{{ $message }}</span>
-    @enderror
-    <br><br>
-
-    <label for="eventTime">Event Start Date/Time:</label>
-<div class="d-flex align-items-center gap-2">
-    <small class="text-muted">
-        Current: {{ $announcement->eventTime ? date('M/d/Y', strtotime($announcement->eventTime)) . ' at ' . date('g:i A', strtotime($announcement->eventTime)) : 'Not set' }}
-    </small>
-</div>
-<input type="datetime-local" 
-       name="eventTime" 
-       id="eventTime" 
-       value="{{old('eventTime', $announcement->eventTime ? date('Y-m-D\TH:i', strtotime($announcement->eventime)) : "")}}">
-<br><br>
-
-<label for="eventEnd">Event End Date/Time:</label>
-<div class="d-flex align-items-center gap-2">
-    <small class="text-muted">
-        Current: {{ $announcement->eventEnd ? date('M/d/Y', strtotime($announcement->eventEnd)) . ' at '. date('g:i A', strtotime($announcement->eventEnd)) : 'Not set' }}
-    </small>
-</div>
-<input type="datetime-local" 
-       name="eventEnd" 
-       id="eventEnd" 
-       value="{{ old('eventEnd', $announcement->eventEnd ? date('Y-m-d\TH:i', strtotime($announcement->eventEnd)) : '') }}">
-
-
-    <button type="submit">Update Announcement</button>
-    <div id="localSuccessMessage" style="display:none;max-width:600px;margin:20px auto;padding:12px;background:#d4edda;color:#155724;border-radius:6px;border:1px solid #c3e6cb;text-align:center;"> Announcement posted successfully. </div>
-
-</form>
 </div>
 
 <div class="display-announcement">
