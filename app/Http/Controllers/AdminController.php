@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Archive;
 
 class AdminController extends Controller
 {
@@ -55,10 +56,11 @@ class AdminController extends Controller
         return view("admin.complaintRequest", compact('admin'));
     }
     public function announcements(){
-        $admin = Auth::user();
-        $announcements = Announcement::with('user:id,firstName,lastName')->latest()->get();
-        return view('admin.announcements', compact('admin', 'announcements'));
-    }
+    $admin = Auth::user();
+    $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
+    return view('admin.announcements', compact('admin', 'announcement'));
+}
+
     public function feedbackRequest(): View
     {
         $admin = Auth::user();
@@ -105,6 +107,12 @@ class AdminController extends Controller
 {
     $admin = Auth::user();
     return view("admin.adminBlotter", compact('admin'));
+}
+public function archives(): View
+{
+$admin = Auth::user();
+$archive = Archive::latest()->get();
+return view("admin.archives", compact('admin', 'archive'));
 }
 
 }

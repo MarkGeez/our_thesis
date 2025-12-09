@@ -69,6 +69,8 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
         Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
         Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
+        Route::get('/archives', [AdminController::class,'archives'])->name('archives');
+        
         Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
         Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
@@ -76,6 +78,9 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
         route::get('/archive', [ArchiveController::class, 'showArchive'])->name('archive');
 
+        Route::get('/admin/archives', [ArchiveController::class, 'showArchive']);
+
+        Route::get('/admin/edit-announcement/{id}', [AnnouncementController::class, 'edit']);
        });
 });
 

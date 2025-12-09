@@ -86,23 +86,6 @@
                                 </div>
 
                             </div>
-<<<<<<< HEAD
-                            <h1>📢ANNOUNCEMENTS!!!</h1>
-                            @foreach($announcements as $announcement)
-                            <div>
-                                <H1>Title:{{ $announcement->title }}</H1>
-                                @if($announcement->image)
-                                    <img style="height:340px; width:620px;" 
-                                    src="{{ asset('storage/' . $announcement->image) }}" 
-                                    alt="{{ $announcement->title }}">
-                                @endif
-                                <h6>Details:{{ $announcement->details }}</h6>
-                                <h6>Event Time:{{ $announcement->eventTime }}</h6>
-                                <h6>Event End:{{ $announcement->eventEnd }}</h6>
-                                <h6>Posted By: {{ $announcement->user->firstName . ',' . $announcement->user->lastName }}</h6>
-                            </div>
-                            @endforeach
-=======
 
                            <div class="container-fluid">
     <h2 style="color:#007BFF; margin-left: 10px;">Latest Announcements</h2>
@@ -132,7 +115,6 @@
     </div>
 </div>
 
->>>>>>> f54c290f0ba724f4655e264294db60b35e66ed26
                            
                           
                         </div>

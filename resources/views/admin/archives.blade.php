@@ -1,25 +1,92 @@
+
+
+
+<head>
+    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+
+    </style>
+
+
+
+</head>
+
+ <div class="layer"></div>
+    <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
+    <div class="page-flex">  
+   
+   @include('admin.admin-sidebar', ['admin' => auth()->user()])
+
+
+
+<div class="main-wrapper">
+           
+    @include('admin.admin-header', ['admin' => auth()->user()])
+            <main class="main users chart-page" id="skip-target">
+                <!--Dito lalagay main content-->
+    <div class="main-container">
+   
+  <div class="d-flex justify-content-between align-items-center">
+  <h2 style="color:#000000; margin: 20px 45px;">Archives</h2>
+  
+
+</div>
+
+
+
+
+
+  
 @if($archive->count() > 0)
+
+<div class="table-responsive" style="margin: 0 3em">
+<table class="table table-bordered  table-striped-row table-hover"> 
+    <thead class="table-primary">
+        <tr>
+            <th scope="col">Archived type</th>
+            <th scope="col">Archived By</th>
+            <th scope="col">Archived Date</th>
+            <th scope="col">Original Record Details</th>
+        </tr> 
+    </thead>
+<tbody>
     @foreach($archive as $item)
-        <div class="archive-item">
-            <h2>Archived type: {{ ucfirst($item->record_type) }}</h2>
-            
-            <p><strong>Archived By:</strong> {{ $item->archived_by }}</p>
-            <p><strong>Archived At:</strong> {{ $item->created_at->format('M-d-Y H:i') }}</p>
-            
-            <hr>
-            
-            <h3>Original Record Details:</h3>
-            <ul>
+    <tr>
+        <td>{{ ucfirst($item->record_type) }}</td>
+        <td>{{ $item->archived_by }}</td>
+        <td>{{ $item->created_at->format('M-d-Y H:i') }}</td>
+        <td>
                 @if(is_array($item->data))
                     @foreach($item->data as $key => $value)
-                        <div>{{ ucfirst(str_replace('_', '', $key)) }}: {{ $value }}</div>                        
+                        {{ ucfirst(str_replace('_', '', $key)) }}: {{ $value }}<br>                        
                     @endforeach
                 @endif
-            </ul>
-            
-            <hr style="margin: 20px 0;">
-        </div>
+            </td>
+        </tr>
     @endforeach
+</tbody>
+
+</table>
+</div>
 @else
     <p>No archived records found.</p>
-@endif
+  @endif
+</main>
+
+</div>
+</div> 
+@include('admin.create-announcement')
+
+
+<script src="{{ asset('template/plugins/chart.min.js') }}"></script>
+<script src="{{ asset('template/plugins/feather.min.js') }}"></script>
+<script src="{{ asset('template/js/script.js') }}"></script>
+<!--    -- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

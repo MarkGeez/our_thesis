@@ -1,26 +1,26 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Resident;  
+use App\Models\Resident;
+use App\Models\Announcement;
 use Illuminate\Http\Request;
 
 class ResidentController extends Controller
 {
     
-    public function dashboard()
+     public function dashboard()
     {
-                $resident = auth()->user();
-
-        return view('resident.dashboard', compact('resident'));
+        $resident = auth()->user();
+        $announcements = Announcement::with('user:id,firstName,lastName')->latest()->get();
+        return view('resident.dashboard', compact('resident', 'announcements'));
     }
 
     public function profile()
     {
-                $resident = auth()->user();
-
+        $resident = auth()->user();
         return view('resident.profile', compact('resident'));
     }
+
 
     
 
