@@ -19,10 +19,12 @@
 }
 
 .announcement-card img {
-  width: 100%;
+  display: block;
+  margin: 0 auto 15px;
+  width: auto;
+  max-width: 400px;
   height: 200px;
   border-radius: 10px;
-  margin-bottom: 15px;
   object-fit: cover;
 }
 
@@ -41,6 +43,17 @@
   margin-top: 8px;
   padding-top: 10px;
   border-top: 1px solid #eee;
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.announcement-actions form {
+  margin: 0;
 }
 
 .announcement-text {
@@ -79,12 +92,29 @@
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
     <div class="main-container">
-    @if(session("success"))
-      <h6>{{ session("success") }}</h6>
-    @endif
-  <h2 style="color:#007BFF; margin-left: 20px;">Latest Announcements  <a class="btn btn-info" href="{{ url('admin/create-announcement') }}">create announcement</a>
-    
-</h2>
+   
+  <div class="d-flex justify-content-between align-items-center">
+  <h2 style="color:#000000; margin-left: 20px;">Latest Announcements</h2>
+  
+
+</div>
+
+  @if(session("success"))
+<div id="successAlert" class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm"
+     style="max-width: 325px; box-shadow: 0 4px 12px rgb(5, 94, 12);">
+    <h6>{{ session("success") }}</h6>
+</div>
+
+<script>
+    setTimeout(function() {
+        const alertBox = document.getElementById("successAlert");
+        if (alertBox) {
+            alertBox.style.display = "none";
+        }
+    }, 10000);
+</script>
+@endif
+
 
 
    <div class="announcements-grid">
@@ -98,40 +128,79 @@
        >
       @endif
        
-       <div class="announcement-text">
-         <h3>{{ $announcements->title }}</h3>
+       <div class="announcement-text" >
+         <h3 class=" fw-bold">{{ $announcements->title }}</h3>
 
-         <p class="mt-3">{{ $announcements->details }}</p>
+         <p class="mt-3 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
 
          @if($announcements->eventTime || $announcements->eventEnd)
-           <p class="mt-2"><strong>Event Start:</strong> {{ $announcements->eventTime }}</p>
+           <p class="mt-2 mb-2"><strong>Event Start:</strong> {{ $announcements->eventTime }}</p>
            <p><strong>Event End:</strong> {{ $announcements->eventEnd }}</p>
          @endif
 
          <div class="announcement-meta">
            Posted by: {{ ucfirst($announcements->user->firstName) }}, {{ ucfirst($announcements->user->lastName) }}
          </div>
-         <div>
-          <button><a href="{{ url("admin/edit-announcement/".$announcements->id) }}">Edit announcement</a></button>
+         <div class="announcement-actions">
+          
+                          
           <form action="{{ route('admin.announcement.archive', $announcements->id) }}" method="post">
-      @csrf
-      @method('DELETE')
-      <button type="submit" onclick="return confirm('archive this announcement?')">Archive</button>
-    </form>
+            @csrf
+            @method('DELETE')
+            
+          </form>
          </div>
+         
        </div>
      </div>
+
+
+    <!-- Modal -->
+<div class="modal fade" id="editAnnouncement{{ $announcements->id }}" tabindex="-1" aria-labelledby="editAnnouncementLabel{{ $announcements->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAnnouncementLabel{{ $announcements->id }}">Edit Announcement</h5>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('admin.update.announcement', $announcements->id) }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <label for="title{{ $announcements->id }}">Title</label>
+                    <input class="form-control" type="text" name="title" id="title{{ $announcements->id }}" value="{{ $announcements->title }}" required>
+
+                    <label for="details{{ $announcements->id }}">Details</label>
+                    <textarea class="form-control" name="details" id="details{{ $announcements->id }}" cols="40" rows="10">{{ old('details', $announcements->details) }}</textarea>
+
+                    <label for="eventTime{{ $announcements->id }}">Event Start</label>
+                    <input class="form-control" type="datetime-local" name="eventTime" id="eventTime{{ $announcements->id }}" value="{{ old('eventTime', $announcements->eventTime ? date('Y-m-d\TH:i', strtotime($announcements->eventTime)) : '') }}">
+
+                    <label for="eventEnd{{ $announcements->id }}">Event End</label>
+                    <input class="form-control" type="datetime-local" name="eventEnd" id="eventEnd{{ $announcements->id }}" value="{{ old('eventEnd', $announcements->eventEnd ? date('Y-m-d\TH:i', strtotime($announcements->eventEnd)) : '') }}">
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
      @endforeach
    </div>
 
 </div>
-</div>
+</div> 
     
 </main>
 
 </div>
 </div> 
+@include('admin.create-announcement')
+
 
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+<!--    -- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -6,73 +6,91 @@
 
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
     <style>
-    .announcement-form {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 25px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.announcement-card {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #ffffff;
+  margin: 5px 20px; 
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.announcement-form form label {
-    font-weight: 600;
-    margin-bottom: 6px;
-    display: block;
+.announcement-card img {
+  display: block;
+  margin: 0 auto 15px;
+  width: auto;
+  max-width: 400px;
+  height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
-.announcement-form input[type="text"],
-.announcement-form input[type="file"],
-.announcement-form input[type="datetime-local"],
-.announcement-form textarea {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    background-color: #f7f7f7;
+/*
+ .announcement-card img {
+width: auto;
+height: 200px;
+border-radius: 10px;
+margin-bottom: 15px;
+object-fit: cover;
+}
+*/
+
+.announcements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  justify-items: stretch;
+  align-items: start;
+  padding-top: 10px;
 }
 
-.announcement-form textarea {
-    resize: vertical;
+.announcement-meta {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
 }
 
-.announcement-form span {
-    color: #d00;
-    font-size: 13px;
-    margin-top: -10px;
-    display: block;
-    margin-bottom: 10px;
+.announcement-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
 }
 
-.announcement-form button {
-    width: 100%;
-    padding: 12px;
-    background-color: #0069d9;
-    color: #fff;
-    font-size: 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+.announcement-actions form {
+  margin: 0;
 }
 
-.announcement-form button:hover {
-    background-color: #0056b3;
+.announcement-text {
+  background-color: #d8ebff;
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 4px solid #007BFF;
+  line-height: 1.5px;
 }
 
-.announcementImage{
-    height: 120px;
-    width:220px;
+@media (max-width: 768px) {
+  .announcements-grid {
+    grid-template-columns: 1fr; 
+  }
+  .announcement-card img {
+    height: 240px;
+  }
 }
-
-
     </style>
+
+
+
+
+
 </head>
 
  <div class="layer"></div>
@@ -88,65 +106,146 @@
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
-                <h1>active annnouncements</h1>
-                <a class="btn btn-info" href="{{ url('admin/create-announcement') }}">create announcement</a>
-
-    <table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Image</th>
-            <th>Details</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Created At:</th>
-            <th>Uploaded By:</th>
-            <th>Actions:</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($announcements as $announcement)
-        <tr>
-            <td>{{ $announcement->title }}</td>
-            <td>
-    @if($announcement->image)
-        <img class="announcementImage" src="{{ asset('storage/'. $announcement->image) }}" alt="">
-    @else
-        No image uploaded  
-    @endif
-    </td>
-            <td>{{ $announcement->details }}</td>
-<td>{{ $announcement->eventStart ? $announcement->eventStart->format('M-d-Y H:i') : '' }}</td>
-            <td>{{ $announcement->eventEnd ? date("M-d-Y", strtotime($announcement->eventEnd)). 'at' . date("g:i A", strtotime($announcement->eventEnd)) : "no end date" }}</td>
-            <td>{{ $announcement->postedAt }}</td>
-            <td> {{ ucfirst($announcement->user->firstName) }}, {{ ucfirst($announcement->user->lastName) }}</td>
-            <td colspan="2"><a class="btn btn-info" href="{{ url('admin/edit-announcement/'. $announcement->id) }}">Edit</a></td>
-            <td>
-                <form action="{{ route('admin.announcement.archive', $announcement->id) }}" method="post">
-      @csrf
-      @method('DELETE')
-      <button type="submit" class="btn btn-danger" onclick="return confirm('archive this announcement?')">Archive</button>
-    </form>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-<h1>Announcement Archive</h1>
-
+    <div class="main-container">
+   
+  <div class="d-flex justify-content-between align-items-center">
+  <h2 style="color:#000000; margin-left: 20px;">Active Announcements</h2>
+  <button type="button" class="btn btn-primary me-3"
+        data-bs-toggle="modal"
+        data-bs-target="#createAnnouncement">
+    Create Announcement <i class="fa-solid fa-plus"></i>
+</button>
 
 </div>
 
-<div class="display-announcement">
+  @if(session("success"))
+<div id="successAlert" class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm"
+     style="max-width: 325px; box-shadow: 0 4px 12px rgb(5, 94, 12);">
+    <h6>{{ session("success") }}</h6>
+</div>
+
+<script>
+    setTimeout(function() {
+        const alertBox = document.getElementById("successAlert");
+        if (alertBox) {
+            alertBox.style.display = "none";
+        }
+    }, 10000);
+</script>
+@endif
+
+
+
+   <div class="announcements-grid">
+     @foreach($announcement as $announcements)
+     <div class="announcement-card">
+
+      @if($announcements->image)
+        <img 
+         src="{{ $announcements->image ? asset('storage/'.$announcements->image) : "no image uploaded" }}"
+         alt="{{ $announcements->title }}"
+       >
+      @endif
+       
+       <div class="announcement-text" >
+         <h3 class=" fw-bold">{{ $announcements->title }}</h3>
+
+         <p class="mt-3 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
+
+         @if($announcements->eventTime || $announcements->eventEnd)
+           <p class="mt-2 mb-2"><strong>Event Start:</strong> {{ $announcements->eventTime }}</p>
+           <p><strong>Event End:</strong> {{ $announcements->eventEnd }}</p>
+         @endif
+
+         <div class="announcement-meta">
+           Posted by: {{ ucfirst($announcements->user->firstName) }}, {{ ucfirst($announcements->user->lastName) }}
+         </div>
+         <div class="announcement-actions">
+          <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAnnouncement{{ $announcements->id }}">
+              <i class="fa-solid fa-edit"></i> Edit
+          </button>
+                          
+          <form action="{{ route('admin.announcement.archive', $announcements->id) }}" method="post">
+            @csrf
+            @method('DELETE')
+            <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('archive this announcement?')">
+              <i class="fa-solid fa-archive"></i> Archive
+            </button>
+          </form>
+         </div>
+         
+       </div>
+     </div>
+
+
+    <!-- Modal -->
+<div class="modal fade" id="editAnnouncement{{ $announcements->id }}" tabindex="-1" aria-labelledby="editAnnouncementLabel{{ $announcements->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAnnouncementLabel{{ $announcements->id }}">Edit Announcement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('admin.update.announcement', $announcements->id) }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <label for="title{{ $announcements->id }}">Title</label>
+                    <input class="form-control" type="text" name="title" id="title{{ $announcements->id }}" value="{{ $announcements->title }}" required>
+
+                    <label for="details{{ $announcements->id }}">Details</label>
+                    <textarea class="form-control" name="details" id="details{{ $announcements->id }}" cols="40" rows="10">{{ old('details', $announcements->details) }}</textarea>
+
+                   <label for="eventTime{{ $announcements->id }}">Event Start</label>
+<input class="form-control datetime-picker" 
+       type="text" 
+       name="eventTime" 
+       id="eventTime{{ $announcements->id }}" 
+       value="{{ old('eventTime', $announcements->eventTime ? date('Y-m-d H:i', strtotime($announcements->eventTime)) : '') }}">
+
+<label for="eventEnd{{ $announcements->id }}">Event End</label>
+<input class="form-control datetime-picker" 
+       type="text" 
+       name="eventEnd" 
+       id="eventEnd{{ $announcements->id }}" 
+       value="{{ old('eventEnd', $announcements->eventEnd ? date('Y-m-d H:i', strtotime($announcements->eventEnd)) : '') }}">
+
+                    <button type="submit" class="btn btn-success mt-3">Update Announcement</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+     @endforeach
+   </div>
+
+</div>
+</div> 
     
-
-</div>
 </main>
 
 </div>
 </div> 
+@include('admin.create-announcement')
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    flatpickr(".datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i", // 24-hour format for submission
+        altInput: true,
+        altFormat: "F j, Y h:i K", // user sees AM/PM
+        time_24hr: false
+    });
+});
+</script>
+
 
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-<script> document.addEventListener("DOMContentLoaded", function() { const form = document.querySelector("form"); const msg = document.getElementById("localSuccessMessage"); form.addEventListener("submit", function() { msg.style.display = "block"; setTimeout(function() { msg.style.opacity = "0"; msg.style.transition = "opacity 0.6s"; setTimeout(() => msg.remove(), 600); }, 2000); }); }); </script>
+<!--    -- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

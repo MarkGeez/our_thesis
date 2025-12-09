@@ -3,7 +3,7 @@
         <div class="sidebar-head">
             <a href="{{ route('admin.dashboard') }}" class="logo-wrapper">
                 <span class="sr-only">Home</span>
-                <span class="icon logo">
+                <span class="logo" aria-hidden="true">
                     <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Brgy 249 Logo">
                 </span>
                 <div class="logo-text">
@@ -144,6 +144,13 @@
                     <a class="{{ Request::routeIs('admin.reports') ? 'active' : '' }}"
                        href="{{ route('admin.reports') }}">
                         <span class="icon"><i class="fa-solid fa-clipboard-list"></i></i></span>Reports
+                    </a>
+                </li>
+
+                 <li>
+                    <a class="{{ Request::routeIs('admin.archives') ? 'active' : '' }}"
+                       href="{{ route('admin.archives') }}">
+                        <span class="icon"><i class="fa-solid fa-box-archive"></i></span>Archives
                     </a>
                 </li>
 
