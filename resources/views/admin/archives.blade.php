@@ -12,7 +12,7 @@
             <ul>
                 @if(is_array($item->data))
                     @foreach($item->data as $key => $value)
-                        <div>{{ ucfirst(str_replace('_', '', $key)) }}: {{ $value }}</div>                        
+                        <div>{{ ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}</div>                        
                     @endforeach
                 @endif
             </ul>
