@@ -28,6 +28,37 @@
             <main class="main users chart-page" id="skip-target"></main>
 
 </main>
+<form action="{{ route('admin.submit.complaint') }}" method="POST">
+    @csrf
+    
+    <div>
+        <label for="address">Address location to be complained </label>
+        <input type="text" 
+               name="address" 
+               id="address" 
+               value="{{ old('address') }}"
+               required>
+        @error('address')
+            <div style="color: red;">{{ $message }}</div>
+        @enderror
+    </div>
+    
+    <div>
+        <label for="details">Details of complaint </label>
+        <textarea name="details" 
+                  id="details" 
+                  rows="5"
+                  required>{{ old('details') }}</textarea>
+        @error('details')
+            <div style="color: red;">{{ $message }}</div>
+        @enderror
+    </div>
+    
+    
+    
+    <button type="submit">Submit Complaint</button>
+</form>
+
 
 </div>
 </div> 

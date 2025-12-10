@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
 
@@ -68,9 +69,9 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
         Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
         Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
+        Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
         Route::get('/archives', [AdminController::class,'archives'])->name('archives');
-        
         Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
         Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
         Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');

@@ -12,7 +12,9 @@
 
                     <label>Title</label>
                     <input class="form-control" type="text" name="title" required>
-
+                    @error('title')
+                        <p>{{ $message }}</p>
+                    @enderror
                     <label class="mt-2">Details</label>
                     <textarea class="form-control" name="details" rows="6"></textarea>
 
