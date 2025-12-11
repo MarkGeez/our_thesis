@@ -59,7 +59,16 @@
     <button type="submit">Submit Complaint</button>
 </form>
 
+<h1>Complaints made</h1>
+@foreach ($myComplaints as $complaints)
+    <p>{{ $complaints->complainant_id }}</p> 
+    <P>{{ $complaints->details }}</P>   
+@endforeach
 
+<table>
+    
+
+</table>
 </div>
 </div> 
 

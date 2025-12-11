@@ -28,12 +28,15 @@ class AdminController extends Controller
 
     public function adminComplaint():View{
         $admin = Auth::user();
-        return view("admin.adminComplaint", compact('admin'));
+
+        $myComplaints = $admin->complaints()->get();
+        return view("admin.adminComplaint", compact('admin', 'myComplaints'));
     }
     
     public function blotterRequest(): View
     {
         $admin = Auth::user();
+
         return view("admin.blotterRequest", compact('admin'));
     }
     public function adminServices(){
@@ -58,11 +61,7 @@ class AdminController extends Controller
         return view("admin.serviceRequest", compact('admin'));
     }
     
-    public function complaintRequest(): View
-    {
-        $admin = Auth::user();
-        return view("admin.complaintRequest", compact('admin'));
-    }
+    
     public function announcements(){
     $admin = Auth::user();
     $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();

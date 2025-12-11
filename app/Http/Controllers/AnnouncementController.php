@@ -18,7 +18,9 @@ class AnnouncementController extends Controller
 
     public function showEdit($id):View{
         $announcement = Announcement::findOrFail($id);
-        return view("admin.edit-announcement", compact("announcement"));
+        $role = Auth::user()->role;
+        $route = $role . ".edit-announcement";
+        return view($route, compact("announcement"));
     }
 
     public function update(Request $request, $id){
@@ -42,8 +44,10 @@ class AnnouncementController extends Controller
         $announcement->eventEnd= $request->eventEnd;
 
         $announcement->save();
+        $role = Auth::user()->role;
+        $route = $role . ".dashboard";
 
-        return redirect()->route("admin.dashboard")->with("success", "Announcement updated successfully");
+        return redirect()->route($route)->with("success", "Announcement updated successfully");
 
 
     }
@@ -74,7 +78,10 @@ class AnnouncementController extends Controller
             "eventEnd" => $request->eventEnd,
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Announcement created successfully!');
+        $role = Auth::user()->role;
+        $route = $role . ".dashboard";
+
+        return redirect()->route($route)->with('success', 'Announcement created successfully!');
         
 
       
@@ -84,8 +91,10 @@ class AnnouncementController extends Controller
         $announcement = Announcement::findOrFail($id);
 
         $archiveService->archive($announcement, "Old announcement");
-
-        return redirect()->route("admin.announcements")->with('success',"Announcement archived successfully");
+       
+        $role = Auth::user()->role;
+        $route = $role . ".dashboard";
+        return redirect()->route($route)->with('success',"Announcement archived successfully");
 
     }
 }

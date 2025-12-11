@@ -56,7 +56,7 @@ class User extends Authenticatable
     }
 
     public function complaints():HasMany{
-        return $this->hasMany(Complaints::class);
+        return $this->hasMany(Complaints::class, 'complainant_id');
     }
 
     public function feedbacks():HasMany{

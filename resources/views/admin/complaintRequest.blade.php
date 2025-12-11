@@ -29,6 +29,52 @@
 
 </main>
 
+@if (session('success'))
+    <p>{{ session('success')}}</p>
+@endif
+
+@foreach ($complaints as $complaint)
+<table class="table table-bordered">
+
+    <tr>
+        <th>Complaint ID</th>
+        <th>Complainant ID</th>
+        <th>Complainant Name</th>
+        <th>Address</th>
+        <th>Details</th>
+        <th>Respondent ID</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+        <th>Actions:</th>
+    </tr>
+
+    <tr>
+        <td>{{ $complaint->id }}</td>
+        <td>{{ $complaint->complainant_id }}</td>
+        <td>{{ $complaint->complainantName }}</td>
+        <td>{{ $complaint->address }}</td>
+        <td>{{ $complaint->details }}</td>
+        <td>{{ $complaint->respondent_id }}</td>
+        <td>{{ $complaint->status }}</td>
+        <td>{{ $complaint->created_at }}</td>
+        <td>{{ $complaint->updated_at }}</td>
+        <td>
+   <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="post">
+        @csrf
+        @method('PUT')
+
+        <input type="radio" name="status" value="resolved" id="resolved">Resolved
+        <input type="radio" name="status" value="rejected" id="rejected">Rejected
+        <input type="radio" name="status" value="on-going" id="on-going">On-going
+        <button type="submit" class="btn btn-primary">Update Status</button>
+   </form>
+</td>
+    </tr>
+
+</table>
+@endforeach
+
 </div>
 </div> 
 

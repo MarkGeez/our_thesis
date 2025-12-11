@@ -55,7 +55,12 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
         Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
         Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
-        Route::get('/complaintRequest', [AdminController::class,'complaintRequest'])->name('complaintRequest');
+        
+        Route::get('/complaintRequest', [ComplaintController::class,'showComplaints'])->name('complaintRequest');
+        Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
+        Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
+        Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
+
         Route::get('/feedbackRequest', [AdminController::class,'feedbackRequest'])->name('feedbackRequest');
         Route::get('/aboutus', [AdminController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [AdminController::class,'contactus'])->name('contactus');
@@ -68,8 +73,6 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/adminBlotter', [AdminController::class,'adminBlotter'])->name('adminBlotter');
         Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
         Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
-        Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
-        Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
         Route::get('/archives', [AdminController::class,'archives'])->name('archives');
         Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
