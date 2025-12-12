@@ -53,10 +53,11 @@ class ResidentController extends Controller
     }
 
     public function complaint()
-    {
-        $resident = auth()->user();
-        return view('resident.complaint', compact('resident'));
-    }
+{
+    $resident = auth()->user();
+    $myComplaints = $resident->complaints()->get();
+    return view('resident.complaint', compact('resident', 'myComplaints'));
+}
 
     public function feedback()
     {
@@ -75,4 +76,21 @@ class ResidentController extends Controller
         $resident = auth()->user();
         return view('resident.aboutus', compact('resident'));
     }
+
+    public function submitComplaint(Request $request)
+{
+    $validated = $request->validate([
+        'address' => 'required|string|max:255',
+        'details' => 'required|string',
+    ]);
+
+    Complaint::create([
+        'complainant_id' => auth()->id(),
+        'address' => $validated['address'],
+        'details' => $validated['details'],
+        'status' => 'pending',
+    ]);
+
+    return redirect()->route('resident.complaint')->with('success', 'Complaint submitted successfully!');
+}
 }

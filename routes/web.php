@@ -44,6 +44,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/feedback', [ResidentController::class,'feedback'])->name('feedback');
         Route::get('/aboutus', [ResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
+
+        
     });
 });
 
