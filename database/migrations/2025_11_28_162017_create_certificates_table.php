@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('certificates', function (Blueprint $table) {
             $table->id(); 
-            $table->foreignId('ServiceType')->constrained('certificates'); 
-            $table->foreignId('UserId')->constrained('users'); 
+            $table->foreignId('service_type')->constrained('certificates'); 
+            $table->foreignId('user_id')->constrained('users'); 
             $table->string('purpose', 255); 
-            $table->enum('status', ['PENDING', 'APPROVED', 'DECLINED'])
-                  ->default('PENDING'); 
+            $table->enum('status', ['pending', 'approved', 'declined'])
+                  ->default('pending'); 
             $table->timestamps();
         });
     }

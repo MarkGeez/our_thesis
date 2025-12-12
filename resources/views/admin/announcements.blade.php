@@ -218,8 +218,12 @@ object-fit: cover;
        id="eventEnd{{ $announcements->id }}" 
        value="{{ old('eventEnd', $announcements->eventEnd ? date('Y-m-d H:i', strtotime($announcements->eventEnd)) : '') }}">
 
-                    <button type="submit" class="btn btn-success mt-3">Update Announcement</button>
-                </form>
+<div class="text-end mt-3">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <button class="btn btn-primary" type="submit">Update Announcement</button>
+                    </div>                
+                  </form>
             </div>
         </div>
     </div>

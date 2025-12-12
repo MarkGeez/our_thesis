@@ -1,6 +1,4 @@
 
-
-
 <head>
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
 
@@ -65,7 +63,7 @@
         <td>
                 @if(is_array($item->data))
                     @foreach($item->data as $key => $value)
-                        {{ ucfirst(str_replace('_', '', $key)) }}: {{ $value }}<br>                        
+                        <div>{{ ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}</div>                        
                     @endforeach
                 @endif
             </td>

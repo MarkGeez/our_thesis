@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('ServiceType')->constrained('certificates'); 
             $table->foreignId('UserId')->constrained('users'); 
             $table->string('purpose', 255); 
-            $table->enum('status', ['PENDING', 'APPROVED', 'DECLINED', 'RETURNED'])
-                  ->default('PENDING'); 
+            $table->enum('status', ['pending', 'approved', 'declined', 'returned'])
+                  ->default('pending'); 
             $table->date('requestSchedule')->nullable();
             $table->timestamp('approvedAt')->nullable();
             $table->timestamp('returnedAt')->nullable();

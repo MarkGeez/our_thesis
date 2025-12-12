@@ -25,13 +25,24 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.profile", compact('admin'));
     }
+
+    public function adminComplaint():View{
+        $admin = Auth::user();
+
+        $myComplaints = $admin->complaints()->get();
+        return view("admin.adminComplaint", compact('admin', 'myComplaints'));
+    }
     
     public function blotterRequest(): View
     {
         $admin = Auth::user();
+
         return view("admin.blotterRequest", compact('admin'));
     }
-    
+    public function adminServices(){
+        $admin = Auth::user();
+        return view("admin.adminServices", compact('admin'));
+    }
     public function certificateRequest(): View
     {
         $admin = Auth::user();
@@ -50,11 +61,7 @@ class AdminController extends Controller
         return view("admin.serviceRequest", compact('admin'));
     }
     
-    public function complaintRequest(): View
-    {
-        $admin = Auth::user();
-        return view("admin.complaintRequest", compact('admin'));
-    }
+    
     public function announcements(){
     $admin = Auth::user();
     $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
@@ -115,17 +122,9 @@ class AdminController extends Controller
         return view("admin.adminCertificate", compact('admin'));
     }
 
-    public function adminServices(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminServices", compact('admin'));
-    }
+    
 
-    public function adminComplaint(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminComplaint", compact('admin'));
-    }
+    
     public function archives(): View
     {
     $admin = Auth::user();

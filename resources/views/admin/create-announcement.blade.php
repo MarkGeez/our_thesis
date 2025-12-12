@@ -42,7 +42,11 @@
                     <label for="image" class="mt-2">Image</label>
                     <input class="form-control" type="file" name="image" id="image">
 
-                    <button class="btn btn-primary mt-3" type="submit">Post Announcement</button>
+                    <div class="text-end mt-3">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <button class="btn btn-primary" type="submit">Post Announcement</button>
+                    </div>
                 </form>
             </div>
         </div>
