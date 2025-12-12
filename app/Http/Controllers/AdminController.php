@@ -104,15 +104,33 @@ class AdminController extends Controller
         return view("admin.reports", compact('admin'));
     }
     public function adminBlotter(): View
-{
+    {
+        $admin = Auth::user();
+        return view("admin.adminBlotter", compact('admin'));
+    }
+
+    public function adminCertificate(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminCertificate", compact('admin'));
+    }
+
+    public function adminServices(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminServices", compact('admin'));
+    }
+
+    public function adminComplaint(): View
+    {
+        $admin = Auth::user();
+        return view("admin.adminComplaint", compact('admin'));
+    }
+    public function archives(): View
+    {
     $admin = Auth::user();
-    return view("admin.adminBlotter", compact('admin'));
-}
-public function archives(): View
-{
-$admin = Auth::user();
-$archive = Archive::latest()->get();
-return view("admin.archives", compact('admin', 'archive'));
-}
+    $archive = Archive::latest()->get();
+    return view("admin.archives", compact('admin', 'archive'));
+    }
 
 }

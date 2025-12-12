@@ -66,6 +66,17 @@
     background-color: #0056b3;
 }
 
+.modal-content .form-control {
+  border: 2px solid #dddddd !important;
+  box-shadow: none !important;
+}
+
+.modal-content .form-control:focus {
+  border: 2px solid #0056b3 !important;
+  box-shadow: 0 0 0 0.15rem rgba(0,123,255,0.2) !important;
+  outline: none !important;
+}
+
 
     </style>
 </head>

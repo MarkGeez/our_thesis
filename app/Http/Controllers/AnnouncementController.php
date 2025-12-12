@@ -88,4 +88,10 @@ class AnnouncementController extends Controller
         return redirect()->route("admin.announcements")->with('success',"Announcement archived successfully");
 
     }
+    public function edit($id) {
+    $announcement = Announcement::findOrFail($id);
+    return view('admin.edit-announcement', compact('announcement'));
+}
+
+    
 }

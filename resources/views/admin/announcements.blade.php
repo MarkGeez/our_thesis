@@ -70,12 +70,19 @@ object-fit: cover;
 }
 
 .announcement-text {
-  background-color: #d8ebff;
+  background-color: #f0efef;
   border-radius: 8px;
   padding: 15px;
-  border-left: 4px solid #007BFF;
+
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.25),
+    inset 0 8px 20px rgba(0, 0, 0, 0.2),
+    inset 0 -8px 20px rgba(0, 0, 0, 0.15);
+
   line-height: 1.5px;
 }
+
 
 @media (max-width: 768px) {
   .announcements-grid {
@@ -147,16 +154,16 @@ object-fit: cover;
        >
       @endif
        
-       <div class="announcement-text" >
-         <h3 class=" fw-bold">{{ $announcements->title }}</h3>
-
-         <p class="mt-3 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
+       
+         <h3 class=" fw-bold mb-2">{{ $announcements->title }}</h3>
+    <div class="announcement-text" >
+         <p class="mt-1 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
 
          @if($announcements->eventTime || $announcements->eventEnd)
            <p class="mt-2 mb-2"><strong>Event Start:</strong> {{ $announcements->eventTime }}</p>
            <p><strong>Event End:</strong> {{ $announcements->eventEnd }}</p>
          @endif
-
+</div>  
          <div class="announcement-meta">
            Posted by: {{ ucfirst($announcements->user->firstName) }}, {{ ucfirst($announcements->user->lastName) }}
          </div>
@@ -174,7 +181,7 @@ object-fit: cover;
           </form>
          </div>
          
-       </div>
+       
      </div>
 
 
