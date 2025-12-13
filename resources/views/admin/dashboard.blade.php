@@ -129,13 +129,9 @@
                                 </p>
 
                                 @if($announcements->eventTime || $announcements->eventEnd)
-                                    <p class="mt-2 mb-2">
-                                        <strong>Event Start:</strong> {{ $announcements->eventTime }}
-                                    </p>
-
-                                    <p>
-                                        <strong>Event End:</strong> {{ $announcements->eventEnd }}
-                                    </p>
+                                    <p class="mt-2 mb-2"><strong>Event Start:</strong>  {{ date('M-d-Y g:i A', strtotime($announcements->eventTime)) }}</p>
+                                    <p><strong>Event End:</strong> {{ date('M-d-Y g:i A', strtotime($announcements->eventEnd)) }}</p>
+                                
                                 @endif
                             </div>
                                 <div class="announcement-meta">

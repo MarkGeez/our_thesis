@@ -52,6 +52,7 @@
                         <th>Details</th>
                         <th>Respondent ID</th>
                         <th>Status</th>
+                        <th> Admin Remarks: </th>
                         <th>Created At</th>
                         <th>Updated At</th>
                         <th>Actions</th>
@@ -63,7 +64,7 @@
                     <tr>
                         <td>{{ $complaint->id }}</td>
                         <td>{{ $complaint->complainant_id }}</td>
-                        <td>{{ ucfirst($complaint->complainantName) }}</td>
+                        <td>{{ ucwords($complaint->complainantName) }}</td>
                         <td>{{ $complaint->address }}</td>
                         <td>{{ $complaint->details }}</td>
                         <td>{{ $complaint->respondent_id }}</td>
@@ -79,40 +80,103 @@
                             {{ ucfirst($complaint->status) }}
                         </span>
                     </td>
-                        <td>{{ $complaint->created_at }}</td>
-                        <td>{{ $complaint->updated_at }}</td>
+                    <td>{{ $complaint->remarks}}</td>
+                        <td>{{ date('M-d-Y g:i A', strtotime($complaint->created_at)) }}</td>
+                        <td>{{ date('M-d-Y g:i A', strtotime($complaint->updated_at)) }}</td>
 
-                        <td>
-                            <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-
-                                <div class="d-flex flex-column gap-1">
-
-                                    <div class="d-flex align-items-center gap-1 container bg-success shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="resolved" id="resolved">
-                                        <label for="resolved" class="text-light fw-bold"> Resolved</label>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-1 container bg-danger shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="rejected" id="rejected">
-                                        <label for="rejected" class="text-light fw-bold"> Rejected</label>
-                                    </div>
-
-                                    <div class="d-flex align-items-center gap-1 container bg-warning shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="on-going" id="on-going">
-                                        <label for="on-going" class="text-dark fw-bold">On-going</label>
-                                    </div>
-                                        <hr>
-                                    <button type="submit" class="btn btn-sm btn-primary ">
-                                        Update Status
-                                    </button>
-
-                                </div>
-                            </form>
-                        </td>
-
+                       <td class="text-center"> <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#complaintActionModal{{ $complaint->id }}" > Manage </button> </td>
                     </tr>
+
+                    <div class="modal fade" id="complaintActionModal{{ $complaint->id }}" tabindex="-1"> <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
+                             <div class="modal-header">
+            <h5 class="modal-title">
+                Update Complaint #{{ $complaint->id }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="POST"> 
+            @csrf @method('PUT')
+
+            <div class="modal-body">
+
+    <div class="mb-3">
+        <label class="fw-bold mb-2 d-block">Update Status</label>
+
+        <div class="border rounded p-3">
+
+            <div class="form-check mb-2">
+                <input
+                    class="form-check-input"
+                    type="radio"
+                    name="status"
+                    id="statusResolved{{ $complaint->id }}"
+                    value="resolved"
+                    {{ $complaint->status == 'resolved' ? 'checked' : '' }}
+                >
+                <label class="form-check-label fw-semibold text-success" for="statusResolved{{ $complaint->id }}">
+                    Resolved
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input
+                    class="form-check-input"
+                    type="radio"
+                    name="status"
+                    id="statusRejected{{ $complaint->id }}"
+                    value="rejected"
+                    {{ $complaint->status == 'rejected' ? 'checked' : '' }}
+                >
+                <label class="form-check-label fw-semibold text-danger" for="statusRejected{{ $complaint->id }}">
+                    Rejected
+                </label>
+            </div>
+
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="radio"
+                    name="status"
+                    id="statusOngoing{{ $complaint->id }}"
+                    value="on-going"
+                    {{ $complaint->status == 'on-going' ? 'checked' : '' }}
+                >
+                <label class="form-check-label fw-semibold text-warning" for="statusOngoing{{ $complaint->id }}">
+                    On-going
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="fw-bold">Remarks</label>
+        <textarea
+            name="remarks"
+            class="form-control mt-1"
+            rows="3"
+            placeholder="Add remarks if needed"
+        >{{ old('remarks', $complaint->remarks) }}</textarea>
+    </div>
+
+</div>
+
+<div class="modal-footer d-flex justify-content-end gap-2">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+        Cancel
+    </button>
+    <button type="submit" class="btn btn-primary">
+        Save Changes
+    </button>
+</div>
+
+
+        </form>
+
+    </div>
+</div>
+
                     @endforeach
                 </tbody>
 
@@ -132,3 +196,4 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

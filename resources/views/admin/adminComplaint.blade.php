@@ -125,12 +125,16 @@
                                             <div class="text-danger small mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    
+                                    
                                 </div>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                     <button class="btn btn-primary" type="submit">Submit Complaint</button>
+                                    
                                 </div>
+                                
                             </form>
                         </div>
                     </div>
@@ -152,15 +156,26 @@
                                     </p>
                                 </div>
 
-                                <p><strong>Complaint Date:</strong> {{ $complaints->created_at }}</p>
+                                <p><strong>Complaint Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->created_at)) }}</p>
 
+                                
+                                <p><strong>Admin remarks:</strong> {{$complaints->remarks}}</p>
+                                 <p><strong>Response Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->updated_at)) }}</p>
+
+                                <p>
+                                    @if ($complaints->respondent)
+                                        <strong>Responded by:</strong> {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName }}
+                                    @else
+                                        <strong>Responded by:</strong> Not assigned
+                                    @endif
+                                </p>
                                 <p>
                                     <strong>Status:</strong>
                                     <span class="status-container status-{{ $complaints->status }}">
                                         {{ ucfirst($complaints->status) }}
                                     </span>
                                 </p>
-
+                                
                             </div>
                         @endforeach
                     </div>

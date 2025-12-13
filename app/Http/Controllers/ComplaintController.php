@@ -38,7 +38,7 @@ class ComplaintController extends Controller
 
     public function showComplaints(){
         $user= Auth::user();
-        $complaints = Complaints::latest()->get();
+        $complaints = Complaints::oldest()->get();
         $route = $user->role . ".complaintRequest";
         return view($route, compact ('complaints'));
         
@@ -49,7 +49,7 @@ class ComplaintController extends Controller
         $respondent = Auth::user()->id;
 
         $request->validate([
-            "status"=> "in:resolved,on-going,rejected",
+            "status"=> "required|in:resolved,on-going,rejected",
             "remarks"=> "nullable|string|max:1000",
         ]);
 
