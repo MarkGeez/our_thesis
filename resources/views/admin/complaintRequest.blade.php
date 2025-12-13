@@ -52,6 +52,7 @@
                         <th>Details</th>
                         <th>Respondent ID</th>
                         <th>Status</th>
+                        <th>Remarks: </th>
                         <th>Created At</th>
                         <th>Updated At</th>
                         <th>Actions</th>
@@ -79,6 +80,7 @@
                             {{ ucfirst($complaint->status) }}
                         </span>
                     </td>
+                    <td>{{ $complaint->remarks}}</td>
                         <td>{{ $complaint->created_at }}</td>
                         <td>{{ $complaint->updated_at }}</td>
 
@@ -89,26 +91,42 @@
 
                                 <div class="d-flex flex-column gap-1">
 
-                                    <div class="d-flex align-items-center gap-1 container bg-success shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="resolved" id="resolved">
-                                        <label for="resolved" class="text-light fw-bold"> Resolved</label>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-1 container bg-danger shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="rejected" id="rejected">
-                                        <label for="rejected" class="text-light fw-bold"> Rejected</label>
-                                    </div>
+    <div class="d-flex align-items-center gap-1 container bg-success shadow-sm p-2 rounded-3">
+        <input type="radio" name="status" value="resolved">
+        <label class="text-light fw-bold">Resolved</label>
+    </div>
 
-                                    <div class="d-flex align-items-center gap-1 container bg-warning shadow-sm p-2 rounded-3">
-                                        <input type="radio" name="status" value="on-going" id="on-going">
-                                        <label for="on-going" class="text-dark fw-bold">On-going</label>
-                                    </div>
-                                        <hr>
-                                    <button type="submit" class="btn btn-sm btn-primary ">
-                                        Update Status
-                                    </button>
+    <div class="d-flex align-items-center gap-1 container bg-danger shadow-sm p-2 rounded-3">
+        <input type="radio" name="status" value="rejected">
+        <label class="text-light fw-bold">Rejected</label>
+    </div>
 
-                                </div>
+    <div class="d-flex align-items-center gap-1 container bg-warning shadow-sm p-2 rounded-3">
+        <input type="radio" name="status" value="on-going">
+        <label class="text-dark fw-bold">On-going</label>
+    </div>
+
+    
+    <div class="mt-2">
+        <label class="fw-bold">Remarks (optional)</label>
+        <textarea
+            name="remarks"
+            class="form-control"
+            rows="2"
+        >{{ old('remarks',  $complaint->remarks) }}</textarea>
+    </div>
+
+    <hr>
+
+    <button type="submit" class="btn btn-sm btn-primary">
+        Update Status
+    </button>
+    @error('status')
+       <p>You need to select an acctiion </p>
+    @enderror
+
+</div>
+
                             </form>
                         </td>
 

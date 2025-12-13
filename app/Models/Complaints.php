@@ -13,6 +13,7 @@ class Complaints extends Model
     "complainantName",
     "address",
     "details",
+    "remarks",
     "status"
     ];
 

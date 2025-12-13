@@ -125,12 +125,16 @@
                                             <div class="text-danger small mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    
+                                    
                                 </div>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                     <button class="btn btn-primary" type="submit">Submit Complaint</button>
+                                    
                                 </div>
+                                
                             </form>
                         </div>
                     </div>
@@ -152,7 +156,7 @@
                                     </p>
                                 </div>
 
-                                <p><strong>Complaint Date:</strong> {{ $complaints->created_at }}</p>
+                                <p><strong>Complaint Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->created_at)) }}</p>
 
                                 <p>
                                     <strong>Status:</strong>
