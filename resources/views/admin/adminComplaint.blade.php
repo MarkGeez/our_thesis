@@ -164,7 +164,7 @@
                                         {{ ucfirst($complaints->status) }}
                                     </span>
                                 </p>
-                                <p>Updated By: Hon. {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName}}</p>
+                                <p>Responded by: Hon. {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName}}</p>
 
                             </div>
                         @endforeach
