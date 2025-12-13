@@ -157,13 +157,14 @@
                                 </div>
 
                                 <p><strong>Complaint Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->created_at)) }}</p>
-
+                                <p>Complaint remarks:{{$complaints->remarks}}</p>
                                 <p>
                                     <strong>Status:</strong>
                                     <span class="status-container status-{{ $complaints->status }}">
                                         {{ ucfirst($complaints->status) }}
                                     </span>
                                 </p>
+                                <p>Updated By: Hon. {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName}}</p>
 
                             </div>
                         @endforeach

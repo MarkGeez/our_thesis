@@ -29,7 +29,7 @@ class AdminController extends Controller
     public function adminComplaint():View{
         $admin = Auth::user();
 
-        $myComplaints = $admin->complaints()->get();
+        $myComplaints = $admin->complaints()->with('respondent')->get();
         return view("admin.adminComplaint", compact('admin', 'myComplaints'));
     }
     
@@ -64,7 +64,7 @@ class AdminController extends Controller
     
     public function announcements(){
     $admin = Auth::user();
-    $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
+    $announcement = Announcement::with('respondent')->latest()->get();
     return view('admin.announcements', compact('admin', 'announcement'));
 }
 
