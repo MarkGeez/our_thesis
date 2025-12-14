@@ -83,7 +83,7 @@
                         <li>
                            <a class="{{ Request::routeIs('admin.adminComplaint*') ? 'active' : '' }}"
                        href="{{ route('admin.adminComplaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>Complaints
+                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>Complaints 
                     </a>
                     </ul>
                 </li>
@@ -136,7 +136,7 @@
                  <li>
                     <a class="{{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
                        href="{{ route('admin.complaintRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints Records
                     </a>
                 </li>
 

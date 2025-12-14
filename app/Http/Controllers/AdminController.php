@@ -64,8 +64,8 @@ class AdminController extends Controller
     
     
     public function announcements(){
-    $admin = Auth::user();
-    $announcement = Announcement::with('respondent')->latest()->get();
+     $admin = Auth::user();
+    $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
     return view('admin.announcements', compact('admin', 'announcement'));
 }
 

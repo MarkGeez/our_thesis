@@ -158,15 +158,25 @@
                                 </div>
 
                                 <p><strong>Complaint Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->created_at)) }}</p>
-                                <p>Complaint remarks:{{$complaints->remarks}}</p>
+
+                                
+                                <p><strong>Admin remarks:</strong> {{$complaints->remarks}}</p>
+                                 <p><strong>Response Date:</strong> {{ date('M-d-Y g:i A', strtotime($complaints->updated_at)) }}</p>
+
+                                <p>
+                                    @if ($complaints->respondent)
+                                        <strong>Responded by:</strong> {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName }}
+                                    @else
+                                        <strong>Responded by:</strong> Not assigned
+                                    @endif
+                                </p>
                                 <p>
                                     <strong>Status:</strong>
                                     <span class="status-container status-{{ $complaints->status }}">
                                         {{ ucfirst($complaints->status) }}
                                     </span>
                                 </p>
-                                <p>Responded by: Hon. {{ $complaints->respondent->firstName . ", " . $complaints->respondent->lastName}}</p>
-
+                                
                             </div>
                         @endforeach
                         @endif
