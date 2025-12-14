@@ -144,7 +144,8 @@
                     
 
                     <div class="complaints-grid mt-3">
-                        @foreach ($myComplaints as $complaints)
+                        @if ($myComplaints->count()>0)
+                             @foreach ($myComplaints as $complaints)
                             <div class="complaint-card">
 
                                 <p><strong>Complainant ID:</strong> {{ $complaints->complainant_id }}</p>
@@ -168,6 +169,8 @@
 
                             </div>
                         @endforeach
+                        @endif
+                       
                     </div>
                 </div>
 

@@ -53,14 +53,23 @@
           <h1 class="main-title">Feedback</h1>
           <hr>
           
-        <form action=""> 
+       
         <div class="main-container">
           <div class="m-4">
             <h5 class="mb-3"><i class="fa-solid fa-comment-dots me-2 text-primary"></i>Send Us Your Feedback</h5>
-            <form>
+            @if (session('success'))
+              <p>{{session('success')}}</p>
+            @endif
+            <form method="post" action="{{ route('resident.submit.feedback') }}">
+              @csrf
               <div class="mb-3">
                 <label for="feedbackMessage" class="form-label">Your Message:</label>
-                <textarea class="form-control" id="feedbackMessage" rows="4" placeholder="Enter your feedback or concerns here..."></textarea>
+                <textarea class="form-control" id="feedbackMessage" name="message" rows="4" placeholder="Enter your feedback or concerns here..."></textarea>
+
+                @error('message')
+                  <p>{{$message}}</p>
+                @enderror
+                
               </div>
               <button type="submit" class="btn btn-primary btn-sm">
                 <i class="fa-solid fa-paper-plane me-1"></i> Submit Feedback
@@ -68,7 +77,7 @@
             </form>
           </div>
         </div>
-        </form>
+        
       </div>
             </main>
 

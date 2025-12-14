@@ -27,6 +27,14 @@
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target"></main>
 
+            @if ($feedbacks->count() > 0)
+                @foreach ($feedbacks as $feedback)
+                    {{ $feedback->message }}<br><br>
+                    {{ date('M-d-Y h:i A', strToTime($feedback->created_at)) }}
+                @endforeach
+
+                {{ $feedbacks->links() }}
+            @endif
 </main>
 
 </div>

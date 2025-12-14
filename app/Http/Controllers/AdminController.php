@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Announcement;
+use App\Models\Feedbacks;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Archive;
@@ -71,7 +72,8 @@ class AdminController extends Controller
     public function feedbackRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.feedbackRequest", compact('admin'));
+        $feedbacks = Feedbacks::oldest()->paginate(10);
+        return view("admin.feedbackRequest", compact('admin', 'feedbacks'));
     }
     
     public function aboutus(): View
