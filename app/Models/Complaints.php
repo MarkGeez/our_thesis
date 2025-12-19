@@ -19,7 +19,6 @@ class Complaints extends Model
 
     public function complainant(): BelongsTo{
         return $this->belongsTo(User::class, "complainant_id");
-
     }
 
     public function respondent(): BelongsTo{

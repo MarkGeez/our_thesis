@@ -10,11 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
         <style>
     .status-container {
-    padding: 5px 10px;
-    border-radius: 5px;
-    color: #fff;
-    font-weight: bold;
-    line-height: 2.5;
+padding: 4px 10px;
+border-radius: 999px;
+font-size: 12px;
+font-weight: 600;
+line-height: 1.8;
 }
 
     .status-resolved {
@@ -38,13 +38,43 @@
     }
 
     .complaint-card {
-    max-width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #ffffff;
-    margin: 5px 20px;
-    padding: 18px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+background-color: #ffffff;
+border: 1px solid #e5e7eb;
+border-radius: 12px;
+padding: 16px 18px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.complaint-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.complaint-id {
+font-size: 13px;
+color: #555;
+}
+
+.complaint-date {
+font-size: 12px;
+color: #777;
+}
+.complaint-details {
+font-size: 14px;
+line-height: 1.5;
+color: #222;
+background-color: #f9fafb;
+padding: 10px 12px;
+border-radius: 8px;
+}
+
+.complaint-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-top: 5px;
 }
 
 .complaints-grid {
@@ -91,7 +121,7 @@
                 <div class="modal fade" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form action="{{ route('admin.submit.complaint') }}" method="POST">
+                            <form action="{{ route('resident.submit.complaint') }}" method="POST">
                                 @csrf
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="complaintModalLabel">Submit Complaint</h5>
@@ -138,32 +168,22 @@
                     </div>
                 </div>
 
-                <div class="mt-4 ms-3">
+                <div class="m-4 ms-3">
                     
 
                     <div class="complaints-grid mt-3">
                         @foreach ($myComplaints as $complaints)
-                            <div class="complaint-card">
+                            <div class="complaint-card"> <div class="complaint-header"> <span class="complaint-id"> Complaint ID: {{ $complaints->complainant_id }} </span>
+<span class="complaint-date">
+  {{ date('M d, Y g:i A', strtotime($complaints->created_at)) }}
+</span>
 
-                                <p><strong>Complainant ID:</strong> {{ $complaints->complainant_id }}</p>
+</div> <div class="complaint-details"> {{ $complaints->details }} </div> <div class="complaint-footer"> <strong>Status</strong>
+<span class="status-container status-{{ $complaints->status }}">
+  {{ ucfirst($complaints->status) }}
+</span>
 
-                                <p><strong>Details:</strong></p>
-                                <div class="announcement-text mb-2">
-                                    <p style="line-height: 1.35em;">
-                                        {{ $complaints->details }}
-                                    </p>
-                                </div>
-
-                                <p><strong>Complaint Date:</strong> {{ $complaints->created_at }}</p>
-
-                                <p>
-                                    <strong>Status:</strong>
-                                    <span class="status-container status-{{ $complaints->status }}">
-                                        {{ ucfirst($complaints->status) }}
-                                    </span>
-                                </p>
-
-                            </div>
+</div> </div>
                         @endforeach
                     </div>
                 </div>

@@ -7,16 +7,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
+use App\Http\Controllers\FeedbackController;
 
 use Illuminate\Support\Facades\Route;
 
 
-use App\Http\Middleware\secret;
 use Illuminate\Auth\Events\Login;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 
 Route::get('login', [AuthController::class,'showLoginForm'])->name('login');
@@ -42,9 +40,10 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/service', [ResidentController::class,'service'])->name('service');
         Route::get('/complaint', [ResidentController::class,'complaint'])->name('complaint');
         Route::get('/feedback', [ResidentController::class,'feedback'])->name('feedback');
+        Route::post('/feedback', [FeedbackController::class, 'submitFeedback'])->name('submit.feedback');
         Route::get('/aboutus', [ResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
-
+         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         
     });
 });
