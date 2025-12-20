@@ -29,6 +29,7 @@ class AnnouncementController extends Controller
        
         $request->validate([
             "title" => "string|max:255|required", 
+            "image" => "nullable|image|mimes:png,jpg,jpeg|max:4096",
             "details" => "required|string", 
             "eventTime" => "nullable|date",
             "eventEnd" => "nullable|date|after_or_equal:eventTime", 
@@ -42,6 +43,10 @@ class AnnouncementController extends Controller
         $announcement->details= $request->details;
         $announcement->eventTime= $request->eventTime;
         $announcement->eventEnd= $request->eventEnd;
+
+        if($request->hasFile("image")){
+            $announcement->image = $request->file("image")->store("photos", "public");
+        }
 
         $announcement->save();
         $role = Auth::user()->role;

@@ -184,7 +184,7 @@
         </div>
 
         @else
-            <p class="ms-5 mt-3">No complaints found.</p>
+            <div class="bg-light m-3 p-3"><p class="ms-5 mt-3">No complaints found.</p></div>
         @endif
 
     </div>

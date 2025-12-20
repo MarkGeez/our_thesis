@@ -23,17 +23,21 @@
     @include('resident.resident-header', ['resident' => $resident])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
-
-                <!-- Button trigger modal -->
-                <div class="add-buttons d-flex justify-content-end gap-2">
+                <div class="main-container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="ms-3" style="color:#000000;">My Blotters</h2>
+                    <div class="add-buttons d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalLong">
                         Add Blotter <i class="fa-solid fa-plus"></i>
                     </button>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#vawcModal">
+                    <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#vawcModal">
                         Add VAWC Blotter <i class="fa-solid fa-plus"></i>
                     </button>
 
                 </div>
+                </div>
+                <!-- Button trigger modal -->
+                
                 <!-- Modal for basic Blotter -->
                 <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                 <div class="modal-dialog" role="document">

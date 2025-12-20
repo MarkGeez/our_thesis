@@ -44,28 +44,28 @@
                 <li>
                     <a class="{{ Request::routeIs('resident.blotter') ? 'active' : '' }}"
                        href="{{ route('resident.blotter' )}}">
-                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter
+                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                     </a>
                 </li>
 
                 <li>
                     <a class="{{ Request::routeIs('resident.certificate') ? 'active' : '' }}"
                        href="{{ route('resident.certificate') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Documents
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
                     </a>
                 </li>
 
                 <li>
                     <a class="{{ Request::routeIs('resident.service') ? 'active' : '' }}"
                        href="{{ route('resident.service') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>Service
+                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>My Services
                     </a>
                 </li>
 
                 <li>
                     <a class="{{ Request::routeIs('resident.complaint') ? 'active' : '' }}"
                        href="{{ route('resident.complaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaint
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
                     </a>
                 </li>
 

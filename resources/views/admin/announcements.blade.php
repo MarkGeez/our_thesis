@@ -160,8 +160,9 @@ object-fit: cover;
          <p class="mt-1 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
 
          @if($announcements->eventTime || $announcements->eventEnd)
-           <p class="mt-2 mb-2"><strong>Event Start:</strong>  {{ date('M-d-Y g:i A', strtotime($announcements->eventTime)) }}</p>
-           <p><strong>Event End:</strong> {{ date('M-d-Y g:i A', strtotime($announcements->eventEnd)) }}</p>
+          <p class="mt-2 mb-2"><strong>Event Start:</strong>  {{ date('M d, Y g:i A', strtotime($announcements->eventTime)) }}</p>
+          <p><strong>Event End:</strong> {{ date('M d, Y g:i A', strtotime($announcements->eventEnd)) }}</p>
+                                
          @endif
 </div>  
          <div class="announcement-meta">
@@ -199,10 +200,10 @@ object-fit: cover;
                     @method('PUT')
 
                     <label for="title{{ $announcements->id }}">Title</label>
-                    <input class="form-control" type="text" name="title" id="title{{ $announcements->id }}" value="{{ $announcements->title }}" required>
+                    <input class="form-control" type="text" name="title" id="title{{ $announcements->id }}" value="{{ $announcements->title }}" >
 
                     <label for="details{{ $announcements->id }}">Details</label>
-                    <textarea class="form-control" name="details" id="details{{ $announcements->id }}" cols="40" rows="10">{{ old('details', $announcements->details) }}</textarea>
+                    <textarea class="form-control" name="details" id="details{{ $announcements->id }}" cols="40" rows="10" required>{{ old('details', $announcements->details) }}</textarea>
 
                    <label for="eventTime{{ $announcements->id }}">Event Start</label>
 <input class="form-control datetime-picker" 

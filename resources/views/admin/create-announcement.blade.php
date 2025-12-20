@@ -32,7 +32,7 @@
                     @enderror
 
                     <label for="details" class="mt-2">Details</label>
-                    <textarea class="form-control" name="details" id="details" rows="6"></textarea>
+                    <textarea class="form-control" name="details" id="details" rows="6" required></textarea>
 
                     <label for="eventTime" class="mt-2">Event Start</label>
                     <input class="form-control datetime-picker" type="text" name="eventTime" id="eventTime" placeholder="Click to enter the event start time...">

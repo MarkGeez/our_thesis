@@ -60,14 +60,14 @@
                      <ul class="cat-sub-menu">
                         <li>
                            <a class="{{ Request::routeIs('admin.adminBlotter*') ? 'active' : '' }}" href="{{ route('admin.adminBlotter') }}">
-                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter
+                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                             </a>
 
                         </li>
                         <li>
                            <a class="{{ Request::routeIs('admin.adminCertificate*') ? 'active' : '' }}"
                        href="{{ route('admin.adminCertificate') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>Documents
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>My Documents
                     </a>
 
                     </a>
@@ -75,7 +75,7 @@
                         <li>
                            <a class="{{ Request::routeIs('admin.adminServices*') ? 'active' : '' }}"
                        href="{{ route('admin.adminServices') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>Services
+                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>My Services
                     </a>
 
                     </a>
@@ -83,7 +83,7 @@
                         <li>
                            <a class="{{ Request::routeIs('admin.adminComplaint*') ? 'active' : '' }}"
                        href="{{ route('admin.adminComplaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>Complaints 
+                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>MyComplaints 
                     </a>
                     </ul>
                 </li>
