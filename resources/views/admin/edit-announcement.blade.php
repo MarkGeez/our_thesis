@@ -145,9 +145,8 @@
        id="eventEnd" 
        value="{{ old('eventEnd', $announcement->eventEnd ? date('Y-m-d\TH:i', strtotime($announcement->eventEnd)) : '') }}">
 
-<div class="text-end mt-3">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
 
+    <button type="submit">Update Announcement</button>
     <div id="localSuccessMessage" style="display:none;max-width:600px;margin:20px auto;padding:12px;background:#d4edda;color:#155724;border-radius:6px;border:1px solid #c3e6cb;text-align:center;"> Announcement posted successfully. </div>
 
 </form>

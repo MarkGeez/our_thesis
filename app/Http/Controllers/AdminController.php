@@ -72,7 +72,7 @@ class AdminController extends Controller
     public function feedbackRequest(): View
     {
         $admin = Auth::user();
-        $feedbacks = Feedbacks::oldest()->paginate(10);
+        $feedbacks = Feedbacks::with('user:id,firstName,lastName')->oldest()->paginate(10);
         return view("admin.feedbackRequest", compact('admin', 'feedbacks'));
     }
     

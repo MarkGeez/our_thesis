@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Feedbacks;
 
+
 class FeedbackController extends Controller
 {
     public function showFeedbackForm(){
@@ -14,18 +15,21 @@ class FeedbackController extends Controller
 
 
     public function submitFeedback(Request $request){
-        $user = auth()->user();
+        $resident = auth()->user();
         $request->validate([
             "message"=> "required|string|max:5000"
         ]);
 
         Feedbacks::create([
-            "user_id"=> $user->id,
+            "user_id"=> $resident->id,
             "message"=> $request->message
         ]);
 
         return redirect()->back()->with('success', 'Feedback successfully submitted');
     }
+    
+
+    
 
     
 }

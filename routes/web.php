@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::post('/feedback', [FeedbackController::class, 'submitFeedback'])->name('submit.feedback');
         Route::get('/aboutus', [ResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
-
+         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         
     });
 });

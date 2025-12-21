@@ -32,6 +32,43 @@
     .section-title {
       margin-bottom: 20px;
     }
+    .feedback-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.feedback-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.feedback-header i {
+  font-size: 22px;
+}
+
+.feedback-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.feedback-card textarea {
+  resize: none;
+}
+
+.feedback-actions {
+  text-align: right;
+}
+
   </style>
 </head>
 
@@ -48,37 +85,70 @@
     @include('resident.resident-header', ['resident' => $resident])
             <main class="main users chart-page" id="skip-target">
                <!--Dito lalagay main content-->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="ms-3" style="color:#000000;">Feedback</h2>
+                    
+                </div>
+             <div class="container">
+              
+              <hr>
 
-                <div class="container">
-          <h1 class="main-title">Feedback</h1>
-          <hr>
-          
-       
-        <div class="main-container">
-          <div class="m-4">
-            <h5 class="mb-3"><i class="fa-solid fa-comment-dots me-2 text-primary"></i>Send Us Your Feedback</h5>
-            @if (session('success'))
-              <p>{{session('success')}}</p>
-            @endif
-            <form method="post" action="{{ route('resident.submit.feedback') }}">
-              @csrf
-              <div class="mb-3">
-                <label for="feedbackMessage" class="form-label">Your Message:</label>
-                <textarea class="form-control" id="feedbackMessage" name="message" rows="4" placeholder="Enter your feedback or concerns here..."></textarea>
+              <div class="feedback-wrapper">
+                <div class="feedback-card">
 
-                @error('message')
-                  <p>{{$message}}</p>
-                @enderror
+                  <div class="feedback-header">
+                    <i class="fa-solid fa-comment-dots text-primary"></i>
+                    <h5 class="mb-0">Send your feedback</h5>
+                  </div>
+
+                  <p class="feedback-desc">
+                    Share your concerns, suggestions, or experience. Your input helps improve the service.
+                  </p>
+
+                  @if (session('success'))
+                    <div class="alert alert-success py-2">
+                      {{ session('success') }}
+                    </div>
+                  @endif
+
+                  <form method="post" action="{{ route('resident.submit.feedback') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                      <label for="feedbackMessage" class="form-label">
+                        Your message
+                      </label>
+                      <div class="mb-3"> <label class="form-label">From</label> <input type="text" class="form-control" value="{{ ucfirst($resident->firstName) }} {{ ucfirst($resident->lastName) }} (You)" disabled> </div>
+                      <textarea
+                        class="form-control"
+                        id="feedbackMessage"
+                        name="message"
+                        rows="5"
+                        placeholder="Type your feedback here"
+                      ></textarea>
+
+                      @error('message')
+                        <small class="text-danger">{{ $message }}</small>
+                      @enderror
+                    </div>
+
+                    <div class="feedback-actions">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-paper-plane me-1"></i>
+                        Submit feedback
+                      </button>
+                    </div>
+                  </form>
+                   @if (session('success'))
+                    <div class="alert alert-success py-2">
+                      {{ session('success') }}
+                    </div>
+                  @endif
+                </div>
                 
               </div>
-              <button type="submit" class="btn btn-primary btn-sm">
-                <i class="fa-solid fa-paper-plane me-1"></i> Submit Feedback
-              </button>
-            </form>
-          </div>
-        </div>
-        
-      </div>
+            </div>
+
             </main>
 
 </div>

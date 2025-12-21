@@ -12,8 +12,9 @@ class Feedbacks extends Model
         "message",
         "user_id"
     ];
-    public function feedback(): BelongsTo{
-        return $this->belongsTo(User::class);
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     
