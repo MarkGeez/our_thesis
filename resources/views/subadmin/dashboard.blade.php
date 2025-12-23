@@ -84,10 +84,10 @@
 <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
 
 <div class="page-flex">
-    @include('admin.admin-sidebar', ['admin' => auth()->user()])
+    @include('subadmin.subadmin-sidebar', ['subadmin' => auth()->user()])
 
     <div class="main-wrapper">
-        @include('admin.admin-header', ['admin' => auth()->user()])
+        @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
 
         <main class="main users chart-page" id="skip-target">
             <div class="main-container">
@@ -213,6 +213,8 @@
         </main>
     </div>
 </div>
+
+
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>

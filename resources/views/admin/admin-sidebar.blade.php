@@ -83,7 +83,7 @@
                         <li>
                            <a class="{{ Request::routeIs('admin.adminComplaint*') ? 'active' : '' }}"
                        href="{{ route('admin.adminComplaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>MyComplaints 
+                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>My Complaints 
                     </a>
                     </ul>
                 </li>

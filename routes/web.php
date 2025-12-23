@@ -8,6 +8,8 @@ use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\SubAdminController;
+
 
 use Illuminate\Support\Facades\Route;
 
@@ -90,3 +92,31 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
 });
 
 
+Route::middleware(['auth', 'role:subadmin'])->group(function(){
+    Route::prefix('subadmin')->name("subadmin.")->group(function(){
+        Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
+        Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
+        Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
+        // Add this new route
+        Route::get('/adminBlotter', [SubAdminController::class,'adminBlotter'])->name('adminBlotter');
+        Route::get('/adminCertificate', [SubAdminController::class,'adminCertificate'])->name('adminCertificate');
+        Route::get('/adminServices', [SubAdminController::class,'adminServices'])->name('adminServices');
+        Route::get('/adminComplaint', [SubAdminController::class,'adminComplaint'])->name('adminComplaint');
+        Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
+       
+        Route::get('/complaintRequest', [SubAdminController::class,'complaintRequest'])->name('complaintRequest');
+        Route::put('/complaintRequest/{id}', [SubAdminController::class, 'updateComplaint'])->name('update.complaint');
+
+
+
+        Route::get('/certificateRequest', [SubAdminController::class,'certificateRequest'])->name('certificateRequest');
+        Route::get('/clearanceRequest', [SubAdminController::class,'clearanceRequest'])->name('clearanceRequest');
+        Route::get('/serviceRequest', [SubAdminController::class,'serviceRequest'])->name('serviceRequest');
+    });
+});
+
+
+
+Route::get('/', function () {
+    return view('index');
+})->name('index');
