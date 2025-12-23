@@ -12,8 +12,9 @@ use App\Models\Announcement;
 class AnnouncementController extends Controller
 {
     public function showAnnouncementForm(): View
-    {
-        return view("admin.create-announcement");
+        {
+    $role = Auth::user()->role;
+    return view($role . ".create-announcement");
     }
 
     public function showEdit($id):View{

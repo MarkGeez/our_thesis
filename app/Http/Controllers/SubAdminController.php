@@ -23,6 +23,11 @@ class SubAdminController extends Controller
         $subadmin = Auth::user();
         return view("subadmin.profile", compact('subadmin'));
     }
+    public function announcements(){
+     $subadmin = Auth::user();
+    $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
+    return view('subadmin.announcements', compact('subadmin', 'announcement'));
+}
 
     public function blotterRequest(): View
     {
@@ -73,4 +78,11 @@ class SubAdminController extends Controller
 
         return back()->with('success', 'Complaint updated successfully.');
     }
+    public function adminComplaint(): View
+        {   
+    $subadmin = auth()->user();
+    $myComplaints = $subadmin->complaints()->get();
+    return view('subadmin.complaint', compact('subadmin', 'myComplaints'));
+}
+    
 }

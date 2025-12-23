@@ -14,10 +14,10 @@ class AdminController extends Controller
 {
     public function dashboard(): View
     {
-        $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
-        $admin = Auth::user();
-            
-        return view("admin.dashboard", compact('announcement', 'admin'));
+    
+    $announcement= Announcement::with('user:id,firstName,lastName')->latest()->get();
+    $admin = Auth::user();
+    return view("admin.dashboard", compact('announcement', 'admin'));
     }
     
     

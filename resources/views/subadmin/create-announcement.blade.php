@@ -22,7 +22,7 @@
             </div>
 
             <div class="modal-body">
-                <form action="{{ route('admin.create-announcement') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('subadmin.create-announcement') }}" method="post" enctype="multipart/form-data">
                     @csrf
 
                     <label for="title">Title</label>

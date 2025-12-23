@@ -104,13 +104,13 @@ object-fit: cover;
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
    
-   @include('admin.admin-sidebar', ['admin' => auth()->user()])
+   @include('subadmin.subadmin-sidebar', ['subadmin' => auth()->user()])
 
 
 
 <div class="main-wrapper">
            
-    @include('admin.admin-header', ['admin' => auth()->user()])
+    @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
     <div class="main-container">
@@ -173,13 +173,13 @@ object-fit: cover;
               <i class="fa-solid fa-edit"></i> Edit
           </button>
                           
-          <form action="{{ route('admin.announcement.archive', $announcements->id) }}" method="post">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('archive this announcement?')">
-              <i class="fa-solid fa-archive"></i> Archive
-            </button>
-          </form>
+          <form action="{{ route('subadmin.announcement.archive', $announcements->id) }}" method="post">
+    @csrf
+    @method('DELETE')
+    <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('archive this announcement?')">
+        <i class="fa-solid fa-archive"></i> Archive
+    </button>
+</form>
          </div>
          
        
@@ -195,7 +195,7 @@ object-fit: cover;
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.update.announcement', $announcements->id) }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('subadmin.update.announcement', $announcements->id) }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -241,7 +241,7 @@ object-fit: cover;
 
 </div>
 </div> 
-@include('admin.create-announcement')
+@include('subadmin.create-announcement')
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

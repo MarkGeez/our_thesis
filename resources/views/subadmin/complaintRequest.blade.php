@@ -64,7 +64,7 @@
                     <tr>
                         <td>{{ $complaint->id }}</td>
                         <td>{{ $complaint->complainant_id }}</td>
-                        <td>{{ ucwords($complaint->complainantName) }}</td>
+<td>{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</td>
                         <td>{{ $complaint->address }}</td>
                         <td>{{ $complaint->details }}</td>
                         <td>{{ $complaint->respondent_id }}</td>

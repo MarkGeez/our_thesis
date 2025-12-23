@@ -64,7 +64,7 @@
                     <tr>
                         <td>{{ $complaint->id }}</td>
                         <td>{{ $complaint->complainant_id }}</td>
-                        <td>{{ ucwords($complaint->complainantName) }}</td>
+<td>{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</td>
                         <td>{{ $complaint->address }}</td>
                         <td>{{ $complaint->details }}</td>
                         <td>{{ $complaint->respondent_id }}</td>
@@ -184,7 +184,7 @@
         </div>
 
         @else
-            <div class="bg-light m-3 p-3"><p class="ms-5 mt-3">No complaints found.</p></div>
+            <div class="bg-light m-3 p-3 shadowed"><p class="ms-5 mt-3">No complaints found.</p></div>
         @endif
 
     </div>
