@@ -8,6 +8,9 @@ use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\SubAdminController;
+use App\Http\Controllers\ActiveLogController;
+use App\Http\Controllers\BlotterController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -49,14 +52,69 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
     });
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function(){
-    Route::prefix('admin')->name("admin.")->group(function(){
-        Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
-        Route::get('/profile', [AdminController::class,'profile'])->name('profile');
-        Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
-        Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
-        Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
-        Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
+
+Admin Routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
+    Route::get('/profile', [AdminController::class,'profile'])->name('profile');
+
+    Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
+    Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+
+    Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
+    Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
+    Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
+
+    Route::get('/complaintRequest', [ComplaintController::class,'showComplaints'])->name('complaintRequest');
+    Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
+    Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
+    Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
+
+    Route::get('/feedbackRequest', [AdminController::class,'feedbackRequest'])->name('feedbackRequest');
+    Route::get('/aboutus', [AdminController::class,'aboutus'])->name('aboutus');
+    Route::get('/contactus', [AdminController::class,'contactus'])->name('contactus');
+    Route::get('/settings', [AdminController::class,'settings'])->name('settings');
+    Route::get('/barangayOfficials', [AdminController::class,'barangayOfficials'])->name('barangayOfficials');
+    Route::get('/census', [AdminController::class,'census'])->name('census');
+    Route::get('/users', [AdminController::class,'users'])->name('users');
+
+    // Use ActiveLogController here and avoid double "admin" in the path
+    Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
+
+    Route::get('/reports', [AdminController::class,'reports'])->name('reports');
+    Route::get('/adminBlotter', [AdminController::class,'adminBlotter'])->name('adminBlotter');
+    Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
+    Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
+    Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
+    Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
+    Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
+    Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
+    Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
+    Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
+    Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
+});
+
+Sub-Admin Routes
+Route::middleware(['auth', 'role:subadmin'])->group(function(){
+    Route::prefix('subadmin')->name("subadmin.")->group(function(){
+        Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
+        Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
+        Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
+        // Add this new route
+        Route::get('/adminBlotter', [SubAdminController::class,'adminBlotter'])->name('adminBlotter');
+        Route::get('/adminCertificate', [SubAdminController::class,'adminCertificate'])->name('adminCertificate');
+        Route::get('/adminServices', [SubAdminController::class,'adminServices'])->name('adminServices');
+        Route::get('/adminComplaint', [SubAdminController::class,'adminComplaint'])->name('adminComplaint');
+        Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
+       
+        Route::get('/complaintRequest', [SubAdminController::class,'complaintRequest'])->name('complaintRequest');
+        Route::put('/complaintRequest/{id}', [SubAdminController::class, 'updateComplaint'])->name('update.complaint');
+
+
+
+        Route::get('/certificateRequest', [SubAdminController::class,'certificateRequest'])->name('certificateRequest');
+        Route::get('/clearanceRequest', [SubAdminController::class,'clearanceRequest'])->name('clearanceRequest');
+        Route::get('/serviceRequest', [SubAdminController::class,'serviceRequest'])->name('serviceRequest');
         
         Route::get('/complaintRequest', [ComplaintController::class,'showComplaints'])->name('complaintRequest');
         Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
@@ -89,5 +147,7 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
         Route::get('/admin/edit-announcement/{id}', [AnnouncementController::class, 'edit']);
        });
 });
+
+
 
 
