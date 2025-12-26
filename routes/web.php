@@ -53,7 +53,6 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 });
 
 
-Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
@@ -94,13 +93,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
 });
 
-Sub-Admin Routes
 Route::middleware(['auth', 'role:subadmin'])->group(function(){
     Route::prefix('subadmin')->name("subadmin.")->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
-        // Add this new route
         Route::get('/adminBlotter', [SubAdminController::class,'adminBlotter'])->name('adminBlotter');
         Route::get('/adminCertificate', [SubAdminController::class,'adminCertificate'])->name('adminCertificate');
         Route::get('/adminServices', [SubAdminController::class,'adminServices'])->name('adminServices');
