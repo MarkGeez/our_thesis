@@ -53,9 +53,9 @@
                                             @endphp
                                             {{ $full !== '' ? ucwords($full) : ucwords($u->name ?? 'N/A') }}
                                         </td>
-
-                                        <td>{{ ucfirst($log->module) }}</td>
                                         <td>{{ $log->action }}</td>
+                                        <td>{{ ucfirst($log->module) }}</td>
+                                        
                                         <td>{{ $log->description }}</td>
                                         <td>{{ $log->record_id ?? '—' }}</td>
                                         <td>{{ $log->created_at->format('M-d-Y g:i A') }}</td>
