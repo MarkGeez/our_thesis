@@ -75,4 +75,9 @@ public function submitBlotter(Request $request)
 
     return redirect()->back()->with('success', 'Blotter submitted successfully!');
 }
+public function showBlotterRequests()
+    {
+        $blotters = Blotter::with('user')->orderByDesc('created_at')->get();
+        return view('admin.blotterRequest', compact('blotters'));
+    }
 }

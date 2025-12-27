@@ -91,6 +91,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
     Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
+
+    Route::get('/blotterRequest', [BlotterController::class, 'showBlotterRequests'])->name('blotterRequest');
+    Route::get('/adminBlotter', [AdminController::class, 'adminBlotter'])->name('adminBlotter');
+    Route::post('/adminBlotter', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+
 });
 
 Route::middleware(['auth', 'role:subadmin'])->group(function(){
