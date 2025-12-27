@@ -19,6 +19,7 @@
         @include('admin.admin-header', ['admin' => auth()->user()])
         
         <main class="main users chart-page" id="skip-target">
+            @include('forms.blotter',['plaintiff', view('forms.unhidden')->render(), 'button'=>"Encode blotter"])
             <div class="container-fluid p-4">
                 <h3 class="mb-4">Blotter Requests</h3>
 
