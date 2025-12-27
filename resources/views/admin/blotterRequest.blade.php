@@ -65,8 +65,11 @@
                                             <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
-                                            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#updateBlotter{{ $blotter->id }}">
+                                            <button class="btn btn-sm btn-secondary me-1" data-bs-toggle="modal" data-bs-target="#updateBlotter{{ $blotter->id }}">
                                                 <i class="fa fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#statusBlotter{{ $blotter->id }}">
+                                                <i class="fa fa-flag"></i> Status
                                             </button>
                                         </td>
                                     </tr>
@@ -101,7 +104,7 @@
                                         </div>
                                     </div>
                                     @include('forms.update')
-                                    {{--  --}}
+                                    @include('forms.status')
                                     
  
 
@@ -120,11 +123,16 @@
 @if ($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var modalEl = null;
+            
             @if(old('updateBlotterId'))
                 var id = "{{ old('updateBlotterId') }}";
-                var modalEl = document.getElementById('updateBlotter' + id);
+                modalEl = document.getElementById('updateBlotter' + id);
+            @elseif(old('statusBlotterId'))
+                var id = "{{ old('statusBlotterId') }}";
+                modalEl = document.getElementById('statusBlotter' + id);
             @else
-                var modalEl = document.getElementById('blotterModal');
+                modalEl = document.getElementById('blotterModal');
             @endif
 
             if (modalEl) {
