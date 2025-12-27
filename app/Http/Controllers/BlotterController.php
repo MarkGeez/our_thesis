@@ -11,23 +11,27 @@ class BlotterController extends Controller
 
 public function submitBlotter(Request $request)
 {
-    $validated = $request->validate([
-        // Defendant
-        "defendantAddress" => "nullable|string|max:255",
-        "defendantContactNumber" => "nullable|digits:11",
-        "defendantName" => "required|string|max:255",
-        "defendantMiddleName" => "nullable|string|max:255",
-        "defendantLastName" => "required|string|max:255",
-        "defendantAge" => "nullable|integer|min:1|max:120",
+   $validated = $request->validate([
+    'plaintiffName' => 'nullable|string|max:255',
+    'plaintiffMiddleName' => 'nullable|string|max:255',
+    'plaintiffLastName' => 'nullable|string|max:255',
+    'plaintiffAddress' => 'nullable|string|max:255',
+    'plaintiffContactNumber' => 'nullable|digits:11',
+    'plaintiffAge' => 'nullable|integer|min:1|max:120',
 
-        // Witness
-        "witnessName" => "nullable|string|max:255",
-        "witnessContactNumber" => "nullable|digits:11",
+   'defendantName' => 'required|string|max:255',
+    'defendantMiddleName' => 'nullable|string|max:255',
+    'defendantLastName' => 'required|string|max:255',
+    'defendantAddress' => 'nullable|string|max:255',
+    'defendantContactNumber' => 'nullable|digits:11',
+    'defendantAge' => 'nullable|integer|min:1|max:120',
 
-        // Case
-        "proof" => "nullable|image|mimes:jpg,png,jpeg|max:4096",
-        "blotterDescription" => "required|string|min:10",
-    ]);
+    'witnessName' => 'nullable|string|max:255',
+    'witnessContactNumber' => 'nullable|digits:11',
+
+    'proof' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
+    'blotterDescription' => 'required|string|min:10',
+]);
 
     $user = Auth::user();
 
@@ -36,17 +40,18 @@ public function submitBlotter(Request $request)
         $proofPath = $request->file('proof')->store('photos', 'public');
     }
 
-    Blotter::create([
-        // ✅ PLAINTIFF (FROM AUTH, NOT FORM)
-        'plaintiffId' => $user->id,
+    $plaintiff_data= [
+        'plaintiffId' => $user->id ?? "",
         'plaintiffAddress' => "123abaca",
-        'plaintiffContactNumber' => $user->contactNumber ?? null,
-        'plaintiffName' => $user->firstName ?? null,
-        'plaintiffMiddleName' => $user->middleName ?? null,
-        'plaintiffLastName' => $user->lastName ?? null,
+        'plaintiffContactNumber' => $user->contactNumber ?? $request->plaintiffContactNumber,
+        'plaintiffName' => $user->firstName ?? $request->plaintiffName,
+        'plaintiffMiddleName' => $user->middleName ?? $request->plaintiffMiddleName,
+        'plaintiffLastName' => $user->lastName ?? $request->plaintiffLastName,
         'plaintiffAge' => "121",
+    ];
 
-        // ✅ DEFENDANT
+    Blotter::create(array_merge($plaintiff_data,[
+        
         'defendantAddress' => $request->defendantAddress,
         'defendantContactNumber' => $request->defendantContactNumber,
         'defendantName' => $request->defendantName,
@@ -66,7 +71,7 @@ public function submitBlotter(Request $request)
         'encodedBy' => null,
         'action' => null,
         'statusDescription' => null,
-    ]);
+    ]));
 
     return redirect()->back()->with('success', 'Blotter submitted successfully!');
 }

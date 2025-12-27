@@ -42,7 +42,12 @@
                             <div class="modal-body">
                                 <form action="{{ route('admin.submit.blotter') }}" method="POST" enctype="multipart/form-data">
     @csrf
-
+    <input type="hidden" name="plaintiffName" value="{{ auth()->user()->firstName }}">
+    <input type="hidden" name="plaintiffLastName" value="{{ auth()->user()->lastName }}">
+    <input type="hidden" name="plaintiffMiddleName" value="{{ auth()->user()->middleName }}">
+    <input type="hidden" name="plaintiffAddress" value="{{ auth()->user()->address }}">
+    <input type="hidden" name="plaintiffContactNumber" value="{{ auth()->user()->contactNumber }}">
+    <input type="hidden" name="plaintiffAge" value="{{ auth()->user()->age }}">
     {{-- ================= DEFENDANT ================= --}}
     <h4>Defendant Information</h4>
 
