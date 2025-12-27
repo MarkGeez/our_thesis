@@ -74,10 +74,68 @@ public function submitBlotter(Request $request)
     ]));
 
     return redirect()->back()->with('success', 'Blotter submitted successfully!');
-}
-public function showBlotterRequests()
+    }
+    public function showBlotterRequests()
     {
         $blotters = Blotter::with('user')->orderByDesc('created_at')->get();
-        return view('admin.blotterRequest', compact('blotters'));
+        $role = auth()->user()->role;
+        return view($role .'.blotterRequest', compact('blotters'));
+    }
+     public function updateBlotter(Request $request, $id) // Changed from updateBlotter to update
+    {
+        $blotter = Blotter::findOrFail($id);
+        
+        $request->validate([
+            'defendantName' => 'required|string|max:255',
+            'defendantMiddleName' => 'nullable|string|max:255',
+            'defendantLastName' => 'required|string|max:255',
+            'defendantAddress' => 'nullable|string|max:255',
+            'defendantContactNumber' => 'nullable|digits:11',
+            'defendantAge' => 'nullable|integer|min:1|max:120',
+
+            'witnessName' => 'nullable|string|max:255',
+            'witnessContactNumber' => 'nullable|digits:11',
+
+            'proof' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
+            'blotterDescription' => 'required|string|min:10',
+        ]);
+        
+        if ($request->hasFile('proof')) {
+            $blotter->proof = $request->file('proof')->store('photos', 'public'); // Added ->
+        }
+
+        // FIXED: Use = instead of =>
+        $blotter->defendantName = $request->defendantName;
+        $blotter->defendantMiddleName = $request->defendantMiddleName;
+        $blotter->defendantLastName = $request->defendantLastName;
+        $blotter->defendantAddress = $request->defendantAddress;
+        $blotter->defendantContactNumber = $request->defendantContactNumber;
+        $blotter->defendantAge = $request->defendantAge;
+        $blotter->witnessName = $request->witnessName;
+        $blotter->witnessContactNumber = $request->witnessContactNumber; // Added missing line
+        $blotter->blotterDescription = $request->blotterDescription;
+
+        $blotter->save();
+
+        return redirect()->back()->with('success', 'Blotter updated');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $blotter = Blotter::findOrFail($id); // Changed from Announcement to Blotter
+        $encoder = auth()->user()->id;
+        
+        $request->validate([
+            "statusDescription" => "nullable|string|max:255",
+            "status" => "required|in:PENDING,SCHEDULED,RESOLVED,CLOSED" // Uppercase to match your enum
+        ]);
+
+        $blotter->statusDescription = $request->statusDescription;
+        $blotter->status = $request->status;
+        $blotter->encodedBy = $encoder;
+
+        $blotter->save();
+        
+        return redirect()->back()->with('success', 'Blotter status updated');
     }
 }

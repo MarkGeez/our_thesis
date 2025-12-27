@@ -5,7 +5,7 @@
 
     <!-- Button to open modal -->
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#blotterModal">
-        {!! $button ?? '' !!}
+        {!! $button ?? ''!!}
     </button>
 
     <!-- Modal -->
@@ -148,15 +148,4 @@
         </div>
     </div>
 
-    {{-- Auto-open modal on validation errors --}}
-    @if ($errors->any())
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const modalEl = document.getElementById('blotterModal');
-            if (modalEl) {
-                const modal = new bootstrap.Modal(modalEl);
-                modal.show();
-            }
-        });
-    </script>
-    @endif
+    

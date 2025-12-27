@@ -62,8 +62,11 @@
                                         </td>
                                         <td>{{ $blotter->created_at->format('M d, Y') }}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
+                                            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
                                                 <i class="fa fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#updateBlotter{{ $blotter->id }}">
+                                                <i class="fa fa-edit"></i> Edit
                                             </button>
                                         </td>
                                     </tr>
@@ -86,10 +89,10 @@
                                                     @if($blotter->witnessName)
                                                         <hr>
                                                         <h6>Witness Information:</h6>
-                                                        <p><strong>Name:</strong> {{ $blotter->witnessName }}</p> <p><strong>Contact:</strong> {{ $blotter->witnessContactNumber ?? 'N/A' }}</p>
-                                                        <p><strong>Contact:</strong> {{ $blotter->witness_contact_number ?? 'N/A' }}</p>
+                                                        <p><strong>Name:</strong> {{ $blotter->witnessName }}</p>
+                                                        <p><strong>Contact:</strong> {{ $blotter->witnessContactNumber ?? 'N/A' }}</p>
                                                     @endif
-                                                    
+
                                                     <hr>
                                                     <h6>Description:</h6>
                                                     <p>{{ $blotter->blotterDescription }}</p>
@@ -97,6 +100,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @include('forms.update')
+                                    {{--  --}}
+                                    
+ 
+
                                 @endforeach
                             </tbody>
                         </table>
@@ -106,6 +114,27 @@
         </main>
     </div>
 </div> 
+
+
+{{-- Auto-open modal on validation errors --}}
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(old('updateBlotterId'))
+                var id = "{{ old('updateBlotterId') }}";
+                var modalEl = document.getElementById('updateBlotter' + id);
+            @else
+                var modalEl = document.getElementById('blotterModal');
+            @endif
+
+            if (modalEl) {
+                var modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    </script>
+@endif
+
 
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>

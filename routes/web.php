@@ -59,6 +59,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
     Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+    Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+    Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
+
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
@@ -92,9 +95,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
 
-    Route::get('/blotterRequest', [BlotterController::class, 'showBlotterRequests'])->name('blotterRequest');
-    Route::get('/adminBlotter', [AdminController::class, 'adminBlotter'])->name('adminBlotter');
-    Route::post('/adminBlotter', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
 
 });
 

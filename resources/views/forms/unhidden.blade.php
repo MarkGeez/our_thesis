@@ -1,6 +1,5 @@
 
 
-
 <input type="text" name="plaintiffName"
     class="form-control border border-light @error('plaintiffName') is-invalid @enderror"
     value="{{ old('plaintiffName') }}">
@@ -48,3 +47,6 @@
      @error('plaintiffAge')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
+
+
+    

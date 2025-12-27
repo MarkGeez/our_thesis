@@ -41,5 +41,6 @@ class Blotter extends Model
         return $this->belongsTo(User::class, 'plaintiffId');
     }
 
+
     
 }
