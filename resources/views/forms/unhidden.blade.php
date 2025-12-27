@@ -3,7 +3,7 @@
 
 <input type="text" name="plaintiffName"
     class="form-control border border-light @error('plaintiffName') is-invalid @enderror"
-    value="{{ auth()->user()->firstName }}">
+    value="{{ old('plaintiffName') }}">
 
 @error('plaintiffName')
     <div class="invalid-feedback">{{ $message }}</div>
@@ -12,7 +12,7 @@
 
 <input type="text" name="plaintiffLastName"
     class="form-control border border-light @error('plaintiffLastName') is-invalid @enderror"
-    value="{{ auth()->user()->lastName }}">
+    value="{{ old('plaintiffLastName') }}">
 
     @error('plaintiffLastName')
         <div class="invalid-feedback">{{ $message }}</div>
@@ -20,7 +20,7 @@
 
     <input type="text" name="plaintiffMiddleName"
     class="form-control border border-light"
-    value="{{ auth()->user()->middleName }}">
+    value="{{ old('plaintiffLastName') }}">
 
      @error('plaintiffMiddleName')
         <div class="invalid-feedback">{{ $message }}</div>
@@ -28,7 +28,7 @@
 
 <input type="text" name="plaintiffAddress"
     class="form-control border border-light @error('plaintiffAddress') is-invalid @enderror"
-    value="{{ auth()->user()->address }}">
+    value="{{ old('plaintiffLastName') }}">
 
      @error('plaintiffAddress')
         <div class="invalid-feedback">{{ $message }}</div>
@@ -36,14 +36,14 @@
 
 <input type="text" name="plaintiffContactNumber"
     class="form-control border border-light @error('plaintiffContactNumber') is-invalid @enderror"
-    value="{{ auth()->user()->contactNumber }}">
+    value="{{ old('plaintiffLastName') }}">
 
       @error('plaintiffContactNumber')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 <input type="text" name="plaintiffAge"
     class="form-control border border-light @error('plaintiffAge') is-invalid @enderror"
-    value="{{ auth()->user()->age }}">
+    value="{{ old('plaintiffLastName') }}">
 
      @error('plaintiffAge')
         <div class="invalid-feedback">{{ $message }}</div>
