@@ -9,4 +9,8 @@ class Resident extends Model
     public function religion(){
         return $this->belongsTo(Religion::class, 'religionList');
     }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
