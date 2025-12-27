@@ -1,38 +1,109 @@
+
 <head>
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
-    <style>
-    
-
-    </style>
 </head>
 
- <div class="layer"></div>
-    <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
-    <div class="page-flex">  
-   
-   @include('admin.admin-sidebar', ['admin' => auth()->user()])
+<div class="layer"></div>
+<a class="skip-link sr-only" href="#skip-target">Skip to content</a>
+<div class="page-flex">  
+    @include('admin.admin-sidebar', ['admin' => auth()->user()])
 
+    <div class="main-wrapper">
+        @include('admin.admin-header', ['admin' => auth()->user()])
+        
+        <main class="main users chart-page" id="skip-target">
+            <div class="container-fluid p-4">
+                <h3 class="mb-4">Blotter Requests</h3>
 
+                @if($blotters->isEmpty())
+                    <div class="alert alert-info">No blotter requests found.</div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Submitted By</th>
+                                    <th>Defendant</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Proof</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($blotters as $blotter)
+                                    <tr>
+                                        <td>{{ $blotter->id }}</td>
+                                        <td>{{ $blotter->user->firstName ?? '' }} {{ $blotter->user->lastName ?? '' }}</td>
+                                        <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
+                                        <td>{{ Str::limit($blotter->blotterDescription, 50) }}</td>
+                                        
+                                        <td>
+                                            <span class="badge bg-{{ $blotter->status === 'PENDING' ? 'warning' : 'success' }}"> {{ ucfirst(strtolower($blotter->status)) }} </span>
+                                        </td>
+                                        <td>
+                                            @if($blotter->proof)
+                                                <a href="{{ asset('storage/'.$blotter->proof) }}" target="_blank">
+                                                    <i class="fa fa-file"></i> View
+                                                </a>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        <td>{{ $blotter->created_at->format('M d, Y') }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
+                                                <i class="fa fa-eye"></i> View
+                                            </button>
+                                        </td>
+                                    </tr>
 
-<div class="main-wrapper">
-           
-    @include('admin.admin-header', ['admin' => auth()->user()])
-            <main class="main users chart-page" id="skip-target"></main>
-
-</main>
-
-
-</div>
+                                    {{-- View Modal --}}
+                                    <div class="modal fade" id="viewBlotter{{ $blotter->id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h6>Defendant Information:</h6>
+                                                    <p><strong>Name:</strong> {{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</p>
+                                                    <p><strong>Age:</strong> {{ $blotter->defendantAge ?? 'N/A' }}</p>
+                                                    <p><strong>Address:</strong> {{ $blotter->defendantAddress ?? 'N/A' }}</p>
+                                                    <p><strong>Contact:</strong> {{ $blotter->defendantContactNumber ?? 'N/A' }}</p>
+                                                    
+                                                    @if($blotter->witnessName)
+                                                        <hr>
+                                                        <h6>Witness Information:</h6>
+                                                        <p><strong>Name:</strong> {{ $blotter->witnessName }}</p> <p><strong>Contact:</strong> {{ $blotter->witnessContactNumber ?? 'N/A' }}</p>
+                                                        <p><strong>Contact:</strong> {{ $blotter->witness_contact_number ?? 'N/A' }}</p>
+                                                    @endif
+                                                    
+                                                    <hr>
+                                                    <h6>Description:</h6>
+                                                    <p>{{ $blotter->blotterDescription }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </main>
+    </div>
 </div> 
 
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
