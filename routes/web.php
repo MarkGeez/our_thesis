@@ -10,7 +10,7 @@ use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SubAdminController;
 use App\Http\Controllers\ActiveLogController;
-
+use App\Http\Controllers\BlotterController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +22,7 @@ use Illuminate\Auth\Events\Login;
 
 Route::get('login', [AuthController::class,'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.attempt');
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('register', [RegistrationController::class,'showRegister'])->name('register');
 Route::post('register', [RegistrationController::class, 'register'])->name('register.attempt');
@@ -53,11 +54,16 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 });
 
 
-// Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
+
     Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
+    Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+    Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+    Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
+
+
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
     Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
@@ -89,15 +95,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
     Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
+
+
 });
 
-// Sub-Admin Routes
 Route::middleware(['auth', 'role:subadmin'])->group(function(){
     Route::prefix('subadmin')->name("subadmin.")->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
-        // Add this new route
         Route::get('/adminBlotter', [SubAdminController::class,'adminBlotter'])->name('adminBlotter');
         Route::get('/adminCertificate', [SubAdminController::class,'adminCertificate'])->name('adminCertificate');
         Route::get('/adminServices', [SubAdminController::class,'adminServices'])->name('adminServices');

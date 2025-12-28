@@ -36,10 +36,13 @@
                                 </li>
 
                                 <li>
-                                    <a class="danger" href="##">
-                                        <i data-feather="log-out" aria-hidden="true"></i>
-                                        <span>Log out</span>
-                                    </a>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="danger" style="background: none; border: none; padding: 0; width: 100%; text-align: left;">
+                                            <i style="color: #dc3545" data-feather="log-out" aria-hidden="true"></i>
+                                            <span class="text-danger">Log out</span>
+                                        </button>
+                                    </form>
                                 </li>
                             </ul>
                         </div>

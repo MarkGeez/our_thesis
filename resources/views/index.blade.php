@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Boldonse&family=Chicle&family=Exo:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Metal+Mania&family=Mochiy+Pop+P+One&family=Oi&family=Oswald:wght@200..700&family=Quicksand:wght@600&family=Reggae+One&family=Teko:wght@300..700&family=Yesteryear&display=swap" rel="stylesheet">
     <style>
         body {
-            background-image: url("https://scontent-mnl3-3.xx.fbcdn.net/v/t1.15752-9/551808660_24645116478444319_6807754490734972390_n.jpg?stp=dst-jpg_s2048x2048_tt6&_nc_cat=109&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeGwpXVRSoHHWA1K9xSHxI3n9a2MLZSER6b1rYwtlIRHpsr-xrkC-PhTkop0ZXG1TAch0TGwM6kb75xgyzjpr1zR&_nc_ohc=GwjrXKPGXo8Q7kNvwGDgRR1&_nc_oc=AdksV24RzmtdNzvMEzKlgwaev6ZLHO1nCpscUNMN4s4tc7MP2Ja_Vc48vHsAwl7rp1g&_nc_zt=23&_nc_ht=scontent-mnl3-3.xx&oh=03_Q7cD3wEnGn7I8EC23yUMP38iV-NFHQW1a4UmjJqlna2P2WMchw&oe=694A81E1");
+            background-image: url('{{ asset("images/brgy249_background.jpg") }}');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;

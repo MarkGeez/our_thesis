@@ -23,8 +23,8 @@ class Announcement extends Model
     {
     static::created(function ($announcement) {
         ActiveLogger::log(
-            'created',
             'Announcement',
+            'created',
             $announcement->id,
             'Created a new announcement'
         );
@@ -32,8 +32,8 @@ class Announcement extends Model
 
     static::updated(function ($announcement) {
         ActiveLogger::log(
-            'updated',
             'Announcement',
+            'updated',
             $announcement->id,
             'Updated an announcement'
         );
@@ -41,7 +41,7 @@ class Announcement extends Model
     
 
     static::deleted(function($announcement){
-        ActiveLogger::log('archived', 'Announcement', $announcement->id, 'Archived an announcement');
+        ActiveLogger::log('Announcement', 'archived', $announcement->id, 'Archived an announcement');
     });
     
     }
