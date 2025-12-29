@@ -44,6 +44,7 @@
                                 <option value="" disabled>-- Choose Option --</option>
                                 <option value="PENDING" {{ old('status', $blotter->status) === 'PENDING' ? 'selected' : '' }}>Pending (Awaiting Action)</option>
                                 <option value="SCHEDULED" {{ old('status', $blotter->status) === 'SCHEDULED' ? 'selected' : '' }}>Scheduled (For Hearing)</option>
+                                <option value="COLD CASE" {{ old('status', $blotter->status) === 'COLD CASE' ? 'selected' : '' }}>Cold Case (Inactive)</option>
                                 <option value="RESOLVED" {{ old('status', $blotter->status) === 'RESOLVED' ? 'selected' : '' }}>Resolved (Settled)</option>
                                 <option value="CLOSED" {{ old('status', $blotter->status) === 'CLOSED' ? 'selected' : '' }}>Closed (Terminated)</option>
                             </select>

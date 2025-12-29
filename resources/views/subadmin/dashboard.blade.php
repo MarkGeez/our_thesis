@@ -4,8 +4,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Boldonse&family=Chicle&family=Exo:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Metal+Mania&family=Mochiy+Pop+P+One&family=Oi&family=Oswald:wght@200..700&family=Quicksand:wght@600&family=Reggae+One&family=Teko:wght@300..700&family=Yesteryear&display=swap" rel="stylesheet">
     <style>
+        .oswald-regular {
+            font-family: "Oswald", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 200;
+            font-style: normal;
+            }
         .announcement-card {
             max-width: 100%;
             border: 1px solid #ddd;
@@ -229,6 +235,7 @@
             font-size: 2rem;
             margin-bottom: 10px;
             font-weight: 700;
+            font-family: "Oswald", sans-serif;
         }
 
         .welcome-card p {

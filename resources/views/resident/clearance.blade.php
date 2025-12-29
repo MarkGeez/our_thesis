@@ -15,13 +15,11 @@
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
    
-    @include('resident.resident-sidebar', ['resident' => $resident])
+    @include('resident.resident-sidebar', ['resident' => auth()->user()])
+   
 
-
-
-<div class="main-wrapper">
-           
-    @include('resident.resident-header', ['resident' => $resident])
+    <div class="main-wrapper">
+        @include('resident.resident-header', ['resident' => auth()->user()])
             <main class="main users chart-page" id="skip-target">
                 <!--Dito lalagay main content-->
 

@@ -9,10 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
     <style>
+        
         .table-wrapper {
-            margin: 0 3em;
+            margin: 0 1em;
         }
-
+        
         table th,
         table td {
             vertical-align: middle;

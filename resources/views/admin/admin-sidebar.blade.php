@@ -1,3 +1,30 @@
+<style>
+    .sidebar-body {
+        overflow-y: auto;
+        max-height: calc(100vh - 100px); /* adjust 100px based on your header height */
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: rgba(0,0,0,0) transparent; /* Firefox */
+    }
+
+    /* Chrome, Edge, Safari */
+    .sidebar-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar-body::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.2);
+        border-radius: 3px;
+    }
+
+    .sidebar-body::-webkit-scrollbar-thumb:hover {
+        background: rgba(0,0,0,0.3);
+    }
+</style>
+
 <aside class="sidebar">
     <div class="sidebar-start">
         <div class="sidebar-head">
@@ -18,7 +45,7 @@
             </button>
         </div>
 
-        <div class="sidebar-body">
+        <div class="sidebar-body" style="overflow-y: auto; max-height: calc(100vh - 100px);">
             <ul class="sidebar-body-menu">
                 <li>
                     <a class="{{ Request::routeIs('admin.dashboard') ? 'active' : '' }}"
