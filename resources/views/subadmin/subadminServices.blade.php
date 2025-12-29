@@ -1,6 +1,4 @@
-
-    <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -9,24 +7,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+    <style>
+    
+
+    </style>
 </head>
 
  <div class="layer"></div>
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
    
-    @include('resident.resident-sidebar', ['resident' => $resident])
+   @include('subadmin.subadmin-sidebar', ['subadmin' => auth()->user()])
 
+    <div class="main-wrapper">
+        @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
+            <main class="main users chart-page" id="skip-target"></main>
 
-
-<div class="main-wrapper">
-           
-    @include('resident.resident-header', ['resident' => $resident])
-            <main class="main users chart-page" id="skip-target">
-                <!--Dito lalagay main content-->
-
-
-            </main>
+</main>
 
 </div>
 </div> 
@@ -34,5 +32,3 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-
-

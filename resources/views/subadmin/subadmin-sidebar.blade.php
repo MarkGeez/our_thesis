@@ -21,8 +21,7 @@
         <div class="sidebar-body">
             <ul class="sidebar-body-menu">
                 <li>
-                    <a class="{{ Request::routeIs('subadmin.dashboard') ? 'active' : '' }}"
-                       href="{{ route('subadmin.dashboard') }}">
+                    <a class="{{ Request::routeIs('subadmin.dashboard') ? 'active' : '' }}" href="{{ route('subadmin.dashboard') }}">
                         <span class="icon home"></span>Dashboard
                     </a>
                 </li>
@@ -31,94 +30,77 @@
             <span class="system-menu__title">Personal</span>
 
             <ul class="sidebar-body-menu">
-
                 <li>
-                    <a class="{{ Request::routeIs('subadmin.profile') ? 'active' : '' }}"
-                       href="{{ route('subadmin.profile') }}">
+                    <a class="{{ Request::routeIs('subadmin.profile') ? 'active' : '' }}" href="{{ route('subadmin.profile') }}">
                         <span class="icon"><i class="fa-solid fa-user"></i></span>Profile
                     </a>
                 </li>
 
                 @php
-    $servicesActive = Request::routeIs(
-        'subadmin.adminBlotter*',
-        
-        'subadmin.adminServices*',
-        'subadmin.adminComplaint*',
-        
-    );
-@endphp
+                    $servicesActive = Request::routeIs(
+                        'subadmin.subadminBlotter*',
+                        'subadmin.subadminCertificate*',
+                        'subadmin.subadminServices*',
+                        'subadmin.complaint*'
+                    );
+                @endphp
+
                 <li>
-                    <!-- make this the toggle the script looks for and avoid malformed blade syntax -->
-                    <a class="show-cat-btn" href="#">
-                         E-Barangay Services
-                         <span class="category__btn transparent-btn" title="Open list">
-                             <span class="sr-only">Open list</span>
-                             <span class="icon arrow-down" aria-hidden="true"></span>
-                         </span>
-                     </a>
-                     <ul class="cat-sub-menu">
+                    <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="##">
+                        <span class="icon"></span>E-Barangay Services
+                        <span class="category__btn transparent-btn" title="Open list">
+                            <span class="sr-only">Open list</span>
+                            <span class="icon arrow-down" aria-hidden="true"></span>
+                        </span>
+                    </a>
+                    <ul class="cat-sub-menu">
                         <li>
-                           <a class="{{ Request::routeIs('subadmin.adminBlotter*') ? 'active' : '' }}" href="{{ route('subadmin.adminBlotter') }}">
+                            <a class="{{ Request::routeIs('subadmin.subadminBlotter') ? 'active' : '' }}" href="{{ route('subadmin.subadminBlotter') }}">
                                 <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                             </a>
-
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('subadmin.adminCertificate*') ? 'active' : '' }}"
-                       href="{{ route('subadmin.adminCertificate') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>My Documents
-                    </a>
-
-                    </a>
+                            <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
+                                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
+                            </a>
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('subadmin.adminServices*') ? 'active' : '' }}"
-                       href="{{ route('subadmin.adminServices') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>My Services
-                    </a>
-
-                    </a>
+                            <a class="{{ Request::routeIs('subadmin.subadminServices*') ? 'active' : '' }}" href="{{ route('subadmin.subadminServices') }}">
+                                <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>My Services
+                            </a>
                         </li>
                         <li>
-                           <a class="{{ Request::routeIs('subadmin.adminComplaint*') ? 'active' : '' }}"
-                       href="{{ route('subadmin.adminComplaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>My Complaints 
-                    </a>
+                            <a class="{{ Request::routeIs('subadmin.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
+                                <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
+                            </a>
+                        </li>
                     </ul>
                 </li>
-                <span class="system-menu__title">manage system</span>
+            </ul>
+
+            <span class="system-menu__title">Manage System</span>
+
+            <ul class="sidebar-body-menu">
                 <li>
-                    <a class="{{ Request::routeIs('subadmin.announcements') ? 'active' : '' }}"
-                       href="{{ route('subadmin.announcements') }}">
-                        <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
+                    <a class="{{ Request::routeIs('subadmin.announcements') ? 'active' : '' }}" href="{{ route('subadmin.announcements') }}">
+                        <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>Announcements
                     </a>
                 </li>
-                
-                
-
                 <li>
-                    <a class="{{ Request::routeIs('subadmin.blotterRequest') ? 'active' : '' }}"
-                       href="{{ route('subadmin.blotterRequest' )}}">
+                    <a class="{{ Request::routeIs('subadmin.blotterRequest') ? 'active' : '' }}" href="{{ route('subadmin.blotterRequest') }}">
                         <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
                     </a>
                 </li>
-
-            
-
                 <li>
-                    <a class="{{ Request::routeIs('subadmin.serviceRequest') ? 'active' : '' }}"
-                       href="{{ route('subadmin.serviceRequest') }}">
+                    <a class="{{ Request::routeIs('subadmin.serviceRequest') ? 'active' : '' }}" href="{{ route('subadmin.serviceRequest') }}">
                         <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>Service Requests
                     </a>
                 </li>
-                 <li>
-                    <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}"
-                       href="{{ route('subadmin.complaintRequest') }}">
+                <li>
+                    <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
                         <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints Records
                     </a>
                 </li>
-
             </ul>
         </div>
     </div>
@@ -126,20 +108,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const active = document.querySelector('.sidebar .active');
-    if (!active) return;
+    const activeItem = document.querySelector('.sidebar .active');
+    if (!activeItem) return;
 
-    // ensure parent submenu is open
-    const submenu = active.closest('.cat-sub-menu');
+    // ensure parent submenu is open if a child is active
+    const submenu = activeItem.closest('.cat-sub-menu');
     if (submenu) {
         submenu.style.display = 'block';
         const toggle = submenu.previousElementSibling;
         if (toggle) toggle.classList.add('active');
     }
 
-    // scroll active item into view (center)
+    // scroll active item into view
     try {
-        active.scrollIntoView({ behavior: 'auto', block: 'center' });
-    } catch (e) { /* ignore */ }
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) { /* fallback for older browsers */ }
 });
 </script>

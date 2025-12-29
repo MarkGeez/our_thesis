@@ -106,10 +106,10 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
-        Route::get('/adminBlotter', [SubAdminController::class,'adminBlotter'])->name('adminBlotter');
-        Route::get('/adminCertificate', [SubAdminController::class,'adminCertificate'])->name('adminCertificate');
-        Route::get('/adminServices', [SubAdminController::class,'adminServices'])->name('adminServices');
-        Route::get('/adminComplaint', [SubAdminController::class,'adminComplaint'])->name('adminComplaint');
+        Route::get('/subadminBlotter', [SubAdminController::class,'subadminBlotter'])->name('subadminBlotter');
+        Route::get('/subadminCertificate', [SubAdminController::class,'subadminCertificate'])->name('subadminCertificate');
+        Route::get('/subadminServices', [SubAdminController::class,'subadminServices'])->name('subadminServices');
+        Route::get('/complaint', [SubAdminController::class,'adminComplaint'])->name('complaint');
         Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
        
         Route::get('/complaintRequest', [SubAdminController::class,'complaintRequest'])->name('complaintRequest');

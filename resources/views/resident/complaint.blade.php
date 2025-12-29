@@ -117,7 +117,8 @@
             gap: 8px;
         }
     </style>
-</head>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <div class="layer"></div>
 <a class="skip-link sr-only" href="#skip-target">Skip to content</a>

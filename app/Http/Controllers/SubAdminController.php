@@ -52,10 +52,10 @@ class SubAdminController extends Controller
         $subadmin = Auth::user();
         return view("subadmin.serviceRequest", compact('subadmin'));
     }
-    public function adminBlotter(): View
+    public function subadminBlotter(): View
     {
         $subadmin = Auth::user();
-        return view("subadmin.adminBlotter", compact('subadmin'));
+        return view("subadmin.subadminBlotter", compact('subadmin'));
     }
     public function complaintRequest(): View
     {
