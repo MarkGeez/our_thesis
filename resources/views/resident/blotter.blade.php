@@ -32,6 +32,8 @@
                     {{ session('success') }}
                 </div>
             @endif
+                        @include('forms.display')
+
         </main>
     </div>
 </div>

@@ -141,4 +141,14 @@ class BlotterController extends Controller
         
         return redirect()->back()->with('success', 'Blotter status updated');
     }
+
+   public function ownBlotters(){
+       $user = auth()->user();
+
+       $blotters = $user->blottersPlaintiff()->paginate(10);
+
+       return view($user->role .  ".blotter", compact('blotters'));
+   }
+
+
 }

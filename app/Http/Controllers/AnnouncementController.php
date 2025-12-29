@@ -13,6 +13,7 @@ class AnnouncementController extends Controller
 {
     public function showAnnouncementForm(): View
         {
+    
     $role = Auth::user()->role;
     return view($role . ".create-announcement");
     }

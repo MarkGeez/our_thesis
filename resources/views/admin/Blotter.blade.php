@@ -112,6 +112,7 @@
 
 <div class="d-flex align-items-center mb-3 px-3 blotter-header">
                     <h2 class="mb-0" style="color:#000000;">My Blotter</h2>
+                    @include('forms.display')
                     <div class="ms-auto encode-btn-wrapper me-4">
                          @include('forms.blotter', [
                             'plaintiff' => view('forms.hidden')->render(),

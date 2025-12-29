@@ -41,7 +41,7 @@
 
                 @php
     $servicesActive = Request::routeIs(
-        'admin.adminBlotter*',
+        'admin.Blotter*',
         'admin.adminCertificate*',
         'admin.adminServices*',
         'admin.adminComplaint*',
@@ -59,7 +59,7 @@
                      </a>
                      <ul class="cat-sub-menu">
                         <li>
-                           <a class="{{ Request::routeIs('admin.adminBlotter*') ? 'active' : '' }}" href="{{ route('admin.adminBlotter') }}">
+                           <a class="{{ Request::routeIs('admin.Blotter*') ? 'active' : '' }}" href="{{ route('admin.Blotter') }}">
                                 <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                             </a>
 

@@ -41,7 +41,9 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
         Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
-        Route::get('/blotter', [ResidentController::class,'blotter'])->name('blotter');
+
+        Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
+
         Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
         Route::get('/clearance', [ResidentController::class,'clearance'])->name('clearance');
         Route::get('/service', [ResidentController::class,'service'])->name('service');
@@ -60,11 +62,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
 
-    Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
+    Route::get('/blotterRequest', [AdminController::class, 'blotterRequest'])->name('blotterRequest');
     Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
     Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
     Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
-
+    Route::get('/adminBlotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
@@ -87,7 +89,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
 
     Route::get('/reports', [AdminController::class,'reports'])->name('reports');
-    Route::get('/adminBlotter', [AdminController::class,'adminBlotter'])->name('adminBlotter');
     Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
     Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
     Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
@@ -106,8 +107,8 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
-        Route::get('/subadminBlotter', [SubAdminController::class,'subadminBlotter'])->name('subadminBlotter');
-        Route::get('/subadminCertificate', [SubAdminController::class,'subadminCertificate'])->name('subadminCertificate');
+        Route::get('/subadminBlotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
+            Route::get('/subadminCertificate', [SubAdminController::class,'subadminCertificate'])->name('subadminCertificate');
         Route::get('/subadminServices', [SubAdminController::class,'subadminServices'])->name('subadminServices');
         Route::get('/complaint', [SubAdminController::class,'adminComplaint'])->name('complaint');
         Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
@@ -141,7 +142,7 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
     Route::prefix('non-resident')->name('non-resident.')->group(function(){
         Route::get('/dashboard', [NonResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [NonResidentController::class,'profile'])->name('profile');
-        Route::get('/blotter', [NonResidentController::class,'blotter'])->name('blotter');
+        Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
         Route::get('/aboutus', [NonResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [NonResidentController::class,'contactus'])->name('contactus');
         

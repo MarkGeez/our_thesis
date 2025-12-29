@@ -42,8 +42,8 @@
                 
 
                 <li>
-                    <a class="{{ Request::routeIs('non-resident.blotter') ? 'active' : '' }}"
-                       href="{{ route('non-resident.blotter' )}}">
+                    <a class="{{ Request::routeIs('non-resident.Blotter') ? 'active' : '' }}"
+                       href="{{ route('non-resident.Blotter' )}}">
                         <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                     </a>
                 </li>

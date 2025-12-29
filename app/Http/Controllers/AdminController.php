@@ -114,11 +114,7 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.reports", compact('admin'));
     }
-    public function adminBlotter(): View
-    {
-        $admin = Auth::user();
-        return view("admin.adminBlotter", compact('admin'));
-    }
+   
 
     public function adminCertificate(): View
     {
