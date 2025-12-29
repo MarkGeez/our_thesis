@@ -12,6 +12,8 @@ use App\Http\Controllers\SubAdminController;
 use App\Http\Controllers\ActiveLogController;
 use App\Http\Controllers\BlotterController;
 
+use App\Http\Controllers\NonResidentController;
+
 use Illuminate\Support\Facades\Route;
 
 
@@ -133,5 +135,17 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
     });
 });
 
+
+// Nonresident routes
+Route::middleware(['auth', 'role:non-resident'])->group(function(){
+    Route::prefix('non-resident')->name('non-resident.')->group(function(){
+        Route::get('/dashboard', [NonResidentController::class,'dashboard'])->name('dashboard');
+        Route::get('/profile', [NonResidentController::class,'profile'])->name('profile');
+        Route::get('/blotter', [NonResidentController::class,'blotter'])->name('blotter');
+        Route::get('/aboutus', [NonResidentController::class,'aboutus'])->name('aboutus');
+        Route::get('/contactus', [NonResidentController::class,'contactus'])->name('contactus');
+        
+    });
+});
 
 

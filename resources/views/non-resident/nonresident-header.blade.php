@@ -1,0 +1,51 @@
+ <nav class="main-nav--bg">
+                <div class="container main-nav">
+                    <div class="main-nav-start">
+                        <div style="display:inline-block; margin-right:12px;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Bagong_Pilipinas_logo.png/330px-Bagong_Pilipinas_logo.png"
+                                alt="logo" style="width:50px; height:auto; display:block;">
+                        </div>
+                    </div>
+                    <div class="main-nav-end">
+                        <button class="sidebar-toggle transparent-btn" title="Menu" type="button">
+                            <span class="sr-only">Toggle menu</span>
+                            <span class="icon menu-toggle--gray" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="nav-user-wrapper">
+                            <button href="##" class="nav-user-btn dropdown-btn" title="My profile" type="button">
+                                <span class="sr-only">My profile</span>
+                                <span class="nav-user-img">
+                                    <picture>
+                                        <source srcset="./img/avatar/avatar-illustrated-02.webp" type="image/webp">
+                                        <img src="./img/avatar/avatar-illustrated-02.png" alt="User name">
+                                    </picture>
+                                </span>
+                            </button>
+                            <ul class="users-item-dropdown nav-user-dropdown dropdown">
+                                <li class="user-info text-center">
+                                    <h3 class="user-name mb-2">{{ auth()->user()->firstName }}</h3>
+                                    <p class="text-secondary user-role text-muted small">Non-Resident</p>
+                                </li>
+                                <hr>
+                                <li>
+                                    <a href="##">
+                                        <i data-feather="user" aria-hidden="true"></i>
+                                        <span>Profile</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="danger" style="background: none; border: none; padding: 0; width: 100%; text-align: left;">
+                                            <i style="color: #dc3545" data-feather="log-out" aria-hidden="true"></i>
+                                            <span class="text-danger">Log out</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
