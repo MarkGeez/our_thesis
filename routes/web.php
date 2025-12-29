@@ -54,6 +54,11 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/contactus', [ResidentController::class,'contactus'])->name('contactus');
         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         
+        // check mo kung tama to nagana naman sa side ko
+        Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+        Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+        Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
+        
     });
 });
 
@@ -133,6 +138,11 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
     Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
     
+    // check mo kung tama to nagana naman sa side ko
+    Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+        Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+        Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
+        
     });
 });
 
@@ -145,6 +155,12 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
         Route::get('/aboutus', [NonResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [NonResidentController::class,'contactus'])->name('contactus');
+        
+
+        // check mo kung tama to nagana naman sa side ko
+        Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
+        Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+        Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
         
     });
 });
