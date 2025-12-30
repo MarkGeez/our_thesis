@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Feedbacks;
 use App\Models\Blotter;
+use App\Models\Setting;
 
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -92,7 +93,51 @@ class AdminController extends Controller
     public function settings(): View
     {
         $admin = Auth::user();
-        return view("admin.settings", compact('admin'));
+        $settings = Setting::first();
+        return view("admin.settings", compact('admin', 'settings'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'barangay_name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'theme' => 'nullable|string|max:7',
+            'contact_address' => 'nullable|string|max:255',
+            'contact_number' => 'nullable|string|max:50',
+            'contact_email' => 'nullable|email|max:255',
+        ]);
+
+        $settings = Setting::first() ?? new Setting();
+
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($settings->logo_path && file_exists(public_path($settings->logo_path))) {
+                unlink(public_path($settings->logo_path));
+            }
+
+            // Store new logo
+            $file = $request->file('logo');
+            $path = $file->store('uploads/logo', 'public');
+            $settings->logo_path = 'storage/' . $path;
+        }
+
+        $settings->barangay_name = $request->barangay_name;
+        if ($request->filled('theme')) {
+            $settings->theme = $request->theme;
+        }
+        if ($request->filled('contact_address')) {
+            $settings->contact_address = $request->contact_address;
+        }
+        if ($request->filled('contact_number')) {
+            $settings->contact_number = $request->contact_number;
+        }
+        if ($request->filled('contact_email')) {
+            $settings->contact_email = $request->contact_email;
+        }
+        $settings->save();
+
+        return redirect()->back()->with('success', 'Settings updated successfully!');
     }
     public function barangayOfficials(): View
     {

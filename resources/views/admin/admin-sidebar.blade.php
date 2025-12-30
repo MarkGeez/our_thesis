@@ -1,27 +1,6 @@
 <style>
-    .sidebar-body {
-        overflow-y: auto;
-        max-height: calc(100vh - 100px); /* adjust 100px based on your header height */
-        scrollbar-width: thin; /* Firefox */
-        scrollbar-color: rgba(0,0,0,0) transparent; /* Firefox */
-    }
-
-    /* Chrome, Edge, Safari */
-    .sidebar-body::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .sidebar-body::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .sidebar-body::-webkit-scrollbar-thumb {
-        background: rgba(0,0,0,0.2);
-        border-radius: 3px;
-    }
-
-    .sidebar-body::-webkit-scrollbar-thumb:hover {
-        background: rgba(0,0,0,0.3);
+    .sidebar {
+        background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
     }
 </style>
 
@@ -31,10 +10,15 @@
             <a href="{{ route('admin.dashboard') }}" class="logo-wrapper">
                 <span class="sr-only">Home</span>
                 <span class="logo" aria-hidden="true">
-                    <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Brgy 249 Logo">
+                    @php
+    $logoPath = \App\Models\Setting::get('logo', 'template/img/brgy 249 Logo png.png');
+@endphp
+<img src="{{ asset($logoPath) }}" alt="System Logo" style="border-radius: 50%;">
                 </span>
                 <div class="logo-text">
-                    <span class="logo-title" style="font-family: 'Orbitron', sans-serif;">brgy249</span>
+                    <span class="logo-title" style="font-family: 'Orbitron', sans-serif;">
+                        {{ \App\Models\Setting::get('name') }}
+                    </span>
                     <span class="logo-subtitle">Dashboard</span>
                 </div>
             </a>
@@ -45,7 +29,7 @@
             </button>
         </div>
 
-        <div class="sidebar-body" style="overflow-y: auto; max-height: calc(100vh - 100px);">
+        <div class="sidebar-body">
             <ul class="sidebar-body-menu">
                 <li>
                     <a class="{{ Request::routeIs('admin.dashboard') ? 'active' : '' }}"

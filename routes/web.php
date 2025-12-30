@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/aboutus', [AdminController::class,'aboutus'])->name('aboutus');
     Route::get('/contactus', [AdminController::class,'contactus'])->name('contactus');
     Route::get('/settings', [AdminController::class,'settings'])->name('settings');
+    Route::post('/settings', [AdminController::class,'updateSettings'])->name('updateSettings');
     Route::get('/barangayOfficials', [AdminController::class,'barangayOfficials'])->name('barangayOfficials');
     Route::get('/census', [AdminController::class,'census'])->name('census');
     Route::get('/users', [AdminController::class,'users'])->name('users');

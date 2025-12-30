@@ -1,13 +1,24 @@
+<style>
+    .sidebar {
+        background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
+    }
+</style>
+
 <aside class="sidebar">
     <div class="sidebar-start">
         <div class="sidebar-head">
             <a href="{{ route('subadmin.dashboard') }}" class="logo-wrapper">
                 <span class="sr-only">Home</span>
                 <span class="logo" aria-hidden="true">
-                    <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Brgy 249 Logo">
+                   @php
+    $logoPath = \App\Models\Setting::get('logo', 'template/img/brgy 249 Logo png.png');
+@endphp
+<img src="{{ asset($logoPath) }}" alt="System Logo" style="border-radius: 50%;">
                 </span>
                 <div class="logo-text">
-                    <span class="logo-title" style="font-family: 'Orbitron', sans-serif;">brgy249</span>
+                    <span class="logo-title" style="font-family: 'Orbitron', sans-serif;">
+                        {{ \App\Models\Setting::get('name') }}
+                    </span>
                     <span class="logo-subtitle">Dashboard</span>
                 </div>
             </a>

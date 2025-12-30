@@ -1,6 +1,6 @@
 
 @if($blotters->count() > 0)
-    <div class="table-responsive table-wrapper">
+    <div class="table-responsive ">
         <table class="table table-bordered table-hover">
             <thead class="table-primary">
                 <tr>

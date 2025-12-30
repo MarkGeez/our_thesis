@@ -20,4 +20,5 @@ class ActiveLogController extends Controller
 
         return view('admin.activityLogs', compact('logs', 'user'));
     }
+    
 }

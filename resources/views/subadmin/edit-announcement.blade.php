@@ -5,8 +5,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
@@ -166,3 +165,5 @@
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script> document.addEventListener("DOMContentLoaded", function() { const form = document.querySelector("form"); const msg = document.getElementById("localSuccessMessage"); form.addEventListener("submit", function() { msg.style.display = "block"; setTimeout(function() { msg.style.opacity = "0"; msg.style.transition = "opacity 0.6s"; setTimeout(() => msg.remove(), 600); }, 2000); }); }); </script>
+
+

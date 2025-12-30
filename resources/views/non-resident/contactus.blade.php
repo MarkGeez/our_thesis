@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
         <style>
@@ -80,7 +80,7 @@
           </div>
            
             <div class="d-flex justify-content-center mb-3">
-              <h4 class="h4">Barangay 249 Zone 23, Tondo, Manila</h4>
+              <h4 class="h4">{{ \App\Models\Setting::get('contact_address', 'Barangay 249 Zone 23, Tondo, Manila') }}</h4>
             </div>
 
            
@@ -91,15 +91,15 @@
       </h4>
       <p class="mb-3">
         <i class="fa-solid fa-map-marker-alt text-danger me-2"></i>
-        JX8H+H57, Yakal St, Tondo, Manila, 1008 Metro Manila
+        {{ \App\Models\Setting::get('contact_address', 'JX8H+H57, Yakal St, Tondo, Manila, 1008 Metro Manila') }}
       </p>
       <p class="mb-3">
         <i class="fa-solid fa-phone text-success me-2"></i>
-        0999-123-4567
+        {{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}
       </p>
       <p>
         <i class="fa-solid fa-envelope text-warning me-2 mb-3"></i>
-        brgy249@email.com
+        {{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}
       </p>
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.6974750090753!2d120.9780723024629!3d14.6163018517375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b5fa20b91ee9%3A0x4fc85db2949a910d!2sBarangay%20249%20Tondo!5e0!3m2!1sen!2sph!4v1759393446597!5m2!1sen!2sph"
             width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -119,6 +119,8 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+
+
 
 
 
