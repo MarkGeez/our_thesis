@@ -11,6 +11,8 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SubAdminController;
 use App\Http\Controllers\ActiveLogController;
 use App\Http\Controllers\BlotterController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ServiceRequestController;
 
 use App\Http\Controllers\NonResidentController;
 
@@ -46,7 +48,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 
         Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
         Route::get('/clearance', [ResidentController::class,'clearance'])->name('clearance');
-        Route::get('/service', [ResidentController::class,'service'])->name('service');
+        Route::get('/service', [ServiceController::class,'residentIndex'])->name('service');
+        Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
         Route::get('/complaint', [ResidentController::class,'complaint'])->name('complaint');
         Route::get('/feedback', [ResidentController::class,'feedback'])->name('feedback');
         Route::post('/feedback', [FeedbackController::class, 'submitFeedback'])->name('submit.feedback');
@@ -75,7 +78,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
-    Route::get('/serviceRequest', [AdminController::class,'serviceRequest'])->name('serviceRequest');
+    Route::get('/serviceRequest', [ServiceRequestController::class,'adminIndex'])->name('serviceRequest');
+    Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
+    Route::put('/serviceRequest/{serviceRequest}/status', [ServiceRequestController::class, 'updateStatus'])->name('serviceRequest.status');
 
     Route::get('/complaintRequest', [ComplaintController::class,'showComplaints'])->name('complaintRequest');
     Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
@@ -96,7 +101,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/reports', [AdminController::class,'reports'])->name('reports');
     Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
-    Route::get('/adminServices', [AdminController::class,'adminServices'])->name('adminServices');
+    Route::get('/adminServices', [ServiceController::class,'adminIndex'])->name('adminServices');
+    Route::post('/adminServices', [ServiceController::class,'store'])->name('services.store');
+    Route::put('/adminServices/{service}', [ServiceController::class,'update'])->name('services.update');
+    Route::delete('/adminServices/{service}/archive', [ServiceController::class,'archive'])->name('services.archive');
     Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
     Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
     Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
@@ -115,7 +123,8 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
         Route::get('/subadminBlotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
             Route::get('/subadminCertificate', [SubAdminController::class,'subadminCertificate'])->name('subadminCertificate');
-        Route::get('/subadminServices', [SubAdminController::class,'subadminServices'])->name('subadminServices');
+        Route::get('/subadminServices', [ServiceController::class,'subadminIndex'])->name('subadminServices');
+        Route::post('/subadminServices', [ServiceController::class,'store'])->name('services.store');
         Route::get('/complaint', [SubAdminController::class,'adminComplaint'])->name('complaint');
         Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
        
@@ -126,7 +135,9 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
 
         Route::get('/certificateRequest', [SubAdminController::class,'certificateRequest'])->name('certificateRequest');
         Route::get('/clearanceRequest', [SubAdminController::class,'clearanceRequest'])->name('clearanceRequest');
-        Route::get('/serviceRequest', [SubAdminController::class,'serviceRequest'])->name('serviceRequest');
+        Route::get('/serviceRequest', [ServiceRequestController::class,'subadminIndex'])->name('serviceRequest');
+        Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
+        Route::put('/serviceRequest/{serviceRequest}/status', [ServiceRequestController::class, 'updateStatus'])->name('serviceRequest.status');
         
 
         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
