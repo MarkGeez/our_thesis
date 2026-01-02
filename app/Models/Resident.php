@@ -6,6 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Resident extends Model
 {
+    protected $table= 'residents';
+
+    protected $fillable = [
+        'firstName',
+        'middleName',
+        'lastName',
+        'houseNo',
+        'street',
+        'contactNo',
+        'birthday',
+        'emergencyContactNo',
+        'emergencyContactName',
+        'age',
+        'sex',
+        'parent',
+        'enrolled',
+        'educationalAttainment',
+        'religionId',
+        'EncodedBy',
+    ];
+    
     public function religion(){
         return $this->belongsTo(Religion::class, 'religionList');
     }

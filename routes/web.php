@@ -13,6 +13,7 @@ use App\Http\Controllers\ActiveLogController;
 use App\Http\Controllers\BlotterController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
+use App\Http\Controllers\ResidentListController;
 
 use App\Http\Controllers\NonResidentController;
 
@@ -101,7 +102,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/reports', [AdminController::class,'reports'])->name('reports');
     Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
-    Route::get('/adminServices', [ServiceController::class,'adminIndex'])->name('adminServices');
+    Route::get( '/adminServices', [ServiceController::class,'adminIndex'])->name('adminServices');
     Route::post('/adminServices', [ServiceController::class,'store'])->name('services.store');
     Route::put('/adminServices/{service}', [ServiceController::class,'update'])->name('services.update');
     Route::delete('/adminServices/{service}/archive', [ServiceController::class,'archive'])->name('services.archive');
@@ -112,6 +113,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');
     Route::put('/edit-announcement/{id}', [AnnouncementController::class, 'update'])->name('update.announcement');
     Route::delete('/archive-announcement/{id}', [AnnouncementController::class, 'archive'])->name('announcement.archive');
+
+    Route::get('/residents', [ResidentListController::class, 'showResidents'])->name('residents');
+    Route::post('/residents', [ResidentListController::class, 'encodeResidents'])->name('encode.residents');
 
 
 });
