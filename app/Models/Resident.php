@@ -23,7 +23,8 @@ class Resident extends Model
         'parent',
         'enrolled',
         'educationalAttainment',
-        'religionId',
+        'religionList',
+        'headOfFamily',
         'EncodedBy',
     ];
     

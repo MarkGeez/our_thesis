@@ -42,7 +42,8 @@ class ResidentListController extends Controller
     unset($validated['religionId']);
     
     $validated['EncodedBy'] = auth()->id();
-    $validated['religionId'] = 1; // Always set to 1
+   $validated['religionList'] = 1; // instead of $validated['religionId'] = 1
+
 
     Resident::create($validated);
 
