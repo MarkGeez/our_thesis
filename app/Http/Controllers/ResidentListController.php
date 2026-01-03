@@ -50,9 +50,9 @@ public function searchResidents(Request $request)
         'emergencyContactNo' => 'required|string|max:11',
         'emergencyContactName' => 'required|string|max:255',
         'age' => 'required|integer|min:0|max:255',
-        'sex' => 'required|in:male,female',
-        'parent' => 'required|in:yes,no,single',
-        'enrolled' => 'required|in:yes,no',
+        'sex' => 'nullable|in:male,female',
+        'parent' => 'nullable|in:yes,no,single',
+        'enrolled' => 'nullable|in:yes,no',
         'religion' => 'nullable|string|max:255',
 
 

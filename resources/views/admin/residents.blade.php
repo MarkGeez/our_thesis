@@ -323,7 +323,6 @@
                             <form action="{{ route($user->role . '.encode.residents') }}" method="post">
                                 @csrf
 
-                               <input type="text" name="search" class="form-control" placeholder="Enter name or ID here..." value="{{ request('search') }}">
 
 <label for="firstName">First Name</label>
 <input type="text" id="firstName" name="firstName" class="form-control" value="{{ old('firstName') }}" placeholder="Enter First Name here" required>
