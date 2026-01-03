@@ -23,18 +23,35 @@
                     <h2 class="mb-0 text-dark">User Records</h2>
                 </div>
 
-                <form action="{{ route($user->role . '.users') }}" method="get" class="px-4 mb-3">
-                    <div class="input-group">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            class="form-control" 
-                            placeholder="Search users" 
-                            value="{{ request('search') }}"
-                        >
-                        <button class="btn btn-primary">Search</button>
-                    </div>
-                </form>
+                <form action="{{ route($user->role . '.users') }}" method="get" class="px-4 mb-4">
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold">Search User</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class="fa fa-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-control" 
+                    placeholder="Enter name or ID here..." 
+                    value="{{ request('search') }}"
+                >
+            </div>
+        </div>
+        <div class="col-12 col-md-auto d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">Search</button>
+            
+            {{-- Revert/Reset Button --}}
+            @if(request('search'))
+                <a href="{{ route($user->role . '.users') }}" class="btn btn-outline-secondary px-4">
+                    <i class="fas fa-times me-1"></i> Clear
+                </a>
+            @endif
+        </div>
+    </div>
+</form>
 
                 @if($userList->count() > 0)
                     <div class="px-4 mb-2 text-muted">

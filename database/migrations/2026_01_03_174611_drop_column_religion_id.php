@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('residents', function (Blueprint $table) {
-            // Only drop if column exists
-            if (Schema::hasColumn('residents', 'religionId')) {
-                $table->dropColumn('religionId');
-            }
+            $table->dropColumn('religionId');
         });
     }
 
@@ -25,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('residents', function (Blueprint $table) {
-            if (!Schema::hasColumn('residents', 'religionId')) {
-                $table->foreignId('religionId')->constrained('religions');
-            }
+            //
         });
     }
 };
