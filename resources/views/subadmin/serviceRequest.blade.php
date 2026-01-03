@@ -63,6 +63,8 @@
                                             <tr>
                                                 <th>Service</th>
                                                 <th>Schedule</th>
+                                                                                                <th>Purpose</th>
+
                                                 <th>Status</th>
                                                 <th>Requester</th>
                                                 <th class="text-end">Update</th>

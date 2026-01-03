@@ -90,43 +90,7 @@
                                 </form>
                             </div>
                         </div>
-                        <div class="card card-ghost shadow-sm mt-4">
-                            <div class="card-body">
-                                <h6 class="mb-3 text-uppercase text-muted">Add service / equipment</h6>
-                                <form method="POST" action="{{ route('subadmin.services.store') }}" enctype="multipart/form-data" class="vstack gap-3">
-                                    @csrf
-                                    <div>
-                                        <label class="form-label">Name</label>
-                                        <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Description</label>
-                                        <textarea name="description" rows="3" class="form-control" required>{{ old('description') }}</textarea>
-                                    </div>
-                                    <div class="row g-2">
-                                        <div class="col-sm-6">
-                                            <label class="form-label">Quantity</label>
-                                            <input type="number" min="0" name="quantity" value="{{ old('quantity', 0) }}" class="form-control">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label class="form-label">Availability</label>
-                                            <select name="serviceAvailability" class="form-select" required>
-                                                @foreach (['AVAILABLE', 'UNAVAILABLE'] as $availability)
-                                                    <option value="{{ $availability }}" @selected(old('serviceAvailability') === $availability)>{{ ucfirst(strtolower($availability)) }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Image (optional)</label>
-                                        <input type="file" name="image" accept="image/*" class="form-control">
-                                    </div>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-secondary">Save service</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        
                     </div>
 
                     <div class="col-xl-7">

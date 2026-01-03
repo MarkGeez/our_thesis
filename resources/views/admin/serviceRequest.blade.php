@@ -87,7 +87,7 @@
                                             <tr>
                                                 <th>Service</th>
                                                 <th>Schedule</th>
-                                                <th>Status</th>
+                                                <th></th>Status</th>
                                                 <th>Requester</th>
                                                 <th class="text-end">Update</th>
                                             </tr>
