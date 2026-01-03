@@ -82,21 +82,20 @@
                 @foreach($residents as $resident)
                     <tr>
                         <td>{{ $resident->id }}</td>
-                        <td>{{ $resident->firstName }} {{ $resident->middleName }} {{ $resident->lastName }}</td>
-                        
+<td> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </td>                        
                         <td class="text-center text-nowrap">
                             <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
                                 <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#viewResident{{ $resident->id }}">
                                     <i class="fa fa-eye fa-fw"></i><span>View</span>
                                 </button>
-                                <button class="btn btn-sm btn-secondary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#updateResident{{ $resident->id }}">
+                                <button class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#updateResident{{ $resident->id }}">
                                     <i class="fa fa-edit fa-fw"></i><span>Edit</span>
                                 </button>
-                                <form action="#" method="POST" class="d-inline">
+                                <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" onclick="return confirm('Are you sure?')">
-                                        <i class="fa fa-trash fa-fw"></i><span>Delete</span>
+                                        <i class="fa fa-trash fa-fw"></i><span>Archive</span>
                                     </button>
                                 </form>
                             </div>
@@ -119,8 +118,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="fw-semibold text-secondary">Full Name</div>
-                            <div class="fs-6">{{ $resident->firstName }} {{ $resident->middleName }} {{ $resident->lastName }}</div>
-                        </div>
+<div class="fs-6"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </div>                        </div>
                         <div class="col-md-6">
                             <div class="fw-semibold text-secondary">Age</div>
                             <div class="fs-6">{{ $resident->age }}</div>
@@ -133,10 +131,7 @@
                             <div class="fw-semibold text-secondary">Birthday</div>
                             <div class="fs-6">{{ \Carbon\Carbon::parse($resident->birthday)->format('M d, Y') }}</div>
                         </div>
-                        <div class="col-12">
-                            <div class="fw-semibold text-secondary">Address</div>
-                            <div class="fs-6">{{ $resident->houseNo }}, {{ $resident->street }}</div>
-                        </div>
+                        <div class="col-12"> <div class="fw-semibold text-secondary">Address</div> <div class="fs-6"> House No. {{ $resident->houseNo }}<br> {{ ucwords(strtolower($resident->street)) }} </div> </div>
                         <div class="col-md-6">
                             <div class="fw-semibold text-secondary">Contact Number</div>
                             <div class="fs-6">{{ $resident->contactNo }}</div>
@@ -170,8 +165,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="fw-semibold text-secondary">Emergency Contact</div>
-                            <div class="fs-6">{{ $resident->emergencyContactName ?? 'N/A' }} ({{ $resident->emergencyContactNo ?? 'N/A' }})</div>
-                        </div>
+<div class="fs-6"> {{ ucwords(strtolower($resident->emergencyContactName ?? 'N/A')) }} ({{ $resident->emergencyContactNo ?? 'N/A' }}) </div>                        </div>
                     </div>
                 </section>
             </div>
@@ -182,7 +176,126 @@
     </div>
 </div>
 
-                    {{-- Include Update Modal --}}
+                    {{-- Edit Modal --}}
+<div class="modal fade" id="updateResident{{ $resident->id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Resident #{{ $resident->id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route($user->role . '.update.resident', $resident->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <label for="firstName{{ $resident->id }}">First Name</label>
+                    <input type="text" id="firstName{{ $resident->id }}" name="firstName" class="form-control @error('firstName') is-invalid @enderror" value="{{ old('firstName', $resident->firstName) }}" placeholder="Enter first name" required>
+                    @error('firstName') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="middleName{{ $resident->id }}">Middle Name</label>
+                    <input type="text" id="middleName{{ $resident->id }}" name="middleName" class="form-control @error('middleName') is-invalid @enderror" value="{{ old('middleName', $resident->middleName) }}" placeholder="Enter middle name" required>
+                    @error('middleName') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="lastName{{ $resident->id }}">Last Name</label>
+                    <input type="text" id="lastName{{ $resident->id }}" name="lastName" class="form-control @error('lastName') is-invalid @enderror" value="{{ old('lastName', $resident->lastName) }}" placeholder="Enter last name" required>
+                    @error('lastName') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <hr class="mt-4">
+
+                    <label for="houseNo{{ $resident->id }}">House No.</label>
+                    <input type="text" id="houseNo{{ $resident->id }}" name="houseNo" class="form-control @error('houseNo') is-invalid @enderror" value="{{ old('houseNo', $resident->houseNo) }}" required>
+                    @error('houseNo') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="street{{ $resident->id }}">Street</label>
+                    <input type="text" id="street{{ $resident->id }}" name="street" class="form-control @error('street') is-invalid @enderror" value="{{ old('street', $resident->street) }}" required>
+                    @error('street') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="contactNo{{ $resident->id }}">Contact No.</label>
+                    <input type="text" id="contactNo{{ $resident->id }}" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" value="{{ old('contactNo', $resident->contactNo) }}" placeholder="e.g. 09123456789" required>
+                    @error('contactNo') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <hr class="mt-4">
+
+                    <label for="birthday{{ $resident->id }}">Birthday</label>
+                    <input type="text" id="birthday{{ $resident->id }}" name="birthday" class="form-control date-picker-edit @error('birthday') is-invalid @enderror" value="{{ old('birthday', $resident->birthday) }}" placeholder="Select birth date..." required>
+                    @error('birthday') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="age{{ $resident->id }}">Age</label>
+                    <input type="number" id="age{{ $resident->id }}" name="age" class="form-control @error('age') is-invalid @enderror" value="{{ old('age', $resident->age) }}" min="0" max="255" required>
+                    @error('age') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="sex{{ $resident->id }}">Sex</label>
+                    <select id="sex{{ $resident->id }}" name="sex" class="form-select @error('sex') is-invalid @enderror" required>
+                        <option value="">Select Sex</option>
+                        <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
+                        <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
+                    </select>
+                    @error('sex') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <hr class="mt-4">
+
+                    <label for="emergencyContactName{{ $resident->id }}">Emergency Contact Name</label>
+                    <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" required>
+                    @error('emergencyContactName') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
+                    <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" required>
+                    @error('emergencyContactNo') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <hr class="mt-4">
+
+                    <label for="parent{{ $resident->id }}">Parent Status</label>
+                    <select id="parent{{ $resident->id }}" name="parent" class="form-select @error('parent') is-invalid @enderror" required>
+                        <option value="">Select Option</option>
+                        <option value="yes" {{ old('parent', $resident->parent) === 'yes' ? 'selected' : '' }}>Yes</option>
+                        <option value="no" {{ old('parent', $resident->parent) === 'no' ? 'selected' : '' }}>No</option>
+                        <option value="single" {{ old('parent', $resident->parent) === 'single' ? 'selected' : '' }}>Single</option>
+                    </select>
+                    @error('parent') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="enrolled{{ $resident->id }}">Currently Enrolled</label>
+                    <select id="enrolled{{ $resident->id }}" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror" required>
+                        <option value="">Select Option</option>
+                        <option value="yes" {{ old('enrolled', $resident->enrolled) === 'yes' ? 'selected' : '' }}>Yes</option>
+                        <option value="no" {{ old('enrolled', $resident->enrolled) === 'no' ? 'selected' : '' }}>No</option>
+                    </select>
+                    @error('enrolled') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="educationalAttainment{{ $resident->id }}">Educational Attainment</label>
+                    <input type="text" id="educationalAttainment{{ $resident->id }}" name="educationalAttainment" class="form-control @error('educationalAttainment') is-invalid @enderror" value="{{ old('educationalAttainment', $resident->educationalAttainment) }}">
+                    @error('educationalAttainment') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="religionId{{ $resident->id }}">Religion</label>
+                    <select id="religionId{{ $resident->id }}" name="religionId" class="form-select @error('religionId') is-invalid @enderror">
+                        <option value="">Select Religion</option>
+                        @foreach (\App\Models\Religion::all() as $religion)
+                            <option value="{{ $religion->id }}" {{ old('religionId', $resident->religionList) == $religion->id ? 'selected' : '' }}>
+                                {{ $religion->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('religionId') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <label for="headOfFamily{{ $resident->id }}">Head of Family</label>
+                    <select id="headOfFamily{{ $resident->id }}" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
+                        <option value="">Select Option</option>
+                        <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
+                        <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
+                    </select>
+                    @error('headOfFamily') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
+                    <div class="text-end mt-4 pt-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-4">Update Resident</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+                    
                     
                 @endforeach
             </tbody>
@@ -327,23 +440,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    flatpickr(".date-picker", {
-        altInput: true,
-        altFormat: "F j, Y",
-        dateFormat: "Y-m-d",
-        maxDate: "today",
-        onChange: function(selectedDates) {
-            if (selectedDates.length > 0) {
-                const birthDate = selectedDates[0];
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-                document.getElementById('age').value = age;
-            }
-        }
-    });
-});
-</script>
+<script> document.addEventListener("DOMContentLoaded", function () { function calculateAge(birthDate, ageInput) { const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--; ageInput.value = age; } flatpickr(".date-picker", { allowInput: true, dateFormat: "Y-m-d", altInput: true, altFormat: "F j, Y", maxDate: "today", onChange: function (selectedDates) { if (selectedDates.length) { calculateAge(selectedDates[0], document.getElementById("age")); } }, onClose: function (selectedDates, dateStr, instance) { if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) { instance.clear(); document.getElementById("age").value = ""; } } }); flatpickr(".date-picker-edit", { allowInput: true, dateFormat: "Y-m-d", altInput: true, altFormat: "F j, Y", maxDate: "today", onChange: function (selectedDates, dateStr, instance) { if (selectedDates.length) { const modalBody = instance.input.closest(".modal-body"); const ageInput = modalBody.querySelector('input[name="age"]'); calculateAge(selectedDates[0], ageInput); } }, onClose: function (selectedDates, dateStr, instance) { if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) { instance.clear(); const modalBody = instance.input.closest(".modal-body"); const ageInput = modalBody.querySelector('input[name="age"]'); ageInput.value = ""; } } }); }); </script>
+

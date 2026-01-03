@@ -58,7 +58,7 @@
     @foreach($archive as $item)
     <tr>
         <td>{{ ucfirst($item->record_type) }}</td>
-        <td>{{ $item->archived_by }}</td>
+        <td>{{ $item->user ? $item->user->firstName . ' ' . $item->user->lastName : 'Unknown' }}</td>
         <td>{{ $item->created_at->format('M-d-Y H:i') }}</td>
         <td>
                 @if(is_array($item->data))

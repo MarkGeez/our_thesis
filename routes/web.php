@@ -116,8 +116,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/residents', [ResidentListController::class, 'showResidents'])->name('residents');
     Route::post('/residents', [ResidentListController::class, 'encodeResidents'])->name('encode.residents');
-    Route::get('/residents', [ResidentListController::class, 'searchResidents'])->name('residents');
-
+    Route::get('/residents', [ResidentListController::class, 'searchResidents'])->name('residents')
+    Route::put('/residents/{id}', [ResidentListController::class, 'updateResident'])->name('update.resident');
+    Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
 
 
 });
