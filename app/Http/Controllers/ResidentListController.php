@@ -53,7 +53,8 @@ public function searchResidents(Request $request)
         'sex' => 'required|in:male,female',
         'parent' => 'required|in:yes,no,single',
         'enrolled' => 'required|in:yes,no',
-        'religion' => 'nullable|string|max:255', 
+        'religion' => 'nullable|string|max:255',
+
 
         'educationalAttainment' => 'nullable|string',
         'headOfFamily' => 'required|in:yes,no',
@@ -61,9 +62,10 @@ public function searchResidents(Request $request)
 
     
     $validated['EncodedBy'] = auth()->id();
+$validated['religionList'] = 1; // or any value you want as default
 
+Resident::create($validated);
 
-    Resident::create($validated);
 
     return redirect()->back()->with('success', 'Resident encoded successfully!');
 

@@ -26,4 +26,17 @@ class UserListController extends Controller
 
         return view($user->role . '.users', compact('user', 'search', 'userList'));
     }
+
+
+    public function updateRole(Request $request, $id){
+        $request->validate(['role' => 'in:admin,subadmin,resident,non-resident']);
+
+        $user = User::findOrFail($id);
+
+        $user->role = $request->role;
+        
+        $user->save();
+
+        return redirect()->back()->with('success', 'user role updated');
+    }
 }

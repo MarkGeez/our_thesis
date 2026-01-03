@@ -9,25 +9,26 @@ class Resident extends Model
     protected $table= 'residents';
 
     protected $fillable = [
-        'firstName',
-        'middleName',
-        'lastName',
-        'houseNo',
-        'street',
-        'contactNo',
-        'birthday',
-        'emergencyContactNo',
-        'emergencyContactName',
-        'age',
-        'sex',
-        'parent',
-        'enrolled',
-        'educationalAttainment',
-        'religion',
-        'headOfFamily',
-        'EncodedBy',
-        'user_id'
-    ];
+    'firstName',
+    'middleName',
+    'lastName',
+    'houseNo',
+    'street',
+    'contactNo',
+    'birthday',
+    'emergencyContactNo',
+    'emergencyContactName',
+    'age',
+    'sex',
+    'parent',
+    'enrolled',
+    'educationalAttainment',
+    'religion',  // add this
+    'headOfFamily',
+    'EncodedBy',
+    'user_id'
+];
+
     
     
 

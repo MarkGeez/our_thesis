@@ -99,7 +99,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/census', [AdminController::class,'census'])->name('census');
 
     Route::get('/users', [UserListController::class,'showUsers'])->name('users');
-
+    Route::put('/users/{id}', [UserListController::class, 'updateRole'])->name('update.role');
     // Use ActiveLogController here and avoid double "admin" in the path
     Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
 

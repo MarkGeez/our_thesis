@@ -58,11 +58,15 @@
                         <i class="fas fa-plus me-2"></i> Encode Resident
                     </button>
                 </div>
-                <form action="{{ route($user->role . ".residents")}}" method="get">
-                    <label for="">dsa</label>
-                    <input type="text" name="search" class="form border-light">
+                <form action="{{ route($user->role . '.residents') }}" method="get" class="mb-4"> <div class="row g-2 align-items-end"> <div class="col-12 col-md-6"> <label class="form-label fw-semibold">Search Resident</label> <div class="input-group"> <span class="input-group-text bg-light"> <i class="fa fa-search"></i> </span> <input type="text" name="search" class="form-control" placeholder="Search by name or ID" value="{{ request('search') }}" > </div> </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-primary w-100 px-4">
+            Search
+        </button>
+    </div>
+</div>
 
-                </form>
+</form>
 
                 @if($residents->isEmpty())
     <div class="container bg-light p-3 m-3 alert alert-info">No residents found.</div>
@@ -266,16 +270,10 @@
                     <input type="text" id="educationalAttainment{{ $resident->id }}" name="educationalAttainment" class="form-control @error('educationalAttainment') is-invalid @enderror" value="{{ old('educationalAttainment', $resident->educationalAttainment) }}">
                     @error('educationalAttainment') <span class="invalid-feedback">{{ $message }}</span> @enderror
 
-                    <label for="religionId{{ $resident->id }}">Religion</label>
-                    <select id="religionId{{ $resident->id }}" name="religionId" class="form-select @error('religionId') is-invalid @enderror">
-                        <option value="">Select Religion</option>
-                        @foreach (\App\Models\Religion::all() as $religion)
-                            <option value="{{ $religion->id }}" {{ old('religionId', $resident->religionList) == $religion->id ? 'selected' : '' }}>
-                                {{ $religion->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('religionId') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                    <label for="religion">Religion</label>
+<input type="text" id="religion" name="religion" class="form-control @error('religion') is-invalid @enderror" value="{{ old('religion') }}" placeholder="Enter religion">
+@error('religion') <span class="invalid-feedback">{{ $message }}</span> @enderror
+
 
                     <label for="headOfFamily{{ $resident->id }}">Head of Family</label>
                     <select id="headOfFamily{{ $resident->id }}" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
