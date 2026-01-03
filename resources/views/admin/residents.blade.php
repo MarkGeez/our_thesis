@@ -58,6 +58,11 @@
                         <i class="fas fa-plus me-2"></i> Encode Resident
                     </button>
                 </div>
+                <form action="{{ route($user->role . ".residents")}}" method="get">
+                    <label for="">dsa</label>
+                    <input type="text" name="search" class="form border-light">
+
+                </form>
 
                 @if($residents->isEmpty())
     <div class="container bg-light p-3 m-3 alert alert-info">No residents found.</div>
@@ -73,6 +78,7 @@
                 </tr>
             </thead>
             <tbody>
+                
                 @foreach($residents as $resident)
                     <tr>
                         <td>{{ $resident->id }}</td>
@@ -201,6 +207,8 @@
                     </div>
                 @endif
             </div>
+            
+
 
             <!-- Modal -->
             <div class="modal fade" id="encodeResidentModal" tabindex="-1" aria-hidden="true">
@@ -293,15 +301,8 @@
                                 @error('educationalAttainment') <span class="invalid-feedback">{{ $message }}</span> @enderror
 
                                 <label for="religionId">Religion</label>
-                                <select id="religionId" name="religionId" class="form-select @error('religionId') is-invalid @enderror">
-                                    <option value="">Select Religion</option>
-                                    @foreach (\App\Models\Religion::all() as $religion)
-                                        <option value="{{ $religion->id }}" {{ old('religionId', 1) == $religion->id ? 'selected' : '' }}>
-                                            {{ $religion->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('religionId') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                                <input type="text" name="religion">
+                                @error('religion') <span class="invalid-feedback">{{ $message }}</span> @enderror
 
                                 <label for="headOfFamily">Head of Family</label>
                                 <select id="headOfFamily" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>

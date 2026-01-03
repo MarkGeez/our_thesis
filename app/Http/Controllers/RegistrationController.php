@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Resident;
+
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -27,17 +29,26 @@ class RegistrationController extends Controller
             'contactNumber'   => 'required|string|digits:11',
             'birthday'        => 'required|date|before:today',
             'role'            => 'required|in:yes,no',
-            'proofOfIdentity' => 'required|image|mimes:jpg,png,jpeg|max:4096',
+            'proofOfIdentity' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
         ]);
 
-        $role = $request->role === 'yes' ? 'resident' : 'non-resident';
         
         $imageData = null;
         if($request->hasFile('proofOfIdentity')){
             $imageData = $request->file('proofOfIdentity')->store('photos', 'public');
         }
 
-        User::create([
+        $resident = Resident::where('firstName',  $request->firstName)->where('middleName',  $request->middleName)->where('lastName',  $request->lastName)->first();
+
+        $role = "non-resident";
+        $status = "pending";
+
+        if($resident){
+            $role= "resident";
+            $status = "approved";
+        }
+        
+        $user = User::create([
             'email'            => $request->email,
             'password'         => Hash::make($request->password),
             'firstName'        => $request->firstName,
@@ -48,8 +59,14 @@ class RegistrationController extends Controller
             'proofOfIdentity'  => $imageData,  
             'role'             => $role,
             'registrationDate' => now(),
-            'status'           => 'pending'
+            'status'           => $status
         ]);
+
+        if($resident){
+            $resident->update([
+                'user_id' => $user->id
+            ]);
+        }
 
         return redirect()
             ->route('login')

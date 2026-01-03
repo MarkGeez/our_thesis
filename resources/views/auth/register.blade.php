@@ -277,30 +277,13 @@
             <div class="mb-3">
                 <label class="form-label">Proof of Identity</label>
                 <input type="file" accept=".jpg, .jpeg, .png" name="proofOfIdentity"
-                id="proofOfIdentity" class="form-control" required>
+                id="proofOfIdentity" class="form-control">
                 @error('proofOfIdentity')
                 <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
-            <div class="divider"></div>
-
-                        <div class="mb-3">
-                <label class="form-label">Are you a resident of Barangay 249?</label>
-                <div>
-                    <label for="yes" class="form-label me-3">
-                        <input type="radio" name="role" id="yes" value="yes"
-                        @checked(old('role', 'yes') == 'yes')> Yes
-                    </label>
-                    <label for="no" class="form-label">
-                        <input type="radio" name="role" id="no" value="no"
-                        @checked(old('role') == 'no')> No
-                    </label>
-                </div>
-                @error('role')
-                <div class="text-danger small mt-1">{{ $message }}</div>
-                @enderror
-            </div>
+           
 
             <button type="submit" class="btn btn-primary fw-bold">Submit</button>
 

@@ -73,5 +73,9 @@ class User extends Authenticatable
     public function blottersEncoder():HasMany{
         return $this->hasMany(Blotter::class, 'encodedBy');
     }
+
+    public function resident():HasOne{
+        return $this->hasOne(Resident::class);
+    }
    
 }

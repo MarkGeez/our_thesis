@@ -7,16 +7,35 @@ use App\Models\Resident;
 
 class ResidentListController extends Controller
 {
-    public function showResidents(){
-        $user = auth()->user();
-
-        if(!$user || $user->role === "resident" || $user->role === "non-resident" ){
-            abort(403);
-        }else{
-            $residents = Resident::with('user:id,firstName,lastname')->paginate(10);
-            return view($user->role . '.residents', compact('user', 'residents'));
-        }
+   public function showResidents(Request $request)
+{
+    $user = auth()->user();
+    
+    if(!$user || $user->role === "resident" || $user->role === "non-resident"){
+        abort(403);
     }
+    
+    $searchTerm = $request->input('search');
+    
+    $residents = Resident::with('user:id,firstName,lastname')
+        ->when($searchTerm, function($query, $searchTerm) {
+            return $query->where(function($q) use ($searchTerm) {
+                $q->where('firstName', 'like', "%{$searchTerm}%")
+                  ->orWhere('lastName', 'like', "%{$searchTerm}%")
+                  ->orWhere('middleName', 'like', "%{$searchTerm}%")
+                  ->orWhere('id', 'like', "%{$searchTerm}%");
+            });
+        })
+        ->paginate(10);
+    
+    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm'));
+}
+
+// Then remove searchResidents() or keep it as an alias
+public function searchResidents(Request $request)
+{
+    return $this->showResidents($request);
+}
 
     public function encodeResidents(Request $request){
     $validated = $request->validate([
@@ -33,8 +52,9 @@ class ResidentListController extends Controller
         'sex' => 'required|in:male,female',
         'parent' => 'required|in:yes,no,single',
         'enrolled' => 'required|in:yes,no',
+        'religion' => 'nullable|string|max:255', 
+
         'educationalAttainment' => 'nullable|string',
-        'religionId' => 'nullable|exists:religions,id',
         'headOfFamily' => 'required|in:yes,no',
     ]);
 
@@ -42,11 +62,13 @@ class ResidentListController extends Controller
     unset($validated['religionId']);
     
     $validated['EncodedBy'] = auth()->id();
-   $validated['religionList'] = 1; // instead of $validated['religionId'] = 1
 
 
     Resident::create($validated);
 
     return redirect()->back()->with('success', 'Resident encoded successfully!');
+
+
+    
 }
 }
