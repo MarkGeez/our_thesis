@@ -267,14 +267,7 @@
                     @error('educationalAttainment') <span class="invalid-feedback">{{ $message }}</span> @enderror
 
                     <label for="religionId{{ $resident->id }}">Religion</label>
-                    <select id="religionId{{ $resident->id }}" name="religionId" class="form-select @error('religionId') is-invalid @enderror">
-                        <option value="">Select Religion</option>
-                        @foreach (\App\Models\Religion::all() as $religion)
-                            <option value="{{ $religion->id }}" {{ old('religionId', $resident->religionList) == $religion->id ? 'selected' : '' }}>
-                                {{ $religion->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="religion">
                     @error('religionId') <span class="invalid-feedback">{{ $message }}</span> @enderror
 
                     <label for="headOfFamily{{ $resident->id }}">Head of Family</label>
