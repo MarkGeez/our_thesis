@@ -29,8 +29,9 @@ class Resident extends Model
     ];
     
     public function religion(){
-        return $this->belongsTo(Religion::class, 'religionList');
-    }
+    return $this->belongsTo(Religion::class, 'religionId'); // use the correct column
+}
+
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');

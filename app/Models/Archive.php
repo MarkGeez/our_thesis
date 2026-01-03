@@ -17,4 +17,8 @@ class Archive extends Model
     protected $casts = [
         "data" => "array"
     ];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'archived_by');
+    }
 }
