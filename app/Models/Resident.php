@@ -26,6 +26,7 @@ class Resident extends Model
         'religion',
         'headOfFamily',
         'EncodedBy',
+        'user_id'
     ];
     
     

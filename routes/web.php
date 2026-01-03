@@ -14,6 +14,8 @@ use App\Http\Controllers\BlotterController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ResidentListController;
+use App\Http\Controllers\UserListController;
+
 
 use App\Http\Controllers\NonResidentController;
 
@@ -95,7 +97,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/settings', [AdminController::class,'updateSettings'])->name('updateSettings');
     Route::get('/barangayOfficials', [AdminController::class,'barangayOfficials'])->name('barangayOfficials');
     Route::get('/census', [AdminController::class,'census'])->name('census');
-    Route::get('/users', [AdminController::class,'users'])->name('users');
+
+    Route::get('/users', [UserListController::class,'showUsers'])->name('users');
 
     // Use ActiveLogController here and avoid double "admin" in the path
     Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
@@ -108,6 +111,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/adminServices/{service}/archive', [ServiceController::class,'archive'])->name('services.archive');
     Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
     Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
+    
     Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
     Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
     Route::get('/edit-announcement/{id}', [AnnouncementController::class, 'showEdit'])->name('editAnnouncement');

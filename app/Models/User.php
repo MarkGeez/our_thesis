@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne; 
 
 class User extends Authenticatable
 {
@@ -19,6 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+    'user_id',
     'firstName',
     'middleName',
     'lastName',
@@ -75,7 +76,7 @@ class User extends Authenticatable
     }
 
     public function resident():HasOne{
-        return $this->hasOne(Resident::class);
+        return $this->hasOne(Resident::class, 'user_id');
     }
    
 }
