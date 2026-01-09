@@ -43,7 +43,7 @@
         <div class="col-12 col-md-auto d-flex gap-2">
             <button type="submit" class="btn btn-primary px-4">Search</button>
             
-            {{-- Revert/Reset Button --}}
+            
             @if(request('search'))
                 <a href="{{ route($user->role . '.users') }}" class="btn btn-outline-secondary px-4">
                     <i class="fas fa-times me-1"></i> Clear
