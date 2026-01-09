@@ -72,6 +72,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
+    Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
+    Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
 
     Route::get('/blotterRequest', [AdminController::class, 'blotterRequest'])->name('blotterRequest');
     Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
@@ -99,7 +101,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/census', [AdminController::class,'census'])->name('census');
 
     Route::get('/users', [UserListController::class,'showUsers'])->name('users');
-    Route::put('/users/{id}', [UserListController::class, 'updateRole'])->name('update.role');
+    Route::put('/users/update-role/{id}', [UserListController::class, 'updateRole'])->name('update.role');
+    Route::put('/users/update-status/{id}', [UserListController::class, 'updateStatus'])->name('update.status');
+
     // Use ActiveLogController here and avoid double "admin" in the path
     Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
 
@@ -124,7 +128,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/residents/{id}', [ResidentListController::class, 'updateResident'])->name('update.resident');
     Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
 
+        Route::put('/resident/{id}/update-info', [ResidentListController::class, 'updateOwnInfo'])->name('resident.update');
 
+    
 });
 
 Route::middleware(['auth', 'role:subadmin'])->group(function(){

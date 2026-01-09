@@ -79,18 +79,29 @@
                                             {{ ucwords(strtolower($list->lastName)) }}
                                         </td>
                                         <td>{{ $list->email }}</td>
-                                        <td>{{ ucfirst($list->role) }}</td>
+                                        <td>{{ ucfirst($list->role) }} </td>
                                         <td>
                                             @php
                                                 $statusClass = [
-                                                    'active' => 'bg-success',
-                                                    'inactive' => 'bg-secondary',
-                                                    'blocked' => 'bg-danger',
+                                                    'approved' => 'bg-success',
+                                                    'pending' => 'bg-secondary',
+                                                    'rejected' => 'bg-danger',
                                                 ][$list->status] ?? 'bg-secondary';
                                             @endphp
                                             <span class="badge {{ $statusClass }}">
                                                 {{ ucfirst($list->status) }}
                                             </span>
+                                            <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                            @csrf
+                                            @method('put')
+                                             <label for="approve_{{ $list->id }}">Approve</label>
+                                             <input type="radio" name="status" value="approved" id="approve_{{ $list->id }}" placeholder="approve">
+
+                                             <label for="decline_{{ $list->id }}">decline</label>
+                                                <input type="radio" name="status" value="declined" id="decline_{{ $list->id }}" placeholder="decline"> 
+                                            <button type="submit">SUBMIT</button>
+
+                                        </form>
                                         </td>
                                         <td>
                                             <form action="{{ route($user->role . '.update.role', $list->id) }}" method="post" class="d-flex align-items-center gap-2 justify-content-center">

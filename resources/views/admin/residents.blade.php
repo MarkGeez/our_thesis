@@ -387,8 +387,11 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
+    <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
+    <script src="{{ asset('template/js/script.js') }}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function calculateAge(birthDate, ageInput) {
