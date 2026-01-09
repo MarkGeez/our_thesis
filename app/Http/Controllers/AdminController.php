@@ -27,7 +27,8 @@ class AdminController extends Controller
     public function profile(): View
     {
         $admin = Auth::user();
-        return view("admin.profile", compact('admin'));
+        $resident = $admin->resident()->where('user_id', $admin->id)->first();
+        return view("admin.profile", compact('admin', 'resident'));
     }
 
     public function adminComplaint():View{

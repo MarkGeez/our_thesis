@@ -134,4 +134,37 @@ Resident::create($validated);
 
         return redirect()->back()->with('success', 'Resident archived successfully!');
     }
+
+    public function updateOwnInfo(Request $request, $id)
+{
+    // Validate the request
+    $validated = $request->validate([
+        'houseNo' => 'required|string|max:8',
+        'street' => 'required|string|max:70',
+        'contactNo' => 'required|string|max:11',
+        'birthday' => 'required|date',
+        'emergencyContactNo' => 'required|string|max:11',
+        'emergencyContactName' => 'required|string|max:255',
+        'age' => 'required|integer|min:0|max:255',
+        'sex' => 'required|in:male,female',
+        'parent' => 'required|in:yes,no,single',
+        'enrolled' => 'required|in:yes,no',
+        'educationalAttainment' => 'nullable|string|max:255',
+        'headOfFamily' => 'required|in:yes,no',
+        'religion' => 'nullable|string|max:255'
+    ]);
+
+    // Find the resident record
+    $resident = Resident::findOrFail($id);
+    
+    // Check if the resident belongs to the logged-in user
+    if ($resident->user_id !== auth()->id()) {
+        return back()->withErrors(['error' => 'You can only update your own information.']);
+    }
+
+    // Update the resident
+    $resident->update($validated);
+
+    return back()->with('success', 'Resident information updated successfully.');
+}
 }

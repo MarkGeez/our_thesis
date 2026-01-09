@@ -21,11 +21,34 @@
    @include('admin.admin-sidebar', ['admin' => auth()->user()])
 
 
-
 <div class="main-wrapper">
            
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target"></main>
+            <h1>USER INFORMATION</h1>
+    {{ $admin->firstName }}
+{{ $admin->middleName }}
+{{ $admin->lastName }}
+{{ $admin->email }}
+{{ $admin->contactNumber }}
+{{ \Carbon\Carbon::parse($admin->birthday)->format('F d, Y')}}
+{{ $admin->role }}
+{{ $admin->houseNo }}
+
+            <h1>RESIDENT INFORMATION</h1>    @include('profileforms.edituser')
+
+
+@if($resident)
+    {{ $resident->firstName }}
+    {{ $resident->middleName }}
+        <!---ilagay ang edit sariling resident info -->
+        @include('profileforms.editresident')
+@else
+    <p>No resident information retrieved</p>
+    <!---ilagay ang include ng encode sariling resident info -->
+@endif
+<br>
+
 
 </main>
 
