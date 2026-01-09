@@ -60,9 +60,12 @@ public function searchResidents(Request $request)
         'headOfFamily' => 'required|in:yes,no',
     ]);
 
+    $validated['firstName'] = strtolower(trim($validated['firstName']));
+    $validated['middleName'] = strtolower(trim($validated['middleName']));
+    $validated['lastName'] = strtolower(trim($validated['lastName']));
     
     $validated['EncodedBy'] = auth()->id();
-$validated['religionList'] = 1; // or any value you want as default
+    $validated['religionList'] = 1; // or any value you want as default
 
 Resident::create($validated);
 
