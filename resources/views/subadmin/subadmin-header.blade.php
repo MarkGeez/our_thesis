@@ -16,10 +16,14 @@
                             <button href="##" class="nav-user-btn dropdown-btn" title="My profile" type="button">
                                 <span class="sr-only">My profile</span>
                                 <span class="nav-user-img">
-                                    <picture>
-                                        <source srcset="./img/avatar/avatar-illustrated-02.webp" type="image/webp">
-                                        <img src="./img/avatar/avatar-illustrated-02.png" alt="User name">
-                                    </picture>
+                                    @if(auth()->user()->profile_image)
+                                        <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                    @else
+                                        <picture>
+                                            <source srcset="./img/avatar/avatar-illustrated-02.webp" type="image/webp">
+                                            <img src="./img/avatar/avatar-illustrated-02.png" alt="User name">
+                                        </picture>
+                                    @endif
                                 </span>
                             </button>
                             <ul class="users-item-dropdown nav-user-dropdown dropdown">

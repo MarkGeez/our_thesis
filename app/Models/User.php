@@ -30,7 +30,8 @@ class User extends Authenticatable
     'proofOfIdentity',
     'role',
     'registrationDate',
-    'status'
+    'status',
+    'profile_image'
 
     ];
 

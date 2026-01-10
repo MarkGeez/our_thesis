@@ -8,6 +8,7 @@ use App\Models\Announcement;
 use App\Models\Feedbacks;
 use App\Models\Blotter;
 use App\Models\Setting;
+use App\Models\Resident;
 
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -24,13 +25,17 @@ class AdminController extends Controller
     }
     
     
-    public function profile(): View
-    {
-        $admin = Auth::user();
-        $resident = $admin->resident()->where('user_id', $admin->id)->first();
-        return view("admin.profile", compact('admin', 'resident'));
-    }
-
+    public function profile()
+{
+    $admin = auth()->user();
+    
+    // Try to find resident by matching firstName, lastName
+    $resident = Resident::where('firstName', $admin->firstName)
+                        ->where('lastName', $admin->lastName)
+                        ->first();
+    
+    return view('admin.profile', compact('admin', 'resident'));
+}
     public function adminComplaint():View{
         $admin = Auth::user();
 

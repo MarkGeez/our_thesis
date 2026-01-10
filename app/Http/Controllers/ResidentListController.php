@@ -157,14 +157,15 @@ Resident::create($validated);
     // Find the resident record
     $resident = Resident::findOrFail($id);
     
-    // Check if the resident belongs to the logged-in user
-    if ($resident->user_id !== auth()->id()) {
+    // Check if the resident belongs to the logged-in user (skip for admin/subadmin)
+    $user = auth()->user();
+    if (!in_array($user->role, ['admin', 'subadmin']) && $resident->user_id !== $user->id) {
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
 
     // Update the resident
     $resident->update($validated);
 
-    return back()->with('success', 'Resident information updated successfully.');
+    return redirect()->route($user->role . '.profile')->with('success', 'Resident information updated successfully.');
 }
 }

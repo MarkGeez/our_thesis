@@ -26,6 +26,24 @@
 
 <main class="main users chart-page container-fluid py-4" id="skip-target">
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
@@ -40,6 +58,20 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mb-3">
+                                @if($admin->profile_image)
+                                    <img src="{{ asset('storage/' . $admin->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                                @else
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background-color: #f1f3f5;">
+                                        <i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Full Name</div>
                         <div class="col-7">
@@ -69,10 +101,7 @@
                         <div class="col-7 text-capitalize">{{ $admin->role }}</div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-5 text-muted">House No.</div>
-                        <div class="col-7">{{ $admin->houseNo }}</div>
-                    </div>
+                    
                 </div>
 
                 <div class="card-footer text-end">

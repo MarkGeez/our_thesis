@@ -3,8 +3,34 @@
 $user = auth()->user();
 @endphp
 
-<form action="{{ route($user->role . '.update.profile', $user->id) }}" method="POST"> @csrf @method('PUT')
-<div class="card-body">
+<form method="POST" action="{{ route(auth()->user()->role . '.update.profile', auth()->user()->id) }}" enctype="multipart/form-data"> @csrf @method('PUT')<div class="card-body">
+
+    <h6 class="text-muted mb-3">Profile Image</h6>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="mb-3">
+                <label class="form-label">Profile Picture</label>
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        @if($user->profile_image)
+                            <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                        @else
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: #f1f3f5;">
+                                <i class="fas fa-user" style="font-size: 40px; color: #adb5bd;"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <div>
+                        <input type="file" name="profile_image" id="profile_image" class="form-control" accept="image/*">
+                        <small class="text-muted d-block mt-2">Accepted formats: JPG, PNG, GIF (Max 2MB)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
 
     <h6 class="text-muted mb-3">Account Information</h6>
 
@@ -58,7 +84,7 @@ $user = auth()->user();
     </small>
 
     <div class="row mb-3">
-        <!--
+    
         <div class="col-md-4">
             <label for="current_password" class="form-label">Current Password</label>
         <div class="input-group">
@@ -68,7 +94,6 @@ $user = auth()->user();
             </span>
         </div>
         </div>
-        -->
         <div class="col-md-4">
             <label class="form-label">New Password</label>
             <input
@@ -94,6 +119,8 @@ $user = auth()->user();
     <button type="submit" class="btn btn-primary px-4">
         Save Changes
     </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
 </div>
 
 </form> <script> document.addEventListener('DOMContentLoaded', function () { const birthday = document.getElementById('birthday'); const openDate = document.getElementById('openDate'); const rawDate = "{{ old('birthday', $user->birthday) }}"; if (rawDate) { const d = new Date(rawDate); birthday.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } openDate.addEventListener('click', function () { if (birthday.showPicker) { birthday.showPicker(); } else { birthday.focus(); } }); }); function togglePassword(id) { const input = document.getElementById(id); input.type = input.type === 'password' ? 'text' : 'password'; } </script>
