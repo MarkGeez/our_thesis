@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("address", 255);
             $table->longText("details");
             $table->foreignId( "respondent_id")->nullable()->constrained("users");
-            $table->enum("status",["resolved", "on-going", "rejected"])->default("pending");
+            $table->enum("status",["resolved", "on-going", "rejected", "pending"])->default("pending");
 
         });
     }

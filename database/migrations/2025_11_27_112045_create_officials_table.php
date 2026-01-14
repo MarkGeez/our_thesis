@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             
-            $table->foreignId('user_id')->constrained();
-            
+            $table->foreignId('resident_id')->nullabe();
             $table->foreignId('position_id')->unique()->constrained();
             
             $table->text('description');

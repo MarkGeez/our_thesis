@@ -79,5 +79,7 @@ class User extends Authenticatable
     public function resident():HasOne{
         return $this->hasOne(Resident::class, 'user_id');
     }
+
+   
    
 }

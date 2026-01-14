@@ -45,9 +45,8 @@ class UserListController extends Controller
 
     public function updateStatus(Request $request, $id){
         $user = User::findOrFail($id);
-
-        $status = $request->input('status');
-        $user->status = $status;
+        $request->validate(['status'=> "required"]);
+        $user->status = $request->status;
 
         $user->save();
         

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Archive;
+use App\Models\Positions;
+
 
 class ResidentListController extends Controller
 {
@@ -28,8 +30,11 @@ class ResidentListController extends Controller
             });
         })
         ->paginate(10);
+
+    $positions = Positions::get();
+
     
-    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm'));
+    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm', 'positions'));
 }
 
 // Then remove searchResidents() or keep it as an alias
@@ -65,7 +70,6 @@ public function searchResidents(Request $request)
     $validated['lastName'] = strtolower(trim($validated['lastName']));
     
     $validated['EncodedBy'] = auth()->id();
-    $validated['religionList'] = 1; // or any value you want as default
 
 Resident::create($validated);
 
@@ -105,7 +109,7 @@ Resident::create($validated);
         ]);
 
         unset($validated['religionId']);
-        $validated['religionList'] = 1;
+
 
         $resident->update($validated);
 

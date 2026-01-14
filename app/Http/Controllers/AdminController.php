@@ -9,6 +9,8 @@ use App\Models\Feedbacks;
 use App\Models\Blotter;
 use App\Models\Setting;
 use App\Models\Resident;
+use App\Models\Official;
+
 
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -148,7 +150,9 @@ class AdminController extends Controller
     public function barangayOfficials(): View
     {
         $admin = Auth::user();
-        return view("admin.barangayOfficials", compact('admin'));
+        $positions = Position::get();
+
+        return view("admin.barangayOfficials", compact('admin', 'positions'));
     }
      public function census(): View
     {

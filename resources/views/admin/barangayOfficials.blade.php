@@ -24,8 +24,29 @@
 
 <div class="main-wrapper">
            
+    @if (session('success'))
+        {{ session('success') }}
+    @endif
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target"></main>
+
+        @foreach ($officials as $official)
+            Hon: {{ $official->resident->firstName}} <b>{{$official->resident->lastName}}</b>
+            position: {{ $official->position->positionName }}
+        @endforeach
+
+        <form action="{{ route('admin.add.officialName') }}" method="POST">
+    @csrf
+
+    <h1>Official Titles</h1>
+
+    @foreach ($positions as $position)
+        <div>{{ $position->positionName }}</div>
+    @endforeach
+
+    <input type="text" name="positionName" class="form-control" required>
+    <button type="submit">Add Position</button>
+</form>
 
 </main>
 

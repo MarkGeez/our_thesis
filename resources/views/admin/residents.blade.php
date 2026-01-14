@@ -195,6 +195,20 @@
                                         </div>
                                     </div>
 
+                                    <td>
+                                    {{--  --}}
+                                    <form action="{{ route('admin.add.official', $resident->id) }}" method="post">
+                                        @csrf
+                                        @foreach ($positions as $position)
+                                            <input type="radio" name="position_id" id="position_{{$position->id}}" value="{{ $position->id }}">
+                                                                                        <label for="position_{{$position->id}}">{{ $position->positionName }}</label>
+
+                                        @endforeach
+                                        <input type="text" name="description">
+                                        <button type="submit">submit</button>
+                                    </form>
+
+                                    </td>
                                     {{-- Edit Modal --}}
                                     <div class="modal fade" id="updateResident{{ $resident->id }}" tabindex="-1">
                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">

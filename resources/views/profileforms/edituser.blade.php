@@ -88,7 +88,7 @@ $user = auth()->user();
         <div class="col-md-4">
             <label for="current_password" class="form-label">Current Password</label>
         <div class="input-group">
-            <input type="password" class="form-control" id="current_password" name="current_password" required>
+            <input type="password" class="form-control" id="current_password" name="current_password">
             <span class="input-group-text" onclick="togglePassword('current_password')">
                 <i class="fas fa-eye"></i>
             </span>

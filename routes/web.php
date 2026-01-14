@@ -15,6 +15,8 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ResidentListController;
 use App\Http\Controllers\UserListController;
+use App\Http\Controllers\OfficialController;
+
 
 
 use App\Http\Controllers\NonResidentController;
@@ -46,8 +48,6 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
         Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
-        Route::put('/profile/own/{id}', [ResidentController::class,'updateOwnInfo'])->name('update.ownInfo');
-        Route::put('/profile/{id}', [ResidentController::class,'updateProfile'])->name('update.profile');
 
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
@@ -67,7 +67,6 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
         Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
         
-        
     });
 });
 
@@ -75,8 +74,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
-    Route::put('/profile/own/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
-    Route::put('/profile/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
+    Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
+    Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
 
     Route::get('/blotterRequest', [AdminController::class, 'blotterRequest'])->name('blotterRequest');
     Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
@@ -100,7 +99,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/contactus', [AdminController::class,'contactus'])->name('contactus');
     Route::get('/settings', [AdminController::class,'settings'])->name('settings');
     Route::post('/settings', [AdminController::class,'updateSettings'])->name('updateSettings');
-    Route::get('/barangayOfficials', [AdminController::class,'barangayOfficials'])->name('barangayOfficials');
+
+    Route::get('/barangayOfficials', [OfficialController::class,'displayOfficials'])->name('barangayOfficials');
+    Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
+
+
     Route::get('/census', [AdminController::class,'census'])->name('census');
 
     Route::get('/users', [UserListController::class,'showUsers'])->name('users');
@@ -128,19 +131,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/residents', [ResidentListController::class, 'showResidents'])->name('residents');
     Route::post('/residents', [ResidentListController::class, 'encodeResidents'])->name('encode.residents');
     Route::get('/residents', [ResidentListController::class, 'searchResidents'])->name('residents');
+    Route::post('/residents/role/{id}', [OfficialController::class, 'addOfficial'])->name('add.official');
+
     Route::put('/residents/{id}', [ResidentListController::class, 'updateResident'])->name('update.resident');
     Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
 
-    
-    
+
+
+
 });
 
 Route::middleware(['auth', 'role:subadmin'])->group(function(){
     Route::prefix('subadmin')->name("subadmin.")->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
-        Route::put('/profile/own/{id}', [SubAdminController::class,'updateOwnInfo'])->name('update.ownInfo');
-        Route::put('/profile/{id}', [SubAdminController::class,'updateProfile'])->name('update.profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
         Route::get('/subadminBlotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
             Route::get('/subadminCertificate', [SubAdminController::class,'subadminCertificate'])->name('subadminCertificate');
@@ -185,8 +189,6 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
     Route::prefix('non-resident')->name('non-resident.')->group(function(){
         Route::get('/dashboard', [NonResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [NonResidentController::class,'profile'])->name('profile');
-        Route::put('/profile/own/{id}', [NonResidentController::class,'updateOwnInfo'])->name('update.ownInfo');
-        Route::put('/profile/{id}', [NonResidentController::class,'updateProfile'])->name('update.profile');
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
         Route::get('/aboutus', [NonResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [NonResidentController::class,'contactus'])->name('contactus');

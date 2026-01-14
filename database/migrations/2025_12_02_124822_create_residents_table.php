@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('houseNo',8);
             $table->string('street',70);
             $table->string('contactNo', 11);
+            $table->string('religion');
             $table->date('birthday');
             $table->string('emergencyContactNo', 11);
             $table->string('emergencyContactName', 255);
@@ -28,7 +29,6 @@ return new class extends Migration
             $table->enum('parent',['yes', 'no', 'single']);
             $table->enum('enrolled', ['yes', 'no']);
             $table->string('educationalAttainment')->nullable();
-            $table->foreignId('religionId')->constrained('religions');
             $table->enum('headOfFamily', ['yes','no']);
             $table->foreignId('EncodedBy')->constrained('users');
 

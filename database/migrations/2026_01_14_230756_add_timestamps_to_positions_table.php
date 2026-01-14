@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('residents', function (Blueprint $table) {
-            $table->dropForeign(['religionId']);
+        Schema::table('positions', function (Blueprint $table) {
+            $table->timestamps();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('residents', function (Blueprint $table) {
-            //
+        Schema::table('positions', function (Blueprint $table) {
+            $table->timestamps();
         });
     }
 };
