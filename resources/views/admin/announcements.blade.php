@@ -296,8 +296,44 @@
 
           <!-- Modal remains exactly the same -->
           <div class="modal fade" id="editAnnouncement{{ $announcements->id }}" tabindex="-1" aria-labelledby="editAnnouncementLabel{{ $announcements->id }}" aria-hidden="true">
-            <!-- Modal content unchanged -->
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editAnnouncementLabel{{ $announcements->id }}">Edit Announcement</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('admin.update.announcement', $announcements->id) }}" method="post" enctype="multipart/form-data">
+          @csrf
+          @method('PUT')
+
+          <label for="title{{ $announcements->id }}">Title</label>
+          <input class="form-control" type="text" name="title" id="title{{ $announcements->id }}" value="{{ $announcements->title }}" required>
+
+          <label for="details{{ $announcements->id }}">Details</label>
+          <textarea class="form-control" name="details" id="details{{ $announcements->id }}" cols="40" rows="10" required>{{ old('details', $announcements->details) }}</textarea>
+
+          <label for="eventTime{{ $announcements->id }}">Event Start</label>
+          <input class="form-control datetime-picker" type="text" name="eventTime" id="eventTime{{ $announcements->id }}" value="{{ old('eventTime', $announcements->eventTime ? date('Y-m-d H:i', strtotime($announcements->eventTime)) : '') }}">
+
+          <label for="eventEnd{{ $announcements->id }}">Event End</label>
+          <input class="form-control datetime-picker" type="text" name="eventEnd" id="eventEnd{{ $announcements->id }}" value="{{ old('eventEnd', $announcements->eventEnd ? date('Y-m-d H:i', strtotime($announcements->eventEnd)) : '') }}">
+
+          <label for="image{{ $announcements->id }}">Image</label>
+          <input class="form-control" type="file" name="image" id="image{{ $announcements->id }}" accept="image/*">
+          @if($announcements->image)
+            <img src="{{ asset('storage/'.$announcements->image) }}" class="mt-2" style="max-width: 200px;">
+          @endif
+
+          <div class="text-end mt-3">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" type="submit">Update Announcement</button>
           </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
           @endforeach
         </div>
       </div>
