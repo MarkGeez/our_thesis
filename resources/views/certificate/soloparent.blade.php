@@ -213,10 +213,12 @@
                 <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
             </div>
         </div>
-        <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain">
+        <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" style="width:80px;height:80px;object-fit:contain">
     </div>
 
     <div class="content">
+        @include('certificate.certificateofficials')
+        
         <main class="right">
             <div class="cert-title">AFFIDAVIT FROM BARANGAY OF</div>
             <div class="cert-subtitle">SOLO PARENT</div>
@@ -227,7 +229,7 @@
                 Manila, after having duly sworn to in accordance with law, hereby depose and state:
             </p>
 
-            <div class="brgylogo-arc"><img src="Brgy-logo-1.png" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
+            <div class="brgylogo-arc"><img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
 
             <div class="checkbox-section">
                 <div class="checkbox" onclick="toggleCheckbox(this)"></div>
@@ -293,6 +295,8 @@
                     and circumstances and for whatever legal intents and purpose this instrument may serve.
                 </div>
             </div>
+
+            @include('certificate.chairmansignature')
 
         </main>
     </div>

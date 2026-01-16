@@ -200,4 +200,3 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
     });
 });
 
-

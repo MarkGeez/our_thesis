@@ -83,7 +83,7 @@
         <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
       </div>
     </div>
-    <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain">
+    <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" style="width:80px;height:80px;object-fit:contain">
   </div>
 
   
@@ -99,7 +99,7 @@
         <input class="input-line" name="resident_name"> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address
         <input class="input-line" name="postal_address">.
       </p>
-          <div class="brgylogo-arc"><img src="Barangay 249 Logo.png" alt="Barangay Seal" style="width:350; height: 350px;; object-fit:contain"></div>
+          <div class="brgylogo-arc"><img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Barangay Seal" style="width:350; height: 350px;; object-fit:contain"></div>
       <p style="font-size:14px">It is further certified that the above named person as known to be of good moral character and without any derogatory record in this BARANGAY. </p>
       <div style="font-weight:bold;margin-top:10px">This Certification is being issued upon the request of the bearer for: AS REQUIREMENTS AND/OR TO SUPPORT HIS/HER.</div>
       <div style="margin-top:10px">

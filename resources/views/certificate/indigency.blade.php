@@ -83,7 +83,7 @@
         <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
       </div>
     </div>
-    <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain">
+    <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" style="width:80px;height:80px;object-fit:contain">
   </div>
 
   
@@ -95,7 +95,7 @@
                 <div class="cert-title">CERTIFICATION OF INDIGENCY</div>
 
                 <div class="brgylogo-arc">
-                    <img src="Barangay 249 Logo.png" alt="Barangay Seal" style="width:450px; height:450px; object-fit:contain">
+                    <img src="{{ asset('template/img/brgy 249 Logo png.png') }}" alt="Barangay Seal" style="width:450px; height:450px; object-fit:contain">
                 </div>
 
                 <div style="position: relative; z-index: 1;">
