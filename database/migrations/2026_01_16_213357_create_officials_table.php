@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('officials', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            
-            $table->foreignId('resident_id')->nullabe();
-            $table->foreignId('position_id')->unique()->constrained();
-            
-            $table->text('description');
+            $table->enum('position', [' Barangay Captain', 'Kagawad', 'Secretary', 'Treasurer', 'Sk Chairman', 'Sk Kagawad']);
+            $table->quantity('')
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('officials');

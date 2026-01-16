@@ -196,7 +196,7 @@
                                     </div>
 
                                     <td>
-                                    {{--  --}}
+                                    {{-- --}}
                                     <form action="{{ route('admin.add.official', $resident->id) }}" method="post">
                                         @csrf
                                         @foreach ($positions as $position)
