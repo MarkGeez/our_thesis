@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Announcement;
 use App\Models\Resident;
+use App\Models\Announcement;
+
 
 class NonResidentController extends Controller
 {
@@ -104,7 +106,8 @@ class NonResidentController extends Controller
 
     public function aboutus()
     {
+        $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')->paginate(30);
         $nonResident = auth()->user();
-        return view('non-resident.aboutus', compact('nonResident'));
+        return view('non-resident.aboutus', compact('nonResident', 'officials'));
     }
 }

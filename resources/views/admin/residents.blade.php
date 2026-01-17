@@ -151,7 +151,7 @@
                                                                 <div class="fw-semibold text-secondary">Address</div>
                                                                 <div class="fs-6"> House No. {{ $resident->houseNo }}<br> {{ ucwords(strtolower($resident->street)) }} </div>
                                                             </div>
-                                                            <div class="col-md-6">
+                                                            <img src="{{ asset('storage/' . $resident->image_path) }}" alt="profile picture">                                                            <div class="col-md-6">
                                                                 <div class="fw-semibold text-secondary">Contact Number</div>
                                                                 <div class="fs-6">{{ $resident->contactNo }}</div>
                                                             </div>
@@ -244,7 +244,7 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form action="{{ route($user->role . '.update.resident', $resident->id) }}" method="POST">
+                                                    <form action="{{ route($user->role . '.update.resident', $resident->id) }}" method="POST" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PUT')
 
@@ -282,6 +282,7 @@
                                                             <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
                                                             <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
                                                         </select>
+                                                        <input type="file" name="image_path" accept="image/jpeg,image/png">
 
                                                         <hr class="mt-4">
 
@@ -393,6 +394,7 @@
 <input type="number" id="age" name="age" class="form-control" value="{{ old('age') }}" placeholder="0" readonly>
 
 <hr class="mt-4">
+                                                        <input type="file" name="image_path" accept="image/png, image/jpg, image/png">
 
 <label for="emergencyContactName">Emergency Contact Name</label>
 <input type="text" id="emergencyContactName" name="emergencyContactName" class="form-control" value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here" required>

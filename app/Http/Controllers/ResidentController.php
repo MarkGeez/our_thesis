@@ -3,6 +3,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Resident;
 use App\Models\Announcement;
+
+use App\Models\Official;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -139,8 +142,9 @@ class ResidentController extends Controller
 
     public function aboutus()
     {
+        $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')->paginate(30);
         $resident = auth()->user();
-        return view('resident.aboutus', compact('resident'));
+        return view('resident.aboutus', compact('resident', 'officials'));
     }
 
     

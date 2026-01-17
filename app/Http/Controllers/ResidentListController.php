@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Archive;
 use App\Models\Official;
-
+use Illuminate\Support\Facades\Storage;
 
 
 class ResidentListController extends Controller
@@ -57,11 +57,15 @@ public function searchResidents(Request $request)
         'parent' => 'nullable|in:yes,no,single',
         'enrolled' => 'nullable|in:yes,no',
         'religion' => 'nullable|string|max:255',
-
-
         'educationalAttainment' => 'nullable|string',
         'headOfFamily' => 'required|in:yes,no',
+        'image' => 'nullable|mimes:jpg,jpeg,png|max:4096'
     ]);
+
+    $image = null;
+    if($request->hasFile('image_path')){
+        $image = $request->file('image_path')->store('resident', 'public');
+    }
 
     $validated['firstName'] = strtolower(trim($validated['firstName']));
     $validated['middleName'] = strtolower(trim($validated['middleName']));
@@ -104,9 +108,22 @@ public function searchResidents(Request $request)
             'educationalAttainment' => 'nullable|string',
             'religionId' => 'nullable|exists:religions,id',
             'headOfFamily' => 'required|in:yes,no',
+            'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
         ]);
 
-        unset($validated['religionId']);
+
+    
+        if($request->hasFile('image_path')){
+        // Delete old image if exists
+        if($resident->image_path && Storage::disk('public')->exists($resident->image_path)){
+            Storage::disk('public')->delete($resident->image_path);
+        }
+        
+        $validated['image_path'] = $request->file('image_path')->store('resident', 'public');
+        } else {
+        // Keep the old image if no new image uploaded
+        unset($validated['image_path']);
+        }
 
 
         $resident->update($validated);

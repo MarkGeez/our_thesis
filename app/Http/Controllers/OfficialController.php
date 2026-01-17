@@ -11,7 +11,7 @@ class OfficialController extends Controller
 {
     public function displayOfficials()
     {
-        $officials = Official::with('resident:id,firstName,middleName,lastName')->paginate(30);
+        $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')->paginate(30);
         $user = auth()->user();
         return view($user->role . '.barangayOfficials', compact('officials', 'user'));
     }

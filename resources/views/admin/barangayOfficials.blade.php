@@ -30,14 +30,7 @@
     @include('admin.admin-header', ['admin' => auth()->user()])
             <main class="main users chart-page" id="skip-target"></main>
 
-        @foreach ($officials as $official)
-            image: 
-            Hon: {{ $official->resident->firstName}} <b>{{$official->resident->lastName}}</b>
-            position: {{ $official->position }}
-            inaguration {{ date('F d, Y', strToTime($official->start))}}
-            end: {{ date('F d, Y', strToTime($official->end))}}
-
-        @endforeach
+    @include('components.officials')
 
 </main>
 

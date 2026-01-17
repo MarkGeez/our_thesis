@@ -27,7 +27,8 @@ class Resident extends Model
         'religion',
         'headOfFamily',
         'EncodedBy',
-        'user_id'
+        'user_id',
+        'image_path'
     ];
     
     public function user(){

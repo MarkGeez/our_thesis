@@ -155,6 +155,8 @@
             <h3>brgy</h3>
             <h1>249 Online</h1>
         </div>
+            @include('components.officials')
+
         <h4>Your easy access to forms, services, and barangay updates for Barangay 249 Tondo, Manila residents.</h4>
    
         <div class="d-flex justify-content-center mt-4">
