@@ -16,6 +16,8 @@ use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ResidentListController;
 use App\Http\Controllers\UserListController;
 use App\Http\Controllers\OfficialController;
+use App\Http\Controllers\LandingController;
+
 
 
 
@@ -37,9 +39,7 @@ Route::get('register', [RegistrationController::class,'showRegister'])->name('re
 Route::post('register', [RegistrationController::class, 'register'])->name('register.attempt');
 
 
-Route::get('/', function () {
-    return view('index'); 
-});
+Route::get('/', [LandingController::class, 'display']);
 
 
 

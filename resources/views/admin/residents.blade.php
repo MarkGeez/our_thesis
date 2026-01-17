@@ -491,11 +491,7 @@
 
 <hr class="mt-4">
 
-<label for="birthday">Birthday</label>
-<input type="text" id="birthday" name="birthday" class="form-control date-picker" value="{{ old('birthday') }}" placeholder="Click to select Birthday" required>
 
-<label for="age">Age</label>
-<input type="number" id="age" name="age" class="form-control" value="{{ old('age') }}" placeholder="0" readonly>
 
 <hr class="mt-4">
                                                         <input type="file" name="image_path" accept="image/png, image/jpg, image/png">
