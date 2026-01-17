@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('officials', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->enum('position', [' Barangay Captain', 'Kagawad', 'Secretary', 'Treasurer', 'Sk Chairman', 'Sk Kagawad']);
-            $table->quantity('')
+            $table->enum('position', ['Chairman', 'Kagawad', 'Secretary', 'Treasurer', 'Sk Chairman', 'Sk Kagawad']);
+            $table->foreignId('resident_id')->constrained('residents');
+            $table->string('details', 255);
+            $table->date('start');
+            $table->date('end');
         });
     }
 

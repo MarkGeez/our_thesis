@@ -35,6 +35,6 @@ class Resident extends Model
     }
 
     public function official(){
-        return $this->hasOne(Official::class, 'resident_id'); // Specify foreign key
+        return $this->hasOne(Official::class, 'resident_id'); 
     }
 }

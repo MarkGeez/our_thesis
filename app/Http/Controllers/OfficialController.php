@@ -5,51 +5,62 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Official;
-use App\Models\Positions;
 
 
 class OfficialController extends Controller
 {
     public function displayOfficials()
     {
-        $officials = Official::with('resident:id,firstName,middleName,lastName', 'position:id,positionName')->paginate(30);
+        $officials = Official::with('resident:id,firstName,middleName,lastName')->paginate(30);
         $user = auth()->user();
-        $positions = Positions::get();
-        return view($user->role . '.barangayOfficials', compact('officials', 'user', 'positions'));
+        return view($user->role . '.barangayOfficials', compact('officials', 'user'));
     }
     
     public function addOfficial(Request $request, $id)
-    {
-        $resident = Resident::findOrFail($id);
+{
+    $resident = Resident::findOrFail($id);
 
-        $validated = $request->validate([
-            'description' => 'required|string|max:120'
-        ]);
+    $positionLimits = [
+        'Chairman'     => 1,
+        'Kagawad'      => 7,
+        'Secretary'    => 1,
+        'Treasurer'    => 1,  
+        'Sk Chairman'  => 1,
+        'Sk Kagawad'   => 7,
+    ];
 
-        if (Official::where('resident_id', $resident->id)->exists()) {
-            return redirect()->back()->with('error', 'Resident is already an official!');
-        }
+    $request->validate([
+        'details'  => 'nullable|string|max:255',
+        'start'    => 'required|date_format:Y-m-d|before:tomorrow',
+        'end'      => 'required|date_format:Y-m-d|after:start',
+        'position' => 'required|in:' . implode(',', array_keys($positionLimits)),
+    ]);
 
-        Official::create([
-            'resident_id' => $resident->id,  
-            'position_id' => $request->input('position_id'),
-            'description' => $validated['description']
-        ]);
-
-        return redirect()->back()->with('success', 'Added to officials successfully!');
+    if (Official::where('resident_id', $resident->id)->exists()) {
+        return back()->with('error', 'Resident is already an official.');
     }
 
-    public function createOfficialName(Request $request)
-{
-    $validated = $request->validate([
-        'positionName' => 'required|string|max:255',
+    $position = $request->position;
+    $limit    = $positionLimits[$position];
+
+    $count = Official::where('position', $position)->count();
+
+    if ($count >= $limit) {
+        return back()->with('error', "{$position} position has reached its limit.");
+    }
+
+    Official::create([
+        'details'     => $request->details,
+        'start'       => $request->start,
+        'end'         => $request->end,
+        'position'    => $position,
+        'resident_id' => $resident->id,
     ]);
 
-    Positions::create([
-        'positionName' => $validated['positionName'],
-    ]);
-
-    return redirect()->back()->with('success', 'Position created');
+    return back()->with('success', 'Successfully added to the official list.');
 }
+
+
+    
 
 }

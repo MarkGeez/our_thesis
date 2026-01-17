@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Archive;
-use App\Models\Positions;
+use App\Models\Official;
+
 
 
 class ResidentListController extends Controller
@@ -31,10 +32,7 @@ class ResidentListController extends Controller
         })
         ->paginate(10);
 
-    $positions = Positions::get();
-
-    
-    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm', 'positions'));
+    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm'));
 }
 
 // Then remove searchResidents() or keep it as an alias
@@ -71,14 +69,14 @@ public function searchResidents(Request $request)
     
     $validated['EncodedBy'] = auth()->id();
 
-Resident::create($validated);
+    Resident::create($validated);
 
 
     return redirect()->back()->with('success', 'Resident encoded successfully!');
 
 
     
-}
+    }
 
     public function updateResident(Request $request, $id){
         $user = auth()->user();

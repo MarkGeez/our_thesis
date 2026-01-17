@@ -197,16 +197,42 @@
 
                                     <td>
                                     {{-- --}}
-                                    <form action="{{ route('admin.add.official', $resident->id) }}" method="post">
-                                        @csrf
-                                        @foreach ($positions as $position)
-                                            <input type="radio" name="position_id" id="position_{{$position->id}}" value="{{ $position->id }}">
-                                                                                        <label for="position_{{$position->id}}">{{ $position->positionName }}</label>
+<form action="{{ route('admin.add.official', $resident->id) }}" method="POST">
+   @csrf
+    <div>
+        <label>Position:</label><br>
+        
+        <input type="radio" name="position" value="Chairman" id="position1" checked>
+        <label for="position1">Barangay Chairman</label><br>
+        
+        <input type="radio" name="position" value="Kagawad" id="position2">
+        <label for="position2">Kagawad</label><br>
+        
+        <input type="radio" name="position" value="Secretary" id="position3">
+        <label for="position3">Secretary</label><br>
+        
+        <input type="radio" name="position" value="Treasurer" id="position4">
+        <label for="position4">Treasurer</label><br>
+        
+        <input type="radio" name="position" value="Sk Chairman" id="position5">
+        <label for="position5">Sk Chairman</label><br>
+        
+        <input type="radio" name="position" value="Sk Kagawad" id="position6">
+        <label for="position6">Sk Kagawad</label>
+    </div>
+    
+    <div>
+        <label>Description:</label><br>
+        <input type="text" name="details" placeholder="Enter description">
+    </div>
 
-                                        @endforeach
-                                        <input type="text" name="description">
-                                        <button type="submit">submit</button>
-                                    </form>
+    <input type="date" name="start" id="">
+    <input type="date" name="end" id="">
+     
+
+    
+    <button type="submit">Submit</button>
+</form>
 
                                     </td>
                                     {{-- Edit Modal --}}
