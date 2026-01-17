@@ -60,6 +60,9 @@
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1>Resident List</h1>
+                    @if (session('success'))
+                        <p>{{session('success')}}</p>
+                    @endif
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
                         <i class="fas fa-plus me-2"></i> Encode Resident
                     </button>
