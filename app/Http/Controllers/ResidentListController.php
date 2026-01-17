@@ -21,7 +21,7 @@ class ResidentListController extends Controller
     
     $searchTerm = $request->input('search');
     
-    $residents = Resident::with('user:id,firstName,lastname')
+    $residents = Resident::with(['user:id,firstName,lastname', 'official'])
         ->when($searchTerm, function($query, $searchTerm) {
             return $query->where(function($q) use ($searchTerm) {
                 $q->where('firstName', 'like', "%{$searchTerm}%")
@@ -105,8 +105,8 @@ public function searchResidents(Request $request)
             'sex' => 'required|in:male,female',
             'parent' => 'required|in:yes,no,single',
             'enrolled' => 'required|in:yes,no',
-            'educationalAttainment' => 'nullable|string',
-            'religionId' => 'nullable|exists:religions,id',
+            'educationalAttainment' => 'nullable|string|max:255',
+            'religion' => 'nullable|string|max:255',
             'headOfFamily' => 'required|in:yes,no',
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
         ]);
