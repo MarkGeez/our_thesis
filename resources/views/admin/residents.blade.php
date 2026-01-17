@@ -461,68 +461,173 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route($user->role . '.encode.residents') }}" method="post">
-                                @csrf
-                                <label>First Name</label>
-                                <input type="text" name="firstName" class="form-control" placeholder="Enter First Name" required>
+                            <form action="{{ route($user->role . '.encode.residents') }}" method="post" enctype="multipart/form-data">
+    @csrf
+    
+    <!-- First Name -->
+    <label>First Name</label>
+    <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" 
+           placeholder="Enter First Name" value="{{ old('firstName') }}" required>
+    @error('firstName')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-                                <label>Middle Name</label>
-                                <input type="text" name="middleName" class="form-control" placeholder="Enter Middle Name" required>
+    <!-- Middle Name -->
+    <label>Middle Name</label>
+    <input type="text" name="middleName" class="form-control @error('middleName') is-invalid @enderror" 
+           placeholder="Enter Middle Name" value="{{ old('middleName') }}" required>
+    @error('middleName')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-                                <label>Last Name</label>
-                                <input type="text" name="lastName" class="form-control" placeholder="Enter Last Name" required>
+    <!-- Last Name -->
+    <label>Last Name</label>
+    <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" 
+           placeholder="Enter Last Name" value="{{ old('lastName') }}" required>
+    @error('lastName')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-                                <label>Birthday</label>
-                                <input type="text" id="birthdayCreate" name="birthday" class="form-control date-picker" placeholder="Select Birthday" required>
+    <!-- Birthday -->
+    <label>Birthday</label>
+    <input type="text" id="birthdayCreate" name="birthday" class="form-control date-picker @error('birthday') is-invalid @enderror" 
+           placeholder="Select Birthday" value="{{ old('birthday') }}" required>
+    @error('birthday')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-                                <label>Age</label>
-                                <input type="number" id="ageCreate" name="age" class="form-control bg-light" readonly>
+    <!-- Age -->
+    <label>Age</label>
+    <input type="number" id="ageCreate" name="age" class="form-control bg-light @error('age') is-invalid @enderror" 
+           value="{{ old('age') }}" readonly>
+    @error('age')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<hr class="mt-4">
+    <hr class="mt-4">
 
-<label for="houseNo">House No.</label>
-<input type="text" id="houseNo" name="houseNo" class="form-control" value="{{ old('houseNo') }}" placeholder="Enter House No. here" required>
+    <!-- House No -->
+    <label for="houseNo">House No.</label>
+    <input type="text" id="houseNo" name="houseNo" class="form-control @error('houseNo') is-invalid @enderror" 
+           value="{{ old('houseNo') }}" placeholder="Enter House No. here" required>
+    @error('houseNo')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<label for="street">Street</label>
-<input type="text" id="street" name="street" class="form-control" value="{{ old('street') }}" placeholder="Enter Street Name here" required>
+    <!-- Street -->
+    <label for="street">Street</label>
+    <input type="text" id="street" name="street" class="form-control @error('street') is-invalid @enderror" 
+           value="{{ old('street') }}" placeholder="Enter Street Name here" required>
+    @error('street')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<label for="contactNo">Contact No.</label>
-<input type="text" id="contactNo" name="contactNo" class="form-control" value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" required>
+    <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
+    <label for="contactNo">Contact No.</label>
+    <input type="text" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
+           value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" required>
+    @error('contactNo')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<hr class="mt-4">
+    <hr class="mt-4">
 
+    <!-- Sex (Added missing field) -->
+    <label for="sex">Sex</label>
+    <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror">
+        <option value="">Select Sex</option>
+        <option value="male" {{ old('sex') === 'male' ? 'selected' : '' }}>Male</option>
+        <option value="female" {{ old('sex') === 'female' ? 'selected' : '' }}>Female</option>
+    </select>
+    @error('sex')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
+    <!-- Parent Status (Added missing field) -->
+    <label for="parent">Parent Status</label>
+    <select id="parent" name="parent" class="form-select @error('parent') is-invalid @enderror">
+        <option value="">Select Parent Status</option>
+        <option value="yes" {{ old('parent') === 'yes' ? 'selected' : '' }}>Yes</option>
+        <option value="no" {{ old('parent') === 'no' ? 'selected' : '' }}>No</option>
+        <option value="single" {{ old('parent') === 'single' ? 'selected' : '' }}>Single Parent</option>
+    </select>
+    @error('parent')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<hr class="mt-4">
-                                                        <input type="file" name="image_path" accept="image/png, image/jpg, image/png">
+    <!-- Enrolled (Added missing field) -->
+    <label for="enrolled">Enrolled in School</label>
+    <select id="enrolled" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror">
+        <option value="">Select Enrollment Status</option>
+        <option value="yes" {{ old('enrolled') === 'yes' ? 'selected' : '' }}>Yes</option>
+        <option value="no" {{ old('enrolled') === 'no' ? 'selected' : '' }}>No</option>
+    </select>
+    @error('enrolled')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<label for="emergencyContactName">Emergency Contact Name</label>
-<input type="text" id="emergencyContactName" name="emergencyContactName" class="form-control" value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here" required>
+    <hr class="mt-4">
 
-<label for="emergencyContactNo">Emergency Contact No.</label>
-<input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control" value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx" required>
+    <!-- Image -->
+    <label for="image_path">Profile Image</label>
+    <input type="file" name="image_path" id="image_path" class="form-control @error('image_path') is-invalid @enderror" 
+           accept="image/png, image/jpg, image/jpeg">
+    @error('image_path')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<hr class="mt-4">
+    <!-- Emergency Contact Name -->
+    <label for="emergencyContactName">Emergency Contact Name</label>
+    <input type="text" id="emergencyContactName" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" 
+           value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here" required>
+    @error('emergencyContactName')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<label for="educationalAttainment">Educational Attainment</label>
-<input type="text" id="educationalAttainment" name="educationalAttainment" class="form-control" value="{{ old('educationalAttainment') }}" placeholder="Enter Educational Attainment here">
+    <!-- Emergency Contact No -->
+    <label for="emergencyContactNo">Emergency Contact No.</label>
+    <input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
+           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx" required>
+    @error('emergencyContactNo')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
 
-<label for="religion">Religion</label>
-<input type="text" name="religion" class="form-control" value="{{ old('religion') }}" placeholder="Enter Religion here">
-                                <label for="headOfFamily">Head of Family</label>
-                                <select id="headOfFamily" name="headOfFamily" class="form-select" required>
-                                    <option value="">Select Option</option>
-                                    <option value="yes" {{ old('headOfFamily') === 'yes' ? 'selected' : '' }}>Yes</option>
-                                    <option value="no" {{ old('headOfFamily') === 'no' ? 'selected' : '' }}>No</option>
-                                </select>
-                                <label>Contact No.</label>
-                                <input type="text" name="contactNo" class="form-control" placeholder="09xxxxxxxxx" required>
+    <hr class="mt-4">
 
-                                <div class="text-end mt-4 pt-3 border-top">
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary px-4">Save Resident</button>
-                                </div>
-                            </form>
+    <!-- Educational Attainment -->
+    <label for="educationalAttainment">Educational Attainment</label>
+    <input type="text" id="educationalAttainment" name="educationalAttainment" class="form-control @error('educationalAttainment') is-invalid @enderror" 
+           value="{{ old('educationalAttainment') }}" placeholder="Enter Educational Attainment here">
+    @error('educationalAttainment')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    <!-- Religion -->
+    <label for="religion">Religion</label>
+    <input type="text" name="religion" class="form-control @error('religion') is-invalid @enderror" 
+           value="{{ old('religion') }}" placeholder="Enter Religion here">
+    @error('religion')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    <!-- Head of Family -->
+    <label for="headOfFamily">Head of Family</label>
+    <select id="headOfFamily" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
+        <option value="">Select Option</option>
+        <option value="yes" {{ old('headOfFamily') === 'yes' ? 'selected' : '' }}>Yes</option>
+        <option value="no" {{ old('headOfFamily') === 'no' ? 'selected' : '' }}>No</option>
+    </select>
+    @error('headOfFamily')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    <!-- REMOVED DUPLICATE CONTACT NO FIELD THAT WAS HERE -->
+
+    <div class="text-end mt-4 pt-3 border-top">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary px-4">Save Resident</button>
+    </div>
+</form>
                         </div>
                     </div>
                 </div>

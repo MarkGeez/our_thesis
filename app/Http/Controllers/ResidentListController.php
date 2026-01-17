@@ -42,43 +42,45 @@ public function searchResidents(Request $request)
 }
 
     public function encodeResidents(Request $request){
-    $validated = $request->validate([
-        'firstName' => 'required|string|max:70',
-        'middleName' => 'required|string|max:70',
-        'lastName' => 'required|string|max:70',
-        'houseNo' => 'required|string|max:8',
-        'street' => 'required|string|max:70',
-        'contactNo' => 'required|string|max:11',
-        'birthday' => 'required|date',
-        'emergencyContactNo' => 'required|string|max:11',
-        'emergencyContactName' => 'required|string|max:255',
-        'age' => 'required|integer|min:0|max:255',
-        'sex' => 'nullable|in:male,female',
-        'parent' => 'nullable|in:yes,no,single',
-        'enrolled' => 'nullable|in:yes,no',
-        'religion' => 'nullable|string|max:255',
-        'educationalAttainment' => 'nullable|string',
-        'headOfFamily' => 'required|in:yes,no',
-        'image' => 'nullable|mimes:jpg,jpeg,png|max:4096'
-    ]);
+     
+        $validated = $request->validate([
+            'firstName' => 'required|string|max:70',
+            'middleName' => 'required|string|max:70',
+            'lastName' => 'required|string|max:70',
+            'houseNo' => 'required|string|max:8',
+            'street' => 'required|string|max:70',
+            'contactNo' => 'required|string|max:11',
+            'birthday' => 'required|date',
+            'emergencyContactNo' => 'required|string|max:11',
+            'emergencyContactName' => 'required|string|max:255',
+            'age' => 'required|integer|min:0|max:255',
+            'sex' => 'nullable|in:male,female',
+            'parent' => 'nullable|in:yes,no,single',
+            'enrolled' => 'nullable|in:yes,no',
+            'religion' => 'nullable|string|max:255',
+            'educationalAttainment' => 'nullable|string',
+            'headOfFamily' => 'required|in:yes,no',
+            'image_path' => 'nullable|mimes:jpg,jpeg,png|max:4096' // Changed to match form
+        ]);
 
-    $image = null;
-    if($request->hasFile('image_path')){
-        $image = $request->file('image_path')->store('resident', 'public');
-    }
+        // Handle image upload
+        if($request->hasFile('image_path')){
+            $image = $request->file('image_path')->store('resident', 'public');
+            $validated['image_path'] = $image;
+        }
 
-    $validated['firstName'] = strtolower(trim($validated['firstName']));
-    $validated['middleName'] = strtolower(trim($validated['middleName']));
-    $validated['lastName'] = strtolower(trim($validated['lastName']));
-    
-    $validated['EncodedBy'] = auth()->id();
+        // Format names
+        $validated['firstName'] = strtolower(trim($validated['firstName']));
+        $validated['middleName'] = strtolower(trim($validated['middleName']));
+        $validated['lastName'] = strtolower(trim($validated['lastName']));
+        
+        // Add encoded by
+        $validated['EncodedBy'] = auth()->id();
 
-    Resident::create($validated);
+        // Create resident
+        Resident::create($validated);
 
-
-    return redirect()->back()->with('success', 'Resident encoded successfully!');
-
-
+        return redirect()->back()->with('success', 'Resident encoded successfully!');
     
     }
 
