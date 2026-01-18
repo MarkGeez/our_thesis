@@ -96,9 +96,7 @@ class AnnouncementController extends Controller
 
     public function archive($id, ArchiveService $archiveService){
         $announcement = Announcement::findOrFail($id);
-
         $archiveService->archive($announcement, "Old announcement");
-       
         $role = Auth::user()->role;
         $route = $role . ".dashboard";
         return redirect()->route($route)->with('success',"Announcement archived successfully");

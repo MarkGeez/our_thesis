@@ -89,6 +89,16 @@
                         <i class="far fa-calendar-alt me-1"></i>
                         {{ date('M d, Y', strtotime($official->start)) }} - {{ date('M d, Y', strtotime($official->end)) }}
                     </div>
+                    @auth
+                        @if(auth()->user()->role=== "admin")
+                            <form method="post" action="{{ route('admin.untag.official', $official->id) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" name="untag" value="untag">untag</button>
+
+                </form>
+                        @endif
+                    @endauth
                 </div>
             </div>
         </div>

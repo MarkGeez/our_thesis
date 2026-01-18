@@ -94,7 +94,7 @@ class SubAdminController extends Controller
         return redirect()->route('subadmin.profile')->with('success', 'Resident information updated successfully!');
     }
     public function announcements(){
-     $subadmin = Auth::user();
+    $subadmin = Auth::user();
     $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
     return view('subadmin.announcements', compact('subadmin', 'announcement'));
 }
