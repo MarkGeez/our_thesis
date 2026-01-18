@@ -30,7 +30,7 @@ class ResidentListController extends Controller
                   ->orWhere('id', 'like', "%{$searchTerm}%");
             });
         })
-        ->paginate(10);
+        ->paginate(20);
 
     return view($user->role . '.residents', compact('user', 'residents', 'searchTerm'));
 }

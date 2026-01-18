@@ -10,6 +10,7 @@ use App\Models\Blotter;
 use App\Models\Setting;
 use App\Models\Resident;
 use App\Models\Official;
+use App\Models\Position;
 
 
 use Illuminate\View\View;

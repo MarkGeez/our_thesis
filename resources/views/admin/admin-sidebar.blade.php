@@ -1,23 +1,23 @@
 <style>
     .sidebar {
-        background: {{-- \App\Models\Setting::get('theme', '#0061f7') --}} !important;
+        background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
     }
 </style>
 
 <aside class="sidebar">
     <div class="sidebar-start">
         <div class="sidebar-head">
-            <a href="{{ route('admin.dashboard') }}" class="logo-wrapper">
+            <a href="{{ route('subadmin.dashboard') }}" class="logo-wrapper">
                 <span class="sr-only">Home</span>
                 <span class="logo" aria-hidden="true">
-                    @php /*
-    $logoPath = \App\Models\Setting::get('logo', 'template/img/brgy 249 Logo png.png'); */
+                   @php
+    $logoPath = \App\Models\Setting::get('logo', 'template/img/brgy 249 Logo png.png');
 @endphp
-<img src="{{-- asset($logoPath) --}}" alt="System Logo" style="border-radius: 50%;">
+<img src="{{ asset($logoPath) }}" alt="System Logo" style="border-radius: 50%;">
                 </span>
                 <div class="logo-text">
                     <span class="logo-title" style="font-family: 'Orbitron', sans-serif;">
-                        {{-- \App\Models\Setting::get('name') --}}
+                        {{ \App\Models\Setting::get('name') }}
                     </span>
                     <span class="logo-subtitle">Dashboard</span>
                 </div>
@@ -28,6 +28,7 @@
                 <span class="icon menu-toggle"></span>
             </button>
         </div>
+
 
         <div class="sidebar-body">
             <ul class="sidebar-body-menu">

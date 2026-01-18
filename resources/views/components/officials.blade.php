@@ -14,7 +14,7 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
-    .image-container {
+    .image-containers {
         background: #f8f9fa;
         padding: 30px 0;
         text-align: center;
@@ -75,7 +75,7 @@
     @foreach ($officials as $official)
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
             <div class="official-card">
-                <div class="image-container">
+                <div class="image-containers">
                     <img src="{{ $official->resident->image_path ? asset('storage/' . $official->resident->image_path) : 'https://ui-avatars.com/api/?name='.urlencode($official->resident->firstName).'&background=0D6EFD&color=fff&size=128' }}" 
                          alt="Official Photo" class="official-avatar">
                 </div>

@@ -59,14 +59,19 @@
         <main class="main users chart-page" id="skip-target">
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Resident List</h1>
-                    @if (session('success'))
-                        <p>{{session('success')}}</p>
-                    @endif
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
-                        <i class="fas fa-plus me-2"></i> Encode Resident
-                    </button>
-                </div>
+    <h1>Resident List</h1>
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-0" role="alert" style="border-radius: 8px; border-left: 5px solid #198754;">
+           
+            <div>{{ session('success') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
+        <i class="fas fa-plus me-2"></i> Encode Resident
+    </button>
+</div>
 
                 {{-- Search Form --}}
                 <form action="{{ route($user->role . '.residents') }}" method="get" class="mb-4">
@@ -134,96 +139,104 @@
                                     {{-- View Modal --}}
                                         <div class="modal fade" id="viewResident{{ $resident->id }}" tabindex="-1">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
+                                                <div class="modal-content border-0 shadow">
                                                     <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title">Resident Details #{{ $resident->id }}</h5>
+                                                        <h5 class="modal-title">
+                                                            <i class="bi bi-person-badge me-2"></i>Resident Details #{{ $resident->id }}
+                                                        </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
+                                                    
                                                     <div class="modal-body p-4">
                                                         <section class="mb-4">
-                                                            <h6 class="mb-3 text-uppercase fw-bold" style="letter-spacing:0.5px; border-left:4px solid #0d6efd; padding-left:10px;">Personal Information</h6>
-                                                            <div class="row g-3">
-                                                                <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Full Name</div>
-                                                                    <div class="fs-6"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </div>
+                                                            <h6 class="mb-4 text-uppercase fw-bold text-primary" style="letter-spacing:0.5px; border-left:4px solid #0d6efd; padding-left:10px;">
+                                                                Personal Information
+                                                            </h6>
+                                                            
+                                                            <div class="row">
+                                                                <div class="col-md-4 text-center mb-3 mb-md-0">
+                                                                    <div class="img-container mb-2">
+                                                                        <img src="{{ asset('storage/' . $resident->image_path) }}" 
+                                                                            alt="Profile Picture" 
+                                                                            class="img-thumbnail rounded shadow-sm"
+                                                                            style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Age</div>
-                                                                    <div class="fs-6">{{ $resident->age }}</div>
+
+                                                                <div class="col-md-8">
+                                                                    <div class="row g-3">
+                                                                        <div class="col-12">
+                                                                            <div class="fw-semibold text-secondary small text-uppercase">Full Name</div>
+                                                                            <div class="fs-5 fw-bold text-dark"> 
+                                                                                {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} 
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="fw-semibold text-secondary small text-uppercase">Age / Sex</div>
+                                                                            <div class="fs-6">{{ $resident->age }} yrs old, {{ ucfirst($resident->sex) }}</div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="fw-semibold text-secondary small text-uppercase">Birthday</div>
+                                                                            <div class="fs-6">{{ \Carbon\Carbon::parse($resident->birthday)->format('M d, Y') }}</div>
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <div class="fw-semibold text-secondary small text-uppercase">Contact Number</div>
+                                                                            <div class="fs-6">{{ $resident->contactNo }}</div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Sex</div>
-                                                                    <div class="fs-6">{{ ucfirst($resident->sex) }}</div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Birthday</div>
-                                                                    <div class="fs-6">{{ \Carbon\Carbon::parse($resident->birthday)->format('M d, Y') }}</div>
-                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3">
                                                                 <div class="col-12">
-                                                                    <div class="fw-semibold text-secondary">Address</div>
-                                                                    <div class="fs-6"> House No. {{ $resident->houseNo }}<br> {{ ucwords(strtolower($resident->street)) }} </div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Contact Number</div>
-                                                                    <div class="fs-6">{{ $resident->contactNo }}</div>
+                                                                    <div class="p-3 bg-light rounded border-start border-primary border-3">
+                                                                        <div class="fw-semibold text-secondary small text-uppercase">Residential Address</div>
+                                                                        <div class="fs-6"> House No. {{ $resident->houseNo }}, {{ ucwords(strtolower($resident->street)) }} </div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <div class="fw-semibold text-secondary">Age</div>
-                                                                <div class="fs-6">{{ $resident->age }}</div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="fw-semibold text-secondary">Sex</div>
-                                                                <div class="fs-6">{{ ucfirst($resident->sex) }}</div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="fw-semibold text-secondary">Birthday</div>
-                                                                <div class="fs-6">{{ \Carbon\Carbon::parse($resident->birthday)->format('M d, Y') }}</div>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="fw-semibold text-secondary">Address</div>
-                                                                <div class="fs-6"> House No. {{ $resident->houseNo }}<br> {{ ucwords(strtolower($resident->street)) }} </div>
-                                                            </div>
-                                                            <img src="{{ asset('storage/' . $resident->image_path) }}" alt="profile picture">                                                            <div class="col-md-6">
-                                                                <div class="fw-semibold text-secondary">Contact Number</div>
-                                                                <div class="fs-6">{{ $resident->contactNo }}</div>
-                                                            </div>
-                                                        </div>
-                                                    </section>
                                                         </section>
 
-                                                        <section class="mb-4">
-                                                            <h6 class="mb-3 text-uppercase fw-bold" style="letter-spacing:0.5px; border-left:4px solid #0d6efd; padding-left:10px;">Family & Status</h6>
-                                                            <div class="row g-3">
+                                                        <hr class="my-4 text-muted opacity-25">
+
+                                                        <section>
+                                                            <h6 class="mb-3 text-uppercase fw-bold text-primary" style="letter-spacing:0.5px; border-left:4px solid #0d6efd; padding-left:10px;">
+                                                                Family & Status
+                                                            </h6>
+                                                            <div class="row g-3 px-2">
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Head of Family</div>
-                                                                    <div class="fs-6">{{ ucfirst($resident->headOfFamily) }}</div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Head of Family</div>
+                                                                    <div class="fs-6 fw-medium">{{ ucfirst($resident->headOfFamily) }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Parent Status</div>
-                                                                    <div class="fs-6">{{ ucfirst($resident->parent) }}</div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Parent Status</div>
+                                                                    <div class="fs-6 fw-medium">{{ ucfirst($resident->parent) }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Currently Enrolled</div>
-                                                                    <div class="fs-6">{{ ucfirst($resident->enrolled) }}</div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Currently Enrolled</div>
+                                                                    <div class="fs-6 fw-medium">{{ ucfirst($resident->enrolled) }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Educational Attainment</div>
-                                                                    <div class="fs-6">{{ $resident->educationalAttainment ?? 'N/A' }}</div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Educational Attainment</div>
+                                                                    <div class="fs-6 fw-medium">{{ $resident->educationalAttainment ?? 'N/A' }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Religion</div>
-                                                                    <div class="fs-6">{{ $resident->religion ?? 'N/A' }}</div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Religion</div>
+                                                                    <div class="fs-6 fw-medium">{{ $resident->religion ?? 'N/A' }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <div class="fw-semibold text-secondary">Emergency Contact</div>
-                                                                    <div class="fs-6"> {{ ucwords(strtolower($resident->emergencyContactName ?? 'N/A')) }} ({{ $resident->emergencyContactNo ?? 'N/A' }}) </div>
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Emergency Contact</div>
+                                                                    <div class="fs-6 fw-medium text-danger"> 
+                                                                        {{ ucwords(strtolower($resident->emergencyContactName ?? 'N/A')) }} 
+                                                                        <span class="text-dark d-block small">{{ $resident->emergencyContactNo ?? 'N/A' }}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </section>
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Close</button>
+                                                    
+                                                    <div class="modal-footer bg-light">
+                                                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -255,7 +268,7 @@
                                                         </select>
 
                                                         <label>Term Description</label>
-                                                        <input type="text" name="details" class="form-control" placeholder="e.g. 2023-2026 Term" value="{{ $resident->official ? $resident->official->details : '' }}">
+                                                        <input type="text" name="details" class="form-control" placeholder="e.g. 2023-2026 Term" value="{{ $resident->official ? $resident->official->details : '' }}" required>
 
                                                         <div class="row">
                                                             <div class="col-md-6">
@@ -386,7 +399,23 @@
                                                             <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
                                                             <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
                                                         </select>
-                                                        <input type="file" name="image_path" accept="image/jpeg,image/png">
+                                                        <div class="row mt-3"> <div class="col-md-4 text-center"> <label class="d-block mb-2">Current Photo</label> <img id="previewImage{{ $resident->id }}" src="{{ asset('storage/' . $resident->image_path) }}" class="img-fluid rounded shadow-sm mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Resident Photo" > </div>
+<div class="col-md-8">
+    <label for="image_path{{ $resident->id }}">Update Photo</label>
+    <input
+        type="file"
+        id="image_path{{ $resident->id }}"
+        name="image_path"
+        class="form-control"
+        accept="image/png, image/jpg, image/jpeg"
+        onchange="previewResidentImage(event, '{{ $resident->id }}')"
+    >
+    <small class="text-muted d-block mt-1">
+        JPG or PNG. Max 2MB.
+    </small>
+</div>
+
+</div>
 
                                                         <hr class="mt-4">
 
@@ -449,6 +478,14 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($residents->hasPages())
+                        <div class="pagination-wrapper">
+                            <div class="pagination-info">
+                                Showing {{ $residents->firstItem() }} to {{ $residents->lastItem() }} of {{ $residents->total() }} results
+                            </div>
+                            {{ $residents->appends(request()->query())->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 @endif
             </div>
 
@@ -632,12 +669,16 @@
                     </div>
                 </div>
             </div>
+            
         </main>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ asset('template/plugins/chart.min.js') }}"></script>
+<script src="{{ asset('template/plugins/feather.min.js') }}"></script>
+<script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -678,6 +719,8 @@
             allowInput: true
         });
     });
+    function previewResidentImage(event, id) { const image = document.getElementById('previewImage' + id); const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function (e) { image.src = e.target.result; }; reader.readAsDataURL(file); }
 </script>
+
 </body>
 </html>

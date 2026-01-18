@@ -10,11 +10,26 @@ use App\Models\Official;
 class OfficialController extends Controller
 {
     public function displayOfficials()
-    {
-        $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')->paginate(30);
-        $user = auth()->user();
-        return view($user->role . '.barangayOfficials', compact('officials', 'user'));
-    }
+{
+    $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')
+        ->orderByRaw("
+            CASE position
+                WHEN 'Chairman' THEN 1
+                WHEN 'Secretary' THEN 2
+                WHEN 'Treasurer' THEN 3
+                WHEN 'Kagawad' THEN 4
+                WHEN 'Sk Chairman' THEN 5
+                WHEN 'Sk Kagawad' THEN 6
+                ELSE 99
+            END
+        ")
+        ->paginate(30);
+
+    $user = auth()->user();
+
+    return view($user->role . '.barangayOfficials', compact('officials', 'user'));
+}
+
     
     public function addOfficial(Request $request, $id)
 {
