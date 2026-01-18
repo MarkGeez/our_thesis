@@ -1,4 +1,25 @@
 <style>
+    .official-actions {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #e2e8f0;
+    }
+
+    .btn-remove {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 6px;
+        padding: 6px 15px;
+        transition: all 0.2s;
+    }
+
+    .btn-remove:hover {
+        background-color: #ef4444;
+        color: white;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
     .official-card {
         border: none;
         border-radius: 15px;
@@ -82,13 +103,34 @@
                 
                 <div class="official-info">
                     <span class="official-position">{{ $official->position }}</span>
-                    <h3 class="official-name">Hon. {{ $official->resident->firstName }} {{ $official->resident->lastName }}</h3>
+                    <h3 class="official-name">
+    @if(Str::lower($official->position) === 'chairman' || Str::lower($official->position) === 'barangay chairman')
+        Hon. 
+    @endif
+    {{ $official->resident->firstName }} {{ $official->resident->lastName }}
+</h3>
                     
-                    <div class="term-badge mt-3">
+                    <div class="term-badge mt-2">
                         <span class="term-label">Service Term</span>
-                        <i class="far fa-calendar-alt me-1"></i>
-                        {{ date('M d, Y', strtotime($official->start)) }} - {{ date('M d, Y', strtotime($official->end)) }}
+                        <small class="fw-bold">
+                            {{ date('M Y', strtotime($official->start)) }} - {{ date('M Y', strtotime($official->end)) }}
+                        </small>
                     </div>
+
+                    @auth
+                        @if(auth()->user()->role === "admin")
+                            <div class="official-actions">
+                                <form method="POST" action="{{ route('admin.untag.official', $official->id) }}" 
+                                      onsubmit="return confirm('Are you sure you want to remove this resident from the officials list? This will not delete the resident record.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-outline-danger btn-remove w-100" type="submit">
+                                        <i class="fas fa-user-minus me-1"></i> Remove Official
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                    @endauth
                 </div>
             </div>
         </div>

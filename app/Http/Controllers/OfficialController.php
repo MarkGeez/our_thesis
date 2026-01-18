@@ -117,4 +117,14 @@ class OfficialController extends Controller
         return back()->with('success', 'Official information updated successfully.');
     }
 
+    public function untagOfficial(Request $request, $id){
+        $official = Official::findOrFail($id);
+        $official->delete();
+
+        return redirect()->back()->with('success', 'Official removed successfully.');
+
+    }
+
+
+
 }

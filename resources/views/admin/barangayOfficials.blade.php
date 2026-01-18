@@ -45,6 +45,7 @@
 
                 {{-- This include now handles the design and the loop --}}
                 @include('components.officials')
+            
 
             </div>
         </main>

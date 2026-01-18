@@ -168,8 +168,11 @@
                     <div class="official-info">
                         <span class="text-info small fw-bold text-uppercase tracking-widest" style="letter-spacing: 2px;">{{ $official->position }}</span>
                         <h4 class="mt-2" style="font-family: 'Oswald'; font-size: 1.5rem;">
-                            {{ strtoupper($official->resident->firstName) }} {{ strtoupper($official->resident->lastName) }}
-                        </h4>
+    @if(Str::contains(Str::lower($official->position), 'chairman'))
+        HON. 
+    @endif
+    {{ strtoupper($official->resident->firstName) }} {{ strtoupper($official->resident->lastName) }}
+</h4>
                         <div class="mt-3 small opacity-75">
                             <i class="far fa-calendar-alt me-1"></i> Term: {{ date('Y', strtotime($official->start)) }} - {{ date('Y', strtotime($official->end)) }}
                         </div>

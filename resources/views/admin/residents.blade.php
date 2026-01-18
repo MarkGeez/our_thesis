@@ -59,19 +59,47 @@
         <main class="main users chart-page" id="skip-target">
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Resident List</h1>
+                    <h1>Resident List</h1>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
+                        <i class="fas fa-plus me-2"></i> Encode Resident
+                    </button>
+                </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-0" role="alert" style="border-radius: 8px; border-left: 5px solid #198754;">
-           
-            <div>{{ session('success') }}</div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
-        <i class="fas fa-plus me-2"></i> Encode Resident
-    </button>
-</div>
+                {{-- Success Message --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #198754;">
+                        <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
+                        <div>{{ session('success') }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- Error Messages --}}
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
+                        <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
+                        <div>{{ session('error') }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- Validation Errors --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="alert-heading mb-2">Please correct the following errors:</h6>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
 
                 {{-- Search Form --}}
                 <form action="{{ route($user->role . '.residents') }}" method="get" class="mb-4">
@@ -678,7 +706,7 @@
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

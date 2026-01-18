@@ -102,6 +102,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/barangayOfficials', [OfficialController::class,'displayOfficials'])->name('barangayOfficials');
     Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
+    Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
+
 
 
     Route::get('/census', [AdminController::class,'census'])->name('census');
