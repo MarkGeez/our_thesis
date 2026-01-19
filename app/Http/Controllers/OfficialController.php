@@ -46,7 +46,7 @@ class OfficialController extends Controller
 
     $request->validate([
         'details'  => 'nullable|string|max:255',
-        'start'    => 'required|date_format:Y-m-d|before:tomorrow',
+        'start'    => 'required|date_format:Y-m-d',
         'end'      => 'required|date_format:Y-m-d|after:start',
         'position' => 'required|in:' . implode(',', array_keys($positionLimits)),
     ]);

@@ -36,9 +36,7 @@ return new class extends Migration
             $table->string('schedule', 255)->nullable(); 
             $table->foreignId('encodedBy')->nullable()->constrained('users');
             $table->string('action')->nullable(); // Changed to nullable
-            $table->enum('status', ['PENDING', 'SCHEDULED', 'RESOLVED', 'CLOSED'])
-                    ->default('PENDING');
-
+            $table->text('current_stauts');
             $table->longText('statusDescription')->nullable();
             $table->timestamps(); 
         });

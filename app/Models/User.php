@@ -69,11 +69,9 @@ class User extends Authenticatable
         return $this->hasMany(ServiceRequest::class);
     }
 
-    public function blottersPlaintiff():HasMany{
-        return $this->hasMany(Blotter::class, 'plaintiffId');
-    }
-    public function blottersEncoder():HasMany{
-        return $this->hasMany(Blotter::class, 'encodedBy');
+  
+    public function blotters():HasMany{
+        return $this->hasMany(Blotter::class, 'updated_by');
     }
 
     public function resident():HasOne{

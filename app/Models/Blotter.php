@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Blotter extends Model
 {
@@ -11,7 +11,6 @@ class Blotter extends Model
     protected $table = 'blotters';
     
     protected $fillable = [
-    'plaintiffId',
     'plaintiffAddress',
     'plaintiffContactNumber',
     'plaintiffName',
@@ -37,12 +36,8 @@ class Blotter extends Model
 
    
 
-    public function user():BelongsTo{
-        return $this->belongsTo(User::class, 'plaintiffId');
-    }
-
-    public function respondent():BelongsTo{
-        return $this->belongsTo(User::class, 'encodedBy');
+    public function updateBlotter():HasMany{
+      return $this->HasMany(UpdateBlotter::class);
     }
 
     
