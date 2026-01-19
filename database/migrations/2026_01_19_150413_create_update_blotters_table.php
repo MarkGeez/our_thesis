@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['first', 'second', 'third', 'brgyHearing', 'coldCase', 'criminalCase']);
             $table->foreignId('updated_by')->constrained('users');
             $table->string('photo_path');
+            $table->boolean('is_finished')->default(false);
             $table->date('date');
             $table->timestamps();
         });

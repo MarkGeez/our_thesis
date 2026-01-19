@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Services\ActiveLogger;
 
 class Blotter extends Model
 {
@@ -40,5 +41,16 @@ class Blotter extends Model
       return $this->HasMany(UpdateBlotter::class);
     }
 
+    public static function booted(){
+      static::created(function ($blotter) {
+        ActiveLogger::log(
+            'Announcement',
+            'created',
+            $blotter->id,
+            'Created a new blotter record'
+        );
+    });
+
+    }
     
 }

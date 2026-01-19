@@ -140,8 +140,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
 
 
-
-
 });
 
 Route::middleware(['auth', 'role:subadmin'])->group(function(){
@@ -180,8 +178,8 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
     
     // check mo kung tama to nagana naman sa side ko
     Route::post('/blotterRequest', [BlotterController::class, 'submitBlotter'])->name('submit.blotter');
-        Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
-        Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
+    Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
+    Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
         
     });
 });
