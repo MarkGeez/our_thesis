@@ -67,6 +67,17 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             text-align: center;
         }
+        #mainbody {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+        }
 
         h1 { 
             font-family: "Bebas Neue", sans-serif; 
@@ -143,8 +154,8 @@
         </div>
     </nav>
 
-    <section class="hero-section">
-        <div class="glass-card shadow">
+    <section class="hero-section" >
+        <div class="glass-card shadow" id="mainbody">
             <h5 class="text-uppercase fw-bold tracking-widest text-primary mb-2" style="letter-spacing: 5px; font-size: 0.9rem;">Welcome to</h5>
             <div class="d-md-flex justify-content-center align-items-baseline gap-3 mb-3">
                 <h3>barangay</h3>

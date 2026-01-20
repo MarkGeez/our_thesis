@@ -265,7 +265,7 @@
                                              alt="{{ $announcement->title }}">
                                     @endif
                                       
-                                    <h3 class="fw-bold mb-2">{{ $announcement->title }}</h3>
+                                    <h3 class="fw-bold mb-2">{{ strtoupper($announcement->title) }}</h3>
                                     <div class="announcement-text">
                                         <p class="mt-1">{{ $announcement->details }}</p>
 
