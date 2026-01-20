@@ -71,9 +71,7 @@
                      </a>
                      <ul class="cat-sub-menu">
                         <li>
-                           <a class="{{ Request::routeIs('admin.Blotter*') ? 'active' : '' }}" href="{{ route('admin.Blotter') }}">
-                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
-                            </a>
+                         
 
                         </li>
                         <li>
@@ -130,14 +128,7 @@
                         <span class="icon"><i class="fa-solid fa-users-cog"></i></i></span>Officials
                     </a>
                 </li>
-
-                <li>
-                    <a class="{{ Request::routeIs('admin.blotterRequest') ? 'active' : '' }}"
-                       href="{{ route('admin.blotterRequest' )}}">
-                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
-                    </a>
-                </li>
-
+                
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">

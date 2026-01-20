@@ -33,13 +33,18 @@ class Blotter extends Model
     'action',
     'status',
     'statusDescription',
+    'current_status'
     ];
 
    
 
-    public function updateBlotter():HasMany{
-      return $this->HasMany(UpdateBlotter::class);
-    }
+    // App\Models\Blotter.php
+public function updates(): HasMany
+{
+    return $this->hasMany(UpdateBlotter::class, 'blotter_id');
+}
+
+// Then update line 87 in your controller to keep using $blotter->updates
 
     public static function booted(){
       static::created(function ($blotter) {

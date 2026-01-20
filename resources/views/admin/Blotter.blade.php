@@ -130,7 +130,36 @@
                 @endif
 
                 <div class="container-fluid px-3">
-                    @include('forms.display')
+                    <table>
+    <thead>
+        <tr>
+            <th>Blotter No</th>
+            <th>Complainant</th>
+            <th>Respondent</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach ($blotters as $blotter)
+            <tr>
+                <td>{{ $blotter->id }}</td>
+                <td>{{ $blotter->complainant_name }}</td>
+                <td>{{ $blotter->respondent_name }}</td>
+                <td>{{ $blotter->current_status }}</td>
+                <td>
+                   <a href="{{ route('admin.blotter.update.form', $blotter->id) }}">
+                    Update
+                    </a>
+
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+{{ $blotters->links() }}
                 </div>
             </main>
         </div>

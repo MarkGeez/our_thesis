@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('schedule', 255)->nullable(); 
             $table->foreignId('encodedBy')->nullable()->constrained('users');
             $table->string('action')->nullable(); // Changed to nullable
-            $table->text('current_stauts');
+            $table->text('current_status');
             $table->longText('statusDescription')->nullable();
             $table->timestamps(); 
         });

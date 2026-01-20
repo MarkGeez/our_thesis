@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UpdateBlotter extends Model
 {
    protected $fillable = [
+   'blotter_id',
     'remarks',
     'status',
     'photo_path',
-    'date'
+    'date',
+    'updated_by'
    ];
 
    public function blotter():BelongsTo{

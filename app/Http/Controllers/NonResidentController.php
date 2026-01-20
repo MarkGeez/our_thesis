@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Announcement;
 use App\Models\Resident;
-use App\Models\Announcement;
 
 
 class NonResidentController extends Controller
