@@ -1,4 +1,4 @@
-<style> .form-control, .form-select { background-color: #ffffff; border: 1.5px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-size: 14px; } .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25); } .form-label { font-weight: 600; margin-bottom: 6px; } .input-group-text { background-color: #f1f3f5; cursor: pointer; } </style>
+<style> .form-control, .form-select { background-color: #ffffff; border: 1.5px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-size: 14px; } .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25); } .form-label { font-weight: 600; margin-bottom: 6px; } .input-group-text { background-color: #f1f3f5; cursor: pointer; } input[type="date"]::-webkit-calendar-picker-indicator { opacity: 1; cursor: pointer; } </style>
 @php
 $user = auth()->user();
 @endphp
@@ -123,4 +123,44 @@ $user = auth()->user();
 
 </div>
 
-</form> <script> document.addEventListener('DOMContentLoaded', function () { const birthday = document.getElementById('birthday'); const openDate = document.getElementById('openDate'); const rawDate = "{{ old('birthday', $user->birthday) }}"; if (rawDate) { const d = new Date(rawDate); birthday.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); } openDate.addEventListener('click', function () { if (birthday.showPicker) { birthday.showPicker(); } else { birthday.focus(); } }); }); function togglePassword(id) { const input = document.getElementById(id); input.type = input.type === 'password' ? 'text' : 'password'; } </script>
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const birthday = document.getElementById('birthday');
+        const openDate = document.getElementById('openDate');
+        const rawDate = "{{ old('birthday', $user->birthday) }}";
+
+        if (birthday && rawDate) {
+            const d = new Date(rawDate);
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            birthday.value = `${d.getFullYear()}-${month}-${day}`;
+        }
+
+        const openPicker = () => {
+            if (!birthday) return;
+            if (typeof birthday.showPicker === 'function') {
+                birthday.showPicker();
+            } else {
+                birthday.focus();
+            }
+        };
+
+        if (openDate && birthday) {
+            openDate.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+                birthday.focus();
+                openPicker();
+            });
+        }
+
+        if (birthday) {
+            birthday.addEventListener('click', openPicker);
+        }
+    });
+
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+</script>

@@ -47,7 +47,6 @@ class UserListController extends Controller
         $user = User::findOrFail($id);
         $request->validate(['status'=> "required"]);
         $user->status = $request->status;
-
         $user->save();
         
         return redirect()->back()->with('success', 'user status updated');

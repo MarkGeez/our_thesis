@@ -1,268 +1,214 @@
-<?php
-    $role = auth()->user()->role;
-?>
+<style>
+    /* Section Headers - Clean & Spaced */
+    .form-section-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.2rem;
+        color: #6c757d; /* Muted grey */
+    }
 
-<!-- Button to open modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#blotterModal">
-    {!! $button ?? '' !!}
-</button>
+    /* LIGHTER INPUT STYLES */
+    .blotter-form .form-control,
+    .blotter-form .form-select {
+        border: 1px solid #e0e0e0 !important; /* Thinner, lighter border */
+        border-radius: 8px !important;
+        padding: 0.6rem 0.85rem;
+        background-color: #ffffff !important;
+        color: #495057 !important;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); /* Very subtle depth */
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
 
-<!-- Modal -->
-<div class="modal fade" id="blotterModal" tabindex="-1" aria-labelledby="blotterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title" id="blotterModalLabel">
-                    <i class="fa fa-file-alt me-2"></i>Submit New Blotter
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    /* Soft Focus State */
+    .blotter-form .form-control:focus {
+        border-color: #bbdefb !important; /* Very light blue */
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.05) !important;
+        background-color: #fff !important;
+        outline: none;
+    }
+
+    /* Soften the labels */
+    .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+        color: #555;
+        font-weight: 600;
+    }
+
+    /* Divider */
+    .light-divider {
+        border-top: 1px solid #f0f0f0;
+        margin: 2rem 0;
+    }
+
+    /* Light Card for Witnesses/Files */
+    .light-card {
+        background-color: #fcfcfc;
+        border: 1px solid #f0f0f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+
+    .text-danger { color: #ff6b6b !important; } /* Softer red */
+
+    /* Date picker indicator remains visible/interactive */
+    .blotter-form input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 1;
+        display: block;
+        cursor: pointer;
+    }
+
+    .blotter-form .date-group .form-control {
+        border-right: 0 !important;
+        border-radius: 8px 0 0 8px !important;
+    }
+
+    .blotter-form .date-group .input-group-text {
+        border: 1px solid #e0e0e0 !important;
+        border-left: 0 !important;
+        border-radius: 0 8px 8px 0 !important;
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+</style>
+
+<form method="POST" action="{{ route('admin.blotter.store') }}" enctype="multipart/form-data" class="blotter-form p-2">
+    @csrf
+
+    <div class="mb-4">
+        <h6 class="form-section-title text-primary">
+            <i class="fa-solid fa-user-circle me-2 opacity-50"></i> Complainant Information (Nagrereklamo)
+        </h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">First Name <span class="text-danger">*</span></label>
+                <input name="plaintiffName" class="form-control" placeholder="John" required>
             </div>
-            
-            <form action="{{ route($role . '.submit.blotter') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                
-                <div class="modal-body p-4">
-                    {!! $plaintiff ?? '' !!}
-                    
-                    <section>
-                        <h6>Defendant Information</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="info-label">First Name *</label>
-                                    <input type="text" name="defendantName" placeholder="Enter first name here..." class="form-control @error('defendantName') is-invalid @enderror" value="{{ old('defendantName') }}" required>
-                                    @error('defendantName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Middle Name</label>
-                                    <input type="text" name="defendantMiddleName" placeholder="Enter middle name here..." class="form-control @error('defendantMiddleName') is-invalid @enderror" value="{{ old('defendantMiddleName') }}">
-                                    @error('defendantMiddleName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Last Name *</label>
-                                    <input type="text" name="defendantLastName" placeholder="Enter last name here..." class="form-control @error('defendantLastName') is-invalid @enderror" value="{{ old('defendantLastName') }}" required>
-                                    @error('defendantLastName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-8">
-                                    <label class="info-label">Complete Address</label>
-                                    <input type="text" name="defendantAddress" placeholder="Enter complete address here..." class="form-control @error('defendantAddress') is-invalid @enderror" value="{{ old('defendantAddress') }}">
-                                    @error('defendantAddress')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Contact Number</label>
-                                    <input type="text" name="defendantContactNumber" placeholder="09xxxxxxxxx" class="form-control @error('defendantContactNumber') is-invalid @enderror" value="{{ old('defendantContactNumber') }}">
-                                    @error('defendantContactNumber')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="info-label">Age</label>
-                                    <input type="number" name="defendantAge" placeholder="Enter age here..." class="form-control @error('defendantAge') is-invalid @enderror" value="{{ old('defendantAge') }}" min="1" max="120">
-                                    @error('defendantAge')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h6>Witness Information (Optional)</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-md-7">
-                                    <label class="info-label">Witness Name</label>
-                                    <input type="text" name="witnessName" placeholder="Enter witness name here..." class="form-control @error('witnessName') is-invalid @enderror" value="{{ old('witnessName') }}">
-                                    @error('witnessName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-5">
-                                    <label class="info-label">Witness Contact Number</label>
-                                    <input type="text" name="witnessContactNumber" placeholder="09xxxxxxxxx" class="form-control @error('witnessContactNumber') is-invalid @enderror" value="{{ old('witnessContactNumber') }}">
-                                    @error('witnessContactNumber')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h6>Case Details & Evidence</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="info-label">Case Description *</label>
-                                    <textarea name="blotterDescription" placeholder="Enter case description here..." class="form-control @error('blotterDescription') is-invalid @enderror" rows="4" required>{{ old('blotterDescription') }}</textarea>
-                                    @error('blotterDescription')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="info-label d-block">Evidence / Proof</label>
-                                    <div class="input-group">
-                                        <input type="file" name="proof" placeholder="Upload photo or document here..." class="form-control @error('proof') is-invalid @enderror" accept="image/*,.pdf">
-                                    </div>
-                                    <div class="form-text mt-1">Upload photo or document (Max 4MB, JPG/PNG/PDF)</div>
-                                    @error('proof')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Submit Blotter</button>
-                </div>
-            </form>
+            <div class="col-md-4">
+                <label class="form-label">Middle Name</label>
+                <input name="plaintiffMiddleName" class="form-control" placeholder="Santos">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                <input name="plaintiffLastName" class="form-control" placeholder="Doe" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Age</label>
+                <input type="number" name="plaintiffAge" class="form-control" placeholder="--">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Contact Number</label>
+                <input name="plaintiffContactNumber" class="form-control" placeholder="0917-000-0000">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Address</label>
+                <input name="plaintiffAddress" class="form-control" placeholder="Street / Brgy Address">
+            </div>
         </div>
     </div>
-</div>
 
-{{-- to yung dating code
+    <div class="light-divider"></div>
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#blotterModal">
-    {!! $button ?? '' !!}
-</button>
-
-<div class="modal fade" id="blotterModal" tabindex="-1" aria-labelledby="blotterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title" id="blotterModalLabel">
-                    <i class="fa fa-file-alt me-2"></i>Submit New Blotter
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="mb-4">
+        <h6 class="form-section-title" style="color: #e57373;">
+            <i class="fa-solid fa-user-tag me-2 opacity-50"></i> Respondent Details (Nirereklamo)
+        </h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">First Name</label>
+                <input name="defendantName" class="form-control" placeholder="Respondent's name">
             </div>
-            
-            <form action="{{ route('admin.submit.blotter') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                
-                <div class="modal-body p-4">
-                    {!! $plaintiff ?? '' !!}
-                    
-                    <section>
-                        <h6>Defendant Information</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="info-label">First Name *</label>
-                                    <input type="text" name="defendantName" placeholder="Enter first name here..." class="form-control @error('defendantName') is-invalid @enderror" value="{{ old('defendantName') }}" required>
-                                    @error('defendantName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Middle Name</label>
-                                    <input type="text" name="defendantMiddleName" placeholder="Enter middle name here..." class="form-control @error('defendantMiddleName') is-invalid @enderror" value="{{ old('defendantMiddleName') }}">
-                                    @error('defendantMiddleName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Last Name *</label>
-                                    <input type="text" name="defendantLastName" placeholder="Enter last name here..." class="form-control @error('defendantLastName') is-invalid @enderror" value="{{ old('defendantLastName') }}" required>
-                                    @error('defendantLastName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-8">
-                                    <label class="info-label">Complete Address</label>
-                                    <input type="text" name="defendantAddress" placeholder="Enter complete address here..." class="form-control @error('defendantAddress') is-invalid @enderror" value="{{ old('defendantAddress') }}">
-                                    @error('defendantAddress')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="info-label">Contact Number</label>
-                                    <input type="text" name="defendantContactNumber" placeholder="09xxxxxxxxx" class="form-control @error('defendantContactNumber') is-invalid @enderror" value="{{ old('defendantContactNumber') }}">
-                                    @error('defendantContactNumber')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="info-label">Age</label>
-                                    <input type="number" name="defendantAge" placeholder="Enter age here..." class="form-control @error('defendantAge') is-invalid @enderror" value="{{ old('defendantAge') }}" min="1" max="120">
-                                    @error('defendantAge')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h6>Witness Information (Optional)</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-md-7">
-                                    <label class="info-label">Witness Name</label>
-                                    <input type="text" name="witnessName" placeholder="Enter witness name here..." class="form-control @error('witnessName') is-invalid @enderror" value="{{ old('witnessName') }}">
-                                    @error('witnessName')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-5">
-                                    <label class="info-label">Witness Contact Number</label>
-                                    <input type="text" name="witnessContactNumber" placeholder="09xxxxxxxxx" class="form-control @error('witnessContactNumber') is-invalid @enderror" value="{{ old('witnessContactNumber') }}">
-                                    @error('witnessContactNumber')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h6>Case Details & Evidence</h6>
-                        <div class="info-box">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="info-label">Case Description *</label>
-                                    <textarea name="blotterDescription" placeholder="Enter case description here..." class="form-control @error('blotterDescription') is-invalid @enderror" rows="4" required>{{ old('blotterDescription') }}</textarea>
-                                    @error('blotterDescription')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="info-label d-block">Evidence / Proof</label>
-                                    <div class="input-group">
-                                        <input type="file" name="proof" placeholder="Upload photo or document here..." class="form-control @error('proof') is-invalid @enderror" accept="image/*,.pdf">
-                                    </div>
-                                    <div class="form-text mt-1">Upload photo or document (Max 4MB, JPG/PNG/PDF)</div>
-                                    @error('proof')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Submit Blotter</button>
-                </div>
-            </form>
+            <div class="col-md-4">
+                <label class="form-label">Middle Name</label>
+                <input name="defendantMiddleName" class="form-control" placeholder="...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Last Name</label>
+                <input name="defendantLastName" class="form-control" placeholder="...">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Last Known Residence</label>
+                <input name="defendantAddress" class="form-control" placeholder="Neighborhood or specific location">
+            </div>
         </div>
     </div>
-</div>
---}}
+
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="light-card">
+                <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Witness</h6>
+                <div class="mb-3">
+                    <label class="form-label">Witness Name</label>
+                    <input name="witnessName" class="form-control" placeholder="Full Name">
+                </div>
+                                    <label class="form-label">Witness Contact Number</label>
+
+                <input name="witnessContactNumber" class="form-control" placeholder="Phone Number">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="light-card">
+                <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Procedure</h6>
+                <div class="mb-3">
+                    <div class="input-group date-group">
+                        <input type="date" name="schedule" id="blotter_schedule" class="form-control">
+                        <span class="input-group-text schedule-trigger"><i class="fa fa-calendar"></i></span>
+                    </div>
+                    <div class="form-text small opacity-50 px-1">Scheduled Hearing Date</div>
+                </div>
+                <input type="file" name="proof" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Incident Narrative <span class="text-danger">*</span></label>
+            <textarea name="blotterDescription" class="form-control" rows="4" 
+                placeholder="Briefly describe the incident..."></textarea>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-3 mt-5 pt-3">
+        <button type="button" class="btn btn-link text-muted text-decoration-none small fw-bold" data-bs-dismiss="modal">Discard</button>
+        <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 600; letter-spacing: 0.5px;">
+            Record Blotter
+        </button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const scheduleInput = document.getElementById('blotter_schedule');
+        const scheduleTrigger = document.querySelector('.blotter-form .schedule-trigger');
+        const rawSchedule = "{{ old('schedule') }}";
+
+        if (scheduleInput && rawSchedule) {
+            scheduleInput.value = rawSchedule;
+        }
+
+        const openPicker = () => {
+            if (!scheduleInput) return;
+            if (typeof scheduleInput.showPicker === 'function') {
+                scheduleInput.showPicker();
+            } else {
+                scheduleInput.focus();
+            }
+        };
+
+        if (scheduleTrigger && scheduleInput) {
+            scheduleTrigger.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+                scheduleInput.focus();
+                openPicker();
+            });
+        }
+
+        if (scheduleInput) {
+            scheduleInput.addEventListener('click', openPicker);
+        }
+    });
+</script>

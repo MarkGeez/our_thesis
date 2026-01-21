@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Services\ActiveLogger;
 
 class Blotter extends Model
 {
@@ -11,7 +12,6 @@ class Blotter extends Model
     protected $table = 'blotters';
     
     protected $fillable = [
-    'plaintiffId',
     'plaintiffAddress',
     'plaintiffContactNumber',
     'plaintiffName',
@@ -33,17 +33,29 @@ class Blotter extends Model
     'action',
     'status',
     'statusDescription',
+    'current_status'
     ];
 
    
 
-    public function user():BelongsTo{
-        return $this->belongsTo(User::class, 'plaintiffId');
-    }
+    // App\Models\Blotter.php
+public function updates(): HasMany
+{
+    return $this->hasMany(UpdateBlotter::class, 'blotter_id');
+}
 
-    public function respondent():BelongsTo{
-        return $this->belongsTo(User::class, 'encodedBy');
-    }
+// Then update line 87 in your controller to keep using $blotter->updates
 
+    public static function booted(){
+      static::created(function ($blotter) {
+        ActiveLogger::log(
+            'Announcement',
+            'created',
+            $blotter->id,
+            'Created a new blotter record'
+        );
+    });
+
+    }
     
 }

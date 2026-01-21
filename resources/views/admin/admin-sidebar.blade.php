@@ -52,17 +52,16 @@
                 </li>
 
                 @php
-    $servicesActive = Request::routeIs(
-        'admin.Blotter*',
-        'admin.adminCertificate*',
-        'admin.adminServices*',
-        'admin.adminComplaint*',
-        
-    );
-@endphp
+                    $servicesActive = Request::routeIs(
+                        'admin.blotter.*',
+                        'admin.adminCertificate*',
+                        'admin.adminServices*',
+                        'admin.adminComplaint*'
+                    );
+                @endphp
                 <li>
                     <!-- make this the toggle the script looks for and avoid malformed blade syntax -->
-                    <a class="show-cat-btn" href="#">
+                    <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="#">
                          E-Barangay Services
                          <span class="category__btn transparent-btn" title="Open list">
                              <span class="sr-only">Open list</span>
@@ -71,32 +70,28 @@
                      </a>
                      <ul class="cat-sub-menu">
                         <li>
-                           <a class="{{ Request::routeIs('admin.Blotter*') ? 'active' : '' }}" href="{{ route('admin.Blotter') }}">
+                            <a class="{{ Request::routeIs('admin.blotter.*') ? 'active' : '' }}" href="{{ route('admin.blotter.index') }}">
                                 <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                             </a>
-
                         </li>
                         <li>
                            <a class="{{ Request::routeIs('admin.adminCertificate*') ? 'active' : '' }}"
-                       href="{{ route('admin.adminCertificate') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></i></span>My Documents
-                    </a>
-
-                    </a>
+                               href="{{ route('admin.adminCertificate') }}">
+                                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
+                            </a>
                         </li>
                         <li>
                            <a class="{{ Request::routeIs('admin.adminServices*') ? 'active' : '' }}"
-                       href="{{ route('admin.adminServices') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></i></span>My Services
-                    </a>
-
-                    </a>
+                               href="{{ route('admin.adminServices') }}">
+                                <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>My Services
+                            </a>
                         </li>
                         <li>
                            <a class="{{ Request::routeIs('admin.adminComplaint*') ? 'active' : '' }}"
-                       href="{{ route('admin.adminComplaint') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></i></span>My Complaints 
-                    </a>
+                               href="{{ route('admin.adminComplaint') }}">
+                                <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints 
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <span class="system-menu__title">manage system</span>
@@ -104,6 +99,11 @@
                     <a class="{{ Request::routeIs('admin.announcements') ? 'active' : '' }}"
                        href="{{ route('admin.announcements') }}">
                         <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ Request::routeIs('admin.blotterRequest') ? 'active' : '' }}" href="{{ route('admin.blotterRequest') }}">
+                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
                     </a>
                 </li>
                 <li>
@@ -130,14 +130,7 @@
                         <span class="icon"><i class="fa-solid fa-users-cog"></i></i></span>Officials
                     </a>
                 </li>
-
-                <li>
-                    <a class="{{ Request::routeIs('admin.blotterRequest') ? 'active' : '' }}"
-                       href="{{ route('admin.blotterRequest' )}}">
-                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
-                    </a>
-                </li>
-
+                
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">

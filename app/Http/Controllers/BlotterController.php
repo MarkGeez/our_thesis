@@ -4,151 +4,130 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Blotter;
+use App\Models\UpdateBlotter;
 use Illuminate\Support\Facades\Auth;
 
 class BlotterController extends Controller
 {
+    // LIST ALL BLOTTERS (ADMIN)
+    public function index()
+    {
+        $blotters = Blotter::with('updates')->latest()->paginate(10);
+        return view('admin.Blotter', compact('blotters'));
+    }
+
+    // SHOW CREATE FORM
+    public function create()
+    {
+        return view('admin.Blotter');
+    }
+
+    // STORE NEW BLOTTER
     public function submitBlotter(Request $request)
     {
-        $validated = $request->validate([
-            'plaintiffName' => 'nullable|string|max:255',
-            'plaintiffMiddleName' => 'nullable|string|max:255',
-            'plaintiffLastName' => 'nullable|string|max:255',
-            'plaintiffAddress' => 'nullable|string|max:255',
-            'plaintiffContactNumber' => 'nullable|digits:11',
-            'plaintiffAge' => 'nullable|integer|min:1|max:120',
-
-            'defendantName' => 'required|string|max:255',
-            'defendantMiddleName' => 'nullable|string|max:255',
-            'defendantLastName' => 'required|string|max:255',
-            'defendantAddress' => 'nullable|string|max:255',
-            'defendantContactNumber' => 'nullable|digits:11',
-            'defendantAge' => 'nullable|integer|min:1|max:120',
-
-            'witnessName' => 'nullable|string|max:255',
-            'witnessContactNumber' => 'nullable|digits:11',
-
-            'proof' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
-            'blotterDescription' => 'required|string|min:10',
+        $request->validate([
+            'plaintiffName' => 'required|string',
+            'plaintiffLastName' => 'required|string',
+            'blotterDescription' => 'required|string',
         ]);
 
-        $user = Auth::user();
+        $blotter = Blotter::create([
+            'plaintiffName' => $request->plaintiffName,
+            'plaintiffMiddleName' => $request->plaintiffMiddleName,
+            'plaintiffLastName' => $request->plaintiffLastName,
+            'plaintiffAge' => $request->plaintiffAge,
+            'plaintiffAddress' => $request->plaintiffAddress,
+            'plaintiffContactNumber' => $request->plaintiffContactNumber,
 
-        $proofPath = null;
-        if ($request->hasFile('proof')) {
-            $proofPath = $request->file('proof')->store('photos', 'public');
-        }
-
-        $plaintiff_data = [
-            'plaintiffId' => $user->id ?? "",
-            'plaintiffAddress' => "123abaca",
-            'plaintiffContactNumber' => $user->contactNumber ?? $request->plaintiffContactNumber,
-            'plaintiffName' => $user->firstName ?? $request->plaintiffName,
-            'plaintiffMiddleName' => $user->middleName ?? $request->plaintiffMiddleName,
-            'plaintiffLastName' => $user->lastName ?? $request->plaintiffLastName,
-            'plaintiffAge' => "121",
-        ];
-
-        Blotter::create(array_merge($plaintiff_data, [
-            'defendantAddress' => $request->defendantAddress,
-            'defendantContactNumber' => $request->defendantContactNumber,
             'defendantName' => $request->defendantName,
             'defendantMiddleName' => $request->defendantMiddleName,
             'defendantLastName' => $request->defendantLastName,
             'defendantAge' => $request->defendantAge,
+            'defendantAddress' => $request->defendantAddress,
+            'defendantContactNumber' => $request->defendantContactNumber,
 
-            // ✅ WITNESS
             'witnessName' => $request->witnessName,
             'witnessContactNumber' => $request->witnessContactNumber,
 
-            // ✅ CASE
-            'proof' => $proofPath,
+            'proof' => $request->proof,
             'blotterDescription' => $request->blotterDescription,
+            'schedule' => $request->schedule,
 
-            'status' => 'PENDING',
-            'encodedBy' => null,
-            'action' => null,
-            'statusDescription' => null,
-        ]));
+            'encodedBy' => Auth::id(),
+            'current_status' => 'first',
+        ]);
 
-        return redirect()->back()->with('success', 'Blotter submitted successfully!');
+        UpdateBlotter::create([
+            'blotter_id' => $blotter->id,
+            'status' => 'first',
+            'remarks' => 'Initial blotter record',
+            'updated_by' => Auth::id(),
+            'photo_path' => $blotter->proof,
+            'date' => now(),
+        ]);
+
+        return redirect()->route('admin.blotter.index')
+            ->with('success', 'Blotter created successfully.');
     }
 
-    
-    public function showBlotterRequests(Request $request)
-    {
-        $blotters = Blotter::with('user')
-            ->orderByDesc('created_at')
-            ->paginate(15);
+    // SHOW UPDATE FORM
+  public function showUpdateForm($id)
+{
+    $blotter = Blotter::with('updates')->findOrFail($id);
 
-        $role = auth()->user()->role;
-        return view($role . '.blotterRequest', compact('blotters'));
-    }
+    $statuses = [
+        'first',
+        'second',
+        'third',
+        'brgyHearing',
+        'coldCase',
+        'criminalCase',
+    ];
 
-    public function updateBlotter(Request $request, $id)
+    $usedStatuses = $blotter->update_blotter 
+        ? $blotter->update_blotter->pluck('status')->toArray() 
+        : [];
+
+    $availableStatuses = array_diff($statuses, $usedStatuses);
+
+    // Return the UPDATE FORM view, not the main Blotter index view
+    return view('forms.update', compact('blotter', 'availableStatuses'));
+}
+
+    // STORE NEW UPDATE (NO EDITING)
+    public function storeUpdate(Request $request, $id)
     {
         $blotter = Blotter::findOrFail($id);
-        
+
         $request->validate([
-            'defendantName' => 'required|string|max:255',
-            'defendantMiddleName' => 'nullable|string|max:255',
-            'defendantLastName' => 'required|string|max:255',
-            'defendantAddress' => 'nullable|string|max:255',
-            'defendantContactNumber' => 'nullable|digits:11',
-            'defendantAge' => 'nullable|integer|min:1|max:120',
-
-            'witnessName' => 'nullable|string|max:255',
-            'witnessContactNumber' => 'nullable|digits:11',
-
-            'proof' => 'nullable|image|mimes:jpg,png,jpeg|max:4096',
-            'blotterDescription' => 'required|string|min:10',
+            'status' => 'required',
+            'remarks' => 'required|string',
+            'photo_path' => 'nullable|string',
+            'date' => 'required|date',
         ]);
-        
-        if ($request->hasFile('proof')) {
-            $blotter->proof = $request->file('proof')->store('photos', 'public');
+
+        $exists = UpdateBlotter::where('blotter_id', $blotter->id)
+            ->where('status', $request->status)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'This status has already been used.');
         }
 
-        $blotter->defendantName = $request->defendantName;
-        $blotter->defendantMiddleName = $request->defendantMiddleName;
-        $blotter->defendantLastName = $request->defendantLastName;
-        $blotter->defendantAddress = $request->defendantAddress;
-        $blotter->defendantContactNumber = $request->defendantContactNumber;
-        $blotter->defendantAge = $request->defendantAge;
-        $blotter->witnessName = $request->witnessName;
-        $blotter->witnessContactNumber = $request->witnessContactNumber;
-        $blotter->blotterDescription = $request->blotterDescription;
-
-        $blotter->save();
-
-        return redirect()->back()->with('success', 'Blotter updated');
-    }
-
-    public function updateStatus(Request $request, $id)
-    {
-        $blotter = Blotter::findOrFail($id);
-        $encoder = auth()->user()->id;
-        
-        $request->validate([
-            "statusDescription" => "nullable|string|max:255",
-            "status" => "required|in:PENDING,SCHEDULED,RESOLVED,CLOSED"
+        UpdateBlotter::create([
+            'blotter_id' => $blotter->id,
+            'status' => $request->status,
+            'remarks' => $request->remarks,
+            'photo_path' => $request->photo_path,
+            'updated_by' => Auth::id(),
+            'date' => $request->date,
+            'is_finished' => in_array($request->status, ['coldCase', 'criminalCase']),
         ]);
 
-        $blotter->statusDescription = $request->statusDescription;
-        $blotter->status = $request->status;
-        $blotter->encodedBy = $encoder;
+        $blotter->update([
+            'current_stauts' => $request->status,
+        ]);
 
-        $blotter->save();
-        
-        return redirect()->back()->with('success', 'Blotter status updated');
+        return back()->with('success', 'Blotter updated successfully.');
     }
-
-   public function ownBlotters(){
-       $user = auth()->user();
-
-       $blotters = $user->blottersPlaintiff()->paginate(10);
-
-       return view($user->role .  ".blotter", compact('blotters'));
-   }
-
-
 }

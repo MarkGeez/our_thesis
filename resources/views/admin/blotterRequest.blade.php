@@ -177,8 +177,7 @@
                                                     'PENDING'   => 'warning text-dark',
                                                 ];
                                                 $statusClass = $statusClasses[strtoupper($blotter->status)] ?? 'secondary';
-                                            @endphp
-                                            <span class="badge badge-status bg-{{ $statusClass }}">
+                                            @endphp                                            <span class="badge badge-status bg-{{ $statusClass }}">
                                                 {{ ucfirst(strtolower($blotter->status)) }}
                                             </span>
                                         </td>
