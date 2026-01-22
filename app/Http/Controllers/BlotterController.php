@@ -125,9 +125,9 @@ class BlotterController extends Controller
         ]);
 
         $blotter->update([
-            'current_stauts' => $request->status,
+            'current_status' => $request->status,
         ]);
-
+    
         return back()->with('success', 'Blotter updated successfully.');
     }
 }
