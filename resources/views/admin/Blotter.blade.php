@@ -6,7 +6,8 @@
 
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     
     <style>
@@ -14,7 +15,25 @@
             margin-bottom: 24px;
         }
         .table-wrapper {
-            margin: 0 3em;
+            margin: 0 1em;
+        }
+        
+        table th,
+        table td {
+            vertical-align: middle;
+        }
+
+        /* Pagination styling */
+        .pagination-wrapper {
+            margin: 2rem 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination-info {
+            color: #6c757d;
+            margin-right: auto;
         }
 
         .modal-body h6 {
@@ -98,55 +117,63 @@
             }
         }
 
-        /* Modern Soft Status Badges */
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid transparent;
-}
+        /* --- IMPROVED STATUS BADGES --- */
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
 
-/* Status Dot Indicator */
-.status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-}
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
 
-/* Color Themes */
-.status-pending {
-    background-color: #fffbeb; /* Soft Yellow */
-    color: #92400e;
-    border-color: #fef3c7;
-}
-.status-pending .status-dot { background-color: #f59e0b; }
+        .status-pending {
+            background-color: #fff9db;
+            color: #856404;
+            border-color: #ffecb5;
+        }
+        .status-pending .status-dot { background-color: #fab005; }
 
-.status-ongoing {
-    background-color: #eff6ff; /* Soft Blue */
-    color: #1e40af;
-    border-color: #dbeafe;
-}
-.status-ongoing .status-dot { background-color: #3b82f6; }
+        .status-ongoing {
+            background-color: #e7f5ff;
+            color: #1864ab;
+            border-color: #d0ebff;
+        }
+        .status-ongoing .status-dot { background-color: #228be6; }
 
-.status-closed {
-    background-color: #f0fdf4; /* Soft Green */
-    color: #166534;
-    border-color: #dcfce7;
-}
-.status-closed .status-dot { background-color: #22c55e; }
+        .status-closed {
+            background-color: #ebfbee;
+            color: #2b8a3e;
+            border-color: #d3f9d8;
+        }
+        .status-closed .status-dot { background-color: #40c057; }
 
-.status-default {
-    background-color: #f9fafb;
-    color: #374151;
-    border-color: #f3f4f6;
-}
-.status-default .status-dot { background-color: #9ca3af; }
+        .status-default {
+            background-color: #f8f9fa;
+            color: #495057;
+            border-color: #e9ecef;
+        }
+        .status-default .status-dot { background-color: #adb5bd; }
+
+        /* Style for IDs */
+        .case-number {
+         
+            font-size: 0.85rem;
+            color: #0d6efd;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +191,7 @@
                     <div class="d-flex align-items-center flex-wrap gap-3 mb-4 blotter-header">
                         <div>
                             <p class="text-muted mb-1">Dispute records</p>
-                            <h2 class="mb-0 fw-bold" style="color:#000000;">My Blotter</h2>
+                            <h2 class="mb-0 fw-bold" style="color:#000000;">Manage Blotters</h2>
                         </div>
 
                         <div class="ms-auto encode-btn-wrapper">
@@ -181,76 +208,214 @@
                         </div>
                     @endif
                      @if(session('error'))
-                        {{ session('error') }}
+                        <div class="alert alert-danger shadow-sm" role="alert">
+                            {{ session('error') }}
+                        </div>
                      @endif
-                    <div class="card border-0 shadow-sm mb-3">
-                        <div class="card-header bg-white d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <div>
-                                <h5 class="mb-0 fw-semibold">Blotter List</h5>
-                                <small class="text-muted">Track complainants, respondents, and current status</small>
-                            </div>
-                            <span class="badge bg-light text-dark px-3 py-2">{{ $blotters->total() }} total</span>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table mb-0 align-middle">
-                                    <thead class="table-light">
+                    
+                    @if($blotters->isEmpty())
+                        <div class="container bg-light p-3 m-3 alert alert-info">No blotter records found.</div>
+                    @else
+                        <div class="table-responsive table-wrapper">
+                            <table class="table table-bordered table-hover bg-white shadow-sm">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th style="width: 120px;">Blotter No</th>
+                                        <th>Complainant (Nagrereklamo)</th>
+                                        <th>Respondent (Nirereklamo)</th>
+                                        <th style="width: 150px;">Status</th>
+                                        <th class="text-center" style="width: 130px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($blotters as $blotter)
+                                        @php
+                                            $status = strtolower($blotter->current_status ?? '');
+                                            if (str_contains($status, 'pending')) {
+                                                $uiClass = 'status-pending';
+                                            } elseif (str_contains($status, 'ongoing')) {
+                                                $uiClass = 'status-ongoing';
+                                            } elseif (str_contains($status, 'closed')) {
+                                                $uiClass = 'status-closed';
+                                            } else {
+                                                $uiClass = 'status-default';
+                                            }
+                                        @endphp
                                         <tr>
-                                            <th class="text-uppercase small fw-semibold">Blotter No</th>
-                                            <th class="text-uppercase small fw-semibold">Complainant</th>
-                                            <th class="text-uppercase small fw-semibold">Respondent</th>
-                                            <th class="text-uppercase small fw-semibold">Status</th>
-                                            <th class="text-uppercase small fw-semibold text-end">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($blotters as $blotter)
-    @php
-        $status = strtolower($blotter->current_status ?? '');
-        // Determine the class based on status text
-        if (str_contains($status, 'pending')) {
-            $uiClass = 'status-pending';
-        } elseif (str_contains($status, 'ongoing')) {
-            $uiClass = 'status-ongoing';
-        } elseif (str_contains($status, 'closed')) {
-            $uiClass = 'status-closed';
-        } else {
-            $uiClass = 'status-default';
-        }
-    @endphp
-    <tr>
-        <td class="fw-semibold text-dark">#{{ $blotter->id }}</td>
-        <td>{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
-        <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
-        
-        <td>
-            <div class="status-badge {{ $uiClass }}">
-                <span class="status-dot"></span>
-                {{ $blotter->current_status ?? 'N/A' }}
-            </div>
-        </td>
+                                            <td class="case-number">#{{ $blotter->id }}</td>
+                                            <td class="fw-semibold">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
+                                            <td class="fw-semibold">{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
+                                            
+                                            <td>
+                                                <div class="status-badge {{ $uiClass }}">
+                                                    <span class="status-dot"></span>
+                                                    {{ $blotter->current_status ?? 'N/A' }}
+                                                </div>
+                                            </td>
 
-        <td class="text-end">
-            <button class="btn btn-sm btn-outline-primary" style="border-radius: 6px; font-weight: 600;" 
-                    type="button" data-bs-toggle="modal" data-bs-target="#updateBlotterModal" 
-                    data-blotter-id="{{ $blotter->id }}">
-                <i class="fa fa-pen me-1"></i> Update
-            </button>
-        </td>
-    </tr>
-@empty
-    @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
+                                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" 
+                                                            type="button" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
+                                                        <i class="fa fa-eye fa-fw"></i><span>View</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary border shadow-sm d-inline-flex align-items-center gap-1" 
+                                                            type="button" data-bs-toggle="modal" data-bs-target="#updateBlotterModal" 
+                                                            data-blotter-id="{{ $blotter->id }}">
+                                                        <i class="fa fa-pen-to-square fa-fw"></i><span>Update</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        {{-- View Modal --}}
+                                        <div class="modal fade" id="viewBlotter{{ $blotter->id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body p-4">
+                                                        <section>
+                                                            <h6>Complainant Information</h6>
+                                                            <div class="info-box">
+                                                                <div class="row gy-3">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Full Name</div>
+                                                                        <div class="info-value">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffMiddleName }} {{ $blotter->plaintiffLastName }}</div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Age</div>
+                                                                        <div class="info-value">{{ $blotter->plaintiffAge ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="info-label">Address</div>
+                                                                        <div class="info-value">{{ $blotter->plaintiffAddress ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Contact Number</div>
+                                                                        <div class="info-value">{{ $blotter->plaintiffContactNumber ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                        <section>
+                                                            <h6>Respondent Information</h6>
+                                                            <div class="info-box">
+                                                                <div class="row gy-3">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Full Name</div>
+                                                                        <div class="info-value">{{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Age</div>
+                                                                        <div class="info-value">{{ $blotter->defendantAge ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="info-label">Address</div>
+                                                                        <div class="info-value">{{ $blotter->defendantAddress ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Contact Number</div>
+                                                                        <div class="info-value">{{ $blotter->defendantContactNumber ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                        @if($blotter->witnessName)
+                                                            <section>
+                                                                <h6>Witness Information</h6>
+                                                                <div class="info-box">
+                                                                    <div class="row gy-3">
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Witness Name</div>
+                                                                            <div class="info-value">{{ $blotter->witnessName }}</div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Contact Number</div>
+                                                                            <div class="info-value">{{ $blotter->witnessContactNumber ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        @endif
+
+                                                        <section>
+                                                            <h6>Incident Description</h6>
+                                                            <div class="info-box">
+                                                                <div class="info-label mb-1">Details</div>
+                                                                <div class="info-value" style="white-space: pre-line; line-height: 1.6;">
+                                                                    {{ $blotter->blotterDescription }}
+                                                                </div>
+                                                            </div>
+                                                        </section>
+
+                                                        @if($blotter->proof)
+                                                            <section>
+                                                                <h6>Evidence / Proof Submitted</h6>
+                                                                <div class="info-box">
+                                                                    <div class="row gy-2">
+                                                                        <div class="col-12">
+                                                                            <img src="{{ Storage::url($blotter->proof) }}" 
+                                                                                 alt="Evidence for blotter #{{ $blotter->id }}" 
+                                                                                 class="img-fluid rounded border"
+                                                                                 style="max-height: 400px; object-fit: contain;">
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <a href="{{ Storage::url($blotter->proof) }}" 
+                                                                               target="_blank" 
+                                                                               class="btn btn-sm btn-outline-primary">
+                                                                                <i class="fa fa-external-link-alt me-1"></i> View Full Size
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+                                                        @endif
+
+                                                        <section>
+                                                            <h6>Status Information</h6>
+                                                            <div class="info-box">
+                                                                <div class="row gy-2">
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Current Status</div>
+                                                                        <div class="status-badge {{ $uiClass }}">
+                                                                            <span class="status-dot"></span>
+                                                                            {{ $blotter->current_status ?? 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-6">
+                                                                        <div class="info-label">Date Filed</div>
+                                                                        <div class="info-value">{{ $blotter->created_at->format('M d, Y h:i A') }}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        @if ($blotters->hasPages())
-                            <div class="card-footer bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <small class="text-muted">Showing {{ $blotters->firstItem() }}-{{ $blotters->lastItem() }} of {{ $blotters->total() }}</small>
-                                <div class="mb-0">{{ $blotters->links() }}</div>
+
+                        {{-- Pagination --}}
+                        @if($blotters->hasPages())
+                            <div class="pagination-wrapper">
+                                <div class="pagination-info">
+                                    Showing {{ $blotters->firstItem() }} to {{ $blotters->lastItem() }} of {{ $blotters->total() }} results
+                                </div>
+                                {{ $blotters->appends(request()->query())->links('pagination::bootstrap-5') }}
                             </div>
                         @endif
-                    </div>
+                    @endif
                 </div>
 
                 <div class="modal fade" id="blotterModal" tabindex="-1" aria-labelledby="blotterModalLabel" aria-hidden="true">
@@ -315,7 +480,6 @@
                         .then(response => response.text())
                         .then(html => {
                             contentDiv.innerHTML = html;
-                            // Reinitialize date picker if needed
                             initializeDatePickers();
                         })
                         .catch(error => {
@@ -327,10 +491,14 @@
         }
 
         function initializeDatePickers() {
+            // Only attach click handler to calendar icon triggers
             document.querySelectorAll('[id^="date_trigger_"]').forEach(trigger => {
-                trigger.removeEventListener('mousedown', handleDateTrigger);
-                trigger.addEventListener('mousedown', handleDateTrigger);
+                trigger.removeEventListener('click', handleDateTrigger);
+                trigger.addEventListener('click', handleDateTrigger);
             });
+
+            // Date inputs are now fully editable by typing
+            // No auto-open picker behavior attached
         }
 
         function handleDateTrigger(event) {
@@ -343,7 +511,8 @@
             }
         }
 
-        initializeDatePickers();
+        // Allow manual typing in date inputs - remove auto-open on focus/click
+        // Only trigger picker when clicking the calendar icon
     </script>
     
     @yield('scripts')

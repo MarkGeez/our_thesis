@@ -155,13 +155,15 @@
             <div class="light-card">
                 <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Procedure</h6>
                 <div class="mb-3">
+                    <label class="form-label">Scheduled Hearing Date</label>
                     <div class="input-group date-group">
                         <input type="date" name="schedule" id="blotter_schedule" class="form-control">
                         <span class="input-group-text schedule-trigger"><i class="fa fa-calendar"></i></span>
                     </div>
-                    <div class="form-text small opacity-50 px-1">Scheduled Hearing Date</div>
                 </div>
-                <input type="file" name="proof" class="form-control">
+                <label class="form-label">Attach Evidence/Proof (Optional)</label>
+                <input type="file" name="proof" accept="image/jpg, image/jpeg, image/png" class="form-control">
+                <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
             </div>
         </div>
 
@@ -190,25 +192,16 @@
             scheduleInput.value = rawSchedule;
         }
 
-        const openPicker = () => {
-            if (!scheduleInput) return;
-            if (typeof scheduleInput.showPicker === 'function') {
-                scheduleInput.showPicker();
-            } else {
-                scheduleInput.focus();
-            }
-        };
-
+        // Only open picker when clicking the calendar icon, not the input itself
         if (scheduleTrigger && scheduleInput) {
-            scheduleTrigger.addEventListener('mousedown', function (event) {
+            scheduleTrigger.addEventListener('click', function (event) {
                 event.preventDefault();
-                scheduleInput.focus();
-                openPicker();
+                if (typeof scheduleInput.showPicker === 'function') {
+                    scheduleInput.showPicker();
+                } else {
+                    scheduleInput.focus();
+                }
             });
-        }
-
-        if (scheduleInput) {
-            scheduleInput.addEventListener('click', openPicker);
         }
     });
 </script>

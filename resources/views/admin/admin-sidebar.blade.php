@@ -69,11 +69,7 @@
                          </span>
                      </a>
                      <ul class="cat-sub-menu">
-                        <li>
-                            <a class="{{ Request::routeIs('admin.blotter.*') ? 'active' : '' }}" href="{{ route('admin.blotter.index') }}">
-                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
-                            </a>
-                        </li>
+                        
                         <li>
                            <a class="{{ Request::routeIs('admin.adminCertificate*') ? 'active' : '' }}"
                                href="{{ route('admin.adminCertificate') }}">
@@ -126,7 +122,11 @@
                         <span class="icon"><i class="fa-solid fa-users-cog"></i></i></span>Officials
                     </a>
                 </li>
-                
+                <li>
+                            <a class="{{ Request::routeIs('admin.blotter.*') ? 'active' : '' }}" href="{{ route('admin.blotter.index') }}">
+                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Manage Blotters
+                            </a>
+                        </li>
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">

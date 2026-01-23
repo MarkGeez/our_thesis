@@ -58,6 +58,107 @@
         background: #fff;
     }
 
+    /* Blotter-themed timeline for status history */
+    .update-form .timeline {
+        position: relative;
+        padding-left: 18px;
+    }
+
+    .update-form .timeline::before {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #0d6efd, #79a7ff);
+        opacity: 0.35;
+    }
+
+    .update-form .timeline-item {
+        position: relative;
+        padding: 0.75rem 0 0.75rem 14px;
+        border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .update-form .timeline-item:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .update-form .timeline-dot {
+        position: absolute;
+        left: -2px;
+        top: 1.1rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+    }
+
+    .update-form .timeline-body {
+        background: #f9fbff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.65rem 0.85rem;
+        box-shadow: 0 6px 12px rgba(15, 23, 42, 0.03);
+    }
+
+    .update-form .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.35rem;
+    }
+
+    .update-form .timeline-meta {
+        font-size: 0.8rem;
+        color: #6b7280;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .update-form .timeline-remarks {
+        font-size: 0.9rem;
+        color: #111827;
+        margin-bottom: 0.4rem;
+    }
+
+    .update-form .timeline-photo {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .update-form .timeline-photo img {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .update-form .timeline-badge {
+        padding: 0.2rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+
+    .update-form .timeline-badge.pending { background: #fff7e6; color: #b45309; border: 1px solid #fde68a; }
+    .update-form .timeline-badge.ongoing { background: #e0f2fe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .update-form .timeline-badge.closed { background: #ecfdf3; color: #15803d; border: 1px solid #bbf7d0; }
+    .update-form .timeline-badge.scheduled { background: #eff6ff; color: #1e3a8a; border: 1px solid #dbeafe; }
+    .update-form .timeline-badge.cold { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+    .update-form .timeline-badge.resolved { background: #eefcf6; color: #0f766e; border: 1px solid #c5f3e5; }
+
     .update-form input[type="date"]::-webkit-calendar-picker-indicator {
         opacity: 1;
         display: block;
@@ -118,16 +219,43 @@
             <div class="light-card h-100">
                 <h6 class="form-section-title mb-3"><i class="fa fa-clock-rotate-left me-2 opacity-50"></i>Status History</h6>
                 @if($history->count() > 0)
-                    @foreach ($history as $hist)
-                        {{ date('M-d Y', strToTime($hist->date)) }}
-                        @if (!empty($hist->photo_path))
-                        <img src="{{ Storage::url($hist->photo_path) }}" alt="" srcset="">
-                        @endif
-                        {{ $hist->updated_by }}
-                        {{ $hist->status  }}
-                        {{ $hist->remarks }}
-                        <br>
-                    @endforeach
+                    <div class="history-list timeline">
+                        @foreach ($history as $hist)
+                            @php
+                                $normalized = strtolower($hist->status ?? '');
+                                $badgeClass = match(true) {
+                                    str_contains($normalized, 'pending')   => 'pending',
+                                    str_contains($normalized, 'ongoing')   => 'ongoing',
+                                    str_contains($normalized, 'closed')    => 'closed',
+                                    str_contains($normalized, 'scheduled') => 'scheduled',
+                                    str_contains($normalized, 'resolved')  => 'resolved',
+                                    str_contains($normalized, 'cold')      => 'cold',
+                                    default                                => 'pending',
+                                };
+                            @endphp
+                            <div class="timeline-item">
+                                <span class="timeline-dot" style="background:#0d6efd;"></span>
+                                <div class="timeline-body">
+                                    <div class="timeline-header">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="timeline-badge {{ $badgeClass }}">{{ ucwords(str_replace('_',' ', $hist->status)) }}</span>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
+                                    </div>
+                                    <div class="timeline-remarks">{{ $hist->remarks }}</div>
+                                    <div class="timeline-meta">
+                                        <span><i class="fa fa-user-shield me-1 text-primary"></i>{{ $hist->updated_by ?? 'Unknown' }}</span>
+                                    </div>
+                                    @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
+                                        <div class="timeline-photo mt-2">
+                                            <img src="{{ Storage::url($hist->photo_path) }}" alt="Status proof for blotter {{ $blotter->id }}">
+                                            <a class="btn btn-outline-primary btn-sm" href="{{ Storage::url($hist->photo_path) }}" target="_blank" rel="noopener">View evidence</a>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 @else
                     <p class="text-muted mb-0">No status updates yet.</p>
                 @endif
@@ -214,25 +342,16 @@
             dateInput.value = rawDate;
         }
 
-        const openPicker = () => {
-            if (!dateInput) return;
-            if (typeof dateInput.showPicker === 'function') {
-                dateInput.showPicker();
-            } else {
-                dateInput.focus();
-            }
-        };
-
+        // Only open picker when clicking the calendar icon, not the input itself
         if (trigger && dateInput) {
-            trigger.addEventListener('mousedown', function (event) {
+            trigger.addEventListener('click', function (event) {
                 event.preventDefault();
-                dateInput.focus();
-                openPicker();
+                if (typeof dateInput.showPicker === 'function') {
+                    dateInput.showPicker();
+                } else {
+                    dateInput.focus();
+                }
             });
-        }
-
-        if (dateInput) {
-            dateInput.addEventListener('click', openPicker);
         }
     });
 </script>

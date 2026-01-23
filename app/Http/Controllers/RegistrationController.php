@@ -43,7 +43,6 @@ class RegistrationController extends Controller
         $resident = Resident::where('firstName', $request->firstName)
             ->where('middleName', $request-> middleName)
             ->where('lastName', $request->lastName)
-            ->where('contactNo', $request->contactNumber) // Match with contactNo in residents
             ->first();
 
         $role = "non-resident";

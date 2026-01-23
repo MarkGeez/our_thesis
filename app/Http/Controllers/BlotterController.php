@@ -24,51 +24,60 @@ class BlotterController extends Controller
 
     // STORE NEW BLOTTER
     public function submitBlotter(Request $request)
-    {
-        $request->validate([
-            'plaintiffName' => 'required|string',
-            'plaintiffLastName' => 'required|string',
-            'blotterDescription' => 'required|string',
-        ]);
+{
+$request->validate([
+'plaintiffName' => 'required|string',
+'plaintiffLastName' => 'required|string',
+'blotterDescription' => 'required|string',
+'proof' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+]);
 
-        $blotter = Blotter::create([
-            'plaintiffName' => $request->plaintiffName,
-            'plaintiffMiddleName' => $request->plaintiffMiddleName,
-            'plaintiffLastName' => $request->plaintiffLastName,
-            'plaintiffAge' => $request->plaintiffAge,
-            'plaintiffAddress' => $request->plaintiffAddress,
-            'plaintiffContactNumber' => $request->plaintiffContactNumber,
+$proofPath = null;
 
-            'defendantName' => $request->defendantName,
-            'defendantMiddleName' => $request->defendantMiddleName,
-            'defendantLastName' => $request->defendantLastName,
-            'defendantAge' => $request->defendantAge,
-            'defendantAddress' => $request->defendantAddress,
-            'defendantContactNumber' => $request->defendantContactNumber,
+if ($request->hasFile('proof')) {
+    $proofPath = $request->file('proof')->store('blotter_proofs', 'public');
+}
 
-            'witnessName' => $request->witnessName,
-            'witnessContactNumber' => $request->witnessContactNumber,
+$blotter = Blotter::create([
+    'plaintiffName' => $request->plaintiffName,
+    'plaintiffMiddleName' => $request->plaintiffMiddleName,
+    'plaintiffLastName' => $request->plaintiffLastName,
+    'plaintiffAge' => $request->plaintiffAge,
+    'plaintiffAddress' => $request->plaintiffAddress,
+    'plaintiffContactNumber' => $request->plaintiffContactNumber,
 
-            'proof' => $request->proof,
-            'blotterDescription' => $request->blotterDescription,
-            'schedule' => $request->schedule,
+    'defendantName' => $request->defendantName,
+    'defendantMiddleName' => $request->defendantMiddleName,
+    'defendantLastName' => $request->defendantLastName,
+    'defendantAge' => $request->defendantAge,
+    'defendantAddress' => $request->defendantAddress,
+    'defendantContactNumber' => $request->defendantContactNumber,
 
-            'encodedBy' => Auth::id(),
-            'current_status' => 'first',
-        ]);
+    'witnessName' => $request->witnessName,
+    'witnessContactNumber' => $request->witnessContactNumber,
 
-        UpdateBlotter::create([
-            'blotter_id' => $blotter->id,
-            'status' => 'first',
-            'remarks' => 'Initial blotter record',
-            'updated_by' => Auth::id(),
-            'photo_path' => $blotter->proof,
-            'date' => now(),
-        ]);
+    'proof' => $proofPath,
+    'blotterDescription' => $request->blotterDescription,
+    'schedule' => $request->schedule,
 
-        return redirect()->route('admin.blotter.index')
-            ->with('success', 'Blotter created successfully.');
-    }
+    'encodedBy' => Auth::id(),
+    'current_status' => 'first',
+]);
+
+UpdateBlotter::create([
+    'blotter_id' => $blotter->id,
+    'status' => 'first',
+    'remarks' => 'Initial blotter record',
+    'updated_by' => Auth::id(),
+    'photo_path' => $proofPath,
+    'date' => now(),
+]);
+
+return redirect()->route('admin.blotter.index')
+    ->with('success', 'Blotter created successfully.');
+
+
+}
 
     // SHOW UPDATE FORM
   public function showUpdateForm($id)
