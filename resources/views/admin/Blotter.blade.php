@@ -180,7 +180,9 @@
                             {{ session('success') }}
                         </div>
                     @endif
-
+                     @if(session('error'))
+                        {{ session('error') }}
+                     @endif
                     <div class="card border-0 shadow-sm mb-3">
                         <div class="card-header bg-white d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div>

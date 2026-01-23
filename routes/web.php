@@ -47,9 +47,8 @@ Route::get('/', [LandingController::class, 'display']);
 Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
         Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
-        Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
-        Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
-        Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
+        Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
+
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
         Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
@@ -68,10 +67,9 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::put('/blotterRequest/update/{id}', [BlotterController::class, 'updateBlotter'])->name('update.blotter');
         Route::put('/blotterRequest/status/{id}', [BlotterController::class, 'updateStatus'])->name('status.blotter');
         
-
-        
     });
 });
+
 
 Route::prefix('admin/blotter')
     ->name('admin.blotter.')
@@ -119,9 +117,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
     Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
     Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
-
-    // Blotter management
-    Route::get('/blotterRequest', [AdminController::class,'blotterRequest'])->name('blotterRequest');
 
     Route::get('/feedbackRequest', [AdminController::class,'feedbackRequest'])->name('feedbackRequest');
     Route::get('/aboutus', [AdminController::class,'aboutus'])->name('aboutus');

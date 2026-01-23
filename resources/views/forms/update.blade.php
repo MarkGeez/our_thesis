@@ -117,26 +117,25 @@
         <div class="col-lg-5">
             <div class="light-card h-100">
                 <h6 class="form-section-title mb-3"><i class="fa fa-clock-rotate-left me-2 opacity-50"></i>Status History</h6>
-                @if($blotter->update_blotter && $blotter->update_blotter->count() > 0)
-                    <div class="history-list">
-                        @foreach($blotter->update_blotter as $update)
-                            <div class="mb-2 pb-2 border-bottom">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-light text-dark badge-status text-capitalize">{{ $update->status }}</span>
-                                    <small class="text-muted">{{ \Carbon\Carbon::parse($update->date)->format('M d, Y') }}</small>
-                                </div>
-                                <div class="small text-muted mt-1">{{ $update->remarks }}</div>
-                            </div>
-                        @endforeach
-                    </div>
+                @if($history->count() > 0)
+                    @foreach ($history as $hist)
+                        {{ date('M-d Y', strToTime($hist->date)) }}
+                        @if (!empty($hist->photo_path))
+                        <img src="{{ Storage::url($hist->photo_path) }}" alt="" srcset="">
+                        @endif
+                        {{ $hist->status  }}
+                        {{ $hist->remarks }}
+                        <br>
+                    @endforeach
                 @else
                     <p class="text-muted mb-0">No status updates yet.</p>
                 @endif
             </div>
         </div>
     </div>
-
+   
     <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data">
+        
         @csrf
         @method('PUT')
 
@@ -156,20 +155,22 @@
                                 $isUsed = isset($usedStatuses) && in_array($status, $usedStatuses, true);
                                 $isSelected = $selectedStatus === $status;
                             @endphp
-                            <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isUsed && !$isSelected ? 'disabled' : '' }}>
+                            <option value=" {{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isUsed && !$isSelected ? 'disabled' : '' }}>
                                 {{ ucfirst(str_replace('_', ' ', $status)) }}{{ $isUsed && !$isSelected ? ' (already used)' : '' }}
                             </option>
+    
                         @endforeach
+                         @error('status')
+                            <div class="error-text mt-1">{{ $message }}</div>
+                            @enderror
                     </select>
-                    @error('status')
-                        <div class="error-text mt-1">{{ $message }}</div>
-                    @enderror
+                    
                 </div>
 
                 <div class="col-md-6">
                     <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
                     <div class="input-group date-group">
-                        <input type="date" name="date" id="date_{{ $blotter->id }}" class="form-control" required>
+                        <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date') }}" class="form-control" required>
                         <span class="input-group-text" id="date_trigger_{{ $blotter->id }}" style="cursor: pointer;"><i class="fa fa-calendar"></i></span>
                     </div>
                     @error('date')
@@ -179,7 +180,7 @@
 
                 <div class="col-md-12">
                     <label for="remarks_{{ $blotter->id }}" class="form-label">Remarks / Notes <span class="text-danger">*</span></label>
-                    <textarea name="remarks" id="remarks_{{ $blotter->id }}" class="form-control" rows="3" placeholder="Describe the update..." required>{{ old('remarks') }}</textarea>
+                    <textarea name="remarks" id="remarks_{{ $blotter->id }}" class="form-control" value="{{ old('remarks') }}"rows="3" placeholder="Describe the update..." required>{{ old('remarks') }}</textarea>
                     @error('remarks')
                         <div class="error-text mt-1">{{ $message }}</div>
                     @enderror

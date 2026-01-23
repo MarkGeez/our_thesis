@@ -72,9 +72,10 @@ class BlotterController extends Controller
 
     // SHOW UPDATE FORM
   public function showUpdateForm($id)
-{
+    {
     $blotter = Blotter::with('updates')->findOrFail($id);
 
+    $history = $blotter->updates->sortByDesc('date');
     $statuses = [
         'first',
         'second',
@@ -91,8 +92,8 @@ class BlotterController extends Controller
     $availableStatuses = array_diff($statuses, $usedStatuses);
 
     // Return the UPDATE FORM view, not the main Blotter index view
-    return view('forms.update', compact('blotter', 'availableStatuses'));
-}
+    return view('forms.update', compact('blotter', 'availableStatuses' , 'history'));
+    }
 
     // STORE NEW UPDATE (NO EDITING)
     public function storeUpdate(Request $request, $id)
@@ -102,7 +103,7 @@ class BlotterController extends Controller
         $request->validate([
             'status' => 'required',
             'remarks' => 'required|string',
-            'photo_path' => 'nullable|string',
+            'photo_path' => 'nullable|mimes:png,jpg,jpeg|max:4096',
             'date' => 'required|date',
         ]);
 
@@ -113,12 +114,16 @@ class BlotterController extends Controller
         if ($exists) {
             return back()->with('error', 'This status has already been used.');
         }
+        $image=null;
+        if($request->hasFile('photo_path')){
+            $image = $request->file('photo_path')->store('blotter', 'public');
+        }
 
         UpdateBlotter::create([
             'blotter_id' => $blotter->id,
             'status' => $request->status,
             'remarks' => $request->remarks,
-            'photo_path' => $request->photo_path,
+            'photo_path' => $image,
             'updated_by' => Auth::id(),
             'date' => $request->date,
             'is_finished' => in_array($request->status, ['coldCase', 'criminalCase']),

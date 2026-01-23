@@ -101,11 +101,7 @@
                         <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
                     </a>
                 </li>
-                <li>
-                    <a class="{{ Request::routeIs('admin.blotterRequest') ? 'active' : '' }}" href="{{ route('admin.blotterRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
-                    </a>
-                </li>
+                
                 <li>
                     <a class="{{ Request::routeIs('admin.census') ? 'active' : '' }}"
                        href="{{ route('admin.census') }}">
