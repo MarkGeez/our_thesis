@@ -123,6 +123,7 @@
                         @if (!empty($hist->photo_path))
                         <img src="{{ Storage::url($hist->photo_path) }}" alt="" srcset="">
                         @endif
+                        {{ $hist->updated_by }}
                         {{ $hist->status  }}
                         {{ $hist->remarks }}
                         <br>
