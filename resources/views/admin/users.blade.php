@@ -75,6 +75,8 @@
                                     <th>Full Name</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Profile Image</th>
+                                    <th>Proof of Identity</th>
                                     <th>Status</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
@@ -89,6 +91,30 @@
                                         </td>
                                         <td>{{ $list->email }}</td>
                                         <td><span class="badge bg-info text-light">{{ ucfirst($list->role) }}</span></td>
+                                        <td>
+                                            @if($list->profile_image)
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('storage/' . $list->profile_image) }}" alt="Profile image of {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#profileImgModal{{ $list->id }}">
+                                                        <i class="fa-solid fa-image"></i> View
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">None</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($list->proofOfIdentity)
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('storage/' . $list->proofOfIdentity) }}" alt="Proof of identity for {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}" class="rounded" style="width:60px;height:60px;object-fit:cover;">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#proofModal{{ $list->id }}">
+                                                        <i class="fa-solid fa-image"></i> View
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">No upload</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @php
                                                 $statusConfig = [
@@ -127,7 +153,46 @@
                                         </td>
                                     </tr>
 
+                                    {{-- Profile Image Modal --}}
+                                    @if($list->profile_image)
+                                    <div class="modal fade" id="profileImgModal{{ $list->id }}" tabindex="-1" aria-labelledby="profileImgModalLabel{{ $list->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="profileImgModalLabel{{ $list->id }}">Profile Image</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    <img src="{{ asset('storage/' . $list->profile_image) }}" alt="Profile image of {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}" class="img-fluid" style="max-height:70vh;object-fit:contain;">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+
                                     {{-- Status Update Modal --}}
+                                    @if($list->proofOfIdentity)
+                                    <div class="modal fade" id="proofModal{{ $list->id }}" tabindex="-1" aria-labelledby="proofModalLabel{{ $list->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="proofModalLabel{{ $list->id }}">Proof of Identity</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    <img src="{{ asset('storage/' . $list->proofOfIdentity) }}" alt="Proof of identity for {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}" class="img-fluid" style="max-height:70vh;object-fit:contain;">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+
                                     <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-labelledby="statusModalLabel{{ $list->id }}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">

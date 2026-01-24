@@ -248,8 +248,14 @@
                                     </div>
                                     @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
                                         <div class="timeline-photo mt-2">
-                                            <img src="{{ Storage::url($hist->photo_path) }}" alt="Status proof for blotter {{ $blotter->id }}">
-                                            <a class="btn btn-outline-primary btn-sm" href="{{ Storage::url($hist->photo_path) }}" target="_blank" rel="noopener">View evidence</a>
+                                            <img src="{{ Storage::url($hist->photo_path) }}" 
+                                                 alt="Status proof for blotter {{ $blotter->id }}"
+                                                 style="cursor: pointer;"
+                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')"
+                                                 title="Click to view full size">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')">
+                                                <i class="fa fa-search-plus me-1"></i>View evidence
+                                            </button>
                                         </div>
                                     @endif
                                 </div>

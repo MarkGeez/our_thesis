@@ -42,6 +42,7 @@ class SubAdminController extends Controller
             'birthday' => 'required|date',
             'password' => 'nullable|min:6|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         $user->email = $validated['email'];
@@ -61,6 +62,15 @@ class SubAdminController extends Controller
             // Store new image
             $path = $request->file('profile_image')->store('profile_images', 'public');
             $user->profile_image = $path;
+        }
+
+        if ($request->hasFile('proofOfIdentity')) {
+            if ($user->proofOfIdentity && Storage::exists('public/' . $user->proofOfIdentity)) {
+                Storage::delete('public/' . $user->proofOfIdentity);
+            }
+
+            $proofPath = $request->file('proofOfIdentity')->store('photos', 'public');
+            $user->proofOfIdentity = $proofPath;
         }
 
         $user->save();

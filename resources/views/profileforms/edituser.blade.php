@@ -32,6 +32,31 @@ $user = auth()->user();
 
     <hr>
 
+    <h6 class="text-muted mb-3">Proof of Identity</h6>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="mb-3">
+                <label class="form-label">Uploaded Proof</label>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div>
+                        @if($user->proofOfIdentity)
+                            <img src="{{ asset('storage/' . $user->proofOfIdentity) }}" alt="Proof of identity" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                        @else
+                            <span class="text-muted">No proof uploaded</span>
+                        @endif
+                    </div>
+                    <div class="flex-grow-1" style="min-width: 220px;">
+                        <input type="file" name="proofOfIdentity" id="proofOfIdentity" class="form-control" accept="image/*">
+                        <small class="text-muted d-block mt-2">Upload to replace the current proof (JPG/PNG, Max 4MB)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
     <h6 class="text-muted mb-3">Account Information</h6>
 
     <div class="row mb-3">

@@ -243,8 +243,8 @@
                                         @endphp
                                         <tr>
                                             <td class="case-number">#{{ $blotter->id }}</td>
-                                            <td class="fw-semibold">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
-                                            <td class="fw-semibold">{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
+                                            <td class="">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
+                                            <td class="">{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
                                             
                                             <td>
                                                 <div class="status-badge {{ $uiClass }}">
@@ -361,15 +361,15 @@
                                                                         <div class="col-12">
                                                                             <img src="{{ Storage::url($blotter->proof) }}" 
                                                                                  alt="Evidence for blotter #{{ $blotter->id }}" 
-                                                                                 class="img-fluid rounded border"
-                                                                                 style="max-height: 400px; object-fit: contain;">
+                                                                                 class="img-fluid rounded border evidence-img"
+                                                                                 style="max-height: 400px; object-fit: contain; cursor: pointer;"
+                                                                                 onclick="showImageModal('{{ Storage::url($blotter->proof) }}', '#{{ $blotter->id }}')"
+                                                                                 title="Click to view full size">
                                                                         </div>
                                                                         <div class="col-12">
-                                                                            <a href="{{ Storage::url($blotter->proof) }}" 
-                                                                               target="_blank" 
-                                                                               class="btn btn-sm btn-outline-primary">
-                                                                                <i class="fa fa-external-link-alt me-1"></i> View Full Size
-                                                                            </a>
+                                                                            <small class="text-muted">
+                                                                                <i class="fa fa-info-circle me-1"></i> Click image to view full size
+                                                                            </small>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -458,6 +458,21 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Image Viewer Modal --}}
+                <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-fullscreen">
+                        <div class="modal-content bg-dark">
+                            <div class="modal-header border-0 bg-dark text-white">
+                                <h5 class="modal-title" id="imageViewerModalLabel">Evidence - Blotter <span id="modalBlotterId"></span></h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body d-flex align-items-center justify-content-center p-0" style="background-color: #1a1a1a;">
+                                <img id="modalImage" src="" alt="Evidence" class="img-fluid" style="max-height: 90vh; max-width: 100%; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -513,6 +528,14 @@
 
         // Allow manual typing in date inputs - remove auto-open on focus/click
         // Only trigger picker when clicking the calendar icon
+
+        // Image viewer modal function
+        function showImageModal(imageUrl, blotterId) {
+            const modal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
+            document.getElementById('modalImage').src = imageUrl;
+            document.getElementById('modalBlotterId').textContent = blotterId;
+            modal.show();
+        }
     </script>
     
     @yield('scripts')
