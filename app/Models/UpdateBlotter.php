@@ -13,8 +13,11 @@ class UpdateBlotter extends Model
     'status',
     'photo_path',
     'date',
-    'updated_by'
+    'updated_by',
    ];
+
+   
+
 
    public function blotter():BelongsTo{
       return $this->belongsTo(Blotter::class);

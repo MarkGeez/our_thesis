@@ -109,6 +109,8 @@ return redirect()->route('admin.blotter.index')
     {
         $blotter = Blotter::findOrFail($id);
 
+        
+
         $request->validate([
             'status' => 'required',
             'remarks' => 'required|string',
@@ -135,7 +137,7 @@ return redirect()->route('admin.blotter.index')
             'photo_path' => $image,
             'updated_by' => Auth::id(),
             'date' => $request->date,
-            'is_finished' => in_array($request->status, ['coldCase', 'criminalCase']),
+           // 'is_finished' => in_array($request->status, ['coldCase', 'criminalCase']),
         ]);
 
         $blotter->update([
@@ -144,4 +146,25 @@ return redirect()->route('admin.blotter.index')
     
         return back()->with('success', 'Blotter updated successfully.');
     }
+
+    /*
+    public function updateStatus(Request $request, $id){
+        $blotter = UpdateBlotter::findOrFail($id);
+        
+        if($blotter->isFinished()===true){
+            return back()->with('error', 'cannot update blotter, it is already finished');
+        }
+
+
+        $request->validate([
+            'is_finished' = "required|boolean"
+        ]);
+
+        
+
+        $blotter->update([
+            'is_finished' => $request->boolean('is_finished'),
+            'finished_by' => auth()->id()
+        ]);
+    } */
 }

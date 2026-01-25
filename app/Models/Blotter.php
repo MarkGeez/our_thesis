@@ -36,7 +36,13 @@ class Blotter extends Model
     'current_status'
     ];
 
-   
+    protected $casts = [
+      'is_finished'
+   ];
+
+   public function isFinished(): bool {
+      return $this->is_finished === true;
+   }
 
     // App\Models\Blotter.php
 public function updates(): HasMany
