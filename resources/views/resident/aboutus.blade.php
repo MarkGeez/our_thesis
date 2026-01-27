@@ -41,7 +41,11 @@
             </div>
           </div>
           
-              @include('components.officials')
+              @include('components.officials', [
+                  'positions' => $positions,
+                  'officialsByPosition' => $officialsByPosition,
+                  'showControls' => false,
+              ])
 
           
           <!-- Developers Section -->

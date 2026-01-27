@@ -125,6 +125,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/settings', [AdminController::class,'updateSettings'])->name('updateSettings');
 
     Route::get('/barangayOfficials', [OfficialController::class,'displayOfficials'])->name('barangayOfficials');
+    Route::post('/barangayOfficials/assign', [OfficialController::class, 'assign'])->name('assign.official');
     Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
     Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Announcement;
 use App\Models\Resident;
+use App\Models\Official;
 
 
 class NonResidentController extends Controller
@@ -115,8 +116,33 @@ class NonResidentController extends Controller
 
     public function aboutus()
     {
-        $officials = Official::with('resident:id,firstName,middleName,lastName,image_path')->paginate(30);
+        $positions = [
+            'Barangay Chairman',
+            'Barangay Secretary',
+            'Barangay Treasurer',
+            'Kagawad 1',
+            'Kagawad 2',
+            'Kagawad 3',
+            'Kagawad 4',
+            'Kagawad 5',
+            'Kagawad 6',
+            'Kagawad 7',
+            'SK Chairman',
+            'SK Kagawad 1',
+            'SK Kagawad 2',
+            'SK Kagawad 3',
+            'SK Kagawad 4',
+            'SK Kagawad 5',
+            'SK Kagawad 6',
+            'SK Kagawad 7',
+        ];
+
+        $officialsByPosition = Official::with('resident:id,firstName,middleName,lastName,image_path')
+            ->whereIn('position', $positions)
+            ->get()
+            ->keyBy('position');
+
         $nonResident = auth()->user();
-        return view('non-resident.aboutus', compact('nonResident', 'officials'));
+        return view('non-resident.aboutus', compact('nonResident', 'positions', 'officialsByPosition'));
     }
 }

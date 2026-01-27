@@ -225,28 +225,11 @@
 
     <div class="section-container" id="officials">
         <h2 class="section-title">Barangay Leadership</h2>
-        <div class="row g-4 justify-content-center">
-            @foreach ($officials as $official)
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="official-card text-center p-4 h-100">
-                    <img src="{{ $official->resident->image_path ? asset('storage/' . $official->resident->image_path) : 'https://ui-avatars.com/api/?name='.urlencode($official->resident->firstName).'&background=0D6EFD&color=fff&size=128' }}" 
-                         alt="Official Photo" class="rounded-circle border border-4 border-primary mb-3 shadow" style="width: 120px; height: 120px; object-fit: cover;">
-                    <div class="official-info">
-                        <span class="text-info small fw-bold text-uppercase tracking-widest" style="letter-spacing: 2px;">{{ $official->position }}</span>
-                        <h4 class="mt-2" style="font-family: 'Oswald'; font-size: 1.5rem;">
-    @if(Str::contains(Str::lower($official->position), 'chairman'))
-        HON. 
-    @endif
-    {{ strtoupper($official->resident->firstName) }} {{ strtoupper($official->resident->lastName) }}
-</h4>
-                        <div class="mt-3 small opacity-75">
-                            <i class="far fa-calendar-alt me-1"></i> Term: {{ date('Y', strtotime($official->start)) }} - {{ date('Y', strtotime($official->end)) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
+        @include('components.officials', [
+            'positions' => $positions,
+            'officialsByPosition' => $officialsByPosition,
+            'showControls' => false,
+        ])
     </div>
 
     <div class="section-container" id="announcements">

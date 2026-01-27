@@ -35,7 +35,11 @@
           <div class="section-title">
             <div class="d-flex justify-content-center mb-3">
               <h4 class="h4">Barangay Officials</h4>
-                  @include('components.officials')
+                  @include('components.officials', [
+                      'positions' => $positions,
+                      'officialsByPosition' => $officialsByPosition,
+                      'showControls' => false,
+                  ])
 
             </div>
           </div>
