@@ -259,7 +259,7 @@
         <main class="main users chart-page" id="skip-target">
             <div class="main-container">
                 <div class="welcome-card">
-                                <h3>Welcome, {{ ucfirst(auth()->user()->firstName) }}!</h3>
+                                <h3>Welcome, {{ ucwords(auth()->user()->firstName) }}!</h3>
                                 <p>Here's what's happening in your community.</p>
                             </div>
                 
@@ -297,8 +297,9 @@
                                 @endif
                             </div>
                             <div class="announcement-meta">
-                                Posted by: {{ ucfirst($announcements->user->firstName) }},
-                                {{ ucfirst($announcements->user->lastName) }}
+                                Posted by: {{ ucwords($announcements->user->firstName) }}
+                                {{ ucwords($announcements->user->lastName) }}<br>
+                                Posted on: {{ date('M d, Y g:i A', strtotime($announcements->created_at)) }}
                             </div>
 
                             <div class="announcement-actions">

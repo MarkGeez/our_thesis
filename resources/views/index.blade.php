@@ -123,6 +123,61 @@
             backdrop-filter: blur(10px);
             transition: 0.3s;
         }
+        .btn-custom {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2a88 100%);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 15px 40px;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden; /* Important for the sweep effect */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: 1;
+}
+
+/* The Shine/Sweep Effect */
+.btn-custom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: all 0.6s;
+    z-index: -1;
+}
+
+.btn-custom:hover {
+    transform: translateY(-5px) scale(1.05); 
+    box-shadow: 0 15px 30px rgba(45, 125, 253, 0.4); 
+    color: #fff;
+    border-color: var(--accent-gold);
+}
+
+.btn-custom:hover::before {
+    left: 100%; 
+}
+
+
+.btn-custom:hover i {
+    animation: rocketLaunch 0.5s infinite alternate;
+}
+
+@keyframes rocketLaunch {
+    from { transform: translate(0, 0); }
+    to { transform: translate(3px, -3px); }
+}
+@media (max-width: 768px) {
+    .btn-custom {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+}
 
         .official-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.1); }
         .map-frame { filter: grayscale(100%) invert(90%) contrast(90%); border-radius: 20px; }
@@ -134,7 +189,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#">
                 <img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Logo" height="60" style="border-radius: 50%; background: white; padding: 2px;">
-                <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" alt="Bagong Pilipinas" height="60">
+                <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" alt="Bagong Pilipinas" height="60">
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -156,12 +211,12 @@
 
     <section class="hero-section" >
         <div class="glass-card shadow" id="mainbody">
-            <h5 class="text-uppercase fw-bold tracking-widest text-primary mb-2" style="letter-spacing: 5px; font-size: 0.9rem;">Welcome to</h5>
+            <h5 class="text-uppercase fw-bold tracking-widest text-primary mb-2" style="letter-spacing: 5px; font-size: 1.5 rem; color: white;">Welcome to</h5>
             <div class="d-md-flex justify-content-center align-items-baseline gap-3 mb-3">
                 <h3>barangay</h3>
                 <h1>249</h1>
             </div>
-            <h4 class="fw-light mb-5 px-md-5" style="opacity: 0.8; font-size: 1.1rem;">Streamlined public services, real-time announcements, and community support at your fingertips.</h4>
+            <h4 class="fw-light mb-5 px-md-5" style="opacity: 0.8; font-size: 1.75rem;">Streamlined public services, real-time announcements, and community support at your devices.</h4>
             <a href="{{ route('login') }}" class="btn btn-lg btn-custom rounded-pill text-light shadow">
                 GET STARTED <i class="fa-solid fa-rocket ms-2"></i>
             </a>

@@ -269,7 +269,7 @@
               alt="{{ $announcements->title }}">
             @endif
               
-            <h3 class="fw-bold mb-2">{{ $announcements->title }}</h3>
+            <h3 class="fw-bold mb-2">{{ strtoupper($announcements->title )}}</h3>
             <div class="announcement-text">
               <p class="mt-1">{{ $announcements->details }}</p>
               @if($announcements->eventTime || $announcements->eventEnd)
@@ -278,7 +278,8 @@
               @endif
             </div>  
             <div class="announcement-meta">
-              Posted by: {{ ucfirst($announcements->user->firstName) }}, {{ ucfirst($announcements->user->lastName) }}
+           Posted by: {{ ucwords($announcements->user->firstName) }} {{ ucwords($announcements->user->lastName) }}<br>
+           Posted on: {{ date('M d, Y g:i A', strtotime($announcements->created_at)) }}
             </div>
             <div class="announcement-actions">
               <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAnnouncement{{ $announcements->id }}">
