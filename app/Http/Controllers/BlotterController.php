@@ -12,7 +12,7 @@ class BlotterController extends Controller
     // LIST ALL BLOTTERS (ADMIN)
     public function index()
     {
-        $blotters = Blotter::with('updates')->latest()->paginate(10);
+        $blotters = Blotter::with(['updates.updater'])->latest()->paginate(10);
         return view('admin.Blotter', compact('blotters'));
     }
 
@@ -82,7 +82,7 @@ return redirect()->route('admin.blotter.index')
     // SHOW UPDATE FORM
   public function showUpdateForm($id)
     {
-    $blotter = Blotter::with('updates')->findOrFail($id);
+        $blotter = Blotter::with(['updates.updater'])->findOrFail($id);
 
     $history = $blotter->updates->sortByDesc('date');
     $statuses = [
