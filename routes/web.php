@@ -130,7 +130,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
     Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 
-    Route::get('/household-management', [HouseholdController::class, 'showHousehold']);
+    Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
     Route::get('/household-management/{id}', [HouseholdController::class, 'showStreets'])->name('streets.show');
     Route::get('/household-management/houses/{id}', [HouseholdController::class, 'showHeads'])->name('householdHead');
 

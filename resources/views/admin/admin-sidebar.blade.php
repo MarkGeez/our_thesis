@@ -111,6 +111,12 @@
                     </a>
                 </li>
                 <li>
+                    <a class="{{ Request::routeIs('admin.household') ? 'active' : '' }}"
+                       href="{{ route('admin.household') }}">
+                        <span class="icon"><i class="fa-solid fa-house-user"></i></span>Household
+                    </a>
+                </li>
+                <li>
                     <a class="{{ Request::routeIs('admin.users') ? 'active' : '' }}"
                        href="{{ route('admin.users') }}">
                         <span class="icon"><i class="fa-solid fa-users"></i></i></span>Users
