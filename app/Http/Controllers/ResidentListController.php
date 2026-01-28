@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Archive;
 use App\Models\Official;
+use App\Models\House;
+use App\Models\Street;
+use App\Models\Household;
+use App\Models\HouseholdResident;
+
 use Illuminate\Support\Facades\Storage;
 
 
@@ -13,6 +18,8 @@ class ResidentListController extends Controller
 {
    public function showResidents(Request $request)
 {
+    $streets = Street::has('houses')->get();
+    $houses  = House::all();
     $user = auth()->user();
     
     if(!$user || $user->role === "resident" || $user->role === "non-resident"){
@@ -32,7 +39,9 @@ class ResidentListController extends Controller
         })
         ->paginate(20);
 
-    return view($user->role . '.residents', compact('user', 'residents', 'searchTerm'));
+    return view($user->role . '.residents', compact(
+    'user', 'residents', 'searchTerm', 'streets', 'houses'
+));
 }
 
 // Then remove searchResidents() or keep it as an alias
@@ -42,14 +51,11 @@ public function searchResidents(Request $request)
 }
 
     public function encodeResidents(Request $request){
-        $houses = Houses::with('');
      
         $validated = $request->validate([
             'firstName' => 'required|string|max:70',
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
-            'houseNo' => 'required|string|max:8',
-            'street' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
             'birthday' => 'required|date',
             'emergencyContactNo' => 'required|string|max:11',
@@ -61,8 +67,11 @@ public function searchResidents(Request $request)
             'religion' => 'nullable|string|max:255',
             'educationalAttainment' => 'nullable|string',
             'headOfFamily' => 'required|in:yes,no',
-            'image_path' => 'nullable|mimes:jpg,jpeg,png|max:4096' // Changed to match form
+            'image_path' => 'nullable|mimes:jpg,jpeg,png|max:4096', // Changed to match form
+            'house_id' => 'required|exists:houses,id',
         ]);
+
+
 
         // Handle image upload
         if($request->hasFile('image_path')){
@@ -79,8 +88,13 @@ public function searchResidents(Request $request)
         $validated['EncodedBy'] = auth()->id();
 
         // Create resident
-        Resident::create($validated);
-
+        $resident = Resident::create($validated);
+        $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
+        HouseholdResident::create([
+    'household_id' => $household->id,
+    'resident_id'  => $resident->id,
+    'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,
+]);
         return redirect()->back()->with('success', 'Resident encoded successfully!');
     
     }

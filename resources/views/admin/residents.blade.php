@@ -583,21 +583,26 @@
 
     <hr class="mt-4">
 
-    <!-- House No -->
-    <label for="houseNo">House No.</label>
-    <input type="text" id="houseNo" name="houseNo" class="form-control @error('houseNo') is-invalid @enderror" 
-           value="{{ old('houseNo') }}" placeholder="Enter House No. here" required>
-    @error('houseNo')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
+    
 
     <!-- Street -->
-    <label for="street">Street</label>
-    <input type="text" id="street" name="street" class="form-control @error('street') is-invalid @enderror" 
-           value="{{ old('street') }}" placeholder="Enter Street Name here" required>
-    @error('street')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
+   <select id="street_id" class="form-control">
+    <option value="">-- Select Street --</option>
+
+    @foreach ($streets as $street)
+        <option value="{{ $street->id }}">
+            {{ $street->street_name }}
+        </option>
+    @endforeach
+</select>
+
+
+<!-- House No -->
+<select name="house_id" id="house_id" class="form-control">
+    <option value="">-- Select House Number --</option>
+</select>
+
+
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
@@ -721,6 +726,30 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
+    
+    const houses = @json($houses);
+
+    document.getElementById('street_id').addEventListener('change', function () {
+        const streetId = this.value;
+        const houseSelect = document.getElementById('house_id');
+
+        houseSelect.innerHTML = '<option value="">-- Select House Number --</option>';
+
+        if (!streetId) return;
+
+        houses.forEach(house => {
+            if (String(house.street_id) === String(streetId)) {
+                const option = document.createElement('option');
+                option.value = house.id;
+                option.textContent = house.house_no;
+                houseSelect.appendChild(option);
+            }
+        });
+    });
+
+
+
+
     document.addEventListener("DOMContentLoaded", function () {
         // Universal Age Calculator
         function calculateAge(birthDate, targetInputId) {

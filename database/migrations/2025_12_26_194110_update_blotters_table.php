@@ -38,7 +38,9 @@ return new class extends Migration
             $table->string('action')->nullable(); // Changed to nullable
             $table->text('current_status');
             $table->longText('statusDescription')->nullable();
-            $table->timestamps(); 
+            $table->timestamps();
+             $table->boolean('is_finished')->default(false);
+            $table->foreignId('finished_by')->constrained('users'); 
         });
     }
 
