@@ -2,8 +2,7 @@
                 <div class="container main-nav">
                     <div class="main-nav-start" >
                         <div style="display:inline-block; margin-right:12px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Bagong_Pilipinas_logo.png/330px-Bagong_Pilipinas_logo.png"
-                                alt="logo" style="width:50px; height:auto; display:block;">
+                            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}
                         </div>
                     </div>
                     <div class="main-nav-end">
@@ -28,7 +27,7 @@
                             </button>
                             <ul class="users-item-dropdown nav-user-dropdown dropdown">
                                 <li class="user-info text-center">
-                                    <h3 class="user-name mb-2">{{ ucfirst(auth()->user()->firstName) }}</h3>
+                                    <h3 class="user-name mb-2">{{ ucwords(auth()->user()->firstName) }}</h3>
                                     <p class="text-secondary user-role text-muted small">Sub-Admin</p>
                                 </li>
                                 <hr>

@@ -17,6 +17,7 @@ use App\Http\Controllers\ResidentListController;
 use App\Http\Controllers\UserListController;
 use App\Http\Controllers\OfficialController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\HouseholdController;
 
 
 
@@ -125,9 +126,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/settings', [AdminController::class,'updateSettings'])->name('updateSettings');
 
     Route::get('/barangayOfficials', [OfficialController::class,'displayOfficials'])->name('barangayOfficials');
+    Route::post('/barangayOfficials/assign', [OfficialController::class, 'assign'])->name('assign.official');
     Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
     Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 
+    Route::get('/household-management', [HouseholdController::class, 'showHousehold']);
+    Route::get('/household-management/{id}', [HouseholdController::class, 'showStreets'])->name('streets.show');
+    Route::get('/household-management/houses/{id}', [HouseholdController::class, 'showHeads'])->name('householdHead');
 
 
     Route::get('/census', [AdminController::class,'census'])->name('census');

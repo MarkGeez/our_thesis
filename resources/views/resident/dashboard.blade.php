@@ -251,7 +251,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="welcome-card">
-                                <h3>Welcome, {{ ucfirst(auth()->user()->firstName) }}!</h3>
+                                <h3>Welcome, {{ ucwords(auth()->user()->firstName) }}!</h3>
                                 <p>Here's what's happening in your community.</p>
                             </div>
 
@@ -275,8 +275,9 @@
                                         @endif
                                     </div>
                                     <div class="announcement-meta">
-                                        Posted by: {{ ucfirst($announcement->user->firstName) }},
-                                        {{ ucfirst($announcement->user->lastName) }}
+                                        Posted by: {{ ucwords($announcement->user->firstName) }},
+                                        {{ ucwords($announcement->user->lastName) }}<br>
+                                        Posted on: {{ date('M d, Y g:i A', strtotime($announcement->created_at)) }}
                                     </div>
                                 </div>
                                 @endforeach

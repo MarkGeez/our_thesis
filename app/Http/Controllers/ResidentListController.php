@@ -42,6 +42,7 @@ public function searchResidents(Request $request)
 }
 
     public function encodeResidents(Request $request){
+        $houses = Houses::with('');
      
         $validated = $request->validate([
             'firstName' => 'required|string|max:70',

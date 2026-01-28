@@ -125,6 +125,7 @@
         font-size: 0.9rem;
         color: #111827;
         margin-bottom: 0.4rem;
+        white-space: pre-wrap; /* preserve user-entered spacing/line breaks */
     }
 
     .update-form .timeline-photo {
@@ -192,7 +193,7 @@
 
 <div class="update-form p-2">
     <div class="row g-3 mb-3">
-        <div class="col-lg-7">
+        <div class="col-lg-5">
             <div class="light-card h-100">
                 <h6 class="form-section-title text-primary mb-3"><i class="fa fa-file-alt me-2 opacity-50"></i>Blotter Information</h6>
                 <div class="row gy-2">
@@ -215,7 +216,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5">
+        <div class="col-lg-7">
             <div class="light-card h-100">
                 <h6 class="form-section-title mb-3"><i class="fa fa-clock-rotate-left me-2 opacity-50"></i>Status History</h6>
                 @if($history->count() > 0)
@@ -243,13 +244,28 @@
                                         <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
                                     </div>
                                     <div class="timeline-remarks">{{ $hist->remarks }}</div>
+                                    @php
+                                        $updaterName = null;
+                                        if ($hist->updater) {
+                                            $updaterName = trim(($hist->updater->firstName ?? '') . ' ' . ($hist->updater->lastName ?? ''));
+                                            if ($updaterName === '') {
+                                                $updaterName = $hist->updater->email ?? null;
+                                            }
+                                        }
+                                    @endphp
                                     <div class="timeline-meta">
-                                        <span><i class="fa fa-user-shield me-1 text-primary"></i>{{ $hist->updated_by ?? 'Unknown' }}</span>
+                                        <span><i class="fa fa-user-shield me-1 text-primary"></i>{{ ucwords($updaterName ?? 'Unknown') }}</span>
                                     </div>
                                     @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
                                         <div class="timeline-photo mt-2">
-                                            <img src="{{ Storage::url($hist->photo_path) }}" alt="Status proof for blotter {{ $blotter->id }}">
-                                            <a class="btn btn-outline-primary btn-sm" href="{{ Storage::url($hist->photo_path) }}" target="_blank" rel="noopener">View evidence</a>
+                                            <img src="{{ Storage::url($hist->photo_path) }}" 
+                                                 alt="Status proof for blotter {{ $blotter->id }}"
+                                                 style="cursor: pointer;"
+                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')"
+                                                 title="Click to view full size">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')">
+                                                <i class="fa fa-search-plus me-1"></i>View evidence
+                                            </button>
                                         </div>
                                     @endif
                                 </div>
@@ -299,7 +315,7 @@
                 <div class="col-md-6">
                     <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
                     <div class="input-group date-group">
-                        <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date') }}" class="form-control" required>
+                        <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date', now()->toDateString()) }}" class="form-control" required>
                         <span class="input-group-text" id="date_trigger_{{ $blotter->id }}" style="cursor: pointer;"><i class="fa fa-calendar"></i></span>
                     </div>
                     @error('date')

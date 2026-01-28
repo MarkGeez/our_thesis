@@ -287,12 +287,24 @@
                                                         
                                                         <label>Select Position</label>
                                                         <select name="position" class="form-select" required>
-                                                            <option value="Chairman" {{ $resident->official && $resident->official->position === 'Chairman' ? 'selected' : '' }}>Barangay Chairman</option>
-                                                            <option value="Kagawad" {{ $resident->official && $resident->official->position === 'Kagawad' ? 'selected' : '' }}>Kagawad</option>
-                                                            <option value="Secretary" {{ $resident->official && $resident->official->position === 'Secretary' ? 'selected' : '' }}>Secretary</option>
-                                                            <option value="Treasurer" {{ $resident->official && $resident->official->position === 'Treasurer' ? 'selected' : '' }}>Treasurer</option>
-                                                            <option value="Sk Chairman" {{ $resident->official && $resident->official->position === 'Sk Chairman' ? 'selected' : '' }}>SK Chairman</option>
-                                                            <option value="Sk Kagawad" {{ $resident->official && $resident->official->position === 'Sk Kagawad' ? 'selected' : '' }}>SK Kagawad</option>
+                                                            <option value="Barangay Chairman" {{ $resident->official && $resident->official->position === 'Barangay Chairman' ? 'selected' : '' }}>Barangay Chairman</option>
+                                                            <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
+                                                            <option value="Barangay Treasurer" {{ $resident->official && $resident->official->position === 'Barangay Treasurer' ? 'selected' : '' }}>Barangay Treasurer</option>
+                                                            <option value="Kagawad 1" {{ $resident->official && $resident->official->position === 'Kagawad 1' ? 'selected' : '' }}>Kagawad 1</option>
+                                                            <option value="Kagawad 2" {{ $resident->official && $resident->official->position === 'Kagawad 2' ? 'selected' : '' }}>Kagawad 2</option>
+                                                            <option value="Kagawad 3" {{ $resident->official && $resident->official->position === 'Kagawad 3' ? 'selected' : '' }}>Kagawad 3</option>
+                                                            <option value="Kagawad 4" {{ $resident->official && $resident->official->position === 'Kagawad 4' ? 'selected' : '' }}>Kagawad 4</option>
+                                                            <option value="Kagawad 5" {{ $resident->official && $resident->official->position === 'Kagawad 5' ? 'selected' : '' }}>Kagawad 5</option>
+                                                            <option value="Kagawad 6" {{ $resident->official && $resident->official->position === 'Kagawad 6' ? 'selected' : '' }}>Kagawad 6</option>
+                                                            <option value="Kagawad 7" {{ $resident->official && $resident->official->position === 'Kagawad 7' ? 'selected' : '' }}>Kagawad 7</option>
+                                                            <option value="SK Chairman" {{ $resident->official && $resident->official->position === 'SK Chairman' ? 'selected' : '' }}>SK Chairman</option>
+                                                            <option value="SK Kagawad 1" {{ $resident->official && $resident->official->position === 'SK Kagawad 1' ? 'selected' : '' }}>SK Kagawad 1</option>
+                                                            <option value="SK Kagawad 2" {{ $resident->official && $resident->official->position === 'SK Kagawad 2' ? 'selected' : '' }}>SK Kagawad 2</option>
+                                                            <option value="SK Kagawad 3" {{ $resident->official && $resident->official->position === 'SK Kagawad 3' ? 'selected' : '' }}>SK Kagawad 3</option>
+                                                            <option value="SK Kagawad 4" {{ $resident->official && $resident->official->position === 'SK Kagawad 4' ? 'selected' : '' }}>SK Kagawad 4</option>
+                                                            <option value="SK Kagawad 5" {{ $resident->official && $resident->official->position === 'SK Kagawad 5' ? 'selected' : '' }}>SK Kagawad 5</option>
+                                                            <option value="SK Kagawad 6" {{ $resident->official && $resident->official->position === 'SK Kagawad 6' ? 'selected' : '' }}>SK Kagawad 6</option>
+                                                            <option value="SK Kagawad 7" {{ $resident->official && $resident->official->position === 'SK Kagawad 7' ? 'selected' : '' }}>SK Kagawad 7</option>
                                                         </select>
 
                                                         <label>Term Description</label>

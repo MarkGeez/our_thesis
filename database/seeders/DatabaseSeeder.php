@@ -18,16 +18,9 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-         $street = DB::table('streets')->insertGetId([
-            'street_name' => 'musa',
-            'created_at' => now(),
-            'updated_at' => now(),
-
-        ]);
-
-        DB::table('houses')->insert([
-            ['street_id' => $street, 'house_no' => '1134', 'property_type' => "residential", 'created_at' => now(), 'updated_at' => now(), ]
-        ]);
+         $this->call([
+            StreetsSeeder::class
+         ]);
     }
 }
         

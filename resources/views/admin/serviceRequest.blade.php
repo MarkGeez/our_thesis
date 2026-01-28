@@ -43,6 +43,8 @@
     <div class="main-wrapper">
         @include('admin.admin-header', ['admin' => auth()->user()])
 
+
+        <!-- 
         <main class="main users chart-page" id="skip-target">
             <div class="container-fluid py-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
@@ -286,6 +288,9 @@
                 </div>
             </div>
         </main>
+
+
+        -->
     </div>
 </div>
 

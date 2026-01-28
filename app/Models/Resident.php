@@ -38,4 +38,19 @@ class Resident extends Model
     public function official(){
         return $this->hasOne(Official::class, 'resident_id'); 
     }
+
+    public function houses()
+    {
+        return $this->belongsToMany(House::class, 'resident_house')
+                    ->withPivot(['role','is_primary'])
+                    ->withTimestamps();
+    }
+
+    // Resident may belong to many households
+    public function households()
+    {
+        return $this->belongsToMany(Household::class, 'household_resident')
+                    ->withPivot('is_household_head')
+                    ->withTimestamps();
+    }
 }

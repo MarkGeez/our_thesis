@@ -297,7 +297,7 @@
 
 <div class="image-container d-flex justify-content-center mt-4 gap-3">
     <img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Image 1" class="uniform-image" id="brgy249logo">
-    <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" alt="Image 2" class="uniform-image">
+    <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" alt="Image 2" class="uniform-image">
 </div>
 
 </body>
