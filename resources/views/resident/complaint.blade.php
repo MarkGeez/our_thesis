@@ -209,14 +209,14 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <strong>Status</strong>
                                             <span class="status-container status-{{ $complaints->status }}">
-                                                {{ ucfirst($complaints->status) }}
+                                                {{ ucfirst($complaints->status === 'pending' ? 'processing' : $complaints->status) }}
                                             </span>
                                         </div>
                                         
                                         @if($complaints->remarks)
                                             <div class="remarks-box w-100">
                                                 <span class="remarks-label">Official Remarks</span>
-                                                {{ $complaints->remarks }}
+                                                {!! nl2br(e($complaints->remarks)) !!}
                                             </div>
                                         @endif
                                     </div>

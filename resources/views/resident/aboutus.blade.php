@@ -17,6 +17,17 @@
     .section-title {
       margin-bottom: 20px;
     }
+    
+    /* Override official card text to black for this page */
+    .official-card .official-slot,
+    .official-card .official-name,
+    .official-card .official-meta {
+      color: rgba(0, 0, 0, 0.836) !important;
+    }
+    
+    .official-card .official-card-header {
+      border-bottom-color: rgba(0, 0, 0, 0.15) !important;
+    }
   </style>
 </head>
 
@@ -46,7 +57,7 @@
                   'officialsByPosition' => $officialsByPosition,
                   'showControls' => false,
               ])
-
+{{--
           
           <!-- Developers Section -->
           <div class="section-title">
@@ -96,6 +107,7 @@
               </div>
             </div>
           </div>
+         --}}
         </div>
             </main>
 

@@ -262,6 +262,80 @@
                                 <h3>Welcome, {{ ucwords(auth()->user()->firstName) }}!</h3>
                                 <p>Here's what's happening in your community.</p>
                             </div>
+
+                <div class="container-fluid px-3 mb-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Total Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $residentCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-person"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Male Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $maleCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-pink text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #e83e8c;">
+                                        <i class="fa-solid fa-person-dress"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Female Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $femaleCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-person-cane"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Senior Citizens</div>
+                                        <div class="fs-4 fw-bold">{{ $seniorCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Total Users</div>
+                                        <div class="fs-4 fw-bold">{{ $userCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
 
                 @if(session("success"))

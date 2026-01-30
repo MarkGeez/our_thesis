@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\Resident;
 use App\Models\Official;
 use App\Models\Position;
+use App\Models\User;
 
 
 use Illuminate\View\View;
@@ -24,7 +25,12 @@ class AdminController extends Controller
     
     $announcement= Announcement::with('user:id,firstName,lastName')->latest()->get();
     $admin = Auth::user();
-    return view("admin.dashboard", compact('announcement', 'admin'));
+    $residentCount = Resident::count();
+    $maleCount = Resident::where('sex', 'male')->count();
+    $femaleCount = Resident::where('sex', 'female')->count();
+    $seniorCount = Resident::where('age', '>=', 60)->count();
+    $userCount = User::count();
+    return view("admin.dashboard", compact('announcement', 'admin', 'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'userCount'));
     }
     
     

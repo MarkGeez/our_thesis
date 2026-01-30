@@ -66,7 +66,7 @@
                     </a>
                     <ul class="cat-sub-menu">
                         <li>
-                            <a class="{{ Request::routeIs('subadmin.Blotter') ? 'active' : '' }}" href="{{ route('subadmin.Blotter') }}">
+                            <a class="{{ Request::routeIs('subadmin.blotterRequest') ? 'active' : '' }}" href="{{ route('subadmin.blotterRequest') }}">
                                 <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
                             </a>
                         </li>

@@ -225,11 +225,13 @@
 
     <div class="section-container" id="officials">
         <h2 class="section-title">Barangay Leadership</h2>
+        <div style="color: white;">
         @include('components.officials', [
             'positions' => $positions,
             'officialsByPosition' => $officialsByPosition,
             'showControls' => false,
         ])
+        </div>
     </div>
 
     <div class="section-container" id="announcements">

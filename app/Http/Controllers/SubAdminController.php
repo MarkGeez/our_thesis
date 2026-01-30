@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\Complaints;
 use App\Models\Resident;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SubAdminController extends Controller
@@ -17,8 +19,13 @@ class SubAdminController extends Controller
     {
         $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
         $subadmin = Auth::user();
-            
-        return view("subadmin.dashboard", compact('announcement', 'subadmin'));
+        $residentCount = Resident::count();
+        $maleCount = Resident::where('sex', 'male')->count();
+        $femaleCount = Resident::where('sex', 'female')->count();
+        $seniorCount = Resident::where('age', '>=', 60)->count();
+        $userCount = User::count();
+
+        return view("subadmin.dashboard", compact('announcement', 'subadmin', 'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'userCount'));
     }
 
     public function profile(): View
@@ -153,7 +160,23 @@ class SubAdminController extends Controller
 
         $complaint = Complaints::findOrFail($id);
         $complaint->status = $request->input('status');
-        $complaint->remarks = $request->input('remarks');
+
+        $newRemarks = trim((string) $request->input('remarks'));
+        if ($newRemarks !== '') {
+            $user = Auth::user();
+            $remarkerName = trim(($user->firstName ?? '') . ' ' . ($user->lastName ?? ''));
+            if ($remarkerName === '') {
+                $remarkerName = $user->name ?? $user->email ?? 'Unknown';
+            }
+            $remarkerName = Str::title($remarkerName);
+
+            $timestamp = now()->format('M d, Y g:i A');
+            $entry = $timestamp . ' - ' . $remarkerName . ': ' . $newRemarks;
+            $existingRemarks = trim((string) $complaint->remarks);
+            $complaint->remarks = $existingRemarks === ''
+                ? $entry
+                : $existingRemarks . PHP_EOL . $entry;
+        }
         $complaint->save();
 
         return back()->with('success', 'Complaint updated successfully.');

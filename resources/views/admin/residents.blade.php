@@ -583,8 +583,7 @@
 
     <hr class="mt-4">
 
-    
-
+    <label>Street</label>
     <!-- Street -->
    <select id="street_id" class="form-control">
     <option value="">-- Select Street --</option>
@@ -596,7 +595,7 @@
     @endforeach
 </select>
 
-
+<label class="mt-3">House Number</label>
 <!-- House No -->
 <select name="house_id" id="house_id" class="form-control">
     <option value="">-- Select House Number --</option>

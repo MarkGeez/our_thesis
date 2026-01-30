@@ -162,8 +162,26 @@
                                                 <p class="px-2 text-muted mb-4"><i class="fa-solid fa-location-dot me-1"></i> {{ $complaint->address }}</p>
 
                                                 <div class="section-divider">Admin Remarks</div>
+                                                @php
+                                                    $remarksText = $complaint->remarks ?? '';
+                                                    $lines = preg_split("/\r\n|\n|\r/", $remarksText);
+                                                    $formattedLines = [];
+                                                    foreach ($lines as $line) {
+                                                        $line = trim($line);
+                                                        if ($line === '') {
+                                                            $formattedLines[] = $line;
+                                                            continue;
+                                                        }
+                                                        if (preg_match('/^(.*? - )([^:]+)(: .*)$/', $line, $matches)) {
+                                                            $formattedLines[] = $matches[1] . \Illuminate\Support\Str::title($matches[2]) . $matches[3];
+                                                        } else {
+                                                            $formattedLines[] = $line;
+                                                        }
+                                                    }
+                                                    $formattedRemarks = implode(PHP_EOL, $formattedLines);
+                                                @endphp
                                                 <div class="p-3 bg-light rounded italic small">
-                                                    {{ $complaint->remarks ?? 'No remarks yet.' }}
+                                                    {!! $formattedRemarks !== '' ? nl2br(e($formattedRemarks)) : 'No remarks yet.' !!}
                                                 </div>
                                             </div>
                                             <div class="modal-footer border-0">

@@ -2,7 +2,8 @@
                 <div class="container main-nav">
                     <div class="main-nav-start" >
                         <div style="display:inline-block; margin-right:12px;">
-                            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}
+                            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}"
+                                alt="logo" style="width:50px; height:auto; display:block;">
                         </div>
                     </div>
                     <div class="main-nav-end">

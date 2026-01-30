@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Complaints;
 
@@ -54,8 +55,24 @@ class ComplaintController extends Controller
         ]);
 
         $complaint->status = $request->status;
-        $complaint->remarks = $request->remarks;
         $complaint->respondent_id = $respondent;
+
+        $newRemarks = trim((string) $request->remarks);
+        if ($newRemarks !== '') {
+            $user = Auth::user();
+            $remarkerName = trim(($user->firstName ?? '') . ' ' . ($user->lastName ?? ''));
+            if ($remarkerName === '') {
+                $remarkerName = $user->name ?? $user->email ?? 'Unknown';
+            }
+            $remarkerName = Str::title($remarkerName);
+
+            $timestamp = now()->format('M d, Y g:i A');
+            $entry = $timestamp . ' - ' . $remarkerName . ': ' . $newRemarks;
+            $existingRemarks = trim((string) $complaint->remarks);
+            $complaint->remarks = $existingRemarks === ''
+                ? $entry
+                : $existingRemarks . PHP_EOL . $entry;
+        }
 
         $complaint->save();
 

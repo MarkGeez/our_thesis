@@ -10,10 +10,12 @@
 
 <style>
     .official-card {
-        border: 1px solid #e5e7eb;
+        border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 14px;
-        background: #ffffff;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         height: 100%;
         display: flex;
@@ -85,6 +87,16 @@
         margin-top: auto;
     }
 
+    .official-card-public .official-slot,
+    .official-card-public .official-name,
+    .official-card-public .official-meta {
+        color: #ffffff;
+    }
+
+    .official-card-public .official-card-header {
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+    }
+
     .official-action-title {
         font-weight: 700;
         font-size: 0.85rem;
@@ -116,13 +128,15 @@
                 : 'https://ui-avatars.com/api/?name=' . urlencode($slot) . '&background=0D6EFD&color=fff&size=128';
         @endphp
         <div class="col-12 col-md-6 col-xl-4">
-            <div class="official-card">
+            <div class="official-card {{ $showControls ? '' : 'official-card-public' }}">
                 <div class="official-card-header">
                     <span class="official-slot">{{ $slot }}</span>
-                    @if($official)
-                        <span class="badge text-bg-success">Tagged</span>
-                    @else
-                        <span class="badge text-bg-secondary">Unassigned</span>
+                    @if($showControls)
+                        @if($official)
+                            <span class="badge text-bg-success">Tagged</span>
+                        @else
+                            <span class="badge text-bg-secondary">Unassigned</span>
+                        @endif
                     @endif
                 </div>
 
@@ -131,13 +145,17 @@
                         <img src="{{ $avatar }}" alt="Official Photo" class="official-avatar">
                     </div>
                     <div class="flex-grow-1">
-                        <p class="official-name mb-1">{{ $resident ? ucwords(strtolower($resident->firstName.' '.$resident->lastName)) : 'No resident assigned' }}</p>
+                        @if($resident)
+                            <p class="official-name mb-1">{{ ucwords(strtolower($resident->firstName.' '.$resident->lastName)) }}</p>
+                        @elseif($showControls)
+                            <p class="official-name mb-1">No resident assigned</p>
+                        @endif
                         <p class="official-meta mb-0">
                             @if($official && $official->start && $official->end)
                                 Term: {{ date('M d, Y', strtotime($official->start)) }} - {{ date('M d, Y', strtotime($official->end)) }}
                             @elseif($official)
                                 Term dates not set yet.
-                            @else
+                            @elseif($showControls)
                                 Tag a resident to display in this slot.
                             @endif
                         </p>

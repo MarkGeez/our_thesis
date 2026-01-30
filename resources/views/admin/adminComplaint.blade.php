@@ -210,14 +210,32 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <strong>Status</strong>
                                             <span class="status-container status-{{ $complaints->status }}">
-                                                {{ ucfirst($complaints->status) }}
+                                                {{ ucfirst($complaints->status === 'pending' ? 'processing' : $complaints->status) }}
                                             </span>
                                         </div>
                                         
                                         @if($complaints->remarks)
+                                            @php
+                                                $remarksText = $complaints->remarks ?? '';
+                                                $lines = preg_split("/\r\n|\n|\r/", $remarksText);
+                                                $formattedLines = [];
+                                                foreach ($lines as $line) {
+                                                    $line = trim($line);
+                                                    if ($line === '') {
+                                                        $formattedLines[] = $line;
+                                                        continue;
+                                                    }
+                                                    if (preg_match('/^(.*? - )([^:]+)(: .*)$/', $line, $matches)) {
+                                                        $formattedLines[] = $matches[1] . \Illuminate\Support\Str::title($matches[2]) . $matches[3];
+                                                    } else {
+                                                        $formattedLines[] = $line;
+                                                    }
+                                                }
+                                                $formattedRemarks = implode(PHP_EOL, $formattedLines);
+                                            @endphp
                                             <div class="remarks-box w-100">
                                                 <span class="remarks-label">Official Remarks</span>
-                                                {{ $complaints->remarks }}
+                                                {!! nl2br(e($formattedRemarks)) !!}
                                             </div>
                                         @endif
                                     </div>
