@@ -12,4 +12,15 @@ class HouseholdResident extends Pivot
     protected $casts = [
         'is_household_head' => 'boolean',
     ];
+
+    public function resident()
+    {
+    return $this->belongsTo(Resident::class);
+    }
+
+    public function household()
+    {
+    return $this->belongsTo(Household::class);
+    }
+
 }

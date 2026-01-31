@@ -83,7 +83,7 @@
                             </div>
 
                             <div class="d-grid">
-                                <a href="{{ route('admin.streets.show', $streets->id) }}" 
+                                <a href="{{ route('admin.households.streets', $streets->id) }}" 
                                    class="btn btn-outline-primary btn-sm">
                                     View Houses <i class="fas fa-arrow-right ms-2"></i>
                                 </a>

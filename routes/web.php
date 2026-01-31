@@ -138,8 +138,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 
     Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
-    Route::get('/household-management/{id}', [HouseholdController::class, 'showStreets'])->name('streets.show');
-    Route::get('/household-management/houses/{id}', [HouseholdController::class, 'showHeads'])->name('householdHead');
+    Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
+    Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
+
 
 
     Route::get('/census', [AdminController::class,'census'])->name('census');
