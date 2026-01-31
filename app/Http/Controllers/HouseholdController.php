@@ -21,7 +21,18 @@ class HouseholdController extends Controller
 
     public function showStreets($id)
 {
-    $houses = House::where('street_id', $id)->get();
+    $houses = House::where('street_id', $id)
+        ->withCount('households')
+        ->get();
+    
+    // Return JSON for AJAX requests
+    if (request()->ajax() || request()->wantsJson()) {
+        return response()->json([
+            'success' => true,
+            'houses' => $houses
+        ]);
+    }
+    
     return view('admin.houses', compact('houses'));
 }
 
@@ -29,12 +40,21 @@ class HouseholdController extends Controller
 {
     $house = House::findOrFail($id);
 
-    $heads = HouseholdResident::with('resident:id,firstName,lastName,contactNo,birthday')
+    $heads = HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
         ->whereHas('household', function ($q) use ($id) {
             $q->where('house_id', $id);
         })
         ->where('is_household_head', true)
         ->get();
+
+    // Return JSON for AJAX requests
+    if (request()->ajax() || request()->wantsJson()) {
+        return response()->json([
+            'success' => true,
+            'heads' => $heads,
+            'house' => $house
+        ]);
+    }
 
     return view('admin.househeads', compact('heads', 'house'));
 }
