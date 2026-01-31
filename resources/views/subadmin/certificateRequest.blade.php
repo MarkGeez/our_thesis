@@ -14,7 +14,7 @@
         @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
         <main class="main users chart-page" id="skip-target">
             <div class="container mt-4">
-                <h2 class="mb-4"><i class="fas fa-file-lines"></i> My Documents (Certificates)</h2>
+                <h2 class="mb-4"><i class="fas fa-certificate"></i> Certificate Requests</h2>
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
                         <i class="fas fa-check-circle me-3"></i>
@@ -62,7 +62,7 @@
                         </form>
                     </div>
                 </div>
-                <h5 class="mb-3">My Requests</h5>
+                <h5 class="mb-3">My Certificate Requests</h5>
                 @if($requests->isEmpty())
                     <div class="alert alert-info">You have not submitted any certificate requests yet.</div>
                 @else

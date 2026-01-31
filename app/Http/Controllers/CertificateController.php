@@ -1,0 +1,184 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\CertificateRequest;
+use App\Models\Official;
+use App\Models\Resident;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+
+class CertificateController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'certificate_type' => 'required|in:bonafide,indigency,soloparent,senior',
+            'purpose' => 'required|string|max:500',
+            'address' => 'nullable|string|max:255',
+            'request_data' => 'nullable|array',
+        ]);
+
+        $user = Auth::user();
+        $resident = Resident::where('user_id', $user->id)->first();
+
+        $data = $validated['request_data'] ?? [];
+        if (!empty($validated['address'])) {
+            $data['address'] = $validated['address'];
+        }
+
+        CertificateRequest::create([
+            'user_id' => $user->id,
+            'resident_id' => $resident?->id,
+            'certificate_type' => $validated['certificate_type'],
+            'purpose' => $validated['purpose'],
+            'request_data' => $data,
+            'status' => 'pending',
+        ]);
+
+        $route = match ($user->role) {
+            'admin' => 'admin.adminCertificate',
+            'subadmin' => 'subadmin.subadminCertificate',
+            default => 'resident.certificate',
+        };
+
+        return redirect()->route($route)->with('success', 'Certificate request submitted successfully.');
+    }
+
+    public function approve(int $id)
+    {
+        $req = CertificateRequest::findOrFail($id);
+        if ($req->status !== 'pending') {
+            return back()->with('error', 'Request is no longer pending.');
+        }
+        $req->update([
+            'status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => Auth::id(),
+            'decline_reason' => null,
+        ]);
+        return back()->with('success', 'Certificate request approved. Requester may pick up at admin\'s house.');
+    }
+
+    public function reject(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'decline_reason' => 'nullable|string|max:500',
+        ]);
+        $req = CertificateRequest::findOrFail($id);
+        if ($req->status !== 'pending') {
+            return back()->with('error', 'Request is no longer pending.');
+        }
+        $req->update([
+            'status' => 'declined',
+            'decline_reason' => $validated['decline_reason'] ?? null,
+            'approved_at' => null,
+            'approved_by' => null,
+        ]);
+        return back()->with('success', 'Certificate request declined.');
+    }
+
+    public function preview(int $id): View
+    {
+        $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
+        if ($req->status !== 'approved' && $req->status !== 'picked_up') {
+            abort(403, 'Certificate is not yet approved.');
+        }
+        return $this->certificateView($req, false, true);
+    }
+
+    public function generate(int $id): View
+    {
+        $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
+        if ($req->status !== 'approved' && $req->status !== 'picked_up') {
+            abort(403, 'Certificate is not yet approved.');
+        }
+        return $this->certificateView($req, true, false);
+    }
+
+    public function printWithData(Request $request): View
+    {
+        $id = $request->input('certificate_id');
+        $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
+        if ($req->status !== 'approved' && $req->status !== 'picked_up') {
+            abort(403, 'Certificate is not yet approved.');
+        }
+
+        $name = $request->input('name', ucwords(strtolower($req->requester_name)));
+        $address = $request->input('address', ucwords(strtolower($req->requester_address)));
+        $data = $req->request_data ?? [];
+        $submitted = $request->input('request_data', []);
+        foreach ($submitted as $k => $v) {
+            $data[$k] = $v;
+        }
+        // Clear checkbox keys not in submitted (user unchecked them)
+        $checkboxKeys = ['bonafide','medical','hospital','postal','school','referral','transaction','overseas','Ccalamity','sss','others','married_to','no_knowledge_whereabouts','separated'];
+        foreach ($checkboxKeys as $k) {
+            if (!array_key_exists($k, $submitted)) {
+                $data[$k] = null;
+            }
+        }
+
+        $issued = $req->approved_at ?? now();
+        if ($request->filled('issued_day') && $request->filled('issued_month') && $request->filled('issued_year')) {
+            try {
+                $issued = \Carbon\Carbon::parse(
+                    $request->input('issued_day') . ' ' . $request->input('issued_month') . ' ' . $request->input('issued_year')
+                );
+            } catch (\Exception $e) {
+                // keep default
+            }
+        }
+
+        $purpose = $req->purpose;
+        $forPrint = true;
+        $editable = false;
+
+        $certificatePositions = [
+            'Barangay Chairman', 'Kagawad 1', 'Kagawad 2', 'Kagawad 3', 'Kagawad 4',
+            'Kagawad 5', 'Kagawad 6', 'Kagawad 7', 'Barangay Secretary', 'Barangay Treasurer', 'SK Chairman',
+        ];
+        $officialsByPosition = Official::with('resident:id,firstName,middleName,lastName,image_path')
+            ->whereIn('position', $certificatePositions)
+            ->get()
+            ->keyBy('position');
+
+        $view = match ($req->certificate_type) {
+            'bonafide' => 'certificate.print.bonafide',
+            'indigency' => 'certificate.print.indigency',
+            'soloparent' => 'certificate.print.soloparent',
+            'senior' => 'certificate.print.senior',
+            default => 'certificate.print.bonafide',
+        };
+
+        return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
+    }
+
+    private function certificateView(CertificateRequest $req, bool $forPrint, bool $editable = false): View
+    {
+        $view = match ($req->certificate_type) {
+            'bonafide' => 'certificate.print.bonafide',
+            'indigency' => 'certificate.print.indigency',
+            'soloparent' => 'certificate.print.soloparent',
+            'senior' => 'certificate.print.senior',
+            default => 'certificate.print.bonafide',
+        };
+        $name = ucwords(strtolower($req->requester_name));
+        $address = ucwords(strtolower($req->requester_address));
+        $purpose = $req->purpose;
+        $data = $req->request_data ?? [];
+        $issued = $req->approved_at ?? now();
+
+        $certificatePositions = [
+            'Barangay Chairman', 'Kagawad 1', 'Kagawad 2', 'Kagawad 3', 'Kagawad 4',
+            'Kagawad 5', 'Kagawad 6', 'Kagawad 7', 'Barangay Secretary', 'Barangay Treasurer', 'SK Chairman',
+        ];
+        $officialsByPosition = Official::with('resident:id,firstName,middleName,lastName,image_path')
+            ->whereIn('position', $certificatePositions)
+            ->get()
+            ->keyBy('position');
+
+        return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
+    }
+}

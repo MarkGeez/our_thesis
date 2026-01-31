@@ -125,7 +125,15 @@ class SubAdminController extends Controller
     public function certificateRequest(): View
     {
         $subadmin = Auth::user();
-        return view("subadmin.certificateRequest", compact('subadmin'));
+        $requests = $subadmin->certificateRequests()->latest()->get();
+        return view("subadmin.certificateRequest", compact('subadmin', 'requests'));
+    }
+
+    public function subadminCertificate(): View
+    {
+        $subadmin = Auth::user();
+        $requests = $subadmin->certificateRequests()->latest()->get();
+        return view("subadmin.subadminCertificate", compact('subadmin', 'requests'));
     }
 
     public function clearanceRequest(): View

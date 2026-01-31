@@ -78,6 +78,11 @@ class User extends Authenticatable
         return $this->hasOne(Resident::class, 'user_id');
     }
 
+    public function certificateRequests(): HasMany
+    {
+        return $this->hasMany(CertificateRequest::class, 'user_id');
+    }
+
    
    
 }

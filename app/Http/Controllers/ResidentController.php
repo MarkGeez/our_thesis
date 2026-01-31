@@ -112,9 +112,9 @@ class ResidentController extends Controller
 
     public function certificate()
     {
-                $resident = auth()->user();
-
-        return view('resident.certificate', compact('resident'));
+        $resident = auth()->user();
+        $requests = $resident->certificateRequests()->latest()->get();
+        return view('resident.certificate', compact('resident', 'requests'));
     }
 
     public function clearance()

@@ -18,7 +18,7 @@ use App\Http\Controllers\UserListController;
 use App\Http\Controllers\OfficialController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\HouseholdController;
-
+use App\Http\Controllers\CertificateController;
 
 
 
@@ -53,6 +53,7 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
         Route::get('/certificate', [ResidentController::class,'certificate'])->name('certificate');
+        Route::post('/certificate/request', [CertificateController::class, 'store'])->name('certificate.request.store');
         Route::get('/clearance', [ResidentController::class,'clearance'])->name('clearance');
         Route::get('/service', [ServiceController::class,'residentIndex'])->name('service');
         Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
@@ -109,6 +110,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
+    Route::post('/certificate/request', [CertificateController::class, 'store'])->name('certificate.request.store');
+    Route::post('/certificate/approve/{id}', [CertificateController::class, 'approve'])->name('certificate.approve');
+    Route::post('/certificate/reject/{id}', [CertificateController::class, 'reject'])->name('certificate.reject');
+    Route::get('/certificate/preview/{id}', [CertificateController::class, 'preview'])->name('certificate.preview');
+    Route::get('/certificate/generate/{id}', [CertificateController::class, 'generate'])->name('certificate.generate');
+    Route::post('/certificate/print-with-data', [CertificateController::class, 'printWithData'])->name('certificate.printWithData');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
     Route::get('/serviceRequest', [ServiceRequestController::class,'adminIndex'])->name('serviceRequest');
     Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
@@ -190,6 +197,7 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
 
 
         Route::get('/certificateRequest', [SubAdminController::class,'certificateRequest'])->name('certificateRequest');
+        Route::post('/certificate/request', [CertificateController::class, 'store'])->name('certificate.request.store');
         Route::get('/clearanceRequest', [SubAdminController::class,'clearanceRequest'])->name('clearanceRequest');
         Route::get('/serviceRequest', [ServiceRequestController::class,'subadminIndex'])->name('serviceRequest');
         Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');

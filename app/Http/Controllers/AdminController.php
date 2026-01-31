@@ -17,6 +17,7 @@ use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Archive;
+use App\Models\CertificateRequest;
 
 class AdminController extends Controller
 {
@@ -65,7 +66,10 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        return view("admin.certificateRequest", compact('admin'));
+        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName,houseNo,street'])
+            ->latest()
+            ->get();
+        return view("admin.certificateRequest", compact('admin', 'requests'));
     }
     
     public function clearanceRequest(): View
@@ -181,7 +185,8 @@ class AdminController extends Controller
     public function adminCertificate(): View
     {
         $admin = Auth::user();
-        return view("admin.adminCertificate", compact('admin'));
+        $requests = $admin->certificateRequests()->latest()->get();
+        return view("admin.adminCertificate", compact('admin', 'requests'));
     }
 
     
