@@ -116,6 +116,24 @@
     </div>
 </div>
 
+{{-- Decline reason modal --}}
+<div class="modal fade" id="declineReasonModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Decline Reason</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="declineReasonText" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
@@ -151,6 +169,15 @@ document.getElementById('certificatePrintBtn').addEventListener('click', functio
     } catch (e) {
         var id = this.getAttribute('data-current-id');
         if (id) window.open('{{ route("admin.certificate.generate", ["id" => 0]) }}'.replace(/\/0$/, '/' + id), '_blank');
+    }
+});
+
+// Decline reason modal content
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-bs-target="#declineReasonModal"][data-reason]');
+    if (btn) {
+        var reason = btn.getAttribute('data-reason') || 'No reason provided.';
+        document.getElementById('declineReasonText').textContent = reason;
     }
 });
 </script>

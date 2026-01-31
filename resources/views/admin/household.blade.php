@@ -42,7 +42,7 @@
 
     /* Modal Styles */
     .modal-header {
-        background: #0d6efd;
+        background: #dbdbdb;
         color: white;
         border-radius: 0;
     }
@@ -52,8 +52,8 @@
     }
 
     .modal-title {
-        font-family: 'Orbitron', sans-serif;
-        font-weight: 700;
+        font-family: 'Bebas Neue', sans-serif;
+        color: #333333;
     }
 
     .modal-body {

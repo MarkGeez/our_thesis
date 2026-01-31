@@ -91,9 +91,13 @@ class CertificateController extends Controller
     public function generate(int $id): View
     {
         $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
-        if ($req->status !== 'approved' && $req->status !== 'picked_up') {
+        if ($req->status !== 'approved') {
+            if ($req->status === 'picked_up') {
+                abort(403, 'Certificate has already been printed.');
+            }
             abort(403, 'Certificate is not yet approved.');
         }
+        $req->update(['status' => 'picked_up']);
         return $this->certificateView($req, true, false);
     }
 
@@ -101,7 +105,10 @@ class CertificateController extends Controller
     {
         $id = $request->input('certificate_id');
         $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
-        if ($req->status !== 'approved' && $req->status !== 'picked_up') {
+        if ($req->status !== 'approved') {
+            if ($req->status === 'picked_up') {
+                abort(403, 'Certificate has already been printed.');
+            }
             abort(403, 'Certificate is not yet approved.');
         }
 
@@ -151,6 +158,8 @@ class CertificateController extends Controller
             'senior' => 'certificate.print.senior',
             default => 'certificate.print.bonafide',
         };
+
+        $req->update(['status' => 'picked_up']);
 
         return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
     }

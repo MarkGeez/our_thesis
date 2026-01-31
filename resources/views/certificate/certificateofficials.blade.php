@@ -3,8 +3,10 @@
     $chairman = $officialsByPosition->get('Barangay Chairman');
     $chairmanResident = $chairman?->resident;
     $chairmanPhoto = $chairmanResident && $chairmanResident->image_path
-        ? asset('storage/' . $chairmanResident->image_path)
-        : (asset('template/img/barangay-logo.png'));
+        ? (\Illuminate\Support\Facades\Storage::disk('public')->exists($chairmanResident->image_path)
+            ? \Illuminate\Support\Facades\Storage::url($chairmanResident->image_path)
+            : asset('storage/' . ltrim($chairmanResident->image_path, '/')))
+        : asset('template/img/barangay-logo.png');
     $chairmanName = $chairmanResident
         ? ucwords(strtolower(trim($chairmanResident->firstName . ' ' . $chairmanResident->middleName . ' ' . $chairmanResident->lastName)))
         : '';
