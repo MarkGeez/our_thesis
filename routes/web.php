@@ -105,8 +105,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
     Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
     Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
+    Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
 
-    
+
 
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
@@ -175,7 +176,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::put('/residents/{id}', [ResidentListController::class, 'updateResident'])->name('update.resident');
     Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
-
+    
 
 });
 

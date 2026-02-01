@@ -251,6 +251,8 @@
             @endif
         </div>
     </div>
+    @include("profileforms.addMember")
+
 
     @if($admin->proofOfIdentity)
         <div class="modal fade" id="proofModalAdmin" tabindex="-1" aria-labelledby="proofModalAdminLabel" aria-hidden="true">

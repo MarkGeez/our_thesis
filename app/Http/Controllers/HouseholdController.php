@@ -7,6 +7,7 @@ use App\Models\Street;
 use App\Models\House;
 use App\Models\HouseholdResident;
 use App\Models\Household;
+use App\Models\Resident;
 
 
 
@@ -58,6 +59,46 @@ class HouseholdController extends Controller
 
     return view('admin.househeads', compact('heads', 'house'));
 }
+    public function storeFamilyMember(Request $request)
+{
+    $user = auth()->user();
+
+    // Get logged-in resident
+    $resident = Resident::where('user_id', $user->id)->firstOrFail();
+
+    // Find household of the resident
+    $household = HouseholdResident::where('resident_id', $resident->id)
+        ->with('household')
+        ->firstOrFail()
+        ->household;
+
+    // Validate
+    $validated = $request->validate([
+        'firstName' => 'required|string|max:70',
+        'middleName' => 'nullable|string|max:70',
+        'lastName' => 'required|string|max:70',
+        'birthday' => 'required|date',
+        'sex' => 'required|in:male,female',
+        'contactNo' => 'nullable|string|max:11',
+    ]);
+
+    // Create resident
+    $family = Resident::create([
+        ...$validated,
+        'EncodedBy' => $user->id,
+        'headOfFamily' => 'no',
+    ]);
+
+    // Attach to SAME household
+    HouseholdResident::create([
+        'household_id' => $household->id,
+        'resident_id'  => $family->id,
+        'is_household_head' => false,
+    ]);
+
+    return back()->with('success', 'Family member added.');
+}
+
 
     
 }
