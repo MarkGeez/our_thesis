@@ -103,7 +103,7 @@
       <p style="font-size:14px">It is further certified that the above named person as known to be of good moral character and without any derogatory record in this BARANGAY. </p>
       <div style="font-weight:bold;margin-top:10px">This Certification is being issued upon the request of the bearer for: AS REQUIREMENTS AND/OR TO SUPPORT HIS/HER.</div>
       <div style="margin-top:10px">
-        <label class="check-item"><input type="checkbox" name="bonafide"> BONAFIDE RESIDENT</label>
+          <label class="check-item"><input type="checkbox" name="bonafide"> BONAFIDE RESIDENT</label>
         <label class="check-item"><input type="checkbox" name="medical"> MEDICAL TREATMENT</label>
         <label class="check-item"><input type="checkbox" name="hospital"> HOSPITALIZATION</label>
         <label class="check-item"><input type="checkbox" name="postal"> APPLICATION FOR POSTAL ID</label>
@@ -130,7 +130,7 @@
 
 </div>
 
-<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;padding:10px 18px;background:#0a3a8a;color:white;border:none;border-radius:4px;font-size:14px;cursor:pointer">Print Certificate</button>
-
+<!--<button onclick="window.print()" style="position:fixed;bottom:20px;right:20px;padding:10px 18px;background:#0a3a8a;color:white;border:none;border-radius:4px;font-size:14px;cursor:pointer">Print Certificate</button>
+-->
 </body>
 </html>
