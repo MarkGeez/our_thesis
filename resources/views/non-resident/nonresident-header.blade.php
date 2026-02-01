@@ -33,7 +33,7 @@
                                 </li>
                                 <hr>
                                 <li>
-                                    <a href="##">
+                                    <a href="{{ route('non-resident.profile') }}">
                                         <i data-feather="user" aria-hidden="true"></i>
                                         <span>Profile</span>
                                     </a>

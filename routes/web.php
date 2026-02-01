@@ -117,6 +117,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/certificate/preview/{id}', [CertificateController::class, 'preview'])->name('certificate.preview');
     Route::get('/certificate/generate/{id}', [CertificateController::class, 'generate'])->name('certificate.generate');
     Route::post('/certificate/print-with-data', [CertificateController::class, 'printWithData'])->name('certificate.printWithData');
+    Route::get('/certificate/history/{userId}', [CertificateController::class, 'history'])->name('certificate.history');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
     Route::get('/serviceRequest', [ServiceRequestController::class,'adminIndex'])->name('serviceRequest');
     Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');

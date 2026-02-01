@@ -69,7 +69,17 @@ class AdminController extends Controller
         $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName,houseNo,street'])
             ->latest()
             ->get();
-        return view("admin.certificateRequest", compact('admin', 'requests'));
+        
+        // Get request stats for each user
+        $requestStats = CertificateRequest::selectRaw('user_id, COUNT(*) as total, 
+            SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
+            SUM(CASE WHEN status = "declined" THEN 1 ELSE 0 END) as declined,
+            SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending')
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
+        
+        return view("admin.certificateRequest", compact('admin', 'requests', 'requestStats'));
     }
     
     public function clearanceRequest(): View

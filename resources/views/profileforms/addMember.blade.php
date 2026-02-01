@@ -2,21 +2,64 @@
     $user= auth()->user();
 @endphp
 
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Family Member</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route($user->role . '.family.store') }}">
+                @csrf
 
-<form method="POST" action="{{ route($user->role . '.family.store') }}">
-@csrf
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" required placeholder="Enter first name">
+                    </div>
 
-<input name="firstName" required>
-<input name="middleName">
-<input name="lastName" required>
-<input type="date" name="birthday" required>
+                    <div class="col-md-4 mb-3">
+                        <label for="middleName" class="form-label">Middle Name</label>
+                        <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Enter middle name">
+                    </div>
 
-<select name="sex">
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-</select>
+                    <div class="col-md-4 mb-3">
+                        <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" required placeholder="Enter last name">
+                    </div>
+                </div>
 
-<input name="contactNo">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="birthday" class="form-label">Birthday <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="birthday" name="birthday" required>
+                    </div>
 
-<button type="submit">Add Family Member</button>
-</form>
+                    <div class="col-md-6 mb-3">
+                        <label for="sex" class="form-label">Sex <span class="text-danger">*</span></label>
+                        <select class="form-select" id="sex" name="sex" required>
+                            <option value="" selected disabled>Select sex</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="contactNo" class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" id="contactNo" name="contactNo" placeholder="Enter contact number">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Family Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

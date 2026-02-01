@@ -33,7 +33,7 @@
                                 </li>
                                 <hr>
                                 <li>
-                                    <a href="##">
+                                    <a href="{{ route('subadmin.profile') }}">
                                         <i data-feather="user" aria-hidden="true"></i>
                                         <span>Profile</span>
                                     </a>

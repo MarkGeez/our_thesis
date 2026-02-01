@@ -164,6 +164,37 @@ class CertificateController extends Controller
         return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
     }
 
+    public function history(int $userId)
+    {
+        $requests = CertificateRequest::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($req) {
+                return [
+                    'id' => $req->id,
+                    'certificate_type' => ucfirst($req->certificate_type),
+                    'purpose' => \Illuminate\Support\Str::limit($req->purpose, 40),
+                    'status' => $req->status,
+                    'created_at' => $req->created_at->format('M d, Y H:i'),
+                ];
+            });
+
+        $stats = [
+            'total' => $requests->count(),
+            'approved' => $requests->where('status', 'approved')->count(),
+            'declined' => $requests->where('status', 'declined')->count(),
+            'pending' => $requests->where('status', 'pending')->count(),
+        ];
+
+        return response()->json([
+            'requests' => $requests,
+            'total' => $stats['total'],
+            'approved' => $stats['approved'],
+            'declined' => $stats['declined'],
+            'pending' => $stats['pending'],
+        ]);
+    }
+
     private function certificateView(CertificateRequest $req, bool $forPrint, bool $editable = false): View
     {
         $view = match ($req->certificate_type) {
