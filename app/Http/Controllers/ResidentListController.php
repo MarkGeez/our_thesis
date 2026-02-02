@@ -175,8 +175,7 @@ public function searchResidents(Request $request)
 {
     // Validate the request
     $validated = $request->validate([
-        'houseNo' => 'required|string|max:8',
-        'street' => 'required|string|max:70',
+        'house_id' => 'required|exists:houses,id',
         'contactNo' => 'required|string|max:11',
         'birthday' => 'required|date',
         'emergencyContactNo' => 'required|string|max:11',
@@ -198,6 +197,25 @@ public function searchResidents(Request $request)
     if (!in_array($user->role, ['admin', 'subadmin']) && $resident->user_id !== $user->id) {
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
+
+    // Update household assignment
+    $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
+    $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
+
+    if ($householdResident) {
+        $householdResident->update([
+            'household_id' => $household->id,
+            'is_household_head' => $validated['headOfFamily'] === 'yes',
+        ]);
+    } else {
+        HouseholdResident::create([
+            'household_id' => $household->id,
+            'resident_id' => $resident->id,
+            'is_household_head' => $validated['headOfFamily'] === 'yes',
+        ]);
+    }
+
+    unset($validated['house_id']);
 
     // Update the resident
     $resident->update($validated);

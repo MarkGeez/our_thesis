@@ -149,7 +149,17 @@
 
                 <div class="row mb-2">
                     <div class="col-5 text-muted">Address</div>
-                    <div class="col-7">{{ $resident->houseNo }} {{ $resident->street }}</div>
+                    <div class="col-7">
+                        @if($resident && $resident->households->first() && $resident->households->first()->house)
+                            @php
+                                $house = $resident->households->first()->house;
+                                $street = optional($house)->street;
+                            @endphp
+                            {{ $house->house_no ?? 'N/A' }} {{ optional($street)->street_name ?? '' }}
+                        @else
+                            N/A
+                        @endif
+                    </div>
                 </div>
 
                 <div class="row mb-2">

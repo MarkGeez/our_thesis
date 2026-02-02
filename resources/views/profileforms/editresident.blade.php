@@ -30,19 +30,33 @@
     @method('PUT')
 
     <div class="card-body">
+        @php
+            $currentHouse = optional($resident->households->first())->house;
+            $currentStreetId = optional($currentHouse)->street_id;
+            $currentHouseId = optional($currentHouse)->id;
+        @endphp
+
         <h6 class="text-muted mb-3">Address Information</h6>
 
         <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label">House No.</label>
-                <input type="text" name="houseNo" class="form-control form-control-lg"
-                       value="{{ old('houseNo', $resident->houseNo) }}" required>
+            <div class="col-md-6">
+                <label class="form-label">Street</label>
+                <select id="edit_street_id_{{ $resident->id }}" class="form-select form-control-lg" required>
+                    <option value="">-- Select Street --</option>
+                    @foreach ($streets as $street)
+                        <option value="{{ $street->id }}" 
+                            {{ old('street_id', $currentStreetId) == $street->id ? 'selected' : '' }}>
+                            {{ $street->street_name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            <div class="col-md-9">
-                <label class="form-label">Street</label>
-                <input type="text" name="street" class="form-control form-control-lg"
-                       value="{{ old('street', $resident->street) }}" required>
+            <div class="col-md-6">
+                <label class="form-label">House No.</label>
+                <select name="house_id" id="edit_house_id_{{ $resident->id }}" class="form-select form-control-lg" required>
+                    <option value="">-- Select House Number --</option>
+                </select>
             </div>
         </div>
 
@@ -158,7 +172,7 @@
         const resOpenDate = document.getElementById('resident_openDate');
         const rawDate = "{{ old('birthday', $resident->birthday) }}";
         
-      
+        // Birthday handling
         if (rawDate && resBirthday) {
             const d = new Date(rawDate);
             if (!isNaN(d)) {
@@ -168,7 +182,6 @@
             }
         }
         
-  
         if (resOpenDate && resBirthday) {
             resOpenDate.addEventListener('click', function () {
                 if (resBirthday.showPicker) {
@@ -176,6 +189,47 @@
                 } else {
                     resBirthday.focus();
                 }
+            });
+        }
+
+        // Street and House dropdown relationship
+        const houses = @json($houses ?? []);
+        const residentId = "{{ $resident->id }}";
+        const streetSelect = document.getElementById('edit_street_id_' + residentId);
+        const houseSelect = document.getElementById('edit_house_id_' + residentId);
+        const currentHouseId = "{{ old('house_id', $currentHouseId) }}";
+
+        if (streetSelect && houseSelect) {
+            // Function to populate house dropdown
+            function populateHouses(streetId, selectedHouseId = null) {
+                houseSelect.innerHTML = '<option value="">-- Select House Number --</option>';
+                
+                if (!streetId) return;
+
+                houses.forEach(house => {
+                    if (String(house.street_id) === String(streetId)) {
+                        const option = document.createElement('option');
+                        option.value = house.id;
+                        option.textContent = house.house_no;
+                        
+                        // Select the current house if it matches
+                        if (selectedHouseId && String(house.id) === String(selectedHouseId)) {
+                            option.selected = true;
+                        }
+                        
+                        houseSelect.appendChild(option);
+                    }
+                });
+            }
+
+            // Initialize houses on page load if street is already selected
+            if (streetSelect.value) {
+                populateHouses(streetSelect.value, currentHouseId);
+            }
+
+            // Update houses when street changes
+            streetSelect.addEventListener('change', function () {
+                populateHouses(this.value);
             });
         }
     });

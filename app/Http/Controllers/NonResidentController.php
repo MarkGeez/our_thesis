@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Announcement;
 use App\Models\Resident;
+use App\Models\Household;
+use App\Models\HouseholdResident;
 use App\Models\Official;
 
 

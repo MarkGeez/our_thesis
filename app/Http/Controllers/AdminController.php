@@ -40,11 +40,15 @@ class AdminController extends Controller
     $admin = auth()->user();
     
     // Try to find resident by matching firstName, lastName
-    $resident = Resident::where('firstName', $admin->firstName)
+    $resident = Resident::with('households.house.street')
+                        ->where('firstName', $admin->firstName)
                         ->where('lastName', $admin->lastName)
                         ->first();
     
-    return view('admin.profile', compact('admin', 'resident'));
+    $streets = \App\Models\Street::has('houses')->get();
+    $houses = \App\Models\House::all();
+    
+    return view('admin.profile', compact('admin', 'resident', 'streets', 'houses'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();
