@@ -49,6 +49,10 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
         Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
+        Route::get('/profile/add-family', function () {
+            return view('profileforms.addMemberPage');
+        })->name('family.add');
+        Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
 
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
@@ -103,6 +107,9 @@ Route::prefix('admin/blotter')
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
+    Route::get('/profile/add-family', function () {
+        return view('profileforms.addMemberPage');
+    })->name('family.add');
     Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
     Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
     Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
@@ -185,6 +192,10 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
     Route::prefix('subadmin')->name("subadmin.")->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
+        Route::get('/profile/add-family', function () {
+            return view('profileforms.addMemberPage');
+        })->name('family.add');
+        Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
         Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
         Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');

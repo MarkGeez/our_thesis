@@ -29,7 +29,17 @@ class ResidentController extends Controller
         $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
         $streets = \App\Models\Street::has('houses')->get();
         $houses = \App\Models\House::all();
-        return view('resident.profile', compact('resident', 'user', 'streets', 'houses'));
+        
+        // Get family members from the same household
+        $familyMembers = collect();
+        if ($resident && $resident->households->isNotEmpty()) {
+            $household = $resident->households->first();
+            $familyMembers = $household->residents()
+                ->where('residents.id', '!=', $resident->id)
+                ->get();
+        }
+        
+        return view('resident.profile', compact('resident', 'user', 'streets', 'houses', 'familyMembers'));
     }
 
     public function updateProfile(Request $request, $id)

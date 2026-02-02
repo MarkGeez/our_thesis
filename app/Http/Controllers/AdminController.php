@@ -48,7 +48,16 @@ class AdminController extends Controller
     $streets = \App\Models\Street::has('houses')->get();
     $houses = \App\Models\House::all();
     
-    return view('admin.profile', compact('admin', 'resident', 'streets', 'houses'));
+    // Get family members from the same household
+    $familyMembers = collect();
+    if ($resident && $resident->households->isNotEmpty()) {
+        $household = $resident->households->first();
+        $familyMembers = $household->residents()
+            ->where('residents.id', '!=', $resident->id)
+            ->get();
+    }
+    
+    return view('admin.profile', compact('admin', 'resident', 'streets', 'houses', 'familyMembers'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();

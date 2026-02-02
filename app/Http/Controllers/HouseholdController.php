@@ -30,7 +30,10 @@ class HouseholdController extends Controller
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
-            'houses' => $houses
+            'houses' => $houses,
+                
+
+
         ]);
     }
     
@@ -47,30 +50,52 @@ class HouseholdController extends Controller
         })
         ->where('is_household_head', true)
         ->get();
+    $members= HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
+        ->whereHas('household', function($q) use($id){
+        $q->where('house_id', $id);
+        })->where('is_household_head', false)->get();
 
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
-            'success' => true,
-            'heads' => $heads,
-            'house' => $house
-        ]);
+    'success' => true,
+    'heads' => $heads,
+    'members' => $members,
+    'house' => $house
+]);
+
     }
 
-    return view('admin.househeads', compact('heads', 'house'));
+    return view('admin.househeads', compact('heads', 'house', 'members'));
 }
     public function storeFamilyMember(Request $request)
 {
     $user = auth()->user();
 
-    // Get logged-in resident
-    $resident = Resident::where('user_id', $user->id)->firstOrFail();
+    // Get logged-in resident - try by user_id first, then by name match
+    $resident = Resident::where('user_id', $user->id)->first();
+    
+    if (!$resident) {
+        // For admin who might not have user_id set
+        $resident = Resident::where('firstName', $user->firstName)
+            ->where('lastName', $user->lastName)
+            ->first();
+    }
+    
+    if (!$resident) {
+        return back()->with('error', 'Resident record not found. Please contact administrator.');
+    }
 
     // Find household of the resident
-    $household = HouseholdResident::where('resident_id', $resident->id)
+    $householdResident = HouseholdResident::where('resident_id', $resident->id)
         ->with('household')
-        ->firstOrFail()
-        ->household;
+        ->first();
+    
+    if (!$householdResident) {
+        return back()->with('error', 'No household found. Please ensure you are assigned to a household first.');
+    }
+    
+    $household = $householdResident->household;
 
     // Validate
     $validated = $request->validate([
@@ -82,21 +107,42 @@ class HouseholdController extends Controller
         'contactNo' => 'nullable|string|max:11',
     ]);
 
-    // Create resident
-    $family = Resident::create([
-        ...$validated,
-        'EncodedBy' => $user->id,
+    // Calculate age from birthday
+    $birthday = \Carbon\Carbon::parse($validated['birthday']);
+    $age = $birthday->age;
+
+    // Get the house information from the household
+    $house = $household->house;
+    
+    // Create new resident record
+    $newResident = Resident::create([
+        'firstName' => $validated['firstName'],
+        'middleName' => $validated['middleName'] ?? '',
+        'lastName' => $validated['lastName'],
+        'birthday' => $validated['birthday'],
+        'age' => $age,
+        'sex' => $validated['sex'],
+        'contactNo' => $validated['contactNo'] ?? '',
+        'houseNo' => $house->house_no ?? '',
+        'street' => optional($house->street)->street_name ?? '',
+        'religion' => 'Not specified',
+        'emergencyContactNo' => '',
+        'emergencyContactName' => '',
+        'parent' => 'no',
+        'enrolled' => 'no',
+        'educationalAttainment' => '',
         'headOfFamily' => 'no',
+        'EncodedBy' => $user->id,
     ]);
 
     // Attach to SAME household
     HouseholdResident::create([
         'household_id' => $household->id,
-        'resident_id'  => $family->id,
+        'resident_id'  => $newResident->id,
         'is_household_head' => false,
     ]);
 
-    return back()->with('success', 'Family member added.');
+    return redirect()->route($user->role . '.profile')->with('success', 'Family member added successfully!');
 }
 
 

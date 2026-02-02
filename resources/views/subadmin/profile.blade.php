@@ -223,11 +223,49 @@
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
                     Edit Resident Info
                 </button>
+                <button class="btn btn-sm btn-outline-success" onclick="window.location.href='{{ route('subadmin.family.add') }}'">
+                    <i class="fas fa-user-plus me-1"></i>Add Family Member
+                </button>
             @endif
         </div>
     </div>
 </div>
     </div>
+
+    @if($resident && isset($familyMembers) && $familyMembers->count() > 0)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $familyMembers->count() }})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach($familyMembers as $member)
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ ucwords($member->firstName) }} {{ ucwords($member->middleName) }} {{ ucwords($member->lastName) }}</h6>
+                                        <small class="text-muted">{{ $member->age }} years old, {{ ucfirst($member->sex) }}</small>
+                                    </div>
+                                </div>
+                                <div class="small">
+                                    <div class="mb-1"><i class="fas fa-phone me-2 text-muted"></i>{{ $member->contactNo ?? 'N/A' }}</div>
+                                    <div class="mb-1"><i class="fas fa-birthday-cake me-2 text-muted"></i>{{ \Carbon\Carbon::parse($member->birthday)->format('F d, Y') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
    <div class="row">
         <div class="col-12">
