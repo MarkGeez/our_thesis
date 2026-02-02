@@ -30,7 +30,10 @@ class HouseholdController extends Controller
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
-            'houses' => $houses
+            'houses' => $houses,
+                
+
+
         ]);
     }
     
@@ -47,17 +50,23 @@ class HouseholdController extends Controller
         })
         ->where('is_household_head', true)
         ->get();
+    $members= HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
+        ->whereHas('household', function($q) use($id){
+        $q->where('house_id', $id);
+        })->where('is_household_head', false)->get();
 
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
-            'success' => true,
-            'heads' => $heads,
-            'house' => $house
-        ]);
+    'success' => true,
+    'heads' => $heads,
+    'members' => $members,
+    'house' => $house
+]);
+
     }
 
-    return view('admin.househeads', compact('heads', 'house'));
+    return view('admin.househeads', compact('heads', 'house', 'members'));
 }
     public function storeFamilyMember(Request $request)
 {
@@ -83,16 +92,12 @@ class HouseholdController extends Controller
     ]);
 
     // Create resident
-    $family = Resident::create([
-        ...$validated,
-        'EncodedBy' => $user->id,
-        'headOfFamily' => 'no',
-    ]);
+    $random = random_int(2,5);
 
     // Attach to SAME household
     HouseholdResident::create([
         'household_id' => $household->id,
-        'resident_id'  => $family->id,
+        'resident_id'  => $random,
         'is_household_head' => false,
     ]);
 
