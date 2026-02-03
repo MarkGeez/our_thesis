@@ -90,7 +90,7 @@
                                             {{ ucwords(strtolower($list->lastName)) }}
                                         </td>
                                         <td>{{ $list->email }}</td>
-                                        <td><span class="badge bg-info text-light">{{ ucfirst($list->role) }}</span></td>
+                                        <td><span class="">{{ ucfirst($list->role) }}</span></td>
                                         <td>
                                             @if($list->profile_image)
                                                 <div class="d-flex align-items-center gap-2">

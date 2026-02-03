@@ -263,7 +263,7 @@
                                 <p>Here's what's happening in your community.</p>
                             </div>
 
-                <div class="container-fluid px-3 mb-4">
+                <div class="container-fluid px-3 m-4 ">
                     <div class="row g-3">
                         <div class="col-12 col-sm-6 col-lg-3">
                             <div class="card shadow-sm border-0 h-100">
@@ -307,7 +307,7 @@
                             </div>
                         </div>
 
-                        <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="col-12 col-sm-6 col-lg-3 me-1">
                             <div class="card shadow-sm border-0 h-100">
                                 <div class="card-body d-flex align-items-center gap-3">
                                     <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
