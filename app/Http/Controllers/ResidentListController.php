@@ -175,8 +175,6 @@ public function searchResidents(Request $request)
 {
     // Validate the request
     $validated = $request->validate([
-        'houseNo' => 'required|string|max:8',
-        'street' => 'required|string|max:70',
         'contactNo' => 'required|string|max:11',
         'birthday' => 'required|date',
         'emergencyContactNo' => 'required|string|max:11',
@@ -204,4 +202,5 @@ public function searchResidents(Request $request)
 
     return redirect()->route($user->role . '.profile')->with('success', 'Resident information updated successfully.');
 }
+
 }

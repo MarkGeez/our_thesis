@@ -32,19 +32,7 @@
     <div class="card-body">
         <h6 class="text-muted mb-3">Address Information</h6>
 
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label">House No.</label>
-                <input type="text" name="houseNo" class="form-control form-control-lg"
-                       value="{{ old('houseNo', $resident->houseNo) }}" required>
-            </div>
-
-            <div class="col-md-9">
-                <label class="form-label">Street</label>
-                <input type="text" name="street" class="form-control form-control-lg"
-                       value="{{ old('street', $resident->street) }}" required>
-            </div>
-        </div>
+     
 
         <h6 class="text-muted mb-3">Personal Information</h6>
 

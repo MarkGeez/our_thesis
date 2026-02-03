@@ -9,6 +9,7 @@ use App\Models\HouseholdResident;
 use App\Models\Household;
 use App\Models\Resident;
 
+use App\Models\FamilyMember;
 
 
 
@@ -50,10 +51,10 @@ class HouseholdController extends Controller
         })
         ->where('is_household_head', true)
         ->get();
-    $members= HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
-        ->whereHas('household', function($q) use($id){
-        $q->where('house_id', $id);
-        })->where('is_household_head', false)->get();
+        
+    $members = FamilyMember::whereHas('household', function($q) use($id) {
+    $q->where('house_id', $id);
+})->get();
 
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
@@ -87,18 +88,21 @@ class HouseholdController extends Controller
         'middleName' => 'nullable|string|max:70',
         'lastName' => 'required|string|max:70',
         'birthday' => 'required|date',
+        'relationship' => 'required|string|max:70',
         'sex' => 'required|in:male,female',
-        'contactNo' => 'nullable|string|max:11',
+        'contactNumber' => 'nullable|string|max:11',
     ]);
 
-    // Create resident
-    $random = random_int(2,5);
-
-    // Attach to SAME household
-    HouseholdResident::create([
-        'household_id' => $household->id,
-        'resident_id'  => $random,
-        'is_household_head' => false,
+    FamilyMember::create([
+    'household_id' => $household->id,
+    'encoded_by' => $user->id,
+    'firstName' => $validated['firstName'],
+    'middleName' => $validated['middleName'] ?? null,
+    'lastName' => $validated['lastName'],
+    'birthdate' => $validated['birthday'],
+    'relationship' => $validated['relationship'],
+    'sex' => $validated['sex'],
+    'contactNumber' => $validated['contactNumber'] ?? '' ,
     ]);
 
     return back()->with('success', 'Family member added.');

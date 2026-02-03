@@ -12,6 +12,7 @@
 
 </head>
 
+
  <div class="layer"></div>
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
@@ -47,9 +48,15 @@
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
+             @foreach ($members as $member)
+        <h1>Family members: {{ $member->firstName }}</h1>
+        <a href="" class="btn btn-danger">untag</a>
+        <a href="" class="btn btn-danger">edit</a>
+        <form action="$"></form>
+    @endforeach
         </div>
     </div>
-
+    
     <div class="row mb-4">
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
@@ -215,8 +222,9 @@
         </div>
     </div>
 </div>
-    </div>
 
+    </div>
+   
    <div class="row">
         <div class="col-12">
 
