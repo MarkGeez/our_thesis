@@ -42,7 +42,8 @@ class AdminController extends Controller
     $admin = auth()->user();
     
     // Try to find resident by matching firstName, lastName
-    $resident = Resident::where('firstName', $admin->firstName)
+    $resident = Resident::with('households.house.street')
+                        ->where('firstName', $admin->firstName)
                         ->where('lastName', $admin->lastName)
                         ->first();
      $members = FamilyMember::where('encoded_by', $admin->id)->orderBy('firstName')->get();

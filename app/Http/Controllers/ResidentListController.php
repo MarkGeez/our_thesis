@@ -197,6 +197,25 @@ public function searchResidents(Request $request)
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
 
+    // Update household assignment
+    $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
+    $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
+
+    if ($householdResident) {
+        $householdResident->update([
+            'household_id' => $household->id,
+            'is_household_head' => $validated['headOfFamily'] === 'yes',
+        ]);
+    } else {
+        HouseholdResident::create([
+            'household_id' => $household->id,
+            'resident_id' => $resident->id,
+            'is_household_head' => $validated['headOfFamily'] === 'yes',
+        ]);
+    }
+
+    unset($validated['house_id']);
+
     // Update the resident
     $resident->update($validated);
 

@@ -156,7 +156,17 @@
 
                 <div class="row mb-2">
                     <div class="col-5 text-muted">Address</div>
-                    <div class="col-7">{{ $resident->houseNo }} {{ $resident->street }}</div>
+                    <div class="col-7">
+                        @if($resident && $resident->households->first() && $resident->households->first()->house)
+                            @php
+                                $house = $resident->households->first()->house;
+                                $street = optional($house)->street;
+                            @endphp
+                            {{ $house->house_no ?? 'N/A' }} {{ optional($street)->street_name ?? '' }}
+                        @else
+                            N/A
+                        @endif
+                    </div>
                 </div>
 
                 <div class="row mb-2">
@@ -218,13 +228,84 @@
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
                     Edit Resident Info
                 </button>
+                <button class="btn btn-sm btn-outline-success" onclick="window.location.href='{{ route('admin.family.add') }}'">
+                    <i class="fas fa-user-plus me-1"></i>Add Family Member
+                </button>
             @endif
         </div>
     </div>
 </div>
 
+    @if($members && $members->count() > 0)
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $members->count() }})</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach($members as $member)
+                        <div class="col-md-6 mb-3">
+                            <div class="border rounded p-3 h-100 position-relative">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">{{ ucwords($member->firstName) }} {{ ucwords($member->middleName ?? '') }} {{ ucwords($member->lastName) }}</h6>
+                                        <small class="text-muted">{{ ucfirst($member->sex ?? 'N/A') }}</small>
+                                    </div>
+                                    
+                                    <!-- Action buttons -->
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="#" class="btn btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('family-members.destroy', $member->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger" title="Untag" onclick="return confirm('Are you sure you want to remove this family member?')">
+                                                <i class="fas fa-user-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div class="small">
+                                    <div class="mb-1">
+                                        <i class="fas fa-phone me-2 text-muted"></i>
+                                        {{ $member->contactNumber ?? $member->contactNo ?? 'N/A' }}
+                                    </div>
+                                    <div class="mb-1">
+                                        <i class="fas fa-birthday-cake me-2 text-muted"></i>
+                                        @if($member->birthdate || $member->birthday)
+                                            {{ \Carbon\Carbon::parse($member->birthdate ?? $member->birthday)->format('F d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
+                                    @if($member->relationship)
+                                    <div class="mb-1">
+                                        <i class="fas fa-heart me-2 text-muted"></i>
+                                        {{ $member->relationship }}
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-   
+@else
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>No family members found.
+    </div>
+@endif
+
    <div class="row">
         <div class="col-12">
 
@@ -259,8 +340,8 @@
             @endif
         </div>
     </div>
-    @include("profileforms.addMember")
-
+    {{-- @include("profileforms.addMember")
+ --}}
 
     @if($admin->proofOfIdentity)
         <div class="modal fade" id="proofModalAdmin" tabindex="-1" aria-labelledby="proofModalAdminLabel" aria-hidden="true">

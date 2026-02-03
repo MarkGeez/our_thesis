@@ -13,8 +13,6 @@ class Resident extends Model
         'firstName',
         'middleName',
         'lastName',
-        'houseNo',
-        'street',
         'contactNo',
         'birthday',
         'emergencyContactNo',

@@ -73,14 +73,30 @@ class HouseholdController extends Controller
 {
     $user = auth()->user();
 
-    // Get logged-in resident
-    $resident = Resident::where('user_id', $user->id)->firstOrFail();
+    // Get logged-in resident - try by user_id first, then by name match
+    $resident = Resident::where('user_id', $user->id)->first();
+    
+    if (!$resident) {
+        // For admin who might not have user_id set
+        $resident = Resident::where('firstName', $user->firstName)
+            ->where('lastName', $user->lastName)
+            ->first();
+    }
+    
+    if (!$resident) {
+        return back()->with('error', 'Resident record not found. Please contact administrator.');
+    }
 
     // Find household of the resident
-    $household = HouseholdResident::where('resident_id', $resident->id)
+    $householdResident = HouseholdResident::where('resident_id', $resident->id)
         ->with('household')
-        ->firstOrFail()
-        ->household;
+        ->first();
+    
+    if (!$householdResident) {
+        return back()->with('error', 'No household found. Please ensure you are assigned to a household first.');
+    }
+    
+    $household = $householdResident->household;
 
     // Validate
     $validated = $request->validate([
@@ -92,6 +108,7 @@ class HouseholdController extends Controller
         'sex' => 'required|in:male,female',
         'contactNumber' => 'nullable|string|max:11',
     ]);
+    $birthday = \Carbon\Carbon::parse($validated['birthday']);
 
     FamilyMember::create([
     'household_id' => $household->id,
@@ -105,7 +122,7 @@ class HouseholdController extends Controller
     'contactNumber' => $validated['contactNumber'] ?? '' ,
     ]);
 
-    return back()->with('success', 'Family member added.');
+    return redirect()->route($user->role . '.profile')->with('success', 'Family member added successfully!');
 }
 
 

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\Complaints;
 use App\Models\Resident;
+use App\Models\Household;
+use App\Models\HouseholdResident;
+use App\Models\House;
+use App\Models\Street;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,8 +35,20 @@ class SubAdminController extends Controller
     public function profile(): View
     {
         $user = Auth::user();
-        $resident = Resident::where('user_id', $user->id)->first();
-        return view("subadmin.profile", compact('resident', 'user'));
+        $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
+        $streets = \App\Models\Street::has('houses')->get();
+        $houses = \App\Models\House::all();
+        
+        // Get family members from the same household
+        $familyMembers = collect();
+        if ($resident && $resident->households->isNotEmpty()) {
+            $household = $resident->households->first();
+            $familyMembers = $household->residents()
+                ->where('residents.id', '!=', $resident->id)
+                ->get();
+        }
+        
+        return view("subadmin.profile", compact('resident', 'user', 'streets', 'houses', 'familyMembers'));
     }
 
     public function updateProfile(Request $request, $id)
@@ -91,8 +107,7 @@ class SubAdminController extends Controller
         $resident = Resident::findOrFail($id);
         
         $validated = $request->validate([
-            'houseNo' => 'required|string|max:255',
-            'street' => 'required|string|max:255',
+            'house_id' => 'required|exists:houses,id',
             'contactNo' => 'required|string|max:20',
             'birthday' => 'required|date',
             'age' => 'required|integer',
@@ -105,6 +120,25 @@ class SubAdminController extends Controller
             'emergencyContactName' => 'required|string|max:255',
             'emergencyContactNo' => 'required|string|max:20',
         ]);
+        
+        // Update household assignment
+        $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
+        $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
+
+        if ($householdResident) {
+            $householdResident->update([
+                'household_id' => $household->id,
+                'is_household_head' => $validated['headOfFamily'] === 'yes',
+            ]);
+        } else {
+            HouseholdResident::create([
+                'household_id' => $household->id,
+                'resident_id' => $resident->id,
+                'is_household_head' => $validated['headOfFamily'] === 'yes',
+            ]);
+        }
+
+        unset($validated['house_id']);
         
         $resident->update($validated);
         
