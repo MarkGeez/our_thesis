@@ -48,12 +48,7 @@
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
-             @foreach ($members as $member)
-        <h1>Family members: {{ $member->firstName }}</h1>
-        <a href="" class="btn btn-danger">untag</a>
-        <a href="" class="btn btn-danger">edit</a>
-        <form action="$"></form>
-    @endforeach
+           
         </div>
     </div>
     
@@ -262,13 +257,10 @@
                                         <a href="#" class="btn btn-outline-primary" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('family-members.destroy', $member->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
+                                        
                                             <button type="submit" class="btn btn-outline-danger" title="Untag" onclick="return confirm('Are you sure you want to remove this family member?')">
                                                 <i class="fas fa-user-times"></i>
                                             </button>
-                                        </form>
                                     </div>
                                 </div>
                                 
