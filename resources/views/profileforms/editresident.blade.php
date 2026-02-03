@@ -36,7 +36,7 @@
             $currentHouseId = optional($currentHouse)->id;
         @endphp
 
-        <h6 class="text-muted mb-3">Address Information</h6>
+        {{--  <h6 class="text-muted mb-3">Address Information</h6>--}}
 
      
 

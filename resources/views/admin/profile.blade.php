@@ -240,8 +240,8 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
                     <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $members->count() }})</h6>
-                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#addFamilyMemberModal">
-                        <i class="fas fa-plus"></i>
+                    <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#addFamilyMemberModal">
+                        <i class="fas fa-plus"></i> Add Family Member
                     </button>
                 </div>
                 <div class="card-body p-0"> <div class="table-responsive">
@@ -385,7 +385,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add Family Member</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" ></button>
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="{{ route(auth()->user()->role . '.family.store') }}" id="addFamilyForm">
