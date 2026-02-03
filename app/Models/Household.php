@@ -27,4 +27,9 @@ class Household extends Model
     {
         return $this->residents()->wherePivot('is_household_head', true)->first();
     }
+
+    public function familyMembers()
+    {
+        return $this->hasMany(FamilyMember::class);
+    }
 }

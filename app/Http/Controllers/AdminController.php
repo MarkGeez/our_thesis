@@ -13,6 +13,8 @@ use App\Models\Official;
 use App\Models\Position;
 use App\Models\User;
 
+use App\Models\FamilyMember;
+
 
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -44,20 +46,8 @@ class AdminController extends Controller
                         ->where('firstName', $admin->firstName)
                         ->where('lastName', $admin->lastName)
                         ->first();
-    
-    $streets = \App\Models\Street::has('houses')->get();
-    $houses = \App\Models\House::all();
-    
-    // Get family members from the same household
-    $familyMembers = collect();
-    if ($resident && $resident->households->isNotEmpty()) {
-        $household = $resident->households->first();
-        $familyMembers = $household->residents()
-            ->where('residents.id', '!=', $resident->id)
-            ->get();
-    }
-    
-    return view('admin.profile', compact('admin', 'resident', 'streets', 'houses', 'familyMembers'));
+     $members = FamilyMember::where('encoded_by', $admin->id)->orderBy('firstName')->get();
+    return view('admin.profile', compact('admin', 'resident', 'members'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();

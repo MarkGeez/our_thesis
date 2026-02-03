@@ -112,7 +112,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     })->name('family.add');
     Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
     Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
+
+    //HOUSE HOLD
     Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
+    Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
+    Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
+    Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
 
 
 
@@ -146,11 +151,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/barangayOfficials/add-role', [OfficialController::class, 'createOfficialName'])->name('add.officialName');
     Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 
-    Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
-    Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
-    Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
-
-
+  
 
     Route::get('/census', [AdminController::class,'census'])->name('census');
 

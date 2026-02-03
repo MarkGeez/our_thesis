@@ -38,27 +38,7 @@
 
         <h6 class="text-muted mb-3">Address Information</h6>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Street</label>
-                <select id="edit_street_id_{{ $resident->id }}" class="form-select form-control-lg" required>
-                    <option value="">-- Select Street --</option>
-                    @foreach ($streets as $street)
-                        <option value="{{ $street->id }}" 
-                            {{ old('street_id', $currentStreetId) == $street->id ? 'selected' : '' }}>
-                            {{ $street->street_name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">House No.</label>
-                <select name="house_id" id="edit_house_id_{{ $resident->id }}" class="form-select form-control-lg" required>
-                    <option value="">-- Select House Number --</option>
-                </select>
-            </div>
-        </div>
+     
 
         <h6 class="text-muted mb-3">Personal Information</h6>
 

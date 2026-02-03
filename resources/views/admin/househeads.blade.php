@@ -30,10 +30,10 @@
         {{-- Members --}}
         @forelse ($members as $member)
             <tr>
-                <td>{{ $member->resident->firstName }}</td>
-                <td>{{ $member->resident->middleName ?? '—' }}</td>
-                <td>{{ $member->resident->lastName }}</td>
-                <td>{{ $member->resident->contactNo ?? '—' }}</td>
+                <td>{{ $member->firstName }}</td>
+                <td>{{ $member->middleName ?? '—' }}</td>
+                <td>{{ $member->lastName }}</td>
+                <td>{{ $member->contactNo ?? '—' }}</td>
                 <td>Member</td>
             </tr>
         @empty

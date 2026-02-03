@@ -9,6 +9,7 @@ use App\Models\HouseholdResident;
 use App\Models\Household;
 use App\Models\Resident;
 
+use App\Models\FamilyMember;
 
 
 
@@ -50,23 +51,51 @@ class HouseholdController extends Controller
         })
         ->where('is_household_head', true)
         ->get();
-    $members= HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
-        ->whereHas('household', function($q) use($id){
+        
+    $members = FamilyMember::whereHas('household', function($q) use($id) {
         $q->where('house_id', $id);
-        })->where('is_household_head', false)->get();
+    })->get();
+
+    // Transform FamilyMember data to match expected format with 'resident' object
+    $members = $members->map(function($member) {
+        return [
+            'id' => $member->id,
+            'resident' => [
+                'firstName' => $member->firstName,
+                'middleName' => $member->middleName,
+                'lastName' => $member->lastName,
+                'contactNo' => $member->contactNumber,
+                'birthday' => $member->birthdate,
+                'age' => $this->calculateAge($member->birthdate),
+                'sex' => $member->sex,
+                'image_path' => null
+            ]
+        ];
+    });
 
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
-    'success' => true,
-    'heads' => $heads,
-    'members' => $members,
-    'house' => $house
-]);
-
+            'success' => true,
+            'heads' => $heads,
+            'members' => $members,
+            'house' => $house
+        ]);
     }
 
     return view('admin.househeads', compact('heads', 'house', 'members'));
+}
+
+private function calculateAge($birthdate)
+{
+    if (!$birthdate) {
+        return 'N/A';
+    }
+    try {
+        return \Carbon\Carbon::parse($birthdate)->age;
+    } catch (\Exception $e) {
+        return 'N/A';
+    }
 }
     public function storeFamilyMember(Request $request)
 {
@@ -103,43 +132,22 @@ class HouseholdController extends Controller
         'middleName' => 'nullable|string|max:70',
         'lastName' => 'required|string|max:70',
         'birthday' => 'required|date',
+        'relationship' => 'required|string|max:70',
         'sex' => 'required|in:male,female',
-        'contactNo' => 'nullable|string|max:11',
+        'contactNumber' => 'nullable|string|max:11',
     ]);
-
-    // Calculate age from birthday
     $birthday = \Carbon\Carbon::parse($validated['birthday']);
-    $age = $birthday->age;
 
-    // Get the house information from the household
-    $house = $household->house;
-    
-    // Create new resident record
-    $newResident = Resident::create([
-        'firstName' => $validated['firstName'],
-        'middleName' => $validated['middleName'] ?? '',
-        'lastName' => $validated['lastName'],
-        'birthday' => $validated['birthday'],
-        'age' => $age,
-        'sex' => $validated['sex'],
-        'contactNo' => $validated['contactNo'] ?? '',
-        'houseNo' => $house->house_no ?? '',
-        'street' => optional($house->street)->street_name ?? '',
-        'religion' => 'Not specified',
-        'emergencyContactNo' => '',
-        'emergencyContactName' => '',
-        'parent' => 'no',
-        'enrolled' => 'no',
-        'educationalAttainment' => '',
-        'headOfFamily' => 'no',
-        'EncodedBy' => $user->id,
-    ]);
-
-    // Attach to SAME household
-    HouseholdResident::create([
-        'household_id' => $household->id,
-        'resident_id'  => $newResident->id,
-        'is_household_head' => false,
+    FamilyMember::create([
+    'household_id' => $household->id,
+    'encoded_by' => $user->id,
+    'firstName' => $validated['firstName'],
+    'middleName' => $validated['middleName'] ?? null,
+    'lastName' => $validated['lastName'],
+    'birthdate' => $validated['birthday'],
+    'relationship' => $validated['relationship'],
+    'sex' => $validated['sex'],
+    'contactNumber' => $validated['contactNumber'] ?? '' ,
     ]);
 
     return redirect()->route($user->role . '.profile')->with('success', 'Family member added successfully!');

@@ -51,6 +51,13 @@ class User extends Authenticatable
      * @return array<string, string>
      */
     
+    public function familyMembers()
+    {
+        return $this->hasMany(FamilyMember::class, 'encoded_by');
+    }
+
+
+    
     public function announcements(): HasMany{
         return $this->hasMany(Announcement::class);
     }

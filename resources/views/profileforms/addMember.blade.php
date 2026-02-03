@@ -46,8 +46,15 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="contactNo" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control" id="contactNo" name="contactNo" placeholder="Enter contact number">
+                        <label for="contactNumber" class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" id="contactNumber" name="contactNumber" placeholder="Enter contact number">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="relationship" class="form-label">Relationship</label>
+                        <input type="text" class="form-control" id="relationship" name="relationship" placeholder="Enter relationship">
                     </div>
                 </div>
 

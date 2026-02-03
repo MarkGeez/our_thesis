@@ -12,6 +12,7 @@
 
 </head>
 
+
  <div class="layer"></div>
     <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
     <div class="page-flex">  
@@ -47,9 +48,10 @@
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
+           
         </div>
     </div>
-
+    
     <div class="row mb-4">
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
@@ -228,32 +230,59 @@
         </div>
     </div>
 </div>
-    </div>
 
-    @if($resident && isset($familyMembers) && $familyMembers->count() > 0)
+    @if($members && $members->count() > 0)
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $familyMembers->count() }})</h6>
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $members->count() }})</h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        @foreach($familyMembers as $member)
+                        @foreach($members as $member)
                         <div class="col-md-6 mb-3">
-                            <div class="border rounded p-3 h-100">
+                            <div class="border rounded p-3 h-100 position-relative">
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
                                         <i class="fas fa-user text-muted"></i>
                                     </div>
-                                    <div>
-                                        <h6 class="mb-0">{{ ucwords($member->firstName) }} {{ ucwords($member->middleName) }} {{ ucwords($member->lastName) }}</h6>
-                                        <small class="text-muted">{{ $member->age }} years old, {{ ucfirst($member->sex) }}</small>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">{{ ucwords($member->firstName) }} {{ ucwords($member->middleName ?? '') }} {{ ucwords($member->lastName) }}</h6>
+                                        <small class="text-muted">{{ ucfirst($member->sex ?? 'N/A') }}</small>
+                                    </div>
+                                    
+                                    <!-- Action buttons -->
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="#" class="btn btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        
+                                            <button type="submit" class="btn btn-outline-danger" title="Untag" onclick="return confirm('Are you sure you want to remove this family member?')">
+                                                <i class="fas fa-user-times"></i>
+                                            </button>
                                     </div>
                                 </div>
+                                
                                 <div class="small">
-                                    <div class="mb-1"><i class="fas fa-phone me-2 text-muted"></i>{{ $member->contactNo ?? 'N/A' }}</div>
-                                    <div class="mb-1"><i class="fas fa-birthday-cake me-2 text-muted"></i>{{ \Carbon\Carbon::parse($member->birthday)->format('F d, Y') }}</div>
+                                    <div class="mb-1">
+                                        <i class="fas fa-phone me-2 text-muted"></i>
+                                        {{ $member->contactNumber ?? $member->contactNo ?? 'N/A' }}
+                                    </div>
+                                    <div class="mb-1">
+                                        <i class="fas fa-birthday-cake me-2 text-muted"></i>
+                                        @if($member->birthdate || $member->birthday)
+                                            {{ \Carbon\Carbon::parse($member->birthdate ?? $member->birthday)->format('F d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
+                                    @if($member->relationship)
+                                    <div class="mb-1">
+                                        <i class="fas fa-heart me-2 text-muted"></i>
+                                        {{ $member->relationship }}
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -263,7 +292,11 @@
             </div>
         </div>
     </div>
-    @endif
+@else
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>No family members found.
+    </div>
+@endif
 
    <div class="row">
         <div class="col-12">
