@@ -118,8 +118,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
     Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
     Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
-
-
+    Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('admin.untag.member');
+    Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('admin.edit.family');
 
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');

@@ -359,16 +359,10 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="row">
-                                                            <div class="col-md-4">
-                                                                <label>House No.</label>
-                                                                <input type="text" name="houseNo" class="form-control" value="{{ old('houseNo', $resident->houseNo) }}" required>
-                                                            </div>
-                                                            <div class="col-md-8">
-                                                                <label>Street</label>
-                                                                <input type="text" name="street" class="form-control" value="{{ old('street', $resident->street) }}" required>
-                                                            </div>
-                                                        </div>
+                                                        
+    
+    
+
 
                                                         <div class="row">
                                                             <div class="col-md-6">
