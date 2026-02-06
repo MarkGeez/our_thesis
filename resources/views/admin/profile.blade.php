@@ -293,10 +293,10 @@
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
                                             <button class="btn btn-sm btn-outline-primary" title="Edit Member">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="fas fa-edit"></i> Edit
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger" title="Remove" onclick="return confirm('Remove this member?')">
-                                                <i class="fas fa-trash-alt"></i>
+                                                 Untag
                                             </button>
                                         </div>
                                     </td>
