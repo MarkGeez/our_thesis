@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -55,56 +56,65 @@ class HouseholdController extends Controller
     return view('admin.houses', compact('houses'));
 }
 
-   public function showHeads($id)
+public function showHeads($id)
 {
     $house = House::findOrFail($id);
 
-    // Get all households in this house, eager loading the Head and their Family Members
-    $households = Household::where('house_id', $id)
-        ->with(['residents' => function($query) {
-            $query->wherePivot('is_household_head', true);
-        }, 'familyMembers'])
+    // Get Heads - explicitly ensure user_id is loaded from the resident relationship
+    $heads = HouseholdResident::with(['resident' => function($query) {
+            $query->select('id', 'user_id', 'firstName', 'middleName', 'lastName', 'contactNo', 'birthday', 'age', 'sex', 'image_path');
+        }])
+        ->whereHas('household', function ($q) use ($id) {
+            $q->where('house_id', $id);
+        })
+        ->where('is_household_head', true)
         ->get();
-
-    $formattedHouseholds = $households->map(function ($household) {
-        $head = $household->residents->first(); // Get the primary head resident
         
+    // Get members and ensure we have encoded_by
+    $membersRaw = FamilyMember::whereHas('household', function($q) use($id) {
+            $q->where('house_id', $id);
+        })->get();
+
+    $allMembers = $membersRaw->map(function($member) {
         return [
-            'household_id' => $household->id,
-            'head' => $head ? [
-                'firstName' => $head->firstName,
-                'middleName' => $head->middleName,
-                'lastName' => $head->lastName,
-                'contactNo' => $head->contactNo,
-                'age' => $head->age,
-                'sex' => $head->sex,
-                'birthday' => $head->birthday,
-                'image_path' => $head->image_path
-            ] : null,
-            'members' => $household->familyMembers->map(function ($member) {
-                return [
-                    'fullName' => $member->firstName . ' ' . $member->lastName,
-                    'contactNo' => $member->contactNumber,
-                    'age' => $this->calculateAge($member->birthdate),
-                    'sex' => $member->sex,
-                    'relationship' => $member->relationship,
-                    'birthday' => $member->birthdate
-                ];
-            })
+            'id' => $member->id,
+            'household_id' => $member->household_id,
+            'encoded_by' => (int)$member->encoded_by, // Cast to int for strict comparison
+            'resident' => [
+                'firstName' => $member->firstName,
+                'middleName' => $member->middleName,
+                'lastName' => $member->lastName,
+                'contactNo' => $member->contactNumber,
+                'birthday' => $member->birthdate,
+                'age' => $this->calculateAge($member->birthdate),
+                'sex' => $member->sex,
+                'image_path' => null
+            ]
         ];
     });
+
+    $groups = $heads->map(function ($head) use ($allMembers) {
+        // This is the key link: Head's User ID == Member's Encoded By
+        $headUserId = (int)$head->resident->user_id; 
+        
+        $headMembers = $allMembers->filter(function($m) use ($headUserId) {
+            return $m['encoded_by'] === $headUserId;
+        })->values();
+
+        return [
+            'head' => $head,
+            'members' => $headMembers,
+        ];
+    })->values();
 
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
-            'households' => $formattedHouseholds,
-            'house' => $house
+            'groups' => $groups,
+            'unassigned_members' => $allMembers->whereNotIn('encoded_by', $heads->pluck('resident.user_id'))->values(),
         ]);
     }
-
-    return view('admin.househeads', compact('formattedHouseholds', 'house'));
 }
-
 private function calculateAge($birthdate)
 {
     if (!$birthdate) {
