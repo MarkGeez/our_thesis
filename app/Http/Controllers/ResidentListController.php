@@ -11,6 +11,7 @@ use App\Models\Street;
 use App\Models\Household;
 use App\Models\HouseholdResident;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -99,7 +100,7 @@ public function searchResidents(Request $request)
     
     }
 
-    public function updateResident(Request $request, $id){
+      public function updateResident(Request $request, $id){
         $user = auth()->user();
 
         if(!$user || $user->role === "resident" || $user->role === "non-resident"){
@@ -109,11 +110,10 @@ public function searchResidents(Request $request)
         $resident = Resident::findOrFail($id);
 
         $validated = $request->validate([
+            'house_id' => 'required|exists:houses,id',
             'firstName' => 'required|string|max:70',
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
-            'houseNo' => 'required|string|max:8',
-            'street' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
             'birthday' => 'required|date',
             'emergencyContactNo' => 'required|string|max:11',
@@ -142,8 +142,20 @@ public function searchResidents(Request $request)
         unset($validated['image_path']);
         }
 
+        $data = Arr::except($validated, ['house_id', 'headOfFamily']);
+$resident->update($data);
 
-        $resident->update($validated);
+$householdResident = HouseholdResident::where('resident_id', $resident->id)->firstOrFail();
+$household = Household::findOrFail($householdResident->household_id);
+
+$household->update([
+    'house_id' => $validated['house_id']
+]);
+
+$householdResident->update([
+    'is_household_head' => $validated['headOfFamily'] === 'yes',
+]);
+
 
         return redirect()->back()->with('success', 'Resident updated successfully!');
     }

@@ -9,6 +9,9 @@ use App\Models\House;
 use App\Models\Street;
 use App\Models\Official;
 
+use App\Models\FamilyMember;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -27,19 +30,12 @@ class ResidentController extends Controller
     {
         $user = auth()->user();
         $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
-        $streets = \App\Models\Street::has('houses')->get();
-        $houses = \App\Models\House::all();
-        
+       
         // Get family members from the same household
-        $familyMembers = collect();
-        if ($resident && $resident->households->isNotEmpty()) {
-            $household = $resident->households->first();
-            $familyMembers = $household->residents()
-                ->where('residents.id', '!=', $resident->id)
-                ->get();
-        }
+        $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
+
         
-        return view('resident.profile', compact('resident', 'user', 'streets', 'houses', 'familyMembers'));
+        return view('resident.profile', compact('resident', 'user', 'members'));
     }
 
     public function updateProfile(Request $request, $id)

@@ -181,6 +181,33 @@ private function calculateAge($birthdate)
     return redirect()->route($user->role . '.profile')->with('success', 'Family member added successfully!');
 }
 
+public function untagMember(Request $request, $id){
+    $member= FamilyMember::findOrFail($id);
+
+    $member->delete();
+
+    return redirect()->back()->with('success', 'Family member untagged successfully');
+
+}
+public function editMember(Request $request, $id)
+{
+    $validated = $request->validate([
+        'firstName' => 'required|string|max:100',
+        'middleName' => 'nullable|string|max:100',
+        'lastName' => 'required|string|max:100',
+        'birthdate' => 'required|date',
+        'sex' => 'required|in:male,female',
+        'relationship' => 'required|string|max:50',
+        'contactNumber' => 'nullable|string|max:20',
+    ]);
+    
+    $validated['is_inactive'] = $request->boolean('is_inactive');
+    $member = FamilyMember::findOrFail($id);
+    $member->update($validated);
+    
+    
+    return redirect()->back()->with('success', 'Family member details successfully updated.');
+}
 
     
 }
