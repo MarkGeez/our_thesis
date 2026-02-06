@@ -1,4 +1,3 @@
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
@@ -259,11 +258,7 @@ $(document).ready(function() {
     function displayHouses(houses) {
         let html = '';
         houses.forEach(house => {
-<<<<<<< HEAD
             const count = (house.heads_count ?? house.households_count ?? 0);
-=======
-            const householdCount = (house.heads_count ?? house.households_count ?? 0);
->>>>>>> df5e7ac (house head and members only)
             html += `
                 <div class="house-card" data-house-id="${house.id}" data-house-no="${house.house_no}">
                     <div class="house-header">
@@ -302,40 +297,11 @@ $(document).ready(function() {
             url: `/admin/households/houses/${houseId}`,
             method: 'GET',
             success: function(response) {
-<<<<<<< HEAD
                 if (response.success) displayHouseholdHeads(houseId, response.groups || []);
-=======
-                if (response.success) {
-                    displayHouseholdHeads(
-                        houseId,
-                        response.groups || [],
-                        response.unassigned_members || [],
-                        response.heads || [],
-                        response.members || []
-                    );
-                } else {
-                    headsSection.html(`
-                        <div class="no-data-message">
-                            <p class="mb-0">No household heads found</p>
-                        </div>
-                    `);
-                    headsSection.addClass('show');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading household heads:', error);
-                headsSection.html(`
-                    <div class="no-data-message">
-                        <p class="mb-0 text-danger">Failed to load household heads</p>
-                    </div>
-                `);
-                headsSection.addClass('show');
->>>>>>> df5e7ac (house head and members only)
             }
         });
     }
 
-<<<<<<< HEAD
     function displayHouseholdHeads(houseId, groups) {
         const section = $('#heads-' + houseId);
         let html = '<div class="px-3 pb-2">';
@@ -344,32 +310,6 @@ $(document).ready(function() {
             groups.forEach(group => {
                 const headRes = group.head?.resident || {};
                 
-=======
-    // Display household heads
-    function displayHouseholdHeads(houseId, groups, unassignedMembers, heads, members) {
-        const headsSection = $('#heads-' + houseId);
-
-        const safeGroups = groups || [];
-        const safeHeads = heads || [];
-        const safeMembers = members || [];
-        const safeUnassigned = unassignedMembers || [];
-        let html = '<div class="px-2">';
-
-        if (safeGroups.length > 0) {
-            safeGroups.forEach(group => {
-                const head = group.head || {};
-                const resident = head.resident || {};
-                const firstName = toTitleCase(resident.firstName);
-                const middleName = toTitleCase(resident.middleName);
-                const lastName = toTitleCase(resident.lastName);
-                const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
-                const contact = resident.contactNo || 'N/A';
-                const age = resident.age || 'N/A';
-                const sex = toTitleCase(resident.sex);
-                const birthday = resident.birthday || 'N/A';
-
-                html += '<div class="section-title">Household Head</div>';
->>>>>>> df5e7ac (house head and members only)
                 html += `
                     <div class="section-title text-primary mt-3"><i class="fas fa-crown me-1"></i> Household Head</div>
                     <div class="glass-card head-card">
@@ -379,7 +319,6 @@ $(document).ready(function() {
                                 <span>${formatFullName(headRes)}</span>
                             </div>
                         </div>
-<<<<<<< HEAD
                         <div class="glass-meta">
                             <div class="meta-item"><i class="fas fa-phone"></i> ${headRes.contactNo || headRes.contactNumber || 'N/A'}</div>
                             <div class="meta-item"><i class="fas fa-venus-mars"></i> ${toTitleCase(headRes.sex || 'N/A')}</div>
@@ -417,168 +356,6 @@ $(document).ready(function() {
             });
         } else {
             html += '<div class="no-data-message">No households found</div>';
-=======
-                    </div>
-                `;
-
-                const groupMembers = group.members || [];
-                html += '<div class="section-title">Members Tagged</div>';
-                if (groupMembers.length === 0) {
-                    html += `
-                        <div class="no-data-message">
-                            <i class="fas fa-users mb-2"></i>
-                            <p class="mb-0">No members tagged</p>
-                        </div>
-                    `;
-                } else {
-                    groupMembers.forEach(member => {
-                        const memberResident = member.resident || {};
-                        const mFirstName = toTitleCase(memberResident.firstName);
-                        const mMiddleName = toTitleCase(memberResident.middleName);
-                        const mLastName = toTitleCase(memberResident.lastName);
-                        const mFullName = [mFirstName, mMiddleName, mLastName].filter(Boolean).join(' ') || 'N/A';
-                        const mContact = memberResident.contactNo || 'N/A';
-                        const mAge = memberResident.age || 'N/A';
-                        const mSex = toTitleCase(memberResident.sex);
-                        const mBirthday = memberResident.birthday || 'N/A';
-
-                        html += `
-                            <div class="glass-card">
-                                <div class="glass-header">
-                                    <div class="glass-title">
-                                        ${renderAvatar(memberResident, 'fa-user')}
-                                        <span>${mFullName}</span>
-                                    </div>
-                                    <div class="glass-meta">
-                                        <span><i class="fas fa-phone"></i> ${mContact}</span>
-                                        <span><i class="fas fa-venus-mars"></i> ${mSex}</span>
-                                        <span><i class="fas fa-id-card"></i> ${mAge}</span>
-                                        <span><i class="fas fa-cake-candles"></i> ${mBirthday}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            });
-        } else if (safeHeads.length > 0 || safeMembers.length > 0) {
-            html += '<div class="section-title">Household Head(s)</div>';
-            if (safeHeads.length === 0) {
-                html += `
-                    <div class="no-data-message">
-                        <i class="fas fa-user-times mb-2"></i>
-                        <p class="mb-0">No household head assigned</p>
-                    </div>
-                `;
-            } else {
-                safeHeads.forEach(head => {
-                    const resident = head.resident || {};
-                    const firstName = toTitleCase(resident.firstName);
-                    const middleName = toTitleCase(resident.middleName);
-                    const lastName = toTitleCase(resident.lastName);
-                    const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
-                    const contact = resident.contactNo || 'N/A';
-                    const age = resident.age || 'N/A';
-                    const sex = toTitleCase(resident.sex);
-                    const birthday = resident.birthday || 'N/A';
-
-                    html += `
-                        <div class="glass-card">
-                            <div class="glass-header">
-                                <div class="glass-title">
-                                    ${renderAvatar(resident, 'fa-user-circle')}
-                                    <span>${fullName}</span>
-                                </div>
-                                <div class="glass-meta">
-                                    <span><i class="fas fa-phone"></i> ${contact}</span>
-                                    <span><i class="fas fa-venus-mars"></i> ${sex}</span>
-                                    <span><i class="fas fa-id-card"></i> ${age}</span>
-                                    <span><i class="fas fa-cake-candles"></i> ${birthday}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            html += '<div class="section-title">Members Tagged</div>';
-            if (safeMembers.length === 0) {
-                html += `
-                    <div class="no-data-message">
-                        <i class="fas fa-users mb-2"></i>
-                        <p class="mb-0">No members tagged</p>
-                    </div>
-                `;
-            } else {
-                safeMembers.forEach(member => {
-                    const resident = member.resident || {};
-                    const firstName = toTitleCase(resident.firstName);
-                    const middleName = toTitleCase(resident.middleName);
-                    const lastName = toTitleCase(resident.lastName);
-                    const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
-                    const contact = resident.contactNo || 'N/A';
-                    const age = resident.age || 'N/A';
-                    const sex = toTitleCase(resident.sex);
-                    const birthday = resident.birthday || 'N/A';
-
-                    html += `
-                        <div class="glass-card">
-                            <div class="glass-header">
-                                <div class="glass-title">
-                                    ${renderAvatar(resident, 'fa-user')}
-                                    <span>${fullName}</span>
-                                </div>
-                                <div class="glass-meta">
-                                    <span><i class="fas fa-phone"></i> ${contact}</span>
-                                    <span><i class="fas fa-venus-mars"></i> ${sex}</span>
-                                    <span><i class="fas fa-id-card"></i> ${age}</span>
-                                    <span><i class="fas fa-cake-candles"></i> ${birthday}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-        } else {
-            html += `
-                <div class="no-data-message">
-                    <i class="fas fa-user-times mb-2"></i>
-                    <p class="mb-0">No household heads found</p>
-                </div>
-            `;
-        }
-
-        if (safeUnassigned.length > 0) {
-            html += '<div class="section-title">Unassigned Members</div>';
-            safeUnassigned.forEach(member => {
-                const resident = member.resident || {};
-                const firstName = toTitleCase(resident.firstName);
-                const middleName = toTitleCase(resident.middleName);
-                const lastName = toTitleCase(resident.lastName);
-                const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
-                const contact = resident.contactNo || 'N/A';
-                const age = resident.age || 'N/A';
-                const sex = toTitleCase(resident.sex);
-                const birthday = resident.birthday || 'N/A';
-
-                html += `
-                    <div class="glass-card">
-                        <div class="glass-header">
-                            <div class="glass-title">
-                                ${renderAvatar(resident, 'fa-user')}
-                                <span>${fullName}</span>
-                            </div>
-                            <div class="glass-meta">
-                                <span><i class="fas fa-phone"></i> ${contact}</span>
-                                <span><i class="fas fa-venus-mars"></i> ${sex}</span>
-                                <span><i class="fas fa-id-card"></i> ${age}</span>
-                                <span><i class="fas fa-cake-candles"></i> ${birthday}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
->>>>>>> df5e7ac (house head and members only)
         }
         section.html(html + '</div>').addClass('show').data('loaded', true);
         

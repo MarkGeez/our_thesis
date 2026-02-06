@@ -59,14 +59,10 @@ public function showHeads($id)
 {
     $house = House::findOrFail($id);
 
-<<<<<<< HEAD
     // Get Heads - explicitly ensure user_id is loaded from the resident relationship
     $heads = HouseholdResident::with(['resident' => function($query) {
             $query->select('id', 'user_id', 'firstName', 'middleName', 'lastName', 'contactNo', 'birthday', 'age', 'sex', 'image_path');
         }])
-=======
-    $heads = HouseholdResident::with('resident:id,user_id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
->>>>>>> df5e7ac (house head and members only)
         ->whereHas('household', function ($q) use ($id) {
             $q->where('house_id', $id);
         })
@@ -82,10 +78,7 @@ public function showHeads($id)
         return [
             'id' => $member->id,
             'household_id' => $member->household_id,
-<<<<<<< HEAD
             'encoded_by' => (int)$member->encoded_by, // Cast to int for strict comparison
-=======
->>>>>>> df5e7ac (house head and members only)
             'resident' => [
                 'firstName' => $member->firstName,
                 'middleName' => $member->middleName,
@@ -99,7 +92,6 @@ public function showHeads($id)
         ];
     });
 
-<<<<<<< HEAD
     $groups = $heads->map(function ($head) use ($allMembers) {
         // This is the key link: Head's User ID == Member's Encoded By
         $headUserId = (int)$head->resident->user_id; 
@@ -107,15 +99,6 @@ public function showHeads($id)
         $headMembers = $allMembers->filter(function($m) use ($headUserId) {
             return $m['encoded_by'] === $headUserId;
         })->values();
-=======
-    $headHouseholdIds = $heads->pluck('household_id')->filter()->unique()->values();
-
-    $groups = $heads->map(function ($head) use ($members) {
-        $headHouseholdId = $head->household_id;
-        $headMembers = $headHouseholdId
-            ? $members->where('household_id', $headHouseholdId)->values()
-            : collect();
->>>>>>> df5e7ac (house head and members only)
 
         return [
             'head' => $head,
@@ -123,25 +106,11 @@ public function showHeads($id)
         ];
     })->values();
 
-<<<<<<< HEAD
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
             'groups' => $groups,
             'unassigned_members' => $allMembers->whereNotIn('encoded_by', $heads->pluck('resident.user_id'))->values(),
-=======
-    $unassignedMembers = $members->whereNotIn('household_id', $headHouseholdIds)->values();
-
-    // Return JSON for AJAX requests
-    if (request()->ajax() || request()->wantsJson()) {
-        return response()->json([
-            'success' => true,
-            'heads' => $heads,
-            'members' => $members,
-            'groups' => $groups,
-            'unassigned_members' => $unassignedMembers,
-            'house' => $house
->>>>>>> df5e7ac (house head and members only)
         ]);
     }
 }
