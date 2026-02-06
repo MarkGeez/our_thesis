@@ -8,7 +8,6 @@ use App\Models\House;
 use App\Models\HouseholdResident;
 use App\Models\Household;
 use App\Models\Resident;
-use App\Models\User;
 
 use App\Models\FamilyMember;
 
@@ -56,78 +55,55 @@ class HouseholdController extends Controller
     return view('admin.houses', compact('houses'));
 }
 
-    public function showHeads($id)
+   public function showHeads($id)
 {
     $house = House::findOrFail($id);
 
-    $heads = HouseholdResident::with([
-            'resident:id,user_id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path',
-            'household'
-        ])
-        ->whereHas('household', function ($q) use ($id) {
-            $q->where('house_id', $id);
-        })
-        ->where('is_household_head', true)
+    // Get all households in this house, eager loading the Head and their Family Members
+    $households = Household::where('house_id', $id)
+        ->with(['residents' => function($query) {
+            $query->wherePivot('is_household_head', true);
+        }, 'familyMembers'])
         ->get();
 
-    $allMembers = FamilyMember::whereHas('household', function ($q) use ($id) {
-        $q->where('house_id', $id);
-    })->get();
-
-    $memberUserIds = $allMembers->pluck('encoded_by')->filter()->unique()->values();
-    $encoderResidentMap = User::with('resident:id,user_id')
-        ->whereIn('id', $memberUserIds)
-        ->get()
-        ->mapWithKeys(function ($user) {
-            return [$user->id => $user->resident->id ?? null];
-        });
-
-    $groups = $heads->map(function ($head) use ($allMembers, $encoderResidentMap) {
-        $headUserId = $head->resident->user_id ?? null;
-        $headResidentId = $head->resident_id ?? null;
-
-        $members = $allMembers->filter(function ($member) use ($headUserId, $headResidentId, $encoderResidentMap) {
-            $encodedBy = $member->encoded_by ?? null;
-            $encodedByResidentId = $encodedBy ? ($encoderResidentMap[$encodedBy] ?? null) : null;
-
-            return ($headUserId && $encodedBy == $headUserId)
-                || ($headResidentId && $encodedByResidentId == $headResidentId);
-        });
-
-        $members = $members->map(function ($member) {
-            return [
-                'id' => $member->id,
-                'household_id' => $member->household_id,
-                'resident' => [
-                    'firstName' => $member->firstName,
-                    'middleName' => $member->middleName,
-                    'lastName' => $member->lastName,
+    $formattedHouseholds = $households->map(function ($household) {
+        $head = $household->residents->first(); // Get the primary head resident
+        
+        return [
+            'household_id' => $household->id,
+            'head' => $head ? [
+                'firstName' => $head->firstName,
+                'middleName' => $head->middleName,
+                'lastName' => $head->lastName,
+                'contactNo' => $head->contactNo,
+                'age' => $head->age,
+                'sex' => $head->sex,
+                'birthday' => $head->birthday,
+                'image_path' => $head->image_path
+            ] : null,
+            'members' => $household->familyMembers->map(function ($member) {
+                return [
+                    'fullName' => $member->firstName . ' ' . $member->lastName,
                     'contactNo' => $member->contactNumber,
-                    'birthday' => $member->birthdate,
                     'age' => $this->calculateAge($member->birthdate),
                     'sex' => $member->sex,
-                    'image_path' => null
-                ]
-            ];
-        })->values();
-
-        return [
-            'head' => $head,
-            'members' => $members
+                    'relationship' => $member->relationship,
+                    'birthday' => $member->birthdate
+                ];
+            })
         ];
     });
 
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
-            'groups' => $groups,
+            'households' => $formattedHouseholds,
             'house' => $house
         ]);
     }
 
-    return view('admin.househeads', compact('groups', 'house'));
+    return view('admin.househeads', compact('formattedHouseholds', 'house'));
 }
-
 
 private function calculateAge($birthdate)
 {

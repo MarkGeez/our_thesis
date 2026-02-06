@@ -234,7 +234,7 @@
     </div>
 </div>
 
-    @if($members && $members->count() > 0)
+    {{--@if($members && $members->count() > 0)  --}}
     <div class="row mt-4">
         <div class="col-12">
             <div class="card shadow-sm border-0">
@@ -309,7 +309,7 @@
             </div>
         </div>
     </div>
-    @else
+    {{--  @else
     <div class="row mt-4">
         <div class="col-12">
             <div class="alert alert-info border-0 shadow-sm d-flex align-items-center">
@@ -321,8 +321,9 @@
             </div>
         </div>
     </div>
-    @endif
 
+    @endif
+--}}
    <div class="row">
         <div class="col-12">
 
