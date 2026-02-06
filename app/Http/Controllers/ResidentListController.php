@@ -28,7 +28,7 @@ class ResidentListController extends Controller
     
     $searchTerm = $request->input('search');
     
-    $residents = Resident::with(['user:id,firstName,lastname', 'official'])
+    $residents = Resident::with(['user:id,firstName,lastname', 'official', 'households.house.street'])
         ->when($searchTerm, function($query, $searchTerm) {
             return $query->where(function($q) use ($searchTerm) {
                 $q->where('firstName', 'like', "%{$searchTerm}%")

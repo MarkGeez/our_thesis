@@ -214,12 +214,37 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-
+                                                            {{--  
                                                             <div class="row mt-3">
                                                                 <div class="col-12">
                                                                     <div class="p-3 bg-light rounded border-start border-primary border-3">
                                                                         <div class="fw-semibold text-secondary small text-uppercase">Residential Address</div>
                                                                         <div class="fs-6"> House No. {{ $resident->houseNo }}, {{ ucwords(strtolower($resident->street)) }} </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                                    --}}
+                                                            @php
+                                                                $assignedHousehold = $resident->households->first();
+                                                                $assignedHouse = $assignedHousehold ? $assignedHousehold->house : null;
+                                                                $assignedStreet = $assignedHouse ? $assignedHouse->street : null;
+                                                            @endphp
+
+                                                            <div class="row mt-3 g-3">
+                                                                <div class="col-md-6">
+                                                                    <div class="p-3 bg-light rounded border-start border-primary border-3 h-100">
+                                                                        <div class="fw-semibold text-secondary small text-uppercase">Assigned House</div>
+                                                                        <div class="fs-6">
+                                                                            {{ $assignedHouse ? 'House No. ' . $assignedHouse->house_no : 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="p-3 bg-light rounded border-start border-primary border-3 h-100">
+                                                                        <div class="fw-semibold text-secondary small text-uppercase">Assigned Street</div>
+                                                                        <div class="fs-6">
+                                                                            {{ $assignedStreet ? $assignedStreet->street_name : 'N/A' }}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

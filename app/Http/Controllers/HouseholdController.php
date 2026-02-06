@@ -26,6 +26,20 @@ class HouseholdController extends Controller
     $houses = House::where('street_id', $id)
         ->withCount('households')
         ->get();
+
+    $houseIds = $houses->pluck('id');
+
+    $headsCountByHouse = HouseholdResident::join('households', 'household_resident.household_id', '=', 'households.id')
+        ->where('household_resident.is_household_head', true)
+        ->whereIn('households.house_id', $houseIds)
+        ->selectRaw('households.house_id, count(*) as heads_count')
+        ->groupBy('households.house_id')
+        ->pluck('heads_count', 'households.house_id');
+
+    $houses->transform(function ($house) use ($headsCountByHouse) {
+        $house->heads_count = (int) ($headsCountByHouse[$house->id] ?? 0);
+        return $house;
+    });
     
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
@@ -45,7 +59,7 @@ class HouseholdController extends Controller
 {
     $house = House::findOrFail($id);
 
-    $heads = HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
+    $heads = HouseholdResident::with('resident:id,user_id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
         ->whereHas('household', function ($q) use ($id) {
             $q->where('house_id', $id);
         })
@@ -60,6 +74,7 @@ class HouseholdController extends Controller
     $members = $members->map(function($member) {
         return [
             'id' => $member->id,
+            'household_id' => $member->household_id,
             'resident' => [
                 'firstName' => $member->firstName,
                 'middleName' => $member->middleName,
@@ -73,12 +88,30 @@ class HouseholdController extends Controller
         ];
     });
 
+    $headHouseholdIds = $heads->pluck('household_id')->filter()->unique()->values();
+
+    $groups = $heads->map(function ($head) use ($members) {
+        $headHouseholdId = $head->household_id;
+        $headMembers = $headHouseholdId
+            ? $members->where('household_id', $headHouseholdId)->values()
+            : collect();
+
+        return [
+            'head' => $head,
+            'members' => $headMembers,
+        ];
+    })->values();
+
+    $unassignedMembers = $members->whereNotIn('household_id', $headHouseholdIds)->values();
+
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
             'heads' => $heads,
             'members' => $members,
+            'groups' => $groups,
+            'unassigned_members' => $unassignedMembers,
             'house' => $house
         ]);
     }

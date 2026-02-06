@@ -416,7 +416,7 @@ $(document).ready(function() {
         let html = '';
         
         houses.forEach(house => {
-            const householdCount = house.households_count || 0;
+            const householdCount = (house.heads_count ?? house.households_count ?? 0);
             html += `
                 <div class="house-card" data-house-id="${house.id}" data-house-no="${house.house_no}">
                     <div class="house-header">
@@ -512,7 +512,13 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    displayHouseholdHeads(houseId, response.heads || [], response.members || []);
+                    displayHouseholdHeads(
+                        houseId,
+                        response.groups || [],
+                        response.unassigned_members || [],
+                        response.heads || [],
+                        response.members || []
+                    );
                 } else {
                     headsSection.html(`
                         <div class="no-data-message">
@@ -535,23 +541,18 @@ $(document).ready(function() {
     }
 
     // Display household heads
-    function displayHouseholdHeads(houseId, heads, members) {
+    function displayHouseholdHeads(houseId, groups, unassignedMembers, heads, members) {
         const headsSection = $('#heads-' + houseId);
 
+        const safeGroups = groups || [];
         const safeHeads = heads || [];
         const safeMembers = members || [];
+        const safeUnassigned = unassignedMembers || [];
         let html = '<div class="px-2">';
 
-        html += '<div class="section-title">Household Head(s)</div>';
-        if (safeHeads.length === 0) {
-            html += `
-                <div class="no-data-message">
-                    <i class="fas fa-user-times mb-2"></i>
-                    <p class="mb-0">No household head assigned</p>
-                </div>
-            `;
-        } else {
-            safeHeads.forEach(head => {
+        if (safeGroups.length > 0) {
+            safeGroups.forEach(group => {
+                const head = group.head || {};
                 const resident = head.resident || {};
                 const firstName = toTitleCase(resident.firstName);
                 const middleName = toTitleCase(resident.middleName);
@@ -562,6 +563,7 @@ $(document).ready(function() {
                 const sex = toTitleCase(resident.sex);
                 const birthday = resident.birthday || 'N/A';
 
+                html += '<div class="section-title">Household Head</div>';
                 html += `
                     <div class="glass-card">
                         <div class="glass-header">
@@ -578,19 +580,137 @@ $(document).ready(function() {
                         </div>
                     </div>
                 `;
-            });
-        }
 
-        html += '<div class="section-title">Members Tagged</div>';
-        if (safeMembers.length === 0) {
+                const groupMembers = group.members || [];
+                html += '<div class="section-title">Members Tagged</div>';
+                if (groupMembers.length === 0) {
+                    html += `
+                        <div class="no-data-message">
+                            <i class="fas fa-users mb-2"></i>
+                            <p class="mb-0">No members tagged</p>
+                        </div>
+                    `;
+                } else {
+                    groupMembers.forEach(member => {
+                        const memberResident = member.resident || {};
+                        const mFirstName = toTitleCase(memberResident.firstName);
+                        const mMiddleName = toTitleCase(memberResident.middleName);
+                        const mLastName = toTitleCase(memberResident.lastName);
+                        const mFullName = [mFirstName, mMiddleName, mLastName].filter(Boolean).join(' ') || 'N/A';
+                        const mContact = memberResident.contactNo || 'N/A';
+                        const mAge = memberResident.age || 'N/A';
+                        const mSex = toTitleCase(memberResident.sex);
+                        const mBirthday = memberResident.birthday || 'N/A';
+
+                        html += `
+                            <div class="glass-card">
+                                <div class="glass-header">
+                                    <div class="glass-title">
+                                        ${renderAvatar(memberResident, 'fa-user')}
+                                        <span>${mFullName}</span>
+                                    </div>
+                                    <div class="glass-meta">
+                                        <span><i class="fas fa-phone"></i> ${mContact}</span>
+                                        <span><i class="fas fa-venus-mars"></i> ${mSex}</span>
+                                        <span><i class="fas fa-id-card"></i> ${mAge}</span>
+                                        <span><i class="fas fa-cake-candles"></i> ${mBirthday}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+        } else if (safeHeads.length > 0 || safeMembers.length > 0) {
+            html += '<div class="section-title">Household Head(s)</div>';
+            if (safeHeads.length === 0) {
+                html += `
+                    <div class="no-data-message">
+                        <i class="fas fa-user-times mb-2"></i>
+                        <p class="mb-0">No household head assigned</p>
+                    </div>
+                `;
+            } else {
+                safeHeads.forEach(head => {
+                    const resident = head.resident || {};
+                    const firstName = toTitleCase(resident.firstName);
+                    const middleName = toTitleCase(resident.middleName);
+                    const lastName = toTitleCase(resident.lastName);
+                    const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
+                    const contact = resident.contactNo || 'N/A';
+                    const age = resident.age || 'N/A';
+                    const sex = toTitleCase(resident.sex);
+                    const birthday = resident.birthday || 'N/A';
+
+                    html += `
+                        <div class="glass-card">
+                            <div class="glass-header">
+                                <div class="glass-title">
+                                    ${renderAvatar(resident, 'fa-user-circle')}
+                                    <span>${fullName}</span>
+                                </div>
+                                <div class="glass-meta">
+                                    <span><i class="fas fa-phone"></i> ${contact}</span>
+                                    <span><i class="fas fa-venus-mars"></i> ${sex}</span>
+                                    <span><i class="fas fa-id-card"></i> ${age}</span>
+                                    <span><i class="fas fa-cake-candles"></i> ${birthday}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += '<div class="section-title">Members Tagged</div>';
+            if (safeMembers.length === 0) {
+                html += `
+                    <div class="no-data-message">
+                        <i class="fas fa-users mb-2"></i>
+                        <p class="mb-0">No members tagged</p>
+                    </div>
+                `;
+            } else {
+                safeMembers.forEach(member => {
+                    const resident = member.resident || {};
+                    const firstName = toTitleCase(resident.firstName);
+                    const middleName = toTitleCase(resident.middleName);
+                    const lastName = toTitleCase(resident.lastName);
+                    const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'N/A';
+                    const contact = resident.contactNo || 'N/A';
+                    const age = resident.age || 'N/A';
+                    const sex = toTitleCase(resident.sex);
+                    const birthday = resident.birthday || 'N/A';
+
+                    html += `
+                        <div class="glass-card">
+                            <div class="glass-header">
+                                <div class="glass-title">
+                                    ${renderAvatar(resident, 'fa-user')}
+                                    <span>${fullName}</span>
+                                </div>
+                                <div class="glass-meta">
+                                    <span><i class="fas fa-phone"></i> ${contact}</span>
+                                    <span><i class="fas fa-venus-mars"></i> ${sex}</span>
+                                    <span><i class="fas fa-id-card"></i> ${age}</span>
+                                    <span><i class="fas fa-cake-candles"></i> ${birthday}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        } else {
             html += `
                 <div class="no-data-message">
-                    <i class="fas fa-users mb-2"></i>
-                    <p class="mb-0">No members tagged</p>
+                    <i class="fas fa-user-times mb-2"></i>
+                    <p class="mb-0">No household heads found</p>
                 </div>
             `;
-        } else {
-            safeMembers.forEach(member => {
+        }
+
+        if (safeUnassigned.length > 0) {
+            html += '<div class="section-title">Unassigned Members</div>';
+            safeUnassigned.forEach(member => {
                 const resident = member.resident || {};
                 const firstName = toTitleCase(resident.firstName);
                 const middleName = toTitleCase(resident.middleName);
