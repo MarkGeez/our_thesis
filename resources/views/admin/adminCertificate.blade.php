@@ -46,20 +46,81 @@
                         <div class="card-body">
                             <form action="{{ route('admin.certificate.request.store') }}" method="POST">
                                 @csrf
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Certificate Type <span class="text-danger">*</span></label>
-                                        <select class="form-select" name="certificate_type" required>
-                                            <option value="">Select type...</option>
-                                            <option value="bonafide" {{ old('certificate_type') === 'bonafide' ? 'selected' : '' }}>Bonafide</option>
-                                            <option value="indigency" {{ old('certificate_type') === 'indigency' ? 'selected' : '' }}>Indigency</option>
-                                            <option value="soloparent" {{ old('certificate_type') === 'soloparent' ? 'selected' : '' }}>Solo Parent</option>
-                                            <option value="senior" {{ old('certificate_type') === 'senior' ? 'selected' : '' }}>Senior Citizen</option>
-                                        </select>
-                                    </div>
+                                <select id="certificate_type" name="certificate_type" class="form-select">
+    <option value="">-- Select Certificate --</option>
+    <option value="bonafide">Bonafide Certificate</option>
+    <option value="indigency">Certification of Indigency</option>
+    <option value="solo_parent">Affidavit of Solo Parent</option>
+    <option value="senior">Senior Citizen Certificate</option>
+</select>
+
                                     <div class="col-md-6">
                                         <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="purpose" value="{{ old('purpose') }}" placeholder="e.g. Employment" required maxlength="500">
+                                        <div id="bonafide_purpose" class="d-none">
+    <label>Purpose</label>
+    <select name="purpose" class="form-select bonafide-purpose">
+        <option value="">Select purpose</option>
+        <option>Bonafide Resident</option>
+        <option>Medical Treatment</option>
+        <option>Hospitalization Application</option>
+        <option>For Postal ID</option>
+        <option>School Reference</option>
+        <option>Referral</option>
+        <option>Transaction in Bank</option>
+        <option>Overseas Travel Papers</option>
+        <option>Processing for Calamity / Disaster Aid</option>
+        <option>S.S.S. Reference</option>
+        <option value="others">Others</option>
+    </select>
+
+    <input type="text" name="purpose_other" class="form-control mt-2 d-none"
+           placeholder="Please specify purpose">
+</div>
+
+<div id="indigency_purpose" class="d-none">
+    <label>Purpose</label>
+    <select name="purpose" class="form-select indigency-purpose">
+        <option value="">Select purpose</option>
+        <option>Medical Assistance</option>
+        <option>Educational Assistance</option>
+        <option>Burial Assistance</option>
+        <option>Financial Assistance</option>
+        <option value="others">Others</option>
+    </select>
+
+    <input type="text" name="purpose_other" class="form-control mt-2 d-none"
+           placeholder="Please specify purpose">
+</div>
+
+<div id="solo_parent_form" class="d-none">
+
+    <label>Married / Unmarried to</label>
+    <input type="text" name="form_data[partner_name]" class="form-control">
+
+    <label class="mt-2">Number of Children</label>
+    <input type="number" id="children_count" class="form-control" min="1">
+
+    <div id="children_container"></div>
+
+    <label class="mt-3">Separated from</label>
+    <input type="text" name="form_data[separated_from]" class="form-control">
+
+    <label class="mt-2">Since</label>
+    <input type="date" name="form_data[since]" class="form-control">
+
+</div>
+
+<div id="senior_form" class="d-none">
+    <label>Former Address</label>
+    <input type="text" name="form_data[former_address]" class="form-control">
+
+    <label class="mt-2">Transferred To</label>
+    <input type="text" name="form_data[new_address]" class="form-control">
+</div>
+
+
+
+
                                     </div>
                                     @php $res = $admin->resident ?? null; @endphp
                                     @if(!$res)
@@ -75,6 +136,8 @@
                             </form>
                         </div>
                     </div>
+
+
                     <h5 class="mb-3">My Requests</h5>
                     @if($requests->isEmpty())
                         <div class="alert alert-info">You have not submitted any certificate requests yet.</div>
@@ -120,6 +183,68 @@
 </div>
 </div> 
 
+
+<script>
+function handleOthers(selectClass) {
+    document.querySelectorAll(selectClass).forEach(select => {
+        select.addEventListener('change', function () {
+            const otherInput = this.parentElement.querySelector('input[name="purpose_other"]');
+
+            if (this.value === 'others') {
+                otherInput.classList.remove('d-none');
+            } else {
+                otherInput.classList.add('d-none');
+                otherInput.value = '';
+            }
+        });
+    });
+}
+
+// apply to both purpose dropdowns
+handleOthers('.bonafide-purpose');
+handleOthers('.indigency-purpose');
+
+    document.getElementById('children_count').addEventListener('input', function () {
+    const container = document.getElementById('children_container');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= this.value; i++) {
+        container.innerHTML += `
+            <div class="border p-2 mt-2">
+                <label>Child ${i} Name</label>
+                <input type="text" name="form_data[children][${i}][name]" class="form-control">
+
+                <label>Date of Birth</label>
+                <input type="date" name="form_data[children][${i}][dob]" class="form-control">
+            </div>
+        `;
+    }
+});
+
+document.getElementById('certificate_type').addEventListener('change', function () {
+    document.querySelectorAll(
+        '#bonafide_purpose, #indigency_purpose, #solo_parent_form, #senior_form'
+    ).forEach(div => div.classList.add('d-none'));
+
+    if (this.value === 'bonafide') {
+        document.getElementById('bonafide_purpose').classList.remove('d-none');
+    }
+
+    if (this.value === 'indigency') {
+        document.getElementById('indigency_purpose').classList.remove('d-none');
+    }
+
+    if (this.value === 'solo_parent') {
+        document.getElementById('solo_parent_form').classList.remove('d-none');
+    }
+
+    if (this.value === 'senior') {
+        document.getElementById('senior_form').classList.remove('d-none');
+    }
+});
+
+
+</script>
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
