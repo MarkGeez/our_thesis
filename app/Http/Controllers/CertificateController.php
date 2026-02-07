@@ -12,39 +12,88 @@ use Illuminate\View\View;
 class CertificateController extends Controller
 {
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'certificate_type' => 'required|in:bonafide,indigency,soloparent,senior',
-            'purpose' => 'required|string|max:500',
-            'address' => 'nullable|string|max:255',
-            'request_data' => 'nullable|array',
-        ]);
-
-        $user = Auth::user();
-        $resident = Resident::where('user_id', $user->id)->first();
-
-        $data = $validated['request_data'] ?? [];
-        if (!empty($validated['address'])) {
-            $data['address'] = $validated['address'];
-        }
-
-        CertificateRequest::create([
-            'user_id' => $user->id,
-            'resident_id' => $resident?->id,
-            'certificate_type' => $validated['certificate_type'],
-            'purpose' => $validated['purpose'],
-            'request_data' => $data,
-            'status' => 'pending',
-        ]);
-
-        $route = match ($user->role) {
-            'admin' => 'admin.adminCertificate',
-            'subadmin' => 'subadmin.subadminCertificate',
-            default => 'resident.certificate',
-        };
-
-        return redirect()->route($route)->with('success', 'Certificate request submitted successfully.');
+{
+    $validated = $request->validate([
+        'certificate_type' => 'required|in:bonafide,indigency,soloparent,senior',
+        'address' => 'nullable|string|max:255',
+        'request_data' => 'nullable|array',
+    ]);
+    
+    // Conditional validation based on certificate type
+    switch ($validated['certificate_type']) {
+        case 'bonafide':
+        case 'indigency':
+            $request->validate([
+                'purpose' => 'required|string|max:255',
+            ]);
+            break;
+        case 'soloparent':
+            // Validate solo parent specific fields
+            $request->validate([
+                'form_data.partner_name' => 'nullable|string|max:255',
+                'form_data.separated_from' => 'nullable|string|max:255',
+                'form_data.since' => 'nullable|date',
+                // Add children validation if needed
+            ]);
+            break;
+        case 'senior':
+            // Validate senior specific fields
+            $request->validate([
+                'form_data.former_address' => 'nullable|string|max:255',
+                'form_data.new_address' => 'nullable|string|max:255',
+            ]);
+            break;
     }
+    
+    // Handle "Others" for bonafide and indigency
+    $finalPurpose = $request->purpose ?? null;
+    $purposeOthers = null;
+    
+    if (in_array($validated['certificate_type'], ['bonafide', 'indigency'])) {
+        if ($request->purpose === 'others') {
+            $request->validate([
+                'purpose_other' => 'required|string|max:500',
+            ]);
+            $finalPurpose = 'others';
+            $purposeOthers = $request->purpose_other;
+        }
+    }
+    
+    $user = Auth::user();
+    $resident = Resident::where('user_id', $user->id)->first();
+    
+    $data = $validated['request_data'] ?? [];
+    
+    // For solo parent and senior, get form data
+    if (in_array($validated['certificate_type'], ['soloparent', 'senior'])) {
+        $formData = $request->form_data ?? [];
+        $data = array_merge($data, $formData);
+    }
+    
+    if (!empty($validated['address'])) {
+        $data['address'] = $validated['address'];
+    }
+    
+    CertificateRequest::create([
+        'user_id' => $user->id,
+        'resident_id' => $resident?->id,
+        'certificate_type' => $validated['certificate_type'],
+        'purpose' => $finalPurpose,
+        'purpose_other' => $purposeOthers,
+        'request_data' => $data,
+        'status' => 'pending',
+    ]);
+    
+    $route = match ($user->role) {
+        'admin' => 'admin.adminCertificate',
+        'subadmin' => 'subadmin.subadminCertificate',
+        default => 'resident.certificate',
+    };
+    
+    return redirect()
+        ->route($route)
+        ->with('success', 'Certificate request submitted successfully.');
+}
 
     public function approve(int $id)
     {

@@ -50,47 +50,54 @@
     <option value="">-- Select Certificate --</option>
     <option value="bonafide">Bonafide Certificate</option>
     <option value="indigency">Certification of Indigency</option>
-    <option value="solo_parent">Affidavit of Solo Parent</option>
+    <option value="soloparent">Affidavit of Solo Parent</option>
     <option value="senior">Senior Citizen Certificate</option>
 </select>
 
                                     <div class="col-md-6">
-                                        <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                                        <div id="bonafide_purpose" class="d-none">
-    <label>Purpose</label>
-    <select name="purpose" class="form-select bonafide-purpose">
-        <option value="">Select purpose</option>
-        <option>Bonafide Resident</option>
-        <option>Medical Treatment</option>
-        <option>Hospitalization Application</option>
-        <option>For Postal ID</option>
-        <option>School Reference</option>
-        <option>Referral</option>
-        <option>Transaction in Bank</option>
-        <option>Overseas Travel Papers</option>
-        <option>Processing for Calamity / Disaster Aid</option>
-        <option>S.S.S. Reference</option>
-        <option value="others">Others</option>
-    </select>
+    <label class="form-label">Purpose <span class="text-danger">*</span></label>
 
-    <input type="text" name="purpose_other" class="form-control mt-2 d-none"
-           placeholder="Please specify purpose">
+    <div id="bonafide_purpose" class="d-none">
+        <label>Purpose <span class="text-danger">*</span></label>
+
+        <div class="purpose-group" data-group="bonafide">
+            <label><input type="radio" name="purpose" value="Bonafide Resident"> Bonafide Resident</label><br>
+            <label><input type="radio" name="purpose" value="Medical Treatment"> Medical Treatment</label><br>
+            <label><input type="radio" name="purpose" value="Hospitalization Application"> Hospitalization Application</label><br>
+            <label><input type="radio" name="purpose" value="For Postal ID"> For Postal ID</label><br>
+            <label><input type="radio" name="purpose" value="School Reference"> School Reference</label><br>
+            <label><input type="radio" name="purpose" value="Referral"> Referral</label><br>
+            <label><input type="radio" name="purpose" value="Transaction in Bank"> Transaction in Bank</label><br>
+            <label><input type="radio" name="purpose" value="Overseas Travel Papers"> Overseas Travel Papers</label><br>
+            <label><input type="radio" name="purpose" value="Processing for Calamity / Disaster Aid"> Processing for Calamity / Disaster Aid</label><br>
+            <label><input type="radio" name="purpose" value="S.S.S. Reference"> S.S.S. Reference</label><br>
+
+            <label><input type="radio" name="purpose" value="others" class="purpose-others"> Others</label>
+
+            <!-- This input will show only when selecting "others" -->
+            <input type="text" class="form-control mt-2 purpose-other-input d-none"
+                placeholder="Please specify purpose">
+        </div>
+    </div>
 </div>
+
 
 <div id="indigency_purpose" class="d-none">
-    <label>Purpose</label>
-    <select name="purpose" class="form-select indigency-purpose">
-        <option value="">Select purpose</option>
-        <option>Medical Assistance</option>
-        <option>Educational Assistance</option>
-        <option>Burial Assistance</option>
-        <option>Financial Assistance</option>
-        <option value="others">Others</option>
-    </select>
+    <label>Purpose <span class="text-danger">*</span></label>
 
-    <input type="text" name="purpose_other" class="form-control mt-2 d-none"
-           placeholder="Please specify purpose">
+    <div class="purpose-group" data-group="indigency">
+        <label><input type="radio" name="purpose" value="Medical Assistance"> Medical Assistance</label><br>
+        <label><input type="radio" name="purpose" value="Educational Assistance"> Educational Assistance</label><br>
+        <label><input type="radio" name="purpose" value="Burial Assistance"> Burial Assistance</label><br>
+        <label><input type="radio" name="purpose" value="Financial Assistance"> Financial Assistance</label><br>
+
+        <label><input type="radio" name="purpose" value="others" class="purpose-others"> Others</label>
+
+        <input type="text" class="form-control mt-2 purpose-other-input d-none"
+            placeholder="Please specify purpose">
+    </div>
 </div>
+
 
 <div id="solo_parent_form" class="d-none">
 
@@ -183,28 +190,103 @@
 </div>
 </div> 
 
-
 <script>
-function handleOthers(selectClass) {
-    document.querySelectorAll(selectClass).forEach(select => {
-        select.addEventListener('change', function () {
-            const otherInput = this.parentElement.querySelector('input[name="purpose_other"]');
+// Event delegation approach - works with dynamically added elements
+document.addEventListener("change", function (event) {
+    if (event.target.name === "purpose") {
 
-            if (this.value === 'others') {
-                otherInput.classList.remove('d-none');
-            } else {
-                otherInput.classList.add('d-none');
-                otherInput.value = '';
-            }
+        const group = event.target.closest(".purpose-group");
+        const otherInput = group.querySelector(".purpose-other-input");
+
+        if (event.target.value === "others") {
+            otherInput.classList.remove("d-none");
+            otherInput.required = true;
+
+            // Override the radio value on form submit
+            otherInput.addEventListener("input", function () {
+                event.target.value = otherInput.value;
+            });
+
+        } else {
+            otherInput.classList.add("d-none");
+            otherInput.required = false;
+            otherInput.value = "";
+        }
+    }
+});
+
+
+
+// Handle certificate type change
+document.getElementById('certificate_type').addEventListener('change', function () {
+    // Hide all sections
+    document.querySelectorAll(
+        '#bonafide_purpose, #indigency_purpose, #solo_parent_form, #senior_form'
+    ).forEach(div => {
+        div.classList.add('d-none');
+        
+        // Disable all inputs in hidden sections
+        div.querySelectorAll('input, select, textarea').forEach(input => {
+            input.disabled = true;
         });
     });
-}
 
-// apply to both purpose dropdowns
-handleOthers('.bonafide-purpose');
-handleOthers('.indigency-purpose');
+    // Show selected section and enable inputs
+    if (this.value === 'bonafide') {
+        const section = document.getElementById('bonafide_purpose');
+        section.classList.remove('d-none');
+        section.querySelectorAll('input, select, textarea').forEach(input => {
+            input.disabled = false;
+        });
+        
+        // Check if "others" is already selected
+        const select = section.querySelector('.bonafide-purpose');
+        if (select.value === 'others') {
+            const otherInput = section.querySelector('input[name="purpose_other"]');
+            otherInput.classList.remove('d-none');
+            otherInput.disabled = false;
+            otherInput.setAttribute('name', 'purpose_other');
+            otherInput.required = true;
+        }
+    }
+    
+    if (this.value === 'indigency') {
+        const section = document.getElementById('indigency_purpose');
+        section.classList.remove('d-none');
+        section.querySelectorAll('input, select, textarea').forEach(input => {
+            input.disabled = false;
+        });
+        
+        // Check if "others" is already selected
+        const select = section.querySelector('.indigency-purpose');
+        if (select.value === 'others') {
+            const otherInput = section.querySelector('input[name="purpose_other"]');
+            otherInput.classList.remove('d-none');
+            otherInput.disabled = false;
+            otherInput.setAttribute('name', 'purpose_other');
+            otherInput.required = true;
+        }
+    }
 
-    document.getElementById('children_count').addEventListener('input', function () {
+    if (this.value === 'soloparent') {
+        const section = document.getElementById('solo_parent_form');
+        section.classList.remove('d-none');
+        section.querySelectorAll('input, select, textarea').forEach(input => {
+            input.disabled = false;
+        });
+    }
+
+    if (this.value === 'senior') {
+        const section = document.getElementById('senior_form');
+        section.classList.remove('d-none');
+        section.querySelectorAll('input, select, textarea').forEach(input => {
+            input.disabled = false;
+        });
+    }
+});
+
+// Children count handling
+document.getElementById('children_count').addEventListener('input', function () {
     const container = document.getElementById('children_container');
     container.innerHTML = '';
 
@@ -221,26 +303,22 @@ handleOthers('.indigency-purpose');
     }
 });
 
-document.getElementById('certificate_type').addEventListener('change', function () {
-    document.querySelectorAll(
-        '#bonafide_purpose, #indigency_purpose, #solo_parent_form, #senior_form'
-    ).forEach(div => div.classList.add('d-none'));
-
-    if (this.value === 'bonafide') {
-        document.getElementById('bonafide_purpose').classList.remove('d-none');
-    }
-
-    if (this.value === 'indigency') {
-        document.getElementById('indigency_purpose').classList.remove('d-none');
-    }
-
-    if (this.value === 'solo_parent') {
-        document.getElementById('solo_parent_form').classList.remove('d-none');
-    }
-
-    if (this.value === 'senior') {
-        document.getElementById('senior_form').classList.remove('d-none');
-    }
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded - initializing...');
+    
+    // Check initial state
+    document.querySelectorAll('.bonafide-purpose, .indigency-purpose').forEach(select => {
+        if (!select.closest('.d-none') && select.value === 'others') {
+            const otherInput = select.parentElement.querySelector('input[name="purpose_other"]');
+            if (otherInput) {
+                otherInput.classList.remove('d-none');
+                otherInput.disabled = false;
+                otherInput.setAttribute('name', 'purpose_other');
+                otherInput.required = true;
+            }
+        }
+    });
 });
 
 
