@@ -145,14 +145,14 @@
     <div class="main-wrapper">
         @include('admin.admin-header', ['admin' => auth()->user()])
 
-        <main class="main users chart-page" id="skip-target">
+                <main class="main users chart-page" id="skip-target">
             <div class="container-fluid px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 style="color:#000000; margin: 20px 45px;">Household Management</h2>
                 </div>
 
                 <div class="row g-4">
-                    @foreach ($street as $streets)
+                    @forelse ($street as $streets)
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                         <div class="card street-card h-100 shadow-sm">
                             <div class="card-body p-4">
@@ -174,7 +174,13 @@
                             </div>
                         </div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No streets found.
+                        </div>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </main>

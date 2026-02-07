@@ -69,7 +69,7 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName,houseNo,street'])
+        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName'])
             ->latest()
             ->get();
         
