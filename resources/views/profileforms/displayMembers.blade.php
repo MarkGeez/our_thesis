@@ -55,16 +55,19 @@
                                         </div>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <div class="btn-group">
+                                        <div class="d-flex gap-2 justify-content-end align-items-center">
                                             @include('profileforms.editFamily')
-                                            <form action="{{ route($user->role . '.untag.member', $member->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this family member?')">
-                    Delete
-                </button>
-            </form>
-                                            
+
+                                            <form action="{{ route(auth()->user()->role . '.untag.member', $member->id) }}" method="POST" class="m-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-outline-danger d-flex align-items-center" 
+                                                        onclick="return confirm('Are you sure you want to remove this family member?')" 
+                                                        style="padding: 0.25rem 0.75rem;">
+                                                    <i class="fa-solid fa-user-minus me-1"></i> Untag Member
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

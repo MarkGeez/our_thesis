@@ -279,11 +279,12 @@
                             <div class="modal-body">
                                 @include('profileforms.editresident')
                             </div>
-                            @include('profileforms.addMember')
                         </div>
                     </div>
                 </div>
             @endif
+
+            @include('profileforms.addMember')
         </div>
     </div>
 

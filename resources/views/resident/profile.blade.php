@@ -246,6 +246,8 @@
                     </div>
                 </div>
             @endif
+
+            @include('profileforms.addMember')
         </div>
     </div>
 

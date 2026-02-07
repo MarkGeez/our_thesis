@@ -631,7 +631,7 @@
         <option value="{{ $street->id }}">{{ $street->street_name }}</option>
     @endforeach
 </select>
-
+<label>House Number</label>
 <select name="house_id" class="form-control house-select">
     <option value="">-- Select House Number --</option>
 </select>
