@@ -33,6 +33,16 @@
     .watermark-arc{position:absolute;right:18px;bottom:150px;opacity:0.12;font-size:120px}
     .brgylogo-arc{position:absolute;right:1px;bottom:375px;opacity:0.12;font-size:120px}
     @media print{ body{background:white} .page{margin:0;box-shadow:none} .no-print{display:none!important;} }
+    .check-list {
+display: block;
+margin-top: 6px;
+}
+
+.check-list .check-item {
+display: flex;
+align-items: center;
+margin: 6px 0;
+}
   </style>
 </head>
 <body>
@@ -70,25 +80,35 @@
       <p style="font-size:14px">It is further certified that the above named person as known to be of good moral character and without any derogatory record in this BARANGAY.</p>
 <div style="font-weight:bold;margin-top:10px">
     This Certification is being issued upon the request of the bearer for:
+    {{--  
     @if($editable)
         <input type="text" class="fill-line" name="purpose" value="{{ $purpose }}" style="width:300px">
     @else
         <span class="fill-line">{{ $purpose }}</span>.
     @endif
+    --}}
 </div>      <div style="margin-top:10px">
         @php
           $checks = ['bonafide'=>'BONAFIDE RESIDENT','medical'=>'MEDICAL TREATMENT','hospital'=>'HOSPITALIZATION','postal'=>'APPLICATION FOR POSTAL ID','school'=>'SCHOOL REFERENCE','referral'=>'REFERRAL','transaction'=>'TRANSACTION IN BANK','overseas'=>'OVERSEAS TRAVEL PAPERS','Ccalamity'=>'PROCESSING FOR CALAMITY OF DISASTER AID','sss'=>'S.S.S. REFERENCE','others'=>'OTHERS'];
         @endphp
-        @foreach($checks as $key => $label)
-        <label class="check-item">
-          @if($editable)
-            <input type="checkbox" name="request_data[{{ $key }}]" value="1" {{ !empty($data[$key]) ? 'checked' : '' }}>
-          @else
-            <span class="check">{{ !empty($data[$key]) ? '✓' : '☐' }}</span>
-          @endif
-          {{ $label }}@if($key==='others') @if($editable)<input type="text" class="fill-line" name="request_data[others_specify]" value="{{ $data['others_specify'] ?? '' }}" style="width:120px">@else - {{ $data['others_specify'] ?? '' }}@endif @endif
-        </label>
-        @endforeach
+       @foreach($checks as $key => $label) <label class="check-item"> @if($editable) <input type="checkbox" name="request_data[{{ $key }}]" value="1" {{ !empty($data[$key]) ? 'checked' : '' }}> @else <span class="check">{{ !empty($data[$key]) ? '✓' : '☐' }}</span> @endif
+  {{ $label }}
+
+  @if($key === 'others')
+    @if($editable)
+      <input type="text"
+             class="fill-line"
+             name="request_data[others_specify]"
+             value="{{ $data['others_specify'] ?? '' }}"
+             style="width:140px">
+    @else
+      {{ $data['others_specify'] ?? '' }}
+    @endif
+  @endif
+</label>
+
+
+@endforeach
       </div>
       <br>
       <div style="font-weight:bold;margin-top:10px">IN WITNESS WHEREOF I have hereunto set my hand and affixed the Official Seal of this office. Done in the Barangay Hall, Barangay 249, Zone 23, District II, City of Manila.</div>

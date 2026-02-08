@@ -170,11 +170,11 @@
             <p class="intro" style="line-height: 35px;">
                 I,
                 @if($editable)
-                  <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? '' }}" style="width:50px"> years old, Filipino, and
+                  <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? $req->resident?->age ?? '' }}" style="width:50px"> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
                   Manila, with postal address at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">, after having duly sworn to in accordance with law, hereby depose and state:
                 @else
-                  <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? '______' }}</span> years old, Filipino, and
+                  <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
                   Manila, with postal address at <span class="fill-line">{{ $address }}</span>, after having duly sworn to in accordance with law, hereby depose and state:
                 @endif
@@ -195,13 +195,7 @@
                     @else
                         <span class="fill-line">{{ $data['spouse_name'] ?? '________________________' }}</span>
                     @endif
-                    and during our relationship we begot with
-                    @if($editable)
-                        <input type="text" class="fill-line" name="request_data[num_children]" value="{{ $data['num_children'] ?? '' }}" style="width:60px">
-                    @else
-                        <span class="fill-line">{{ $data['num_children'] ?? '____' }}</span>
-                    @endif
-                    child/ children named:
+                    and during our relationship we begot with <strong>{{ $data['num_children'] ?? '____' }}</strong> child/ children named:
 
                     <div class="table-header">
                         <div class="header-name">Name of Child/ Children</div>
@@ -209,25 +203,43 @@
                     </div>
 
                     <div class="children-table">
-                        @for($i = 1; $i <= 5; $i++)
-                        <div class="children-row">
-                            <div class="child-number">{{ $i }}.</div>
-                            <div class="child-name">
-                                @if($editable)
-                                    <input type="text" class="fill-line" name="request_data[children][{{ $i-1 }}][name]" value="{{ $data['children'][$i-1]['name'] ?? '' }}" style="display:block;min-width:200px">
-                                @else
-                                    <span class="fill-line" style="display:block;min-width:200px">{{ $data['children'][$i-1]['name'] ?? '' }}</span>
-                                @endif
-                            </div>
-                            <div class="child-dob">
-                                @if($editable)
-                                    <input type="text" class="fill-line" name="request_data[children][{{ $i-1 }}][dob]" value="{{ $data['children'][$i-1]['dob'] ?? '' }}" style="display:block;min-width:120px">
-                                @else
-                                    <span class="fill-line" style="display:block;min-width:120px">{{ $data['children'][$i-1]['dob'] ?? '' }}</span>
-                                @endif
-                            </div>
-                        </div>
-                        @endfor
+                        @php
+                            $childrenList = array_values($data['children'] ?? []);
+                            $numChildren = intval($data['num_children'] ?? 0);
+$displayCount = max(count($childrenList), $numChildren, 1);
+                        @endphp
+                        @for($i = 0; $i < $displayCount; $i++)
+
+<div class="children-row"> <div class="child-number">{{ $i + 1 }}.</div>
+<div class="child-name">
+    @if($editable)
+        <input type="text"
+               class="fill-line"
+               name="request_data[children][{{ $i }}][name]"
+               value="{{ $childrenList[$i]['name'] ?? '' }}"
+               style="display:block;min-width:200px">
+    @else
+        <span class="fill-line" style="display:block;min-width:200px">
+            {{ $childrenList[$i]['name'] ?? '' }}
+        </span>
+    @endif
+</div>
+
+<div class="child-dob">
+    @if($editable)
+        <input type="text"
+               class="fill-line"
+               name="request_data[children][{{ $i }}][dob]"
+               value="{{ $childrenList[$i]['dob'] ?? '' }}"
+               style="display:block;min-width:120px">
+    @else
+        <span class="fill-line" style="display:block;min-width:120px">
+            {{ $childrenList[$i]['dob'] ?? '' }}
+        </span>
+    @endif
+</div>
+
+</div> @endfor
                     </div>
                 </div>
             </div>

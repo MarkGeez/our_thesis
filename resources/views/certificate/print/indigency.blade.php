@@ -79,18 +79,18 @@
       <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:450px;height:450px;object-fit:contain"></div>
       <div style="position:relative;z-index:1;">
         <p style="font-size:16px;text-align:justify;text-indent:50px;line-height:1.8;">This is to certify that
-          
-          This Certification is being issued upon the request of the bearer for:
-    @if($editable)
-        <input type="text" class="fill-line" name="purpose" value="{{ $purpose }}" style="width:300px">
-    @else
-        <span class="fill-line">{{ $purpose }}</span>.
-    @endif
           @if($editable)
             <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:300px"> of legal age, a bonafide resident of BARANGAY 249 ZONE 23 DISTRICT II with postal address at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:350px">.
           @else
             <span class="fill-line">{{ $name }}</span> of legal age, a bonafide resident of BARANGAY 249 ZONE 23 DISTRICT II with postal address at <span class="fill-line">{{ $address }}</span>.
           @endif
+         {{--  This Certification is being issued upon the request of the bearer for:
+    @if($editable)
+        <input type="text" class="fill-line" name="purpose" value="{{ $purpose }}" style="width:300px">
+    @else
+        <span class="fill-line">{{ $purpose }}</span>.
+    @endif
+           --}}
         </p>
         <p style="font-size:16px;text-align:justify;text-indent:50px;line-height:1.8;">That as a resident of said Barangay, he/she is personally known to me. His/Her family belongs to the indigent families in our Barangay.</p>
         <div style="font-weight:bold;margin:30px 0 10px 0;font-size:16px;">This Certification is being issued for:</div>

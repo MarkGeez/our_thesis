@@ -179,26 +179,40 @@
         <form action="{{ route('admin.certificate.request.store') }}" method="POST">
             @csrf
             <input type="hidden" name="certificate_type" value="bonafide">
+            <input type="hidden" name="purpose" value="Bonafide Certification">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-id-card me-2 text-primary"></i>Request Bonafide Certificate</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-muted mb-3">Please select the purpose of your request:</p>
+                    <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
-                        @php $bonafidePurposes = ['Bonafide Resident', 'Medical Treatment', 'Hospitalization Application', 'For Postal ID', 'School Reference', 'Referral', 'Transaction in Bank', 'Overseas Travel Papers', 'S.S.S. Reference']; @endphp
-                        @foreach($bonafidePurposes as $p)
-                            <div class="form-check mb-1">
-                                <input class="form-check-input" type="radio" name="purpose" value="{{ $p }}" id="b_{{ $loop->index }}" required>
-                                <label class="form-check-label" for="b_{{ $loop->index }}">{{ $p }}</label>
+                        @php
+                        $bonafidePurposes = [
+                            'bonafide' => 'Bonafide Resident',
+                            'medical' => 'Medical Treatment',
+                            'hospital' => 'Hospitalization',
+                            'postal' => 'Application for Postal ID',
+                            'school' => 'School Reference',
+                            'referral' => 'Referral',
+                            'transaction' => 'Transaction in Bank',
+                            'overseas' => 'Overseas Travel Papers',
+                            'Ccalamity' => 'Processing for Calamity or Disaster Aid',
+                            'sss' => 'S.S.S. Reference'
+                        ];
+                        @endphp
+                        @foreach($bonafidePurposes as $key => $label)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="request_data[{{ $key }}]" value="1" id="b_{{ $key }}">
+                                <label class="form-check-label" for="b_{{ $key }}">{{ $label }}</label>
                             </div>
                         @endforeach
-                        <div class="form-check">
-                            <input class="form-check-input purpose-others-toggle" type="radio" name="purpose" value="others" id="b_others">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input purpose-others-toggle" type="checkbox" name="request_data[others]" value="1" id="b_others">
                             <label class="form-check-label" for="b_others">Others</label>
                         </div>
-                        <input type="text" class="form-control mt-2 d-none other-text-input" placeholder="Please specify your purpose">
+                        <input type="text" class="form-control mt-2 d-none other-text-input" name="request_data[others_specify]" placeholder="Please specify your purpose">
                     </div>
 
                     @if(!($admin->resident ?? null))
@@ -222,24 +236,36 @@
         <form action="{{ route('admin.certificate.request.store') }}" method="POST">
             @csrf
             <input type="hidden" name="certificate_type" value="indigency">
+            <input type="hidden" name="purpose" value="Indigency Certification">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-hand-holding-heart me-2 text-success"></i>Request Indigency Certificate</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
-                        @foreach(['Medical Assistance', 'Educational Assistance', 'Burial Assistance', 'Financial Assistance'] as $p)
-                            <div class="form-check mb-1">
-                                <input class="form-check-input" type="radio" name="purpose" value="{{ $p }}" id="i_{{ $loop->index }}" required>
-                                <label class="form-check-label" for="i_{{ $loop->index }}">{{ $p }}</label>
-                            </div>
-                        @endforeach
-                        <div class="form-check">
-                            <input class="form-check-input purpose-others-toggle" type="radio" name="purpose" value="others" id="i_others">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="request_data[medical]" value="1" id="i_medical">
+                            <label class="form-check-label" for="i_medical">Medical Assistance</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="request_data[educational]" value="1" id="i_educational">
+                            <label class="form-check-label" for="i_educational">Educational Assistance</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="request_data[burial]" value="1" id="i_burial">
+                            <label class="form-check-label" for="i_burial">Burial Assistance</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="request_data[financial]" value="1" id="i_financial">
+                            <label class="form-check-label" for="i_financial">Financial Assistance</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input purpose-others-toggle" type="checkbox" name="request_data[others]" value="1" id="i_others">
                             <label class="form-check-label" for="i_others">Others</label>
                         </div>
-                        <input type="text" class="form-control mt-2 d-none other-text-input" placeholder="Specify other indigency purpose">
+                        <input type="text" class="form-control mt-2 d-none other-text-input" name="request_data[others_specify]" placeholder="Specify other indigency purpose">
                     </div>
                 </div>
                 <div class="modal-footer border-0">
@@ -321,21 +347,15 @@
 
 <script>
     document.addEventListener("change", function (e) {
-        // Toggle "Others" input visibility
+        // Toggle "Others" input visibility for checkboxes
         if (e.target.classList.contains("purpose-others-toggle")) {
             const modalBody = e.target.closest(".modal-body");
             const otherInput = modalBody.querySelector(".other-text-input");
-            otherInput.classList.remove("d-none");
-            otherInput.required = true;
-            otherInput.focus();
-            
-            otherInput.addEventListener("input", function() {
-                e.target.value = this.value; 
-            });
-        } else if (e.target.name === "purpose") {
-            const modalBody = e.target.closest(".modal-body");
-            const otherInput = modalBody.querySelector(".other-text-input");
-            if(otherInput) {
+            if (e.target.checked) {
+                otherInput.classList.remove("d-none");
+                otherInput.required = true;
+                otherInput.focus();
+            } else {
                 otherInput.classList.add("d-none");
                 otherInput.required = false;
                 otherInput.value = "";
