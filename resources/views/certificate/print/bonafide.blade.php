@@ -68,8 +68,14 @@
       </p>
       <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:350px;height:350px;object-fit:contain"></div>
       <p style="font-size:14px">It is further certified that the above named person as known to be of good moral character and without any derogatory record in this BARANGAY.</p>
-      <div style="font-weight:bold;margin-top:10px">This Certification is being issued upon the request of the bearer for: AS REQUIREMENTS AND/OR TO SUPPORT HIS/HER.</div>
-      <div style="margin-top:10px">
+<div style="font-weight:bold;margin-top:10px">
+    This Certification is being issued upon the request of the bearer for:
+    @if($editable)
+        <input type="text" class="fill-line" name="purpose" value="{{ $purpose }}" style="width:300px">
+    @else
+        <span class="fill-line">{{ $purpose }}</span>.
+    @endif
+</div>      <div style="margin-top:10px">
         @php
           $checks = ['bonafide'=>'BONAFIDE RESIDENT','medical'=>'MEDICAL TREATMENT','hospital'=>'HOSPITALIZATION','postal'=>'APPLICATION FOR POSTAL ID','school'=>'SCHOOL REFERENCE','referral'=>'REFERRAL','transaction'=>'TRANSACTION IN BANK','overseas'=>'OVERSEAS TRAVEL PAPERS','Ccalamity'=>'PROCESSING FOR CALAMITY OF DISASTER AID','sss'=>'S.S.S. REFERENCE','others'=>'OTHERS'];
         @endphp

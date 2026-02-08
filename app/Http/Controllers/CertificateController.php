@@ -187,7 +187,7 @@ class CertificateController extends Controller
             }
         }
 
-        $purpose = $req->purpose;
+        $purpose = $request->input('purpose', $req->purpose);
         $forPrint = true;
         $editable = false;
 
