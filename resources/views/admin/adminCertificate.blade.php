@@ -332,10 +332,6 @@
                         <label class="form-label">Former Address</label>
                         <input type="text" name="form_data[former_address]" class="form-control" placeholder="Where did you live before?">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Transferred To</label>
-                        <input type="text" name="form_data[new_address]" class="form-control" placeholder="Current address in this Barangay">
-                    </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn btn-warning w-100 text-white">Submit Request</button>

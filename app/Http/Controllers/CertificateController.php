@@ -162,7 +162,10 @@ class CertificateController extends Controller
         }
 
         $name = $request->input('name', ucwords(strtolower($req->requester_name)));
-        $address = $request->input('address', ucwords(strtolower($req->requester_address)));
+        $address = $request->input(
+    'former_address',
+    $req->request_data['former_address'] ?? null
+);
         $data = $req->request_data ?? [];
         $submitted = $request->input('request_data', []);
         foreach ($submitted as $k => $v) {
@@ -253,8 +256,10 @@ class CertificateController extends Controller
             'senior' => 'certificate.print.senior',
             default => 'certificate.print.bonafide',
         };
+        $data = $req->request_data ?? [];
+
         $name = ucwords(strtolower($req->requester_name));
-        $address = ucwords(strtolower($req->requester_address));
+$address = $data['former_address'] ?? null;
         $purpose = $req->purpose;
         $data = $req->request_data ?? [];
         $issued = $req->approved_at ?? now();

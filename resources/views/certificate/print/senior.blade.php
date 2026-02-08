@@ -129,10 +129,17 @@
         <div class="paragraph">
             This is to certify that
             @if($editable)
-              <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:300px">, legal age, and formerly residing at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:250px"> has already transfer to Barangay 249 Zone 23 District II Tondo, Manila.
-            @else
-              <span class="fill-line">{{ $name }}</span>, legal age, and formerly residing at <span class="fill-line">{{ $address }}</span> has already transfer to Barangay 249 Zone 23 District II Tondo, Manila.
-            @endif
+    <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:300px">,
+    legal age, and formerly residing at 
+    <input type="text" class="fill-line" name="former_address" value="{{ $address }}" style="width:250px"> 
+    has already transferred to Barangay 249 Zone 23 District II Tondo, Manila.
+@else
+    <span class="fill-line">{{ $name }}</span>,
+    legal age, and formerly residing at 
+    <span class="fill-line">{{ $address }}</span> 
+    has already transferred to Barangay 249 Zone 23 District II Tondo, Manila.
+@endif
+
         </div>
         <div class="paragraph">
             This certifies further that the above-named person, a Senior Citizen, was already stricken off in the Senior Masterlist Record in our Barangay as per memorandum from MBB and OSCA.
