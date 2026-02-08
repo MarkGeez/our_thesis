@@ -153,13 +153,13 @@
 <div class="page">
     <div class="header-row">
         <div style="display:flex;gap:12px;align-items:center">
-            <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" class="logo-small" alt="">
+            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="logo-small" alt="">
             <div>
                 <div style="font-size:15px;font-weight:bold">REPUBLIC OF THE PHILIPPINES</div>
                 <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
             </div>
         </div>
-        <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
+        <img src="{{ asset('images/Brgy-logo-1.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
     </div>
 
     <div class="content">
@@ -180,7 +180,7 @@
                 @endif
             </p>
 
-            <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
+            <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
 
             <div class="checkbox-section">
                 @if($editable)
@@ -195,7 +195,13 @@
                     @else
                         <span class="fill-line">{{ $data['spouse_name'] ?? '________________________' }}</span>
                     @endif
-                    and during our relationship we begot with <strong>{{ $data['num_children'] ?? '____' }}</strong> child/ children named:
+                    and during our relationship we begot with
+                    @if($editable)
+                        <input type="text" class="fill-line" name="request_data[num_children]" value="{{ $data['num_children'] ?? '' }}" style="width:60px">
+                    @else
+                        <span class="fill-line">{{ $data['num_children'] ?? '____' }}</span>
+                    @endif
+                    child/ children named:
 
                     <div class="table-header">
                         <div class="header-name">Name of Child/ Children</div>

@@ -44,9 +44,9 @@
     .cert-title{text-align:center;font-size:20px;font-weight:bold;margin:35px 0 12px 0}
     .fill-line{display:inline;border:none;border-bottom:1px solid #222;padding:0 4px;font-size:15px;background:transparent}
     .fill-line:focus{outline:none}
-    .check-item{display:inline-flex;align-items:center;font-size:14px;margin:6px 8px 6px 0}
-    .check-item .check{color:#0a3a8a;font-weight:bold}
-    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:4px}
+    .check-item{display:flex;align-items:center;font-size:14px;margin:8px 0;width:100%}
+    .check-item .check{color:#000000;font-weight:bold;font-size:16px; margin-right:8px;}
+    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:8px;accent-color:#000000;cursor:pointer;margin-right:8px;}
     .signature{text-align:right;margin-top:40px}
     .signature-line{border-top:1px solid #222;width:250px;margin-left:auto;padding-top:4px}
     .watermark-arc{position:absolute;right:18px;bottom:150px;opacity:0.12}
@@ -64,19 +64,19 @@
 <div class="page">
   <div class="header-row">
     <div style="display:flex;gap:12px;align-items:center">
-      <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" class="logo-small" alt="">
+      <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="logo-small" alt="">
       <div>
         <div style="font-size:15px;font-weight:bold">REPUBLIC OF THE PHILIPPINES</div>
         <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
       </div>
     </div>
-    <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
+    <img src="{{ asset('images/Brgy-logo-1.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
   </div>
   <div class="content">
     @include('certificate.certificateofficials')
     <main class="right">
       <div class="cert-title">CERTIFICATION OF INDIGENCY</div>
-      <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:450px;height:450px;object-fit:contain"></div>
+      <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:450px;height:450px;object-fit:contain"></div>
       <div style="position:relative;z-index:1;">
         <p style="font-size:16px;text-align:justify;text-indent:50px;line-height:1.8;">This is to certify that
           @if($editable)
@@ -94,7 +94,7 @@
         </p>
         <p style="font-size:16px;text-align:justify;text-indent:50px;line-height:1.8;">That as a resident of said Barangay, he/she is personally known to me. His/Her family belongs to the indigent families in our Barangay.</p>
         <div style="font-weight:bold;margin:30px 0 10px 0;font-size:16px;">This Certification is being issued for:</div>
-        <div style="margin-left:20px;">
+        <div style="margin-left:20px;" class="check-list">
           @php $checks = ['medical'=>'MEDICAL ASSISTANCE','educational'=>'EDUCATIONAL ASSISTANCE','burial'=>'BURIAL ASSISTANCE','financial'=>'FINANCIAL ASSISTANCE','others'=>'OTHERS']; @endphp
           @foreach($checks as $key => $label)
           <label class="check-item">

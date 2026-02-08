@@ -110,7 +110,7 @@
 
 <div class="page">
     <div class="header-container">
-        <img src="{{ asset('template/img/barangay-logo.png') }}" class="header-logo" alt="Barangay Logo">
+        <img src="{{ asset('images/Brgy-logo-1.png') }}" class="header-logo" alt="Barangay Logo">
         <div class="header-text">
             <div class="republic">Republic of the Philippines</div>
             <h1 class="office-title">Office of the Barangay Chairman</h1>
@@ -119,7 +119,7 @@
         </div>
         <div style="display: flex; gap: 5px;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Ph_seal_ncr_manila.svg/250px-Ph_seal_ncr_manila.svg.png" class="header-logo" style="width: 60px;" alt="Manila Seal">
-            <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" class="header-logo" style="width: 60px;" alt="Bagong Pilipinas">
+            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="header-logo" style="width: 60px;" alt="Bagong Pilipinas">
         </div>
     </div>
 
