@@ -2,6 +2,17 @@
     $user= auth()->user();
 @endphp
 
+<div class="card-footer text-end">
+            <button 
+                type="button" 
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#addFamilyMemberModal">
+                <i class="fas fa-user-plus me-2"></i>Add Family Member
+</button>
+                    </div>
+
+
 <div class="container">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
@@ -31,7 +42,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="birthday" class="form-label">Birthday <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" id="birthday" name="birthday" required>
+                        <input type="date" class="form-control" id="birthday" name="birthdate" required>
                     </div>
 
                     <div class="col-md-6 mb-3">

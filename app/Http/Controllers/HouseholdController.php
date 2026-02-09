@@ -156,7 +156,7 @@ private function calculateAge($birthdate)
                 'firstName' => $validated['firstName'],
                 'middleName' => $validated['middleName'] ?? null,
                 'lastName' => $validated['lastName'],
-                'birthdate' => $birthday,
+                'birthdate' => $validated['birthdate'],
                 'relationship' => $validated['relationship'],
                 'sex' => $validated['sex'],
                 'contactNumber' => $validated['contactNumber'] ?? '',
