@@ -201,7 +201,7 @@ private function calculateAge($birthdate)
 
 
 
-
+    
 public function untagMember(Request $request, $id){
     $member= FamilyMember::findOrFail($id);
 
