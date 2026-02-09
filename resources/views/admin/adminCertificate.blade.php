@@ -289,10 +289,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Married / Unmarried to</label>
-                            <input type="text" name="form_data[partner_name]" class="form-control" required>
-                        </div>
+                        
                         <div class="col-md-6">
                             <label class="form-label">Number of Children</label>
                             <input type="number" id="solo_child_count" class="form-control" min="1" required>

@@ -169,9 +169,15 @@ class CertificateController extends Controller
        $data = $req->request_data ?? [];
 $submitted = $request->input('request_data', []);
 
+
 foreach ($submitted as $k => $v) {
     $data[$k] = $v;
 }
+// Auto-count number of children from the children array
+if (!isset($submitted['children']) && isset($req->request_data['children'])) {
+    $data['children'] = $req->request_data['children'];
+}
+
 
 // Clear unchecked checkboxes
 $checkboxKeys = [
@@ -185,6 +191,12 @@ foreach ($checkboxKeys as $k) {
         $data[$k] = null;
     }
 }
+
+// Restore children if it exists and was not part of checkboxKeys
+if (isset($req->request_data['children'])) {
+    $data['children'] = $req->request_data['children'];
+}
+
 
 $req->request_data = $data;
 $req->save();
