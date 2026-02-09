@@ -212,7 +212,7 @@
                         @php
                             $childrenList = array_values($data['children'] ?? []);
                             $numChildren = intval($data['num_children'] ?? 0);
-$displayCount = max(count($childrenList), $numChildren, 1);
+                            $displayCount = max(count($childrenList), $numChildren, 1);
                         @endphp
                         @for($i = 0; $i < $displayCount; $i++)
 
