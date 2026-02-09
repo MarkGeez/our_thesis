@@ -12,39 +12,88 @@ use Illuminate\View\View;
 class CertificateController extends Controller
 {
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'certificate_type' => 'required|in:bonafide,indigency,soloparent,senior',
-            'purpose' => 'required|string|max:500',
-            'address' => 'nullable|string|max:255',
-            'request_data' => 'nullable|array',
-        ]);
-
-        $user = Auth::user();
-        $resident = Resident::where('user_id', $user->id)->first();
-
-        $data = $validated['request_data'] ?? [];
-        if (!empty($validated['address'])) {
-            $data['address'] = $validated['address'];
-        }
-
-        CertificateRequest::create([
-            'user_id' => $user->id,
-            'resident_id' => $resident?->id,
-            'certificate_type' => $validated['certificate_type'],
-            'purpose' => $validated['purpose'],
-            'request_data' => $data,
-            'status' => 'pending',
-        ]);
-
-        $route = match ($user->role) {
-            'admin' => 'admin.adminCertificate',
-            'subadmin' => 'subadmin.subadminCertificate',
-            default => 'resident.certificate',
-        };
-
-        return redirect()->route($route)->with('success', 'Certificate request submitted successfully.');
+{
+    $validated = $request->validate([
+        'certificate_type' => 'required|in:bonafide,indigency,soloparent,senior',
+        'address' => 'nullable|string|max:255',
+        'request_data' => 'nullable|array',
+    ]);
+    
+    // Conditional validation based on certificate type
+    switch ($validated['certificate_type']) {
+        case 'bonafide':
+        case 'indigency':
+            $request->validate([
+                'purpose' => 'required|string|max:255',
+            ]);
+            break;
+        case 'soloparent':
+            // Validate solo parent specific fields
+            $request->validate([
+                'form_data.partner_name' => 'nullable|string|max:255',
+                'form_data.separated_from' => 'nullable|string|max:255',
+                'form_data.since' => 'nullable|date',
+                // Add children validation if needed
+            ]);
+            break;
+        case 'senior':
+            // Validate senior specific fields
+            $request->validate([
+                'form_data.former_address' => 'nullable|string|max:255',
+                'form_data.new_address' => 'nullable|string|max:255',
+            ]);
+            break;
     }
+    
+    // Handle "Others" for bonafide and indigency
+    $finalPurpose = $request->purpose ?? null;
+    $purposeOthers = null;
+    
+    if (in_array($validated['certificate_type'], ['bonafide', 'indigency'])) {
+        if ($request->purpose === 'others') {
+            $request->validate([
+                'purpose_other' => 'required|string|max:500',
+            ]);
+            $finalPurpose = 'others';
+            $purposeOthers = $request->purpose_other;
+        }
+    }
+    
+    $user = Auth::user();
+    $resident = Resident::where('user_id', $user->id)->first();
+    
+    $data = $validated['request_data'] ?? [];
+    
+    // For solo parent and senior, get form data
+    if (in_array($validated['certificate_type'], ['soloparent', 'senior'])) {
+        $formData = $request->form_data ?? [];
+        $data = array_merge($data, $formData);
+    }
+    
+    if (!empty($validated['address'])) {
+        $data['address'] = $validated['address'];
+    }
+    
+    CertificateRequest::create([
+        'user_id' => $user->id,
+        'resident_id' => $resident?->id,
+        'certificate_type' => $validated['certificate_type'],
+        'purpose' => $finalPurpose,
+        'purpose_other' => $purposeOthers,
+        'request_data' => $data,
+        'status' => 'pending',
+    ]);
+    
+    $route = match ($user->role) {
+        'admin' => 'admin.adminCertificate',
+        'subadmin' => 'subadmin.subadminCertificate',
+        default => 'resident.certificate',
+    };
+    
+    return redirect()
+        ->route($route)
+        ->with('success', 'Certificate request submitted successfully.');
+}
 
     public function approve(int $id)
     {
@@ -113,19 +162,32 @@ class CertificateController extends Controller
         }
 
         $name = $request->input('name', ucwords(strtolower($req->requester_name)));
-        $address = $request->input('address', ucwords(strtolower($req->requester_address)));
-        $data = $req->request_data ?? [];
-        $submitted = $request->input('request_data', []);
-        foreach ($submitted as $k => $v) {
-            $data[$k] = $v;
-        }
-        // Clear checkbox keys not in submitted (user unchecked them)
-        $checkboxKeys = ['bonafide','medical','hospital','postal','school','referral','transaction','overseas','Ccalamity','sss','others','married_to','no_knowledge_whereabouts','separated'];
-        foreach ($checkboxKeys as $k) {
-            if (!array_key_exists($k, $submitted)) {
-                $data[$k] = null;
-            }
-        }
+        $address = $request->input(
+    'former_address',
+    $req->request_data['former_address'] ?? null
+);
+       $data = $req->request_data ?? [];
+$submitted = $request->input('request_data', []);
+
+foreach ($submitted as $k => $v) {
+    $data[$k] = $v;
+}
+
+// Clear unchecked checkboxes
+$checkboxKeys = [
+    'bonafide','medical','hospital','postal','school','referral',
+    'transaction','overseas','Ccalamity','sss','others',
+    'married_to','whereabouts','separated','attest_truth'
+];
+
+foreach ($checkboxKeys as $k) {
+    if (!array_key_exists($k, $submitted)) {
+        $data[$k] = null;
+    }
+}
+
+$req->request_data = $data;
+$req->save();
 
         $issued = $req->approved_at ?? now();
         if ($request->filled('issued_day') && $request->filled('issued_month') && $request->filled('issued_year')) {
@@ -138,7 +200,7 @@ class CertificateController extends Controller
             }
         }
 
-        $purpose = $req->purpose;
+        $purpose = $request->input('purpose', $req->purpose);
         $forPrint = true;
         $editable = false;
 
@@ -204,8 +266,10 @@ class CertificateController extends Controller
             'senior' => 'certificate.print.senior',
             default => 'certificate.print.bonafide',
         };
+        $data = $req->request_data ?? [];
+
         $name = ucwords(strtolower($req->requester_name));
-        $address = ucwords(strtolower($req->requester_address));
+$address = $data['former_address'] ?? null;
         $purpose = $req->purpose;
         $data = $req->request_data ?? [];
         $issued = $req->approved_at ?? now();

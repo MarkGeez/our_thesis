@@ -63,8 +63,8 @@
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="d-flex justify-content-center mb-3">
-                                @if($admin->profile_image)
-                                    <img src="{{ asset('storage/' . $admin->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                                @if($user->profile_image)
+                                    <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
                                 @else
                                     <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background-color: #f1f3f5;">
                                         <i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>
@@ -77,36 +77,36 @@
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Full Name</div>
                         <div class="col-7">
-                            {{ ucwords($admin->firstName) }}
-                            {{ ucwords($admin->middleName) }}
-                            {{ ucwords($admin->lastName) }}
+                            {{ ucwords($user->firstName) }}
+                            {{ ucwords($user->middleName) }}
+                            {{ ucwords($user->lastName) }}
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Email</div>
-                        <div class="col-7">{{ $admin->email }}</div>
+                        <div class="col-7">{{ $user->email }}</div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Contact No.</div>
-                        <div class="col-7">{{ $admin->contactNumber }}</div>
+                        <div class="col-7">{{ $user->contactNumber }}</div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Birthday</div>
-                        <div class="col-7">{{ \Carbon\Carbon::parse($admin->birthday)->format('F d, Y') }}</div>
+                        <div class="col-7">{{ \Carbon\Carbon::parse($user->birthday)->format('F d, Y') }}</div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Role</div>
-                        <div class="col-7 text-capitalize">{{ $admin->role }}</div>
+                        <div class="col-7 text-capitalize">{{ $user->role }}</div>
                     </div>
 
                     <div class="row mb-2">
                         <div class="col-5 text-muted">Proof of Identity</div>
                         <div class="col-7">
-                            @if($admin->proofOfIdentity)
+                            @if($user->proofOfIdentity)
                                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#proofModalAdmin">
                                     View Proof
                                 </button>
@@ -138,6 +138,23 @@
         
     </div>
 </div>
+
+    @include('profileforms.displayMembers')
+    {{--  @else
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center">
+                <i class="fas fa-info-circle fs-4 me-3"></i>
+                <div>
+                    <strong>No family members listed.</strong> 
+                    You can add members using the button in the Resident Information section.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @endif
+--}}
 
    <div class="row">
         <div class="col-12">
@@ -171,10 +188,12 @@
                     </div>
                 </div>
             @endif
+
+            @include('profileforms.addMember')
         </div>
     </div>
 
-    @if($admin->proofOfIdentity)
+    @if($user->proofOfIdentity)
         <div class="modal fade" id="proofModalAdmin" tabindex="-1" aria-labelledby="proofModalAdminLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
@@ -183,7 +202,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <img src="{{ asset('storage/' . $admin->proofOfIdentity) }}" alt="Proof of identity" class="img-fluid" style="max-height:70vh;object-fit:contain;">
+                        <img src="{{ asset('storage/' . $user->proofOfIdentity) }}" alt="Proof of identity" class="img-fluid" style="max-height:70vh;object-fit:contain;">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

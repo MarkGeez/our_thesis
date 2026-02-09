@@ -49,10 +49,16 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
     Route::prefix('resident')->name('resident.')->group(function(){
         Route::get('/dashboard', [ResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
+        Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
+        Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
+
         Route::get('/profile/add-family', function () {
             return view('profileforms.addMemberPage');
         })->name('family.add');
         Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
+   Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
+    Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
+
 
         Route::get('/blotter', [BlotterController::class, 'ownBlotters'])->name('Blotter');
 
@@ -85,19 +91,15 @@ Route::prefix('admin/blotter')
         // List blotters
         Route::get('/', [BlotterController::class, 'index'])
             ->name('index');
-
         // Show create form
         Route::get('/create', [BlotterController::class, 'create'])
             ->name('create');
-
         // Store new blotter
         Route::post('/', [BlotterController::class, 'submitBlotter'])
             ->name('store');
-
         // Show update form - Use different URI pattern
         Route::get('/{id}/edit', [BlotterController::class, 'showUpdateForm'])
             ->name('update.form');
-
         // Store new update (append-only) - Use different method and URI
         Route::put('/{id}/updates', [BlotterController::class, 'storeUpdate'])
             ->name('update.store');
@@ -118,8 +120,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/household-management', [HouseholdController::class, 'showHousehold'])->name('household');
     Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
     Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
-    Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('admin.untag.member');
-    Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('admin.edit.family');
+    Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
+    Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
+
+
 
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');

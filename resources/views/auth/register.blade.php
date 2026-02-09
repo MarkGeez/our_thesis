@@ -140,8 +140,9 @@
             margin-bottom: 0.25rem !important;
         }
 
-        .text-danger.small {
-            font-size: 0.75rem;  
+        .text-light.small {
+            font-size: 0.67rem; 
+            margin: 0 2px 
         }
         #textforlogin {
             font-size: 0.9rem;
@@ -209,7 +210,7 @@
                 placeholder="Enter your first name" value="{{ old('firstName') }}" required>
                 <i class="fa-solid fa-user input-icon"></i>
                 @error('firstName')
-                <div class="text-danger small mt-1">{{ $message}}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message}}</div>
                 @enderror
             </div>
 
@@ -221,7 +222,7 @@
                 placeholder="Enter your middle name" value="{{ old('middleName') }}" required> 
                 <i class="fa-solid fa-user input-icon"></i>
                 @error('middleName')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -231,7 +232,7 @@
                 placeholder="Enter your last name" value="{{ old('lastName') }}" required>
                 <i class="fa-solid fa-user input-icon"></i>
                 @error('lastName')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -241,7 +242,7 @@
                 placeholder="Enter your email" value="{{ old('email') }}" required>
                 <i class="fa-solid fa-envelope input-icon"></i>
                 @error('email')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -251,7 +252,7 @@
                 placeholder="Enter your password" required>
                 <i class="fa-solid fa-lock input-icon"></i>
                 @error('password')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -261,7 +262,7 @@
                 placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
                 <i class="fa-solid fa-phone input-icon"></i>
                 @error('contactNumber')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -270,7 +271,7 @@
                 <input type="date" name="birthday" id="birthday" class="form-control"
                 value="{{ old('birthday') }}" required>
                 @error('birthday')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -279,7 +280,7 @@
                 <input type="file" accept=".jpg, .jpeg, .png" name="proofOfIdentity"
                 id="proofOfIdentity" class="form-control">
                 @error('proofOfIdentity')
-                <div class="text-danger small mt-1">{{ $message }}</div>
+                <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                 @enderror
             </div>
 

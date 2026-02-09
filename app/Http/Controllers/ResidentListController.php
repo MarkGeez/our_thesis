@@ -10,10 +10,7 @@ use App\Models\House;
 use App\Models\Street;
 use App\Models\Household;
 use App\Models\HouseholdResident;
-
 use Illuminate\Support\Arr;
-
-
 use Illuminate\Support\Facades\Storage;
 
 
@@ -31,7 +28,7 @@ class ResidentListController extends Controller
     
     $searchTerm = $request->input('search');
     
-    $residents = Resident::with(['user:id,firstName,lastname', 'official'])
+    $residents = Resident::with(['user:id,firstName,lastname', 'official', 'households.house.street'])
         ->when($searchTerm, function($query, $searchTerm) {
             return $query->where(function($q) use ($searchTerm) {
                 $q->where('firstName', 'like', "%{$searchTerm}%")
@@ -102,7 +99,7 @@ $household = Household::where('house_id', $validated['house_id'])->firstOrFail()
     
     }
 
-    public function updateResident(Request $request, $id){
+      public function updateResident(Request $request, $id){
         $user = auth()->user();
 
         if(!$user || $user->role === "resident" || $user->role === "non-resident"){

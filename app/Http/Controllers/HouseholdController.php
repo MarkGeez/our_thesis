@@ -26,6 +26,20 @@ class HouseholdController extends Controller
     $houses = House::where('street_id', $id)
         ->withCount('households')
         ->get();
+
+    $houseIds = $houses->pluck('id');
+
+    $headsCountByHouse = HouseholdResident::join('households', 'household_resident.household_id', '=', 'households.id')
+        ->where('household_resident.is_household_head', true)
+        ->whereIn('households.house_id', $houseIds)
+        ->selectRaw('households.house_id, count(*) as heads_count')
+        ->groupBy('households.house_id')
+        ->pluck('heads_count', 'households.house_id');
+
+    $houses->transform(function ($house) use ($headsCountByHouse) {
+        $house->heads_count = (int) ($headsCountByHouse[$house->id] ?? 0);
+        return $house;
+    });
     
     // Return JSON for AJAX requests
     if (request()->ajax() || request()->wantsJson()) {
@@ -41,25 +55,30 @@ class HouseholdController extends Controller
     return view('admin.houses', compact('houses'));
 }
 
-    public function showHeads($id)
+public function showHeads($id)
 {
     $house = House::findOrFail($id);
 
-    $heads = HouseholdResident::with('resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path')
+    // Get Heads - explicitly ensure user_id is loaded from the resident relationship
+    $heads = HouseholdResident::with(['resident' => function($query) {
+            $query->select('id', 'user_id', 'firstName', 'middleName', 'lastName', 'contactNo', 'birthday', 'age', 'sex', 'image_path');
+        }])
         ->whereHas('household', function ($q) use ($id) {
             $q->where('house_id', $id);
         })
         ->where('is_household_head', true)
         ->get();
         
-    $members = FamilyMember::whereHas('household', function($q) use($id) {
-        $q->where('house_id', $id);
-    })->get();
+    // Get members and ensure we have encoded_by
+    $membersRaw = FamilyMember::whereHas('household', function($q) use($id) {
+            $q->where('house_id', $id);
+        })->get();
 
-    // Transform FamilyMember data to match expected format with 'resident' object
-    $members = $members->map(function($member) {
+    $allMembers = $membersRaw->map(function($member) {
         return [
             'id' => $member->id,
+            'household_id' => $member->household_id,
+            'encoded_by' => (int)$member->encoded_by, // Cast to int for strict comparison
             'resident' => [
                 'firstName' => $member->firstName,
                 'middleName' => $member->middleName,
@@ -73,19 +92,28 @@ class HouseholdController extends Controller
         ];
     });
 
-    // Return JSON for AJAX requests
+    $groups = $heads->map(function ($head) use ($allMembers) {
+        // This is the key link: Head's User ID == Member's Encoded By
+        $headUserId = (int)$head->resident->user_id; 
+        
+        $headMembers = $allMembers->filter(function($m) use ($headUserId) {
+            return $m['encoded_by'] === $headUserId;
+        })->values();
+
+        return [
+            'head' => $head,
+            'members' => $headMembers,
+        ];
+    })->values();
+
     if (request()->ajax() || request()->wantsJson()) {
         return response()->json([
             'success' => true,
-            'heads' => $heads,
-            'members' => $members,
-            'house' => $house
+            'groups' => $groups,
+            'unassigned_members' => $allMembers->whereNotIn('encoded_by', $heads->pluck('resident.user_id'))->values(),
         ]);
     }
-
-    return view('admin.househeads', compact('heads', 'house', 'members'));
 }
-
 private function calculateAge($birthdate)
 {
     if (!$birthdate) {
@@ -197,5 +225,34 @@ public function editMember(Request $request, $id)
     
     return redirect()->back()->with('success', 'Family member details successfully updated.');
 }
+
+public function untagMember(Request $request, $id){
+    $member= FamilyMember::findOrFail($id);
+
+    $member->delete();
+
+    return redirect()->back()->with('success', 'Family member untagged successfully');
+
+}
+public function editMember(Request $request, $id)
+{
+    $validated = $request->validate([
+        'firstName' => 'required|string|max:100',
+        'middleName' => 'nullable|string|max:100',
+        'lastName' => 'required|string|max:100',
+        'birthdate' => 'required|date',
+        'sex' => 'required|in:male,female',
+        'relationship' => 'required|string|max:50',
+        'contactNumber' => 'nullable|string|max:20',
+    ]);
+    
+    $validated['is_inactive'] = $request->boolean('is_inactive');
+    $member = FamilyMember::findOrFail($id);
+    $member->update($validated);
+    
+    
+    return redirect()->back()->with('success', 'Family member details successfully updated.');
+}
+
     
 }

@@ -17,8 +17,14 @@ class FamilyMember extends Model
         'birthdate',
         'sex',
         'relationship',
-        'contactNumber',          
+        'contactNumber',        
+        'is_inactive'  
     ];
+
+   protected $casts = [
+    'is_inactive' => 'boolean',
+];
+
 
 
     public function user()

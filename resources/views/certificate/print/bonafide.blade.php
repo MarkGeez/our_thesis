@@ -24,15 +24,25 @@
     .cert-title{text-align:center;font-size:20px;font-weight:bold;margin:35px 0 12px 0}
     .fill-line{display:inline;border:none;border-bottom:1px solid #222;padding:0 4px;font-size:15px;background:transparent;font-family:inherit}
     .fill-line:focus{outline:none}
-    .check-item{display:inline-flex;align-items:center;font-size:14px;margin:6px 8px 6px 0}
-    .check-item .check{color:#0a3a8a;font-weight:bold}
-    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:4px}
+    .check-item{display:flex;align-items:center;font-size:14px;margin:8px 0;width:100%}
+    .check-item .check{color:#000000;font-weight:bold;font-size:16px}
+    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:8px;accent-color:#000000;cursor:pointer}
     .issued{margin-top:20px;font-size:14px}
     .signature{text-align:right;margin-top:40px}
     .signature-line{border-top:1px solid #222;width:250px;margin-left:auto;padding-top:4px}
     .watermark-arc{position:absolute;right:18px;bottom:150px;opacity:0.12;font-size:120px}
     .brgylogo-arc{position:absolute;right:1px;bottom:375px;opacity:0.12;font-size:120px}
     @media print{ body{background:white} .page{margin:0;box-shadow:none} .no-print{display:none!important;} }
+    .check-list {
+display: block;
+margin-top: 6px;
+}
+
+.check-list .check-item {
+display: flex;
+align-items: center;
+margin: 6px 0;
+}
   </style>
 </head>
 <body>
@@ -45,13 +55,14 @@
 <div class="page">
   <div class="header-row">
     <div style="display:flex;gap:12px;align-items:center">
-      <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" class="logo-small" alt="">
+      <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="logo-small" alt="">
       <div>
         <div style="font-size:15px;font-weight:bold">REPUBLIC OF THE PHILIPPINES</div>
         <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
       </div>
     </div>
-    <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
+  
+    <img src="{{ asset('images/Brgy-logo-1.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
   </div>
 
   <div class="content">
@@ -66,23 +77,39 @@
           <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address <span class="fill-line">{{ $address }}</span>.
         @endif
       </p>
-      <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:350px;height:350px;object-fit:contain"></div>
+      <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:350px;height:350px;object-fit:contain"></div>
       <p style="font-size:14px">It is further certified that the above named person as known to be of good moral character and without any derogatory record in this BARANGAY.</p>
-      <div style="font-weight:bold;margin-top:10px">This Certification is being issued upon the request of the bearer for: AS REQUIREMENTS AND/OR TO SUPPORT HIS/HER.</div>
-      <div style="margin-top:10px">
+<div style="font-weight:bold;margin-top:10px">
+    This Certification is being issued upon the request of the bearer for:
+    {{--  
+    @if($editable)
+        <input type="text" class="fill-line" name="purpose" value="{{ $purpose }}" style="width:300px">
+    @else
+        <span class="fill-line">{{ $purpose }}</span>.
+    @endif
+    --}}
+</div>      <div style="margin-top:10px" class="check-list">
         @php
           $checks = ['bonafide'=>'BONAFIDE RESIDENT','medical'=>'MEDICAL TREATMENT','hospital'=>'HOSPITALIZATION','postal'=>'APPLICATION FOR POSTAL ID','school'=>'SCHOOL REFERENCE','referral'=>'REFERRAL','transaction'=>'TRANSACTION IN BANK','overseas'=>'OVERSEAS TRAVEL PAPERS','Ccalamity'=>'PROCESSING FOR CALAMITY OF DISASTER AID','sss'=>'S.S.S. REFERENCE','others'=>'OTHERS'];
         @endphp
-        @foreach($checks as $key => $label)
-        <label class="check-item">
-          @if($editable)
-            <input type="checkbox" name="request_data[{{ $key }}]" value="1" {{ !empty($data[$key]) ? 'checked' : '' }}>
-          @else
-            <span class="check">{{ !empty($data[$key]) ? '✓' : '☐' }}</span>
-          @endif
-          {{ $label }}@if($key==='others') @if($editable)<input type="text" class="fill-line" name="request_data[others_specify]" value="{{ $data['others_specify'] ?? '' }}" style="width:120px">@else - {{ $data['others_specify'] ?? '' }}@endif @endif
-        </label>
-        @endforeach
+       @foreach($checks as $key => $label) <label class="check-item"> @if($editable) <input type="checkbox" name="request_data[{{ $key }}]" value="1" {{ !empty($data[$key]) ? 'checked' : '' }}> @else <span class="check">{{ !empty($data[$key]) ? '✓' : '☐' }}</span> @endif
+  {{ $label }}
+
+  @if($key === 'others')
+    @if($editable)
+      <input type="text"
+             class="fill-line"
+             name="request_data[others_specify]"
+             value="{{ $data['others_specify'] ?? '' }}"
+             style="width:140px">
+    @else
+      {{ $data['others_specify'] ?? '' }}
+    @endif
+  @endif
+</label>
+
+
+@endforeach
       </div>
       <br>
       <div style="font-weight:bold;margin-top:10px">IN WITNESS WHEREOF I have hereunto set my hand and affixed the Official Seal of this office. Done in the Barangay Hall, Barangay 249, Zone 23, District II, City of Manila.</div>

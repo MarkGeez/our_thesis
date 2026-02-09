@@ -214,12 +214,37 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-
+                                                            {{--  
                                                             <div class="row mt-3">
                                                                 <div class="col-12">
                                                                     <div class="p-3 bg-light rounded border-start border-primary border-3">
                                                                         <div class="fw-semibold text-secondary small text-uppercase">Residential Address</div>
                                                                         <div class="fs-6"> House No. {{ $resident->houseNo }}, {{ ucwords(strtolower($resident->street)) }} </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                                    --}}
+                                                            @php
+                                                                $assignedHousehold = $resident->households->first();
+                                                                $assignedHouse = $assignedHousehold ? $assignedHousehold->house : null;
+                                                                $assignedStreet = $assignedHouse ? $assignedHouse->street : null;
+                                                            @endphp
+
+                                                            <div class="row mt-3 g-3">
+                                                                <div class="col-md-6">
+                                                                    <div class="p-3 bg-light rounded border-start border-primary border-3 h-100">
+                                                                        <div class="fw-semibold text-secondary small text-uppercase">Assigned House</div>
+                                                                        <div class="fs-6">
+                                                                            {{ $assignedHouse ? 'House No. ' . $assignedHouse->house_no : 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="p-3 bg-light rounded border-start border-primary border-3 h-100">
+                                                                        <div class="fw-semibold text-secondary small text-uppercase">Assigned Street</div>
+                                                                        <div class="fs-6">
+                                                                            {{ $assignedStreet ? $assignedStreet->street_name : 'N/A' }}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -358,10 +383,31 @@
                                                                 <input type="text" name="lastName" class="form-control" value="{{ old('lastName', $resident->lastName) }}" required>
                                                             </div>
                                                         </div>
+@php
+    $household = $resident->households->first();
+    $houseId   = $household?->house_id;
+    $streetId  = $household?->house?->street_id;
+@endphp
 
-                                                        
-    
-    
+<label>Street</label>
+<select
+    class="form-control street-select"
+    data-selected-street="{{ $streetId }}"
+    data-selected-house="{{ $houseId }}"
+>
+    <option value="">-- Select Street --</option>
+    @foreach ($streets as $street)
+        <option value="{{ $street->id }}">
+            {{ $street->street_name }}
+        </option>
+    @endforeach
+</select>
+
+<label class="mt-3">House Number</label>
+<select name="house_id" class="form-control house-select">
+    <option value="">-- Select House Number --</option>
+</select>
+
 
 
                                                         <div class="row">
@@ -579,22 +625,16 @@
 
     <label>Street</label>
     <!-- Street -->
-   <select id="street_id" class="form-control">
+   <select class="form-control street-select">
     <option value="">-- Select Street --</option>
-
     @foreach ($streets as $street)
-        <option value="{{ $street->id }}">
-            {{ $street->street_name }}
-        </option>
+        <option value="{{ $street->id }}">{{ $street->street_name }}</option>
     @endforeach
 </select>
-
-<label class="mt-3">House Number</label>
-<!-- House No -->
-<select name="house_id" id="house_id" class="form-control">
+<label>House Number</label>
+<select name="house_id" class="form-control house-select">
     <option value="">-- Select House Number --</option>
 </select>
-
 
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
@@ -722,9 +762,11 @@
     
     const houses = @json($houses);
 
-    document.getElementById('street_id').addEventListener('change', function () {
-        const streetId = this.value;
-        const houseSelect = document.getElementById('house_id');
+    function populateHouseDropdown(streetSelect) {
+        const streetId = streetSelect.value;
+        const modalBody = streetSelect.closest('.modal-body');
+        const houseSelect = modalBody.querySelector('.house-select');
+        const selectedHouseId = streetSelect.dataset.selectedHouse;
 
         houseSelect.innerHTML = '<option value="">-- Select House Number --</option>';
 
@@ -735,12 +777,33 @@
                 const option = document.createElement('option');
                 option.value = house.id;
                 option.textContent = house.house_no;
+
+                if (String(house.id) === String(selectedHouseId)) {
+                    option.selected = true;
+                }
+
                 houseSelect.appendChild(option);
             }
         });
+    }
+
+    // Street change (encode + edit)
+    document.addEventListener('change', function (e) {
+        if (!e.target.classList.contains('street-select')) return;
+        populateHouseDropdown(e.target);
     });
 
+    // Edit modal auto-load
+    document.addEventListener('shown.bs.modal', function (e) {
+        const streetSelect = e.target.querySelector('.street-select');
+        if (!streetSelect) return;
 
+        const savedStreet = streetSelect.dataset.selectedStreet;
+        if (savedStreet) {
+            streetSelect.value = savedStreet;
+            populateHouseDropdown(streetSelect);
+        }
+    });
 
 
     document.addEventListener("DOMContentLoaded", function () {

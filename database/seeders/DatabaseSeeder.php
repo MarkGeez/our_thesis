@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
 
          $this->call([
             StreetsSeeder::class,
-            ResidentSeeder::class,
          ]);
     }
 }

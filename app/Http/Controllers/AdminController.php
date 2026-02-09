@@ -39,15 +39,15 @@ class AdminController extends Controller
     
     public function profile()
 {
-    $admin = auth()->user();
+    $user = auth()->user();
     
     // Try to find resident by matching firstName, lastName
     $resident = Resident::with('households.house.street')
-                        ->where('firstName', $admin->firstName)
-                        ->where('lastName', $admin->lastName)
+                        ->where('firstName', $user->firstName)
+                        ->where('lastName', $user->lastName)
                         ->first();
-     $members = FamilyMember::where('encoded_by', $admin->id)->orderBy('firstName')->get();
-    return view('admin.profile', compact('admin', 'resident', 'members'));
+     $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
+    return view('admin.profile', compact('user', 'resident', 'members'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();
@@ -69,7 +69,7 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName,houseNo,street'])
+        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName'])
             ->latest()
             ->get();
         

@@ -153,13 +153,13 @@
 <div class="page">
     <div class="header-row">
         <div style="display:flex;gap:12px;align-items:center">
-            <img src="https://poropointfreeport.gov.ph/wp-content/uploads/2024/12/Hi-Res-BAGONG-PILIPINAS-LOGO-1474x1536-1.png" class="logo-small" alt="">
+            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="logo-small" alt="">
             <div>
                 <div style="font-size:15px;font-weight:bold">REPUBLIC OF THE PHILIPPINES</div>
                 <div style="font-size:13px;margin-top:4px">City of Manila<br>OFFICE OF THE PUNONG BARANGAY<br>Barangay 249 Zone 23 District II</div>
             </div>
         </div>
-        <img src="{{ asset('template/img/barangay-logo.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
+        <img src="{{ asset('images/Brgy-logo-1.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
     </div>
 
     <div class="content">
@@ -170,17 +170,17 @@
             <p class="intro" style="line-height: 35px;">
                 I,
                 @if($editable)
-                  <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? '' }}" style="width:50px"> years old, Filipino, and
+                  <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? $req->resident?->age ?? '' }}" style="width:50px"> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
                   Manila, with postal address at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">, after having duly sworn to in accordance with law, hereby depose and state:
                 @else
-                  <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? '______' }}</span> years old, Filipino, and
+                  <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
                   Manila, with postal address at <span class="fill-line">{{ $address }}</span>, after having duly sworn to in accordance with law, hereby depose and state:
                 @endif
             </p>
 
-            <div class="brgylogo-arc"><img src="{{ asset('template/img/barangay-logo.png') }}" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
+            <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:350px; height: 350px; object-fit:contain"></div>
 
             <div class="checkbox-section">
                 @if($editable)
@@ -209,35 +209,56 @@
                     </div>
 
                     <div class="children-table">
-                        @for($i = 1; $i <= 5; $i++)
-                        <div class="children-row">
-                            <div class="child-number">{{ $i }}.</div>
-                            <div class="child-name">
-                                @if($editable)
-                                    <input type="text" class="fill-line" name="request_data[children][{{ $i-1 }}][name]" value="{{ $data['children'][$i-1]['name'] ?? '' }}" style="display:block;min-width:200px">
-                                @else
-                                    <span class="fill-line" style="display:block;min-width:200px">{{ $data['children'][$i-1]['name'] ?? '' }}</span>
-                                @endif
-                            </div>
-                            <div class="child-dob">
-                                @if($editable)
-                                    <input type="text" class="fill-line" name="request_data[children][{{ $i-1 }}][dob]" value="{{ $data['children'][$i-1]['dob'] ?? '' }}" style="display:block;min-width:120px">
-                                @else
-                                    <span class="fill-line" style="display:block;min-width:120px">{{ $data['children'][$i-1]['dob'] ?? '' }}</span>
-                                @endif
-                            </div>
-                        </div>
-                        @endfor
+                        @php
+                            $childrenList = array_values($data['children'] ?? []);
+                            $numChildren = intval($data['num_children'] ?? 0);
+$displayCount = max(count($childrenList), $numChildren, 1);
+                        @endphp
+                        @for($i = 0; $i < $displayCount; $i++)
+
+<div class="children-row"> <div class="child-number">{{ $i + 1 }}.</div>
+<div class="child-name">
+    @if($editable)
+        <input type="text"
+               class="fill-line"
+               name="request_data[children][{{ $i }}][name]"
+               value="{{ $childrenList[$i]['name'] ?? '' }}"
+               style="display:block;min-width:200px">
+    @else
+        <span class="fill-line" style="display:block;min-width:200px">
+            {{ $childrenList[$i]['name'] ?? '' }}
+        </span>
+    @endif
+</div>
+
+<div class="child-dob">
+    @if($editable)
+        <input type="text"
+               class="fill-line"
+               name="request_data[children][{{ $i }}][dob]"
+               value="{{ $childrenList[$i]['dob'] ?? '' }}"
+               style="display:block;min-width:120px">
+    @else
+        <span class="fill-line" style="display:block;min-width:120px">
+            {{ $childrenList[$i]['dob'] ?? '' }}
+        </span>
+    @endif
+</div>
+
+</div> @endfor
                     </div>
                 </div>
             </div>
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[no_knowledge_whereabouts]" value="1" {{ !empty($data['no_knowledge_whereabouts']) ? 'checked' : '' }}>
-                @else
-                    <div class="checkbox">{{ !empty($data['no_knowledge_whereabouts']) ? '✓' : '☐' }}</div>
-                @endif
+<input type="checkbox" class="checkbox-input"
+       name="request_data[whereabouts]" value="1"
+       {{ !empty($data['whereabouts']) ? 'checked' : '' }}>
+@else
+<div class="checkbox">{{ !empty($data['whereabouts']) ? '✓' : '☐' }}</div>
+@endif
+
                 <div class="checkbox-text" style="line-height: 28px;">
                     That I have no knowledge of the whereabouts of the father of my child/ children.
                 </div>
@@ -245,10 +266,13 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[separated]" value="1" {{ !empty($data['separated']) ? 'checked' : '' }}>
-                @else
-                    <div class="checkbox">{{ !empty($data['separated']) ? '✓' : '☐' }}</div>
-                @endif
+<input type="checkbox" class="checkbox-input"
+       name="request_data[separated]" value="1"
+       {{ !empty($data['separated']) ? 'checked' : '' }}>
+@else
+<div class="checkbox">{{ !empty($data['separated']) ? '✓' : '☐' }}</div>
+@endif
+
                 <div class="checkbox-text" style="line-height: 28px;">
                     That I had separated from
                     @if($editable)
@@ -256,6 +280,7 @@
                     @else
                         <span class="fill-line">{{ $data['separated_from'] ?? '________________________' }}</span>
                     @endif
+                    
                     since
                     @if($editable)
                         <input type="text" class="fill-line" name="request_data[separated_since]" value="{{ $data['separated_since'] ?? '' }}" style="width:220px">

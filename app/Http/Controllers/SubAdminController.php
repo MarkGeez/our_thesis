@@ -10,6 +10,9 @@ use App\Models\HouseholdResident;
 use App\Models\House;
 use App\Models\Street;
 use App\Models\User;
+use App\Models\FamilyMember;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -36,19 +39,11 @@ class SubAdminController extends Controller
     {
         $user = Auth::user();
         $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
-        $streets = \App\Models\Street::has('houses')->get();
-        $houses = \App\Models\House::all();
+       
         
         // Get family members from the same household
-        $familyMembers = collect();
-        if ($resident && $resident->households->isNotEmpty()) {
-            $household = $resident->households->first();
-            $familyMembers = $household->residents()
-                ->where('residents.id', '!=', $resident->id)
-                ->get();
-        }
-        
-        return view("subadmin.profile", compact('resident', 'user', 'streets', 'houses', 'familyMembers'));
+        $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
+        return view("subadmin.profile", compact('resident', 'user',  'members'));
     }
 
     public function updateProfile(Request $request, $id)
