@@ -72,9 +72,10 @@ margin: 6px 0;
       <p style="font-size:14px">This is to certify that
         @if($editable)
           <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px"> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address
-          <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">.
+1013
         @else
-          <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address <span class="fill-line">{{ $address }}</span>.
+          <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address 1013
+
         @endif
       </p>
       <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:350px;height:350px;object-fit:contain"></div>

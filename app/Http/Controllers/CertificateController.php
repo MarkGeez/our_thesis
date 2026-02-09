@@ -162,19 +162,44 @@ class CertificateController extends Controller
         }
 
         $name = $request->input('name', ucwords(strtolower($req->requester_name)));
-        $address = $request->input('address', ucwords(strtolower($req->requester_address)));
-        $data = $req->request_data ?? [];
-        $submitted = $request->input('request_data', []);
-        foreach ($submitted as $k => $v) {
-            $data[$k] = $v;
-        }
-        // Clear checkbox keys not in submitted (user unchecked them)
-        $checkboxKeys = ['bonafide','medical','hospital','postal','school','referral','transaction','overseas','Ccalamity','sss','others','married_to','no_knowledge_whereabouts','separated'];
-        foreach ($checkboxKeys as $k) {
-            if (!array_key_exists($k, $submitted)) {
-                $data[$k] = null;
-            }
-        }
+        $address = $request->input(
+    'former_address',
+    $req->request_data['former_address'] ?? null
+);
+       $data = $req->request_data ?? [];
+$submitted = $request->input('request_data', []);
+
+
+foreach ($submitted as $k => $v) {
+    $data[$k] = $v;
+}
+// Auto-count number of children from the children array
+if (!isset($submitted['children']) && isset($req->request_data['children'])) {
+    $data['children'] = $req->request_data['children'];
+}
+
+
+// Clear unchecked checkboxes
+$checkboxKeys = [
+    'bonafide','medical','hospital','postal','school','referral',
+    'transaction','overseas','Ccalamity','sss','others',
+    'married_to','whereabouts','separated','attest_truth'
+];
+
+foreach ($checkboxKeys as $k) {
+    if (!array_key_exists($k, $submitted)) {
+        $data[$k] = null;
+    }
+}
+
+// Restore children if it exists and was not part of checkboxKeys
+if (isset($req->request_data['children'])) {
+    $data['children'] = $req->request_data['children'];
+}
+
+
+$req->request_data = $data;
+$req->save();
 
         $issued = $req->approved_at ?? now();
         if ($request->filled('issued_day') && $request->filled('issued_month') && $request->filled('issued_year')) {
@@ -253,8 +278,10 @@ class CertificateController extends Controller
             'senior' => 'certificate.print.senior',
             default => 'certificate.print.bonafide',
         };
+        $data = $req->request_data ?? [];
+
         $name = ucwords(strtolower($req->requester_name));
-        $address = ucwords(strtolower($req->requester_address));
+$address = $data['former_address'] ?? null;
         $purpose = $req->purpose;
         $data = $req->request_data ?? [];
         $issued = $req->approved_at ?? now();

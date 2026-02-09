@@ -178,6 +178,143 @@
     </div>
 </div>
 
+{{-- User/Resident Profile Modal --}}
+<div class="modal fade" id="requesterProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Requester Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="profileLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="profileContent" style="display:none;">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div id="profileImageContainer" class="rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background-color: #f1f3f5;">
+                                    <i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted"><strong>Full Name</strong></div>
+                        <div class="col-7" id="profileFullName" style="text-transform: capitalize;">-</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted"><strong>Email</strong></div>
+                        <div class="col-7" id="profileEmail">-</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted"><strong>Contact No.</strong></div>
+                        <div class="col-7" id="profileContact">-</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted"><strong>Birthday</strong></div>
+                        <div class="col-7" id="profileBirthday">-</div>
+                    </div>
+
+                    <div class="row mb-2" id="profileAgeRow" style="display:none;">
+                        <div class="col-5 text-muted"><strong>Age</strong></div>
+                        <div class="col-7" id="profileAge">-</div>
+                    </div>
+
+                    <div class="row mb-2" id="profileSexRow" style="display:none;">
+                        <div class="col-5 text-muted"><strong>Sex</strong></div>
+                        <div class="col-7" id="profileSex"  style="text-transform: capitalize;">-</div>
+                    </div>
+
+                    <div class="row mb-2" id="profileRoleRow" style="display:none;">
+                        <div class="col-5 text-muted"><strong>Role</strong></div>
+                        <div class="col-7 text-capitalize" id="profileRole">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Request Details Modal --}}
+<div class="modal fade" id="requestDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Certificate Request Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detailsLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="detailsContent" style="display:none;">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold text-primary">Request Information</h6>
+                            <hr>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Request ID</small>
+                            <p class="fw-bold" id="detailsId">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Certificate Type</small>
+                            <p class="fw-bold text-capitalize" id="detailsType">-</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <small class="text-muted">Purpose Explanation</small>
+                            <div class="alert alert-light border" id="detailsPurpose">-</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Status</small>
+                            <p id="detailsStatus">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Submitted Date</small>
+                            <p class="fw-bold" id="detailsDate">-</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3" id="additionalDetailsRow" style="display:none;">
+    <div class="col-12">
+        <h6 class="fw-bold text-primary">Form Details</h6>
+        <hr>
+        <div class="bg-light rounded p-3" id="detailsFormData">
+            <div class="data-list"></div>
+        </div>
+    </div>
+</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
@@ -283,6 +420,160 @@ document.addEventListener('click', function(e) {
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('historyLoading').innerHTML = '<div class="alert alert-danger">Failed to load history</div>';
+            });
+    }
+});
+
+// Requester profile modal
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-requester-user-id]');
+    if (btn) {
+        var userId = btn.getAttribute('data-requester-user-id');
+        var residentId = btn.getAttribute('data-requester-resident-id');
+        
+        document.getElementById('profileLoading').style.display = 'block';
+        document.getElementById('profileContent').style.display = 'none';
+        
+        // Reset profile rows visibility
+        document.getElementById('profileAgeRow').style.display = 'none';
+        document.getElementById('profileSexRow').style.display = 'none';
+        document.getElementById('profileRoleRow').style.display = 'none';
+        
+        var modal = new bootstrap.Modal(document.getElementById('requesterProfileModal'));
+        modal.show();
+        
+        // Fetch requester data
+        var endpoint = residentId ? 
+            '{{ route("admin.resident.info", ["id" => "__ID__"]) }}'.replace('__ID__', residentId) :
+            '{{ route("admin.user.info", ["id" => "__ID__"]) }}'.replace('__ID__', userId);
+        
+        fetch(endpoint)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+                    return;
+                }
+                
+                // Populate profile data
+                document.getElementById('profileFullName').textContent = data.fullName;
+                document.getElementById('profileEmail').textContent = data.email || '-';
+                document.getElementById('profileContact').textContent = data.contact || '-';
+                document.getElementById('profileBirthday').textContent = data.birthday || '-';
+                
+                // Update profile image
+                var imgContainer = document.getElementById('profileImageContainer');
+                if (data.profileImage) {
+                    imgContainer.innerHTML = '<img src="' + data.profileImage + '" alt="Profile" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;">';
+                }
+                
+                // Show resident-specific fields if available
+                if (data.age) {
+                    document.getElementById('profileAge').textContent = data.age;
+                    document.getElementById('profileAgeRow').style.display = 'flex';
+                }
+                
+                if (data.sex) {
+                    document.getElementById('profileSex').textContent = data.sex;
+                    document.getElementById('profileSexRow').style.display = 'flex';
+                }
+                
+                if (data.role) {
+                    document.getElementById('profileRole').textContent = data.role;
+                    document.getElementById('profileRoleRow').style.display = 'flex';
+                }
+                
+                document.getElementById('profileLoading').style.display = 'none';
+                document.getElementById('profileContent').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">Failed to load profile information</div>';
+            });
+    }
+});
+
+// Request details modal
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-view-request-id]');
+    if (btn) {
+        var requestId = btn.getAttribute('data-view-request-id');
+        
+        document.getElementById('detailsLoading').style.display = 'block';
+        document.getElementById('detailsContent').style.display = 'none';
+        
+        var modal = new bootstrap.Modal(document.getElementById('requestDetailsModal'));
+        modal.show();
+        
+        fetch('{{ url("/admin/certificate-request-details") }}/' + requestId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('detailsLoading').innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+                    return;
+                }
+                
+                // Populate details
+                document.getElementById('detailsId').textContent = '#' + data.id;
+                document.getElementById('detailsType').textContent = data.certificate_type;
+                document.getElementById('detailsPurpose').textContent = data.purpose || 'No explanation provided';
+                document.getElementById('detailsDate').textContent = data.created_at;
+                
+                // Status badge
+                var statusBadge = '';
+                switch(data.status) {
+                    case 'pending':
+                        statusBadge = '<span class="badge bg-warning text-dark">Pending</span>';
+                        break;
+                    case 'approved':
+                        statusBadge = '<span class="badge bg-success">Approved</span>';
+                        break;
+                    case 'picked_up':
+                        statusBadge = '<span class="badge bg-secondary">Picked up</span>';
+                        break;
+                    case 'declined':
+                        statusBadge = '<span class="badge bg-danger">Declined</span>';
+                        break;
+                    default:
+                        statusBadge = '<span class="badge bg-secondary">' + data.status + '</span>';
+                }
+                document.getElementById('detailsStatus').innerHTML = statusBadge;
+                
+                // Show form data if available
+                // Show form data if available
+if (data.request_data && Object.keys(data.request_data).length > 0) {
+    document.getElementById('additionalDetailsRow').style.display = 'block';
+    var detailsList = document.querySelector('#detailsFormData .data-list');
+    detailsList.innerHTML = ''; // Clear previous content
+
+    for (var key in data.request_data) {
+        var value = data.request_data[key];
+        
+        // Skip empty or internal values if necessary
+        if (value === null || value === undefined) value = '-';
+
+        // Format the key: Replace underscores with spaces and capitalize
+        var label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+        // Create a nice display row
+        var item = document.createElement('div');
+        item.className = 'mb-2 pb-2 border-bottom';
+        item.innerHTML = `
+            <small class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">${label}</small>
+            <span class="fw-medium">${typeof value === 'object' ? JSON.stringify(value) : value}</span>
+        `;
+        detailsList.appendChild(item);
+    }
+} else {
+    document.getElementById('additionalDetailsRow').style.display = 'none';
+}
+                
+                document.getElementById('detailsLoading').style.display = 'none';
+                document.getElementById('detailsContent').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('detailsLoading').innerHTML = '<div class="alert alert-danger">Failed to load request details</div>';
             });
     }
 });

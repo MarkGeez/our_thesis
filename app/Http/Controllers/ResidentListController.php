@@ -10,7 +10,6 @@ use App\Models\House;
 use App\Models\Street;
 use App\Models\Household;
 use App\Models\HouseholdResident;
-
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
@@ -90,7 +89,7 @@ public function searchResidents(Request $request)
 
         // Create resident
         $resident = Resident::create($validated);
-        $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
+$household = Household::where('house_id', $validated['house_id'])->firstOrFail();
         HouseholdResident::create([
     'household_id' => $household->id,
     'resident_id'  => $resident->id,

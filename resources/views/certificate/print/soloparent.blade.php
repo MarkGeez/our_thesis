@@ -172,11 +172,11 @@
                 @if($editable)
                   <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? $req->resident?->age ?? '' }}" style="width:50px"> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at 1013, after having duly sworn to in accordance with law, hereby depose and state:
                 @else
                   <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at <span class="fill-line">{{ $address }}</span>, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at 1013{{-- <span class="fill-line">{{ $address }}</span> --}}, after having duly sworn to in accordance with law, hereby depose and state:
                 @endif
             </p>
 
@@ -184,24 +184,32 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[married_to]" value="1" {{ !empty($data['married_to']) ? 'checked' : '' }}>
+                    <input type="checkbox" class="checkbox-input" name="request_data[separated_from]" value="1" checked>
                 @else
-                    <div class="checkbox">{{ !empty($data['married_to']) ? '✓' : '☐' }}</div>
+                    <div class="checkbox">✓</div>
                 @endif
+                
                 <div class="checkbox-text">
                     That I was married/unmarried to
                     @if($editable)
-                        <input type="text" class="fill-line" name="request_data[spouse_name]" value="{{ $data['spouse_name'] ?? '' }}" style="width:240px">
+                        <input type="text" class="fill-line" name="request_data[separated_from]" value="{{ $data['separated_from'] ?? '' }}" style="width:240px">
                     @else
-                        <span class="fill-line">{{ $data['spouse_name'] ?? '________________________' }}</span>
+                        <span class="fill-line">{{ $data['separated_from'] ?? '________________________' }}</span>
                     @endif
                     and during our relationship we begot with
+                    @php
+                        $childrenList = array_values($data['children'] ?? []);
+                    @endphp
+                    
                     @if($editable)
-                        <input type="text" class="fill-line" name="request_data[num_children]" value="{{ $data['num_children'] ?? '' }}" style="width:60px">
+                        <input type="text" class="fill-line" name="request_data[num_children]" value="{{ count($childrenList) }}" style="width:60px">
                     @else
-                        <span class="fill-line">{{ $data['num_children'] ?? '____' }}</span>
+                        <span class="fill-line">{{ count($childrenList) }}</span>
                     @endif
                     child/ children named:
+
+
+
 
                     <div class="table-header">
                         <div class="header-name">Name of Child/ Children</div>
@@ -252,10 +260,13 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[no_knowledge_whereabouts]" value="1" {{ !empty($data['no_knowledge_whereabouts']) ? 'checked' : '' }}>
-                @else
-                    <div class="checkbox">{{ !empty($data['no_knowledge_whereabouts']) ? '✓' : '☐' }}</div>
-                @endif
+<input type="checkbox" class="checkbox-input"
+       name="request_data[whereabouts]" value="1"
+       {{ !empty($data['whereabouts']) ? 'checked' : '' }}>
+@else
+<div class="checkbox">{{ !empty($data['whereabouts']) ? '✓' : '☐' }}</div>
+@endif
+
                 <div class="checkbox-text" style="line-height: 28px;">
                     That I have no knowledge of the whereabouts of the father of my child/ children.
                 </div>
@@ -263,10 +274,13 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[separated]" value="1" {{ !empty($data['separated']) ? 'checked' : '' }}>
-                @else
-                    <div class="checkbox">{{ !empty($data['separated']) ? '✓' : '☐' }}</div>
-                @endif
+<input type="checkbox" class="checkbox-input"
+       name="request_data[separated]" value="1"
+       {{ !empty($data['separated']) ? 'checked' : '' }}>
+@else
+<div class="checkbox">{{ !empty($data['separated']) ? '✓' : '☐' }}</div>
+@endif
+
                 <div class="checkbox-text" style="line-height: 28px;">
                     That I had separated from
                     @if($editable)
@@ -274,11 +288,12 @@
                     @else
                         <span class="fill-line">{{ $data['separated_from'] ?? '________________________' }}</span>
                     @endif
+                    
                     since
                     @if($editable)
-                        <input type="text" class="fill-line" name="request_data[separated_since]" value="{{ $data['separated_since'] ?? '' }}" style="width:220px">
+                        <input type="text" class="fill-line" name="request_data[since]" value="{{ $data['since'] ?? '' }}" style="width:220px">
                     @else
-                        <span class="fill-line">{{ $data['separated_since'] ?? '________________________' }}</span>
+                        <span class="fill-line">{{ $data['since'] ?? '________________________' }}</span>
                     @endif
                     and at the present time, I have no husband/ partner and as a Solo Parent, I am
                     taking full custody and care of my child/ children mentioned in this affidavit.
