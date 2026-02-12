@@ -14,6 +14,7 @@ class CertificateRequest extends Model
         'resident_id',
         'certificate_type',
         'purpose',
+        'address',
         'request_data',
         'status',
         'decline_reason',
@@ -59,6 +60,9 @@ class CertificateRequest extends Model
         if ($this->resident) {
             return trim("{$this->resident->houseNo} {$this->resident->street}");
         }
-        return $this->request_data['address'] ?? 'N/A';
+        return $this->address
+            ?? ($this->request_data['address'] ?? null)
+            ?? ($this->request_data['postal_address'] ?? null)
+            ?? 'N/A';
     }
 }

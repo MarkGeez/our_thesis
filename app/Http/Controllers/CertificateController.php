@@ -25,6 +25,7 @@ class CertificateController extends Controller
         case 'indigency':
             $request->validate([
                 'purpose' => 'required|string|max:255',
+                'address' => 'required|string|max:255',
             ]);
             break;
         case 'soloparent':
@@ -70,15 +71,12 @@ class CertificateController extends Controller
         $data = array_merge($data, $formData);
     }
     
-    if (!empty($validated['address'])) {
-        $data['address'] = $validated['address'];
-    }
-    
     CertificateRequest::create([
         'user_id' => $user->id,
         'resident_id' => $resident?->id,
         'certificate_type' => $validated['certificate_type'],
         'purpose' => $finalPurpose,
+        'address' => $validated['address'] ?? null,
         'purpose_other' => $purposeOthers,
         'request_data' => $data,
         'status' => 'pending',
@@ -122,8 +120,8 @@ class CertificateController extends Controller
         $req->update([
             'status' => 'declined',
             'decline_reason' => $validated['decline_reason'] ?? null,
-            'approved_at' => null,
-            'approved_by' => null,
+            'approved_at' => now(),
+            'approved_by' => Auth::id(),
         ]);
         return back()->with('success', 'Certificate request declined.');
     }
@@ -162,12 +160,8 @@ class CertificateController extends Controller
         }
 
         $name = $request->input('name', ucwords(strtolower($req->requester_name)));
-        $address = $request->input(
-    'former_address',
-    $req->request_data['former_address'] ?? null
-);
-       $data = $req->request_data ?? [];
-$submitted = $request->input('request_data', []);
+        $data = $req->request_data ?? [];
+        $submitted = $request->input('request_data', []);
 
 
 foreach ($submitted as $k => $v) {
@@ -197,6 +191,14 @@ if (isset($req->request_data['children'])) {
     $data['children'] = $req->request_data['children'];
 }
 
+if (in_array($req->certificate_type, ['bonafide', 'indigency'])) {
+    $address = $request->input('address', $req->address ?? $data['address'] ?? $data['postal_address'] ?? null);
+    if (!empty($address)) {
+        $req->address = $address;
+    }
+} else {
+    $address = $request->input('former_address', $data['former_address'] ?? null);
+}
 
 $req->request_data = $data;
 $req->save();
@@ -281,7 +283,10 @@ $req->save();
         $data = $req->request_data ?? [];
 
         $name = ucwords(strtolower($req->requester_name));
-$address = $data['former_address'] ?? null;
+        $address = match ($req->certificate_type) {
+            'bonafide', 'indigency' => $req->address ?? $data['address'] ?? $data['postal_address'] ?? null,
+            default => $data['former_address'] ?? null,
+        };
         $purpose = $req->purpose;
         $data = $req->request_data ?? [];
         $issued = $req->approved_at ?? now();

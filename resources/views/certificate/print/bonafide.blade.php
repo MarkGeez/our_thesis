@@ -72,10 +72,10 @@ margin: 6px 0;
       <p style="font-size:14px">This is to certify that
         @if($editable)
           <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px"> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address
-at Biak na Bato St. Corner Almeda Tondo, Manila
+at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">
 
         @else
-          <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
+          <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address at <span class="fill-line">{{ $address }}</span>.
 
 
         @endif

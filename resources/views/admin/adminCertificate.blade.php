@@ -136,6 +136,7 @@
                                 <tr>
                                     <th>Certificate Type</th>
                                     <th>Purpose</th>
+                                    <th>Address</th>
                                     <th>Status</th>
                                     <th>Approved/Rejected By</th>
                                     <th>Date</th>
@@ -147,6 +148,7 @@
                                     <tr>
                                         <td><span class="">{{ ucfirst($req->certificate_type) }}</span></td>
                                         <td>{{ Str::limit($req->purpose, 50) }}</td>
+                                        <td><small>{{ $req->address ?? '—' }}</small></td>
                                         <td>
                                             @switch($req->status)
                                                 @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
@@ -196,6 +198,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mt-3">
+                        <label class="form-label fw-bold">Postal Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
                     <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         @php
@@ -230,13 +237,6 @@
                         <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
                         <small class="text-muted">This will help the barangay officials better understand your request.</small>
                     </div>
-
-                    @if(!($admin->resident ?? null))
-                        <div class="mt-3">
-                            <label class="form-label">Address</label>
-                            <input type="text" name="address" class="form-control" required placeholder="Full Address">
-                        </div>
-                    @endif
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -258,7 +258,15 @@
                     <h5 class="modal-title"><i class="fas fa-hand-holding-heart me-2 text-success"></i>Request Indigency Certificate</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
+                
                 <div class="modal-body">
+
+                    <div class="mt-3">
+                        <label class="form-label fw-bold">Postal Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
                     <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         <div class="form-check mb-2">
@@ -289,6 +297,8 @@
                         <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
                         <small class="text-muted">This will help the barangay officials better understand your request.</small>
                     </div>
+
+                    
                 </div>
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn btn-success w-100">Submit Request</button>
@@ -324,6 +334,10 @@
                         <div class="col-md-6">
                             <label class="form-label">Since (Date)</label>
                             <input type="date" name="request_data[since]" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
                         </div>
                         <div class="col-12 mt-4">
                             <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
@@ -386,6 +400,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Former Address</label>
                         <input type="text" name="form_data[former_address]" class="form-control" placeholder="Where did you live before?">

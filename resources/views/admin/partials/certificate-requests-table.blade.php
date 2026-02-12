@@ -14,7 +14,7 @@
                     <th>Certificate Type</th>
                     <th>Purpose</th>
                     <th>Status</th>
-                    <th>Approved/Rejected By</th>
+                    <th>Updated By</th>
                     <th>Date</th>
                     <th class="text-center">Actions</th>
                 </tr>
