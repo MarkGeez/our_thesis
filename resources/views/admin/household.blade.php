@@ -5,11 +5,11 @@
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-    
+
     <style>
         .main-wrapper { background-color: #f8f9fa; min-height: 100vh; }
         .page-title { font-family: 'Orbitron', sans-serif; font-weight: 700; color: #1e293b; }
-        
+
         .street-card {
             border: none;
             border-radius: 15px;
@@ -17,7 +17,7 @@
             background: #ffffff;
             cursor: pointer;
         }
-        
+
         .street-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.08);
@@ -96,7 +96,7 @@
             border-left: 5px solid #0d6efd !important;
             background: rgba(13, 110, 253, 0.03);
         }
-        
+
         .member-container {
             padding-left: 30px;
             border-left: 2px dashed #dee2e6;
@@ -107,7 +107,7 @@
         .glass-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
         .glass-title { font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
         .glass-meta { display: flex; align-items: center; gap: 14px; color: #475569; font-size: 0.85rem; flex-wrap: wrap; margin-top: 10px; }
-        
+
         .meta-item { display: flex; align-items: center; gap: 5px; }
 
         .glass-avatar {
@@ -145,42 +145,36 @@
     <div class="main-wrapper">
         @include('admin.admin-header', ['admin' => auth()->user()])
 
-                <main class="main users chart-page" id="skip-target">
+        <main class="main users chart-page" id="skip-target">
             <div class="container-fluid px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 style="color:#000000; margin: 20px 45px;">Household Management</h2>
                 </div>
 
                 <div class="row g-4">
-                    @forelse ($street as $streets)
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="card street-card h-100 shadow-sm">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="icon-box"><i class="fas fa-road"></i></div>
-                                </div>
-                                <h5 class="card-title fw-bold mb-1">{{ $streets->street_name }}</h5>
-                                <div class="mb-4">
-                                    <span class="stat-label d-block">Total Houses</span>
-                                    <span class="stat-value">{{ $streets->houses_count }}</span>
-                                </div>
-                                <div class="d-grid">
-                                    <button class="btn btn-outline-primary btn-sm view-houses-btn" 
-                                        data-street-id="{{ $streets->id }}"
-                                        data-street-name="{{ $streets->street_name }}">
-                                        View Houses <i class="fas fa-arrow-right ms-2"></i>
-                                    </button>
+                    @foreach ($street as $streets)
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <div class="card street-card h-100 shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="icon-box"><i class="fas fa-road"></i></div>
+                                    </div>
+                                    <h5 class="card-title fw-bold mb-1">{{ $streets->street_name }}</h5>
+                                    <div class="mb-4">
+                                        <span class="stat-label d-block">Total Houses</span>
+                                        <span class="stat-value">{{ $streets->houses_count }}</span>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button class="btn btn-outline-primary btn-sm view-houses-btn" 
+                                            data-street-id="{{ $streets->id }}"
+                                            data-street-name="{{ $streets->street_name }}">
+                                            View Houses <i class="fas fa-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    @empty
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>No streets found.
-                        </div>
-                    </div>
-                    @endforelse
+                    @endforeach
                 </div>
             </div>
         </main>

@@ -129,14 +129,16 @@
                 <h5 class="mb-3">My Recent Requests</h5>
                 @if($requests->isEmpty())
                     <div class="alert alert-info shadow-sm">You have not submitted any certificate requests yet.</div>
-                @else
+                                @else
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover bg-white shadow-sm">
                             <thead class="table-primary">
                                 <tr>
                                     <th>Certificate Type</th>
                                     <th>Purpose</th>
+                                    <th>Address</th>
                                     <th>Status</th>
+                                    <th>Approved/Rejected By</th>
                                     <th>Date</th>
                                     <th>Remarks</th>
                                 </tr>
@@ -146,6 +148,7 @@
                                     <tr>
                                         <td><span class="">{{ ucfirst($req->certificate_type) }}</span></td>
                                         <td>{{ Str::limit($req->purpose, 50) }}</td>
+                                        <td><small>{{ $req->address ?? '—' }}</small></td>
                                         <td>
                                             @switch($req->status)
                                                 @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
@@ -154,6 +157,15 @@
                                                 @case('declined') <span class="badge bg-danger">Declined</span> @break
                                                 @default <span class="badge bg-secondary">{{ $req->status }}</span>
                                             @endswitch
+                                        </td>
+                                        <td>
+                                            @if($req->approver)
+                                                <small>{{ ucwords(strtolower($req->approver->firstName . ' ' . $req->approver->lastName)) }}</small>
+                                                <br>
+                                                <small class="text-muted">{{ $req->approved_at?->format('M d, Y H:i') ?? '-' }}</small>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
                                         </td>
                                         <td>{{ $req->created_at->format('M d, Y') }}</td>
                                         <td>
@@ -186,6 +198,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mt-3">
+                        <label class="form-label fw-bold">Postal Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
                     <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         @php
@@ -215,12 +232,11 @@
                         <input type="text" class="form-control mt-2 d-none other-text-input" name="request_data[others_specify]" placeholder="Please specify your purpose">
                     </div>
 
-                    @if(!($admin->resident ?? null))
-                        <div class="mt-3">
-                            <label class="form-label">Address</label>
-                            <input type="text" name="address" class="form-control" required placeholder="Full Address">
-                        </div>
-                    @endif
+                    <div class="mt-4">
+                        <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
+                        <small class="text-muted">This will help the barangay officials better understand your request.</small>
+                    </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -242,7 +258,15 @@
                     <h5 class="modal-title"><i class="fas fa-hand-holding-heart me-2 text-success"></i>Request Indigency Certificate</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
+                
                 <div class="modal-body">
+
+                    <div class="mt-3">
+                        <label class="form-label fw-bold">Postal Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
                     <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         <div class="form-check mb-2">
@@ -267,6 +291,14 @@
                         </div>
                         <input type="text" class="form-control mt-2 d-none other-text-input" name="request_data[others_specify]" placeholder="Specify other indigency purpose">
                     </div>
+
+                    <div class="mt-4">
+                        <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
+                        <small class="text-muted">This will help the barangay officials better understand your request.</small>
+                    </div>
+
+                    
                 </div>
                 <div class="modal-footer border-0">
                     <button type="submit" class="btn btn-success w-100">Submit Request</button>
@@ -303,6 +335,15 @@
                             <label class="form-label">Since (Date)</label>
                             <input type="date" name="request_data[since]" class="form-control">
                         </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this affidavit and how you will use it..."></textarea>
+                            <small class="text-muted">This will help the barangay officials better understand your request.</small>
+                        </div>
                         <div class="col-12 mt-3">
     <label class="form-label fw-bold">Affidavit Statements</label>
 
@@ -320,7 +361,9 @@
                name="request_data[separated]" 
                value="1" id="soloCheck2" >
         <label class="form-check-label" for="soloCheck2">
-            That I had separated from my partner, and at the present time, I have no husband/partner and as a Solo Parent, I am taking full custody and care of my child/ children mentioned in this affidavit.
+            That I had separated from my partner, and at the present time, I have no husband/partner and 
+            <br>
+            as a Solo Parent, I am taking full custody and care of my child/ children mentioned in this affidavit.
         </label>
     </div>
 
@@ -329,7 +372,8 @@
                name="request_data[attest_truth]" 
                value="1" id="soloCheck3" >
         <label class="form-check-label" for="soloCheck3">
-            That this is being executed to attest to the truth of the foregoing facts and circumstances and for whatever legal intents and purpose this instrument may serve.
+            That this is being executed to attest to the truth of the foregoing facts and circumstances and
+            <br> for whatever legal intents and purpose this instrument may serve.
         </label>
     </div>
 </div>
@@ -357,8 +401,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
+                        <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">Former Address</label>
                         <input type="text" name="form_data[former_address]" class="form-control" placeholder="Where did you live before?">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
+                        <small class="text-muted">This will help the barangay officials better understand your request.</small>
                     </div>
                 </div>
                 <div class="modal-footer border-0">

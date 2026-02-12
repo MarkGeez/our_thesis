@@ -8,11 +8,13 @@
         <table class="table table-bordered table-hover bg-white">
             <thead class="table-primary">
                 <tr>
+                    <th>Cert ID</th>
                     <th>Requester</th>
                     <th class="text-center">History</th>
                     <th>Certificate Type</th>
                     <th>Purpose</th>
                     <th>Status</th>
+                    <th>Updated By</th>
                     <th>Date</th>
                     <th class="text-center">Actions</th>
                 </tr>
@@ -20,12 +22,15 @@
             <tbody>
                 @foreach($filteredRequests as $request)
                 <tr>
+                    <td><code>{{ $request->id }}</code></td>
                     <td>
-                        @if($request->resident)
-                            {{ ucwords(strtolower($request->resident->firstName . ' ' . $request->resident->lastName)) }}
-                        @else
-                            {{ ucwords(strtolower($request->user->firstName . ' ' . $request->user->lastName)) }}
-                        @endif
+                        <button type="button" class="btn btn-link text-decoration-none p-0" data-requester-user-id="{{ $request->user_id }}" data-requester-resident-id="{{ $request->resident_id ?? '' }}" title="View user information">
+                            @if($request->resident)
+                                {{ ucwords(strtolower($request->resident->firstName . ' ' . $request->resident->lastName)) }}
+                            @else
+                                {{ ucwords(strtolower($request->user->firstName . ' ' . $request->user->lastName)) }}
+                            @endif
+                        </button>
                     </td>
                     <td class="text-center">
                         @php
@@ -43,7 +48,16 @@
                         @endif
                     </td>
                     <td><span >{{ ucfirst($request->certificate_type) }}</span></td>
-                    <td>{{ Str::limit($request->purpose, 40) }}</td>
+                    <td>
+                        <div class="d-flex gap-2 align-items-center">
+                            <div>
+                                <p class="mb-0 small">{{ Str::limit($request->purpose, 40) }}</p>
+                                <button type="button" class="btn btn-xs btn-outline-primary mt-1" data-view-request-id="{{ $request->id }}" title="View full request details">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                            </div>
+                        </div>
+                    </td>
                     <td>
                         @switch($request->status)
                             @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
@@ -52,6 +66,15 @@
                             @case('declined') <span class="badge bg-danger">Declined</span> @break
                             @default <span class="badge bg-secondary">{{ $request->status }}</span>
                         @endswitch
+                    </td>
+                    <td>
+                        @if($request->approver)
+                            <small>{{ ucwords(strtolower($request->approver->firstName . ' ' . $request->approver->lastName)) }}</small>
+                            <br>
+                            <small class="text-muted">{{ $request->approved_at?->format('M d, Y H:i') ?? '-' }}</small>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
                     </td>
                     <td>{{ $request->created_at->format('M d, Y H:i') }}</td>
                     <td class="text-center">

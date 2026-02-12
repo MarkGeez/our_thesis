@@ -51,6 +51,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
         Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
         Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
+        Route::get('add-member', [ResidentController::class, 'search']);
+
 
         Route::get('/profile/add-family', function () {
             return view('profileforms.addMemberPage');
@@ -122,11 +124,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
     Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
     Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
+    Route::get('/profile/search', [HouseholdController::class, 'search']);
 
 
 
 
     Route::get('/certificateRequest', [AdminController::class,'certificateRequest'])->name('certificateRequest');
+    Route::get('/certificate-request-details/{id}', [AdminController::class, 'getCertificateRequestDetails'])->name('certificate.details');
     Route::post('/certificate/request', [CertificateController::class, 'store'])->name('certificate.request.store');
     Route::post('/certificate/approve/{id}', [CertificateController::class, 'approve'])->name('certificate.approve');
     Route::post('/certificate/reject/{id}', [CertificateController::class, 'reject'])->name('certificate.reject');
@@ -134,6 +138,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/certificate/generate/{id}', [CertificateController::class, 'generate'])->name('certificate.generate');
     Route::post('/certificate/print-with-data', [CertificateController::class, 'printWithData'])->name('certificate.printWithData');
     Route::get('/certificate/history/{userId}', [CertificateController::class, 'history'])->name('certificate.history');
+    Route::get('/user-info/{id}', [AdminController::class, 'getUserInfo'])->name('user.info');
+    Route::get('/resident-info/{id}', [AdminController::class, 'getResidentInfo'])->name('resident.info');
     Route::get('/clearanceRequest', [AdminController::class,'clearanceRequest'])->name('clearanceRequest');
     Route::get('/serviceRequest', [ServiceRequestController::class,'adminIndex'])->name('serviceRequest');
     Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');

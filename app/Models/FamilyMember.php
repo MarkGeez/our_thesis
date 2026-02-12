@@ -10,22 +10,10 @@ class FamilyMember extends Model
 
     protected $fillable = [
         'household_id',
+        'resident_id',
         'encoded_by',
-        'firstName',
-        'middleName',
-        'lastName',
-        'birthdate',
-        'sex',
-        'relationship',
-        'contactNumber',        
-        'is_inactive'  
+        'relationship'
     ];
-
-   protected $casts = [
-    'is_inactive' => 'boolean',
-];
-
-
 
     public function user()
     {
@@ -35,6 +23,11 @@ class FamilyMember extends Model
     public function household()
     {
         return $this->belongsTo(Household::class);
+    }
+
+    public function resident()
+    {
+        return $this->belongsTo(Resident::class, 'resident_id');
     }
 }
 

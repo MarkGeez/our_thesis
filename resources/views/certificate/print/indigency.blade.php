@@ -80,7 +80,8 @@
       <div style="position:relative;z-index:1;">
         <p style="font-size:16px;text-align:justify;text-indent:50px;line-height:1.8;">This is to certify that
           @if($editable)
-            <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:300px"> of legal age, a bonafide resident of BARANGAY 249 ZONE 23 DISTRICT II with postal address at 1013
+            <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:300px"> of legal age, a bonafide resident of BARANGAY 249 ZONE 23 DISTRICT II with postal address at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">
+
 
           @else
             <span class="fill-line">{{ $name }}</span> of legal age, a bonafide resident of BARANGAY 249 ZONE 23 DISTRICT II with postal address at <span class="fill-line">{{ $address }}</span>.

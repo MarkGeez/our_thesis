@@ -172,11 +172,13 @@
                 @if($editable)
                   <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? $req->resident?->age ?? '' }}" style="width:50px"> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at 1013, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
+, after having duly sworn to in accordance with law, hereby depose and state:
                 @else
                   <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at <span class="fill-line">{{ $address }}</span>, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
+{{-- <span class="fill-line">{{ $address }}</span> --}}, after having duly sworn to in accordance with law, hereby depose and state:
                 @endif
             </p>
 
@@ -184,9 +186,9 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[married_to]" value="1" {{ !empty($data['married_to']) ? 'checked' : '' }}>
+                    <input type="checkbox" class="checkbox-input" name="request_data[separated_from]" value="1" checked>
                 @else
-                    <div class="checkbox">{{ !empty($data['married_to']) ? '✓' : '☐' }}</div>
+                    <div class="checkbox">✓</div>
                 @endif
                 
                 <div class="checkbox-text">
@@ -220,7 +222,7 @@
                         @php
                             $childrenList = array_values($data['children'] ?? []);
                             $numChildren = intval($data['num_children'] ?? 0);
-$displayCount = max(count($childrenList), $numChildren, 1);
+                            $displayCount = max(count($childrenList), $numChildren, 1);
                         @endphp
                         @for($i = 0; $i < $displayCount; $i++)
 

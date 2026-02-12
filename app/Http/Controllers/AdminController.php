@@ -46,8 +46,9 @@ class AdminController extends Controller
                         ->where('firstName', $user->firstName)
                         ->where('lastName', $user->lastName)
                         ->first();
-     $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
-    return view('admin.profile', compact('user', 'resident', 'members'));
+    $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+    $residents = Resident::select('id','firstName','middleName','lastName')->get();
+    return view('admin.profile', compact('user', 'resident', 'members', 'residents'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();
@@ -69,7 +70,11 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        $requests = CertificateRequest::with(['user:id,firstName,middleName,lastName,role', 'resident:id,firstName,middleName,lastName'])
+        $requests = CertificateRequest::with([
+            'user:id,firstName,middleName,lastName,role,email,contactNumber,birthday,profile_image',
+            'resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path',
+            'approver:id,firstName,middleName,lastName'
+        ])
             ->latest()
             ->get();
         
@@ -83,6 +88,20 @@ class AdminController extends Controller
             ->keyBy('user_id');
         
         return view("admin.certificateRequest", compact('admin', 'requests', 'requestStats'));
+    }
+
+    public function getCertificateRequestDetails(int $id)
+    {
+        $request = CertificateRequest::findOrFail($id);
+        
+        return response()->json([
+            'id' => $request->id,
+            'certificate_type' => $request->certificate_type,
+            'purpose' => $request->purpose,
+            'status' => $request->status,
+            'created_at' => $request->created_at->format('M d, Y H:i'),
+            'request_data' => $request->request_data ?? []
+        ]);
     }
     
     public function clearanceRequest(): View
@@ -210,6 +229,35 @@ class AdminController extends Controller
     $admin = Auth::user();
     $archive = Archive::latest()->get();
     return view("admin.archives", compact('admin', 'archive'));
+    }
+
+    public function getUserInfo(int $id)
+    {
+        $user = User::findOrFail($id);
+        
+        return response()->json([
+            'fullName' => trim("{$user->firstName} {$user->middleName} {$user->lastName}"),
+            'email' => $user->email,
+            'contact' => $user->contactNumber,
+            'birthday' => $user->birthday ? \Carbon\Carbon::parse($user->birthday)->format('F d, Y') : null,
+            'role' => $user->role,
+            'profileImage' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+        ]);
+    }
+
+    public function getResidentInfo(int $id)
+    {
+        $resident = Resident::findOrFail($id);
+        
+        return response()->json([
+            'fullName' => trim("{$resident->firstName} {$resident->middleName} {$resident->lastName}"),
+            'email' => $resident->user?->email,
+            'contact' => $resident->contactNo,
+            'birthday' => $resident->birthday ? \Carbon\Carbon::parse($resident->birthday)->format('F d, Y') : null,
+            'age' => $resident->age,
+            'sex' => $resident->sex,
+            'profileImage' => $resident->image_path ? asset('storage/' . $resident->image_path) : null,
+        ]);
     }
 
 }

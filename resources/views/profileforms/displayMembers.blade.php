@@ -21,6 +21,7 @@
                             </thead>
                             <tbody>
                                 @foreach($members as $member)
+                                @php $r = $member->resident; @endphp
                                 <tr>
                                     <td class="ps-4">
                                         <div class="d-flex align-items-center">
@@ -28,8 +29,8 @@
                                                 <i class="fas fa-user text-success"></i>
                                             </div>
                                             <div>
-                                                <div class="fw-bold text-dark">{{ ucwords($member->firstName) }} {{ ucwords($member->lastName) }}</div>
-                                                <small class="text-muted text-capitalize">{{ $member->sex ?? 'N/A' }}</small>
+                                                <div class="fw-bold text-dark">{{ $r ? ucwords(trim($r->firstName . ' ' . ($r->middleName ?? '') . ' ' . $r->lastName)) : 'Unknown' }}</div>
+                                                <small class="text-muted text-capitalize">{{ $r->sex ?? 'N/A' }}</small>
                                             </div>
                                         </div>
                                     </td>
@@ -40,15 +41,15 @@
                                     </td>
                                     <td>
                                         <div class="small">
-                                            <i class="fas fa-phone-alt me-1 text-muted"></i> 
-                                            {{ $member->contactNumber ?? $member->contactNo ?? 'None' }}
+                                            <i class="fas fa-phone-alt me-1 text-muted"></i>
+                                            {{ $r->contactNo ?? 'None' }}
                                         </div>
                                     </td>
                                     <td>
                                         <div class="small">
                                             <i class="fas fa-calendar-alt me-1 text-muted"></i>
-                                            @if($member->birthdate || $member->birthday)
-                                                {{ \Carbon\Carbon::parse($member->birthdate ?? $member->birthday)->format('M d, Y') }}
+                                            @if($r && $r->birthday)
+                                                {{ \Carbon\Carbon::parse($r->birthday)->format('M d, Y') }}
                                             @else
                                                 <span class="text-muted italic">Not set</span>
                                             @endif
@@ -56,8 +57,6 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="d-flex gap-2 justify-content-end align-items-center">
-                                            @include('profileforms.editFamily')
-
                                             <form action="{{ route(auth()->user()->role . '.untag.member', $member->id) }}" method="POST" class="m-0">
                                                 @csrf
                                                 @method('DELETE')
