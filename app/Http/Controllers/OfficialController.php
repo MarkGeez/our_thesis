@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use App\Models\Resident;
 use App\Models\Official;
+use App\Models\OfficialHistory;
 
 
 class OfficialController extends Controller
@@ -54,9 +55,66 @@ class OfficialController extends Controller
             ->orderBy('firstName')
             ->get(['id', 'firstName', 'middleName', 'lastName', 'image_path']);
 
+        $selectedYear = (int) request()->integer('year', now()->year);
+        if ($selectedYear < 1900 || $selectedYear > 2100) {
+            $selectedYear = now()->year;
+        }
+
+        $historyYears = OfficialHistory::selectRaw('YEAR(start) as year')
+            ->whereNotNull('start')
+            ->groupBy('year')
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->filter()
+            ->values();
+
+        if (!$historyYears->contains($selectedYear)) {
+            $historyYears = $historyYears->prepend($selectedYear)->unique()->values();
+        }
+
+        $fromDate = sprintf('%04d-01-01', $selectedYear);
+        $toDate = sprintf('%04d-12-31', $selectedYear);
+
+        $historyRows = OfficialHistory::with('resident:id,firstName,middleName,lastName')
+            ->where(function ($query) use ($fromDate, $toDate) {
+                $query->whereBetween('start', [$fromDate, $toDate])
+                    ->orWhereBetween('end', [$fromDate, $toDate])
+                    ->orWhere(function ($q) use ($fromDate, $toDate) {
+                        $q->whereNotNull('start')
+                          ->whereNotNull('end')
+                          ->where('start', '<=', $fromDate)
+                          ->where('end', '>=', $toDate);
+                    });
+            })
+            ->orderBy('position')
+            ->orderByDesc('start')
+            ->get();
+
         $user = auth()->user();
 
-        return view($user->role . '.barangayOfficials', compact('positions', 'officialsByPosition', 'residents', 'user'));
+        return view($user->role . '.barangayOfficials', compact(
+            'positions',
+            'officialsByPosition',
+            'residents',
+            'user',
+            'historyRows',
+            'historyYears',
+            'selectedYear'
+        ));
+    }
+
+    private function recordHistoryFromOfficial(Official $official, string $action): void
+    {
+        OfficialHistory::create([
+            'official_id' => $official->id,
+            'resident_id' => $official->resident_id,
+            'position' => $official->position,
+            'details' => $official->details,
+            'start' => $official->start,
+            'end' => $official->end,
+            'action' => $action,
+            'changed_by' => auth()->id(),
+        ]);
     }
 
     private function persistOfficial(array $data, ?Official $official = null): Official
@@ -97,7 +155,10 @@ class OfficialController extends Controller
         ];
 
         if ($official) {
+            $this->recordHistoryFromOfficial($official, 'updated');
+
             if ($existing && $existing->id !== $official->id) {
+                $this->recordHistoryFromOfficial($existing, 'replaced');
                 $existing->delete();
             }
 
@@ -106,6 +167,7 @@ class OfficialController extends Controller
         }
 
         if ($existing) {
+            $this->recordHistoryFromOfficial($existing, 'replaced');
             $existing->update($payload);
             return $existing;
         }
@@ -146,6 +208,7 @@ class OfficialController extends Controller
     public function untagOfficial(Request $request, $id)
     {
         $official = Official::findOrFail($id);
+        $this->recordHistoryFromOfficial($official, 'removed');
         $official->delete();
 
         return redirect()->back()->with('success', 'Official removed successfully.');

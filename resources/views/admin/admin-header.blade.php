@@ -19,10 +19,7 @@
                                     @if(auth()->user()->profile_image)
                                         <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                                     @else
-                                        <picture>
-                                            <source srcset="./img/avatar/avatar-illustrated-02.webp" type="image/webp">
-                                            <img src="./img/avatar/avatar-illustrated-02.png" alt="User name">
-                                        </picture>
+                                        <img src="{{ asset('images/default_profile.jpg') }}" alt="User name" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
                                     @endif
                                 </span>
                             </button>

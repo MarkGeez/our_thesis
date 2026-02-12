@@ -9,113 +9,136 @@
 @endphp
 
 <style>
-    .official-card {
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+  .resident-dropdown {
+    position: absolute;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
 
-    .official-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-    }
+  .resident-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
 
-    .official-card-header {
-        padding: 16px 18px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+  .resident-option:hover {
+    background: #f1f5f9;
+  }
 
-    .official-slot {
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0f172a;
-        font-size: 0.95rem;
-    }
+  .official-card {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .official-card-body {
-        padding: 16px 18px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
+  .official-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  }
 
-    .avatar-ring {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        border: 3px solid #0d6efd;
-        display: grid;
-        place-items: center;
-        background: #e9f2ff;
-    }
+  .official-card-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    .official-avatar {
-        width: 62px;
-        height: 62px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #e2e8f0;
-    }
+  .official-slot {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    font-size: 0.95rem;
+  }
 
-    .official-name {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 1.3rem;
-        letter-spacing: 0.5px;
-        margin: 0;
-        color: #0f172a;
-    }
+  .official-card-body {
+    padding: 16px 18px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
 
-    .official-meta {
-        margin: 0;
-        color: #64748b;
-        font-size: 0.85rem;
-    }
+  .avatar-ring {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #0d6efd;
+    display: grid;
+    place-items: center;
+    background: #e9f2ff;
+  }
 
-    .official-card-actions {
-        padding: 0 18px 18px 18px;
-        margin-top: auto;
-    }
+  .official-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e2e8f0;
+  }
 
-    .official-card-public .official-slot,
-    .official-card-public .official-name,
-    .official-card-public .official-meta {
-        color: #ffffff;
-    }
+  .official-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: #0f172a;
+  }
 
-    .official-card-public .official-card-header {
-        border-bottom-color: rgba(255, 255, 255, 0.2);
-    }
+  .official-meta {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
 
-    .official-action-title {
-        font-weight: 700;
-        font-size: 0.85rem;
-        color: #334155;
-    }
+  .official-card-actions {
+    padding: 0 18px 18px 18px;
+    margin-top: auto;
+  }
 
-    .form-label {
-        font-weight: 600;
-        color: #334155;
-    }
+  .official-card-public .official-slot,
+  .official-card-public .official-name,
+  .official-card-public .official-meta {
+    color: #ffffff;
+  }
 
-    .btn-outline-danger {
-        border-width: 2px;
-    }
+  .official-card-public .official-card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+  }
 
-    .search-help {
-        font-size: 0.8rem;
-        color: #94a3b8;
-    }
+  .official-action-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #334155;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .btn-outline-danger {
+    border-width: 2px;
+  }
+
+  .search-help {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
 </style>
 
 <div class="row g-4">
@@ -125,8 +148,9 @@
             $resident = $official?->resident;
             $avatar = $resident && $resident->image_path
                 ? asset('storage/' . $resident->image_path)
-                : 'https://ui-avatars.com/api/?name=' . urlencode($slot) . '&background=0D6EFD&color=fff&size=128';
+                : asset('images/default_profile.jpg');
         @endphp
+
         <div class="col-12 col-md-6 col-xl-4">
             <div class="official-card {{ $showControls ? '' : 'official-card-public' }}">
                 <div class="official-card-header">
@@ -150,6 +174,7 @@
                         @elseif($showControls)
                             <p class="official-name mb-1">No resident assigned</p>
                         @endif
+
                         <p class="official-meta mb-0">
                             @if($official && $official->start && $official->end)
                                 Term: {{ date('M d, Y', strtotime($official->start)) }} - {{ date('M d, Y', strtotime($official->end)) }}
@@ -159,6 +184,7 @@
                                 Tag a resident to display in this slot.
                             @endif
                         </p>
+
                         @if($official && $official->details)
                             <p class="official-meta mb-0">Notes: {{ $official->details }}</p>
                         @endif
@@ -171,21 +197,22 @@
                         <form method="POST" action="{{ route('admin.assign.official') }}" class="row g-2 official-assign-form">
                             @csrf
                             <input type="hidden" name="position" value="{{ $slot }}">
-                            <input type="hidden" name="resident_id" class="resident-id-input" value="{{ $official->resident_id ?? '' }}">
 
-                            <div class="col-12">
+                            <div class="col-12 position-relative">
                                 <label class="form-label">Search Resident</label>
                                 <input type="text"
-                                       class="form-control resident-search-input"
-                                       list="resident-options-{{ Str::slug($slot, '-') }}"
-                                       placeholder="Type name or ID"
-                                       value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
-                                <datalist id="resident-options-{{ Str::slug($slot, '-') }}">
-                                    @foreach($residents as $person)
-                                        <option data-id="{{ $person->id }}" value="{{ ucwords(strtolower($person->lastName)) }}, {{ ucwords(strtolower($person->firstName)) }} {{ ucwords(strtolower($person->middleName)) }} (ID: {{ $person->id }})"></option>
-                                    @endforeach
-                                </datalist>
-                                <small class="search-help">Pick a suggestion to set the resident. The ID must match.</small>
+                                    class="form-control resident-search-input"
+                                    placeholder="Type name or ID"
+                                    autocomplete="off"
+                                    value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
+
+                                <input type="hidden"
+                                    name="resident_id"
+                                    class="resident-id-input"
+                                    value="{{ $official->resident_id ?? '' }}">
+
+                                <div class="resident-dropdown d-none"></div>
+                                <small class="search-help">Select a resident from the list.</small>
                             </div>
 
                             <div class="col-12">
@@ -227,25 +254,83 @@
 </div>
 
 @if($showControls)
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.official-assign-form').forEach(function (form) {
-            const searchInput = form.querySelector('.resident-search-input');
-            const hiddenInput = form.querySelector('.resident-id-input');
-            const datalistId = searchInput.getAttribute('list');
-            const datalist = document.getElementById(datalistId);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const residents = @json($residents);
 
-            searchInput.addEventListener('change', function () {
-                const value = searchInput.value;
-                hiddenInput.value = '';
-                if (!datalist) return;
+            document.querySelectorAll('.official-assign-form').forEach(function (form) {
+                const searchInput = form.querySelector('.resident-search-input');
+                const hiddenInput = form.querySelector('.resident-id-input');
+                const dropdown = form.querySelector('.resident-dropdown');
 
-                const option = Array.from(datalist.options).find(opt => opt.value === value);
-                if (option) {
-                    hiddenInput.value = option.dataset.id || '';
+                function closeDropdown() {
+                    dropdown.classList.add('d-none');
                 }
+
+                function formatName(name) {
+                    if (!name) return '';
+                    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+                }
+
+                searchInput.addEventListener('input', function () {
+                    const query = searchInput.value.toLowerCase().trim();
+                    dropdown.innerHTML = '';
+                    hiddenInput.value = '';
+
+                    if (!query) {
+                        closeDropdown();
+                        return;
+                    }
+
+                    const matches = residents.filter(function (person) {
+                        const fullName = (
+                            person.lastName + ' ' +
+                            person.firstName + ' ' +
+                            (person.middleName ?? '')
+                        ).toLowerCase();
+                        return fullName.includes(query) || person.id.toString().includes(query);
+                    }).slice(0, 5);
+
+                    if (matches.length === 0) {
+                        closeDropdown();
+                        return;
+                    }
+
+                    matches.forEach(function (person) {
+                        const option = document.createElement('div');
+                        option.classList.add('resident-option');
+
+                        const last = formatName(person.lastName);
+                        const first = formatName(person.firstName);
+                        const middle = formatName(person.middleName);
+
+                        option.textContent = last + ', ' + first + (middle ? ' ' + middle : '') + ' (ID: ' + person.id + ')';
+
+                        option.addEventListener('click', function () {
+                            searchInput.value = option.textContent;
+                            hiddenInput.value = person.id;
+                            closeDropdown();
+                        });
+                        dropdown.appendChild(option);
+                    });
+
+                    dropdown.classList.remove('d-none');
+                });
+
+                form.addEventListener('submit', function (e) {
+                    if (!hiddenInput.value) {
+                        e.preventDefault();
+                        alert('Please select a resident from the dropdown.');
+                        searchInput.focus();
+                    }
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!form.contains(e.target)) {
+                        closeDropdown();
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 @endif
