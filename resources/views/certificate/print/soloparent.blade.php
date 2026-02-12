@@ -184,7 +184,7 @@
 
             <div class="checkbox-section">
                 @if($editable)
-                    <input type="checkbox" class="checkbox-input" name="request_data[separated_from]" value="1" {{ !empty($data['married_to']) ? 'checked' : '' }}>
+                    <input type="checkbox" class="checkbox-input" name="request_data[married_to]" value="1" {{ !empty($data['married_to']) ? 'checked' : '' }}>
                 @else
                     <div class="checkbox">{{ !empty($data['married_to']) ? '✓' : '☐' }}</div>
                 @endif
