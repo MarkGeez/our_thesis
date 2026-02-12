@@ -189,7 +189,6 @@
                 </div>
             @endif
 
-            @include('profileforms.addMember')
         </div>
     </div>
 
@@ -220,6 +219,7 @@
 </div>
 </div> 
 
+@stack('scripts')
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>

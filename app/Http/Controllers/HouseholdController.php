@@ -163,31 +163,19 @@ private function calculateAge($birthdate)
             $household = $householdResident->household;
             \Log::info('Found household: ' . $household->id);
 
-            // Validate
+            // New table stores only household_id, resident_id, encoded_by.
             $validated = $request->validate([
-                'firstName' => 'required|string|max:70',
-                'middleName' => 'nullable|string|max:70',
-                'lastName' => 'required|string|max:70',
-                'birthdate' => 'required|date',
-                'relationship' => 'required|string|max:70',
-                'sex' => 'required|in:male,female',
-                'contactNumber' => 'nullable|string|max:12',
+                'resident_id' => 'required|exists:residents,id',
+                'relationship' => 'required|alpha'
             ]);
-            
-            \Log::info('Validation passed', $validated);
-            
-            $birthday = \Carbon\Carbon::parse($validated['birthdate']);
+
+            $selectedId = $validated['resident_id'];
 
             $familyMember = FamilyMember::create([
                 'household_id' => $household->id,
+                'resident_id' => $selectedId,
                 'encoded_by' => $user->id,
-                'firstName' => $validated['firstName'],
-                'middleName' => $validated['middleName'] ?? null,
-                'lastName' => $validated['lastName'],
-                'birthdate' => $validated['birthdate'],
-                'relationship' => $validated['relationship'],
-                'sex' => $validated['sex'],
-                'contactNumber' => $validated['contactNumber'] ?? '',
+'relationship' => $validated['relationship'] 
             ]);
 
             \Log::info('Family member created: ' . $familyMember->id);
@@ -229,6 +217,18 @@ public function editMember(Request $request, $id)
     
     return redirect()->back()->with('success', 'Family member details successfully updated.');
 }
+
+public function search(Request $request)
+{
+    $keyword = $request->keyword;
+
+    $residents = Resident::select('id', 'firstName', 'lastName', 'middleName')->get();
+
+
+    return view('profileforms.addMember', compact( 'residents'));
+}
+
+
 
     
 }

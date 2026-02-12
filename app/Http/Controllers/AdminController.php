@@ -46,8 +46,9 @@ class AdminController extends Controller
                         ->where('firstName', $user->firstName)
                         ->where('lastName', $user->lastName)
                         ->first();
-     $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
-    return view('admin.profile', compact('user', 'resident', 'members'));
+    $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+    $residents = Resident::select('id','firstName','middleName','lastName')->get();
+    return view('admin.profile', compact('user', 'resident', 'members', 'residents'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();

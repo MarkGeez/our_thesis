@@ -51,6 +51,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         Route::get('/profile', [ResidentController::class,'profile'])->name('profile');
         Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
         Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
+        Route::get('add-member', [ResidentController::class, 'search']);
+
 
         Route::get('/profile/add-family', function () {
             return view('profileforms.addMemberPage');
@@ -122,6 +124,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
     Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
     Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
+    Route::get('/profile/search', [HouseholdController::class, 'search']);
 
 
 
