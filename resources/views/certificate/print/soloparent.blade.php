@@ -172,11 +172,13 @@
                 @if($editable)
                   <input type="text" class="fill-line" name="name" value="{{ $name }}" style="width:280px">, <input type="text" class="fill-line" name="request_data[age]" value="{{ $data['age'] ?? $req->resident?->age ?? '' }}" style="width:50px"> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at 1013, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
+, after having duly sworn to in accordance with law, hereby depose and state:
                 @else
                   <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
-                  Manila, with postal address at 1013{{-- <span class="fill-line">{{ $address }}</span> --}}, after having duly sworn to in accordance with law, hereby depose and state:
+                  Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
+{{-- <span class="fill-line">{{ $address }}</span> --}}, after having duly sworn to in accordance with law, hereby depose and state:
                 @endif
             </p>
 
