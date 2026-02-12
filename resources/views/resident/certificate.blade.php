@@ -32,40 +32,7 @@
                     </div>
                 @endif
 
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header"><strong>Request a Certificate</strong></div>
-                    <div class="card-body">
-                        <form action="{{ route('resident.certificate.request.store') }}" method="POST" id="certRequestForm">
-                            @csrf
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Certificate Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="certificate_type" id="certificate_type" required>
-                                        <option value="">Select type...</option>
-                                        <option value="bonafide" {{ old('certificate_type') === 'bonafide' ? 'selected' : '' }}>Bonafide</option>
-                                        <option value="indigency" {{ old('certificate_type') === 'indigency' ? 'selected' : '' }}>Indigency</option>
-                                        <option value="soloparent" {{ old('certificate_type') === 'soloparent' ? 'selected' : '' }}>Solo Parent</option>
-                                        <option value="senior" {{ old('certificate_type') === 'senior' ? 'selected' : '' }}>Senior Citizen</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="purpose" value="{{ old('purpose') }}" placeholder="e.g. Employment, Scholarship" required maxlength="500">
-                                </div>
-                                @php $res = $resident->resident ?? null; @endphp
-                                @if(!$res)
-                                <div class="col-12">
-                                    <label class="form-label">Address</label>
-                                    <input type="text" class="form-control" name="address" value="{{ old('address') }}" placeholder="Your full address" maxlength="255">
-                                </div>
-                                @endif
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-2"></i>Submit Request</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                @include('components.certificateForms', ['formRoute' => 'resident.certificate.request.store'])
 
                 <h5 class="mb-3">My Certificate Requests</h5>
                 @if($requests->isEmpty())
@@ -98,8 +65,10 @@
                                     </td>
                                     <td>{{ $req->created_at->format('M d, Y') }}</td>
                                     <td>
-                                        @if($req->status === 'approved' || $req->status === 'picked_up')
-                                            <span class="text-success fw-bold"><i class="fas fa-map-marker-alt me-1"></i>You can now go to the admin's house for pickup.</span>
+                                        @if($req->status === 'approved')
+                                            <span class="text-success fw-bold"><i class="fas fa-map-marker-alt me-1"></i>Ready for pickup. Go to the admin's house.</span>
+                                        @elseif($req->status === 'picked_up')
+                                            <span class="text-success fw-bold"><i class="fas fa-check-double me-1"></i>Successfully picked up.</span>
                                         @elseif($req->status === 'declined' && $req->decline_reason)
                                             <span class="text-muted">{{ $req->decline_reason }}</span>
                                         @else
@@ -116,6 +85,8 @@
         </main>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+
