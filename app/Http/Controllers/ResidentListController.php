@@ -89,12 +89,12 @@ public function searchResidents(Request $request)
 
         // Create resident
         $resident = Resident::create($validated);
-$household = Household::where('house_id', $validated['house_id'])->firstOrFail();
-        HouseholdResident::create([
+$household = Household::firstOrCreate(['house_id' => $validated['house_id']]);        
+HouseholdResident::create([
     'household_id' => $household->id,
     'resident_id'  => $resident->id,
-    'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,
-]);
+    'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,]);
+    
         return redirect()->back()->with('success', 'Resident encoded successfully!');
     
     }
