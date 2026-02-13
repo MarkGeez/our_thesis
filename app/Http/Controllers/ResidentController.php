@@ -29,13 +29,15 @@ class ResidentController extends Controller
     public function profile()
     {
         $user = auth()->user();
-        $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
-       
-        // Get family members from the same household
-        $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
-
-        
-        return view('resident.profile', compact('resident', 'user', 'members'));
+    
+    // Try to find resident by matching firstName, lastName
+    $resident = Resident::with('households.house.street')
+                        ->where('firstName', $user->firstName)
+                        ->where('lastName', $user->lastName)
+                        ->first();
+    $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+    $residents = Resident::select('id','firstName','middleName','lastName')->get();
+    return view('resident.profile', compact('user', 'resident', 'members', 'residents'));
     }
 
     public function updateProfile(Request $request, $id)

@@ -25,6 +25,13 @@
 
 <main class="main users chart-page container-fluid py-4" id="skip-target">
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
@@ -279,6 +286,7 @@
 </div>
 </div> 
 
+@stack('scripts')
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>

@@ -133,13 +133,18 @@
             <h6 class="mb-0">Resident Information</h6>
         </div>
 
+
         @include('components.displayFamily')
+
 
         
     </div>
 </div>
+    @if($resident)
+            @include('profileforms.displayMembers')
+    @elseif(!$resident)
 
-    @include('profileforms.displayMembers')
+    @endif
     {{--  @else
     <div class="row mt-4">
         <div class="col-12">
@@ -210,10 +215,17 @@
             </div>
         </div>
     @endif
+@if (!$resident)
+    not a household head cant add member
+@else
+    @php
+        $head = $resident->households?->first()?->pivot?->is_household_head ?? false;
+    @endphp
 
-    @include('profileforms.addMember')
-</div>
-</main>
+    @if ($head)
+        @include('profileforms.addMember')
+    @endif
+@endif
 
 
 </div>

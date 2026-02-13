@@ -37,13 +37,16 @@ class SubAdminController extends Controller
 
     public function profile(): View
     {
-        $user = Auth::user();
-        $resident = Resident::with('households.house.street')->where('user_id', $user->id)->first();
-       
-        
-        // Get family members from the same household
-        $members = FamilyMember::where('encoded_by', $user->id)->orderBy('firstName')->get();
-        return view("subadmin.profile", compact('resident', 'user',  'members'));
+$user = auth()->user();
+    
+    // Try to find resident by matching firstName, lastName
+    $resident = Resident::with('households.house.street')
+                        ->where('firstName', $user->firstName)
+                        ->where('lastName', $user->lastName)
+                        ->first();
+    $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+    $residents = Resident::select('id','firstName','middleName','lastName')->get();
+    return view('subadmin.profile', compact('user', 'resident', 'members', 'residents'));
     }
 
     public function updateProfile(Request $request, $id)
