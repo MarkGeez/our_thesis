@@ -1,8 +1,9 @@
-<button class="btn btn-sm btn-warning d-flex align-items-center" 
-                data-bs-toggle="modal" 
-                data-bs-target="#editFamilyMemberModal{{ $member->id }}" 
-                style="padding: 0.25rem 0.75rem;"><i class="fas fa-edit"></i> Edit</button>
-    
+<button type="button" 
+        class="btn btn-sm btn-warning d-flex align-items-center" 
+        data-bs-toggle="modal" 
+        data-bs-target="#editFamilyMemberModal{{ $member->id }}"
+        style="padding: 0.25rem 0.75rem;">
+    <i class="fas fa-edit me-1"></i> Edit
 </button>
 
 <!-- Edit Family Member Modal -->

@@ -9,6 +9,30 @@ use Illuminate\Support\Facades\Auth;
 
 class BlotterController extends Controller
 {
+    /**
+     * Map status codes to human-readable labels
+     */
+    private static function getStatusLabels()
+    {
+        return [
+            'first' => 'First Summon',
+            'second' => 'Second Summon',
+            'third' => 'Third Summon',
+            'brgyHearing' => 'Brgy Hearing',
+            'coldCase' => 'Cold Case',
+            'criminalCase' => 'Criminal Case',
+        ];
+    }
+
+    /**
+     * Get display label for a status code
+     */
+    public static function getStatusLabel($status)
+    {
+        $labels = self::getStatusLabels();
+        return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
+    }
+
     // LIST ALL BLOTTERS (ADMIN)
     public function index()
     {
@@ -99,9 +123,12 @@ return redirect()->route('admin.blotter.index')
         : [];
 
     $availableStatuses = array_diff($statuses, $usedStatuses);
+    
+    // Create status labels mapping for view
+    $statusLabels = self::getStatusLabels();
 
     // Return the UPDATE FORM view, not the main Blotter index view
-    return view('forms.update', compact('blotter', 'availableStatuses' , 'history'));
+    return view('forms.update', compact('blotter', 'availableStatuses', 'history', 'statusLabels'));
     }
 
     // STORE NEW UPDATE (NO EDITING)

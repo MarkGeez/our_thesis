@@ -170,15 +170,29 @@
                                         <td>{{ Str::limit($blotter->blotterDescription, 50) }}</td>
                                         <td>
                                             @php
-                                                $statusClasses = [
-                                                    'CLOSED'    => 'danger',
-                                                    'SCHEDULED' => 'primary',
-                                                    'RESOLVED'  => 'success',
-                                                    'PENDING'   => 'warning text-dark',
+                                                // Map status codes to display labels
+                                                $statusLabels = [
+                                                    'first' => 'First Summon',
+                                                    'second' => 'Second Summon',
+                                                    'third' => 'Third Summon',
+                                                    'brgyHearing' => 'Brgy Hearing',
+                                                    'coldCase' => 'Cold Case',
+                                                    'criminalCase' => 'Criminal Case',
                                                 ];
-                                                $statusClass = $statusClasses[strtoupper($blotter->status)] ?? 'secondary';
-                                            @endphp                                            <span class="badge badge-status bg-{{ $statusClass }}">
-                                                {{ ucfirst(strtolower($blotter->status)) }}
+                                                $statusKey = $blotter->current_status ?? $blotter->status;
+                                                $displayStatus = $statusLabels[$statusKey] ?? ucfirst(strtolower($statusKey));
+                                                $statusClasses = [
+                                                    'first' => 'primary',
+                                                    'second' => 'primary',
+                                                    'third' => 'info',
+                                                    'brgyHearing' => 'warning text-dark',
+                                                    'coldCase' => 'secondary',
+                                                    'criminalCase' => 'danger',
+                                                ];
+                                                $statusClass = $statusClasses[$statusKey] ?? 'secondary';
+                                            @endphp
+                                            <span class="badge badge-status bg-{{ $statusClass }}">
+                                                {{ $displayStatus }}
                                             </span>
                                         </td>
                                         <td>

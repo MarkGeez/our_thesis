@@ -133,7 +133,7 @@
             <h6 class="mb-0">Resident Information</h6>
         </div>
 
-        @include('components.displayFamily');
+        @include('components.displayFamily')
 
         
     </div>

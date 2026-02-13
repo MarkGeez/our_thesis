@@ -88,17 +88,73 @@
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
                     Edit Resident Info
                 </button>
-
                 {{--  
-                <button class="btn btn-sm btn-outline-success" onclick="window.location.href='{{ route('admin.family.add') }}'">
+                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addFamilyMemberModal">
                     <i class="fas fa-user-plus me-1"></i>Add Family Member
                 </button>
                 --}}
             @endif
         </div>
     </div>
-</div>
 
+    <!-- Add Family Member Modal -->
+    <div class="modal fade" id="addFamilyMemberModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Add Family Member</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFamilyMemberForm" method="POST" action="{{ route(auth()->user()->role . '.family.store') }}">
+                        @csrf
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="relationship" class="form-label">Relationship</label>
+                                <input type="text" class="form-control" id="relationship" name="relationship" placeholder="e.g., Father, Mother, Sibling">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="sex" class="form-label">Sex</label>
+                                <select class="form-select" id="sex" name="sex">
+                                    <option value="">Select</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contactNo" class="form-label">Contact No.</label>
+                                <input type="text" class="form-control" id="contactNo" name="contactNo">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="birthday" class="form-label">Birthday</label>
+                                <input type="date" class="form-control" id="birthday" name="birthday">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="addFamilyMemberForm" class="btn btn-success">Add Family Member</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{--  
     @if($members && $members->count() > 0)
     <div class="row mt-4">
         <div class="col-12">
@@ -194,3 +250,4 @@
         </div>
     </div>
     @endif
+    --}}

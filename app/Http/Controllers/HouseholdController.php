@@ -70,24 +70,29 @@ public function showHeads($id)
         ->get();
         
     // Get members and ensure we have encoded_by
-    $membersRaw = FamilyMember::whereHas('household', function($q) use($id) {
+    $membersRaw = FamilyMember::with(['resident' => function($query) {
+            $query->select('id', 'firstName', 'middleName', 'lastName', 'contactNo', 'birthday', 'age', 'sex', 'image_path');
+        }])
+        ->whereHas('household', function($q) use($id) {
             $q->where('house_id', $id);
         })->get();
 
     $allMembers = $membersRaw->map(function($member) {
+        $resident = $member->resident;
         return [
             'id' => $member->id,
             'household_id' => $member->household_id,
             'encoded_by' => (int)$member->encoded_by, // Cast to int for strict comparison
+            'relationship' => $member->relationship ?? 'Member',
             'resident' => [
-                'firstName' => $member->firstName,
-                'middleName' => $member->middleName,
-                'lastName' => $member->lastName,
-                'contactNo' => $member->contactNumber,
-                'birthday' => $member->birthdate,
-                'age' => $this->calculateAge($member->birthdate),
-                'sex' => $member->sex,
-                'image_path' => null
+                'firstName' => $resident->firstName ?? '',
+                'middleName' => $resident->middleName ?? '',
+                'lastName' => $resident->lastName ?? '',
+                'contactNo' => $resident->contactNo ?? '',
+                'birthday' => $resident->birthday ?? '',
+                'age' => $this->calculateAge($resident->birthday),
+                'sex' => $resident->sex ?? '',
+                'image_path' => $resident->image_path ?? null
             ]
         ];
     });

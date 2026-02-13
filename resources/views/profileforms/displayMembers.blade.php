@@ -4,7 +4,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
                     <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members ({{ $members->count() }})</h6>
-                    <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#addFamilyMemberModal">
+                    <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#addHouseholdMemberModal">
                         <i class="fas fa-plus"></i> Add Family Member
                     </button>
                 </div>
