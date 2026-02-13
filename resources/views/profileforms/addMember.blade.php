@@ -52,11 +52,9 @@
                             <option value="Spouse">Spouse</option>
                             <option value="Child">Child</option>
                             <option value="Parent">Parent</option>
-                            <option value="Father">Father</option>
-                            <option value="Mother">Mother</option>
+                            
                             <option value="Sibling">Sibling</option>
-                            <option value="Brother">Brother</option>
-                            <option value="Sister">Sister</option>
+                            
                             <option value="Grandparent">Grandparent</option>
                             <option value="Grandchild">Grandchild</option>
                             <option value="In-law">In-law</option>

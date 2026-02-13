@@ -260,7 +260,7 @@
     </div>
 
     <div class="section-container mb-5" id="contact">
-        <h2 class="section-title">Connect With Us</h2>
+        <h2 class="section-title">Contact Us</h2>
         <div class="glass-card mx-auto" style="max-width: 1100px; padding: 3rem;">
             <div class="row g-5 align-items-center text-start">
                 <div class="col-lg-5">

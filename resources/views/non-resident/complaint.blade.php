@@ -3,7 +3,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
+    
     <style>
         .status-container {
             padding: 4px 10px;
@@ -253,6 +253,24 @@
             align-items: flex-start;
             gap: 8px;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
     </style>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -261,17 +279,17 @@
 <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
 
 <div class="page-flex">
-    @include('admin.admin-sidebar', ['admin' => auth()->user()])
+   @include('non-resident.nonresident-sidebar', ['non-resident' => auth()->user()])
 
     <div class="main-wrapper">
-        @include('admin.admin-header', ['admin' => auth()->user()])
-
+        @include('non-resident.nonresident-header', ['non-resident' => auth()->user()])
+        
         <main class="main users chart-page" id="skip-target">
             <div class="main-container">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="ms-3" style="color:#000000;">My Complaints</h2>
                     <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#complaintModal">
-                        Create Complaint <i class="fa-solid fa-plus"></i>
+                        Create Complaint  <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
 
@@ -279,7 +297,7 @@
                 <div class="modal fade complaint-modal" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form action="{{ route('admin.submit.complaint') }}" method="POST" id="complaintForm">
+                            <form action="{{ route('non-resident.submit.complaint') }}" method="POST" id="complaintForm">
                                 @csrf
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="complaintModalLabel">
@@ -345,8 +363,8 @@
                 </div>
 
                 <div class="m-4 ms-3">
-                    <div class="complaints-grid mt-3">
-                        @if ($myComplaints->count() > 0)
+                    @if($myComplaints->count() > 0)
+                        <div class="complaints-grid mt-3">
                             @foreach ($myComplaints as $complaints)
                                 <div class="complaint-card">
                                     <div class="complaint-header">
@@ -357,7 +375,7 @@
                                     </div>
                                     
                                     <div class="complaint-details">
-                                        <span class="remarks-label">Complaint Details</span>hr
+                                        <span class="remarks-label">Complaint Details</span>
                                         {{ $complaints->details }}
                                     </div>
                                     
@@ -370,34 +388,24 @@
                                         </div>
                                         
                                         @if($complaints->remarks)
-                                            @php
-                                                $remarksText = $complaints->remarks ?? '';
-                                                $lines = preg_split("/\r\n|\n|\r/", $remarksText);
-                                                $formattedLines = [];
-                                                foreach ($lines as $line) {
-                                                    $line = trim($line);
-                                                    if ($line === '') {
-                                                        $formattedLines[] = $line;
-                                                        continue;
-                                                    }
-                                                    if (preg_match('/^(.*? - )([^:]+)(: .*)$/', $line, $matches)) {
-                                                        $formattedLines[] = $matches[1] . \Illuminate\Support\Str::title($matches[2]) . $matches[3];
-                                                    } else {
-                                                        $formattedLines[] = $line;
-                                                    }
-                                                }
-                                                $formattedRemarks = implode(PHP_EOL, $formattedLines);
-                                            @endphp
                                             <div class="remarks-box w-100">
                                                 <span class="remarks-label">Official Remarks</span>
-                                                {!! nl2br(e($formattedRemarks)) !!}
+                                                {!! nl2br(e($complaints->remarks)) !!}
                                             </div>
                                         @endif
                                     </div>
                                 </div>
                             @endforeach
-                        @endif
-                    </div>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <div class="empty-state-text">No Complaints Yet</div>
+                            <p class="text-muted" style="margin: 0;">You haven't submitted any complaints. Create one to get started!</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </main>
@@ -448,4 +456,3 @@
         }
     }
 </script>
-

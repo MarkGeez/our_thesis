@@ -35,6 +35,143 @@
             color: rgb(0, 0, 0);
         }
 
+        /* Improved Modal Styles */
+        .complaint-modal .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .complaint-modal .modal-header {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border: none;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+        }
+
+        .complaint-modal .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .complaint-modal .modal-body {
+            padding: 28px;
+            background-color: #f8f9fa;
+        }
+
+        .complaint-modal .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .complaint-modal .form-label i {
+            font-size: 16px;
+            color: #0d6efd;
+        }
+
+        .complaint-modal .form-control,
+        .complaint-modal .form-textarea {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .complaint-modal .form-control:focus,
+        .complaint-modal .form-textarea:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+            outline: none;
+        }
+
+        .complaint-modal textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        .char-counter.warning {
+            color: #ff9800;
+        }
+
+        .char-counter.danger {
+            color: #d32f2f;
+        }
+
+        .complaint-modal .modal-footer {
+            background-color: #f8f9fa;
+            border: none;
+            padding: 20px 28px;
+            border-radius: 0 0 16px 16px;
+            gap: 12px;
+        }
+
+        .complaint-modal .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 28px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .complaint-modal .btn-outline-secondary {
+            border: 2px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        .complaint-modal .btn-outline-secondary:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            color: #495057;
+        }
+
+        .complaint-modal .btn-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            border: none;
+            padding: 10px 32px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .complaint-modal .btn-primary:hover {
+            background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(13, 110, 253, 0.3);
+        }
+
+        .complaint-modal .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .form-group-wrapper {
+            margin-bottom: 22px;
+        }
+
+        .form-group-wrapper:last-child {
+            margin-bottom: 0;
+        }
+
         .complaint-card {
             background-color: #ffffff;
             border: 1px solid #e5e7eb;
@@ -138,50 +275,68 @@
                 </div>
 
                 <!-- Modal ng Submit Complaint -->
-                <div class="modal fade" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
+                <div class="modal fade complaint-modal" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form action="{{ route('subadmin.submit.complaint') }}" method="POST">
+                            <form action="{{ route('subadmin.submit.complaint') }}" method="POST" id="complaintForm">
                                 @csrf
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="complaintModalLabel">Submit Complaint</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title" id="complaintModalLabel">
+                                        <i class="fas fa-file-alt"></i>
+                                        Submit a Complaint
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                 </div>
 
                                 <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="address" class="form-label fw-semibold">Address location</label>
+                                    <div class="form-group-wrapper">
+                                        <label for="address" class="form-label">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Incident Location
+                                        </label>
                                         <input 
                                             type="text"
                                             name="address"
                                             id="address"
                                             value="{{ old('address') }}"
-                                            class="form-control border-dark"
+                                            class="form-control"
+                                            placeholder="Enter the specific address or location of the incident"
                                             required
                                         >
                                         @error('address')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
                                         @enderror
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="details" class="form-label fw-semibold">Details of complaint</label>
+                                    <div class="form-group-wrapper">
+                                        <label for="details" class="form-label">
+                                            <i class="fas fa-pen-fancy"></i>
+                                            Complaint Details
+                                        </label>
                                         <textarea
                                             name="details"
                                             id="details"
-                                            rows="5"
-                                            class="form-control border-dark"
+                                            class="form-control"
+                                            placeholder="Please provide detailed information about your complaint, including what happened, when it occurred, and any relevant details..."
                                             required
+                                            maxlength="1000"
                                         >{{ old('details') }}</textarea>
+                                        <div class="char-counter">
+                                            <span id="charCount">0</span> / 1000 characters
+                                        </div>
                                         @error('details')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button class="btn btn-primary" type="submit">Submit Complaint</button>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -244,4 +399,32 @@
         });
     </script>
 @endif
+
+<script>
+    // Character counter for details textarea
+    const detailsTextarea = document.getElementById('details');
+    const charCount = document.getElementById('charCount');
+    
+    if (detailsTextarea && charCount) {
+        detailsTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            const counter = charCount.parentElement;
+            counter.classList.remove('warning', 'danger');
+            
+            if (count >= 900) {
+                counter.classList.add('danger');
+            } else if (count >= 800) {
+                counter.classList.add('warning');
+            }
+        });
+        
+        // Initialize counter on page load if form has old data
+        charCount.textContent = detailsTextarea.value.length;
+        if (detailsTextarea.value.length >= 800) {
+            charCount.parentElement.classList.add(detailsTextarea.value.length >= 900 ? 'danger' : 'warning');
+        }
+    }
+</script>
 

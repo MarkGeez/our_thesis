@@ -110,6 +110,14 @@ class NonResidentController extends Controller
 
         return view('non-resident.blotter', compact('nonResident'));
     }
+
+    public function complaint()
+    {
+        $nonResident = auth()->user();
+        $myComplaints = $nonResident->complaints()->get();
+        return view('non-resident.complaint', compact('nonResident', 'myComplaints'));
+    }
+
     public function contactus()
     {
         $nonResident = auth()->user();

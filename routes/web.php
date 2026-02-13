@@ -253,6 +253,10 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
     Route::prefix('non-resident')->name('non-resident.')->group(function(){
         Route::get('/dashboard', [NonResidentController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [NonResidentController::class,'profile'])->name('profile');
+        Route::put('/profile/update/{id}', [NonResidentController::class, 'updateProfile'])->name('update.profile');
+        Route::put('/profile/{id}', [NonResidentController::class, 'updateOwnInfo'])->name('update.ownInfo');
+        Route::get('/complaint', [NonResidentController::class,'complaint'])->name('complaint');
+        Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
         Route::get('/aboutus', [NonResidentController::class,'aboutus'])->name('aboutus');
         Route::get('/contactus', [NonResidentController::class,'contactus'])->name('contactus');
         

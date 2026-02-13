@@ -50,7 +50,12 @@
                     </a>
                 </li>
 
-                
+                <li>
+                    <a class="{{ Request::routeIs('non-resident.complaint') ? 'active' : '' }}"
+                       href="{{ route('non-resident.complaint') }}">
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
+                    </a>
+                </li>
              
                
 
