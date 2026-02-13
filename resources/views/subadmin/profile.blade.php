@@ -223,7 +223,6 @@
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
                     Edit Resident Info
                 </button>
-                                @include('profileforms.addMember')
 
             @endif
         </div>
@@ -267,7 +266,6 @@
                 </div>
             @endif
 
-            @include('profileforms.addMember')
         </div>
     </div>
 
@@ -291,6 +289,13 @@
     @endif
     
 </div>
+
+@if(!$resident)
+    not a household head cant add member
+@elseif($resident->household->is_household_head === true)
+        @include('profileforms.addMember')
+@endif
+
 
 </div>
 </main>
