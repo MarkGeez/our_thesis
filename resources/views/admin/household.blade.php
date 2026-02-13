@@ -342,6 +342,7 @@ $(document).ready(function() {
                                         ${renderAvatar(mRes, 'fa-user')}
                                         <span>${formatFullName(mRes)}</span>
                                     </div>
+                                    <span class="badge bg-info text-white" style="font-size: 0.75rem; padding: 4px 8px;">${m.relationship || 'Member'}</span>
                                 </div>
                                 <div class="glass-meta">
                                     <div class="meta-item"><i class="fas fa-phone"></i> ${mRes.contactNo || mRes.contactNumber || 'N/A'}</div>
@@ -371,3 +372,8 @@ $(document).ready(function() {
     $('#houseSearchInput').on('input', function() { filterHouses($(this).val()); });
 });
 </script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('template/plugins/chart.min.js') }}"></script>
+<script src="{{ asset('template/plugins/feather.min.js') }}"></script>
+<script src="{{ asset('template/js/script.js') }}"></script>

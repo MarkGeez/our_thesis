@@ -24,8 +24,28 @@
                                 </div>
                                 <div class="col-6 text-end">
                                     <div class="info-label">Current Status</div>
-                                    <span class="badge bg-{{ $blotter->status === 'PENDING' ? 'warning text-dark' : ($blotter->status === 'RESOLVED' ? 'info' : ($blotter->status === 'SCHEDULED' ? 'primary' : 'success')) }}">
-                                        {{ ucfirst(strtolower($blotter->status)) }}
+                                    @php
+                                        $statusLabels = [
+                                            'first' => 'First Summon',
+                                            'second' => 'Second Summon',
+                                            'third' => 'Third Summon',
+                                            'brgyHearing' => 'Brgy Hearing',
+                                            'coldCase' => 'Cold Case',
+                                            'criminalCase' => 'Criminal Case',
+                                        ];
+                                        $currentStatus = $blotter->current_status ?? $blotter->status;
+                                        $displayStatus = $statusLabels[$currentStatus] ?? ucfirst(strtolower($currentStatus));
+                                        $badgeClass = match($currentStatus) {
+                                            'first', 'second' => 'primary',
+                                            'third' => 'info',
+                                            'brgyHearing' => 'warning text-dark',
+                                            'coldCase' => 'secondary',
+                                            'criminalCase' => 'danger',
+                                            default => 'secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge bg-{{ $badgeClass }}">
+                                        {{ $displayStatus }}
                                     </span>
                                 </div>
                                 <div class="col-12 mt-2">

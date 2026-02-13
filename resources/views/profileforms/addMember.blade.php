@@ -1,7 +1,7 @@
 <style>
     .resident-dropdown {
     position: absolute;
-    z-index: 1000;
+    z-index: 1050;
     width: 100%;
     background: white;
     border: 1px solid #ddd;
@@ -22,25 +22,59 @@
 
 </style>
 
-<form method="POST" action="{{ route($user->role. '.family.store') }}">
-    @csrf
-    <div class="mb-3 position-relative">
-    <label class="form-label">Search Resident</label>
+<div class="modal fade" id="addHouseholdMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Add Household Member</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addHouseholdMemberForm" method="POST" action="{{ route($user->role. '.family.store') }}">
+                    @csrf
+                    <div class="mb-3 position-relative">
+                        <label class="form-label">Search Resident</label>
 
-    <input type="text"
-           class="form-control resident-search-input"
-           placeholder="Enter resident name"
-           autocomplete="off">
+                        <input type="text"
+                               class="form-control resident-search-input"
+                               placeholder="Enter resident name"
+                               autocomplete="off" required>
 
-    <input type="hidden" name="resident_id" class="resident-id-input">
+                        <input type="hidden" name="resident_id" class="resident-id-input">
 
-    <div class="resident-dropdown d-none"></div>
+                        <div class="resident-dropdown d-none"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Relationship</label>
+                        <select name="relationship" class="form-select" required>
+                            <option value="">-- Select Relationship --</option>
+                            <option value="Spouse">Spouse</option>
+                            <option value="Child">Child</option>
+                            <option value="Parent">Parent</option>
+                            
+                            <option value="Sibling">Sibling</option>
+                            
+                            <option value="Grandparent">Grandparent</option>
+                            <option value="Grandchild">Grandchild</option>
+                            <option value="In-law">In-law</option>
+                            <option value="Nephew">Nephew</option>
+                            <option value="Niece">Niece</option>
+                            <option value="Cousin">Cousin</option>
+                            <option value="Partner">Partner</option>
+                            <option value="Guardian">Guardian</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="addHouseholdMemberForm" class="btn btn-success">Add Household Member</button>
+            </div>
+        </div>
     </div>
-
-    <input type="text" name="relationship" placeholder="kabit" >
-
-    <button type="submit" class="btn btn-primary">Add Household Member</button>
-</form>
+</div>
 
 @push('scripts')
 <script>
@@ -49,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load all residents from backend
     const residents = @json($residents);
 
-    const form = document.querySelector('form'); 
+    const form = document.getElementById('addHouseholdMemberForm'); 
     const searchInput = document.querySelector('.resident-search-input');
     const hiddenInput = document.querySelector('.resident-id-input');
     const dropdown = document.querySelector('.resident-dropdown');
@@ -95,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const first = formatName(person.firstName);
             const middle = formatName(person.middleName);
 
-            option.textContent = `${last}, ${first} ${middle ? middle : ''} (ID: ${person.id})`;
+            option.textContent = ${last}, ${first} ${middle ? middle : ''} (ID: ${person.id});
 
             option.addEventListener('click', function () {
                 searchInput.value = option.textContent;

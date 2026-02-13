@@ -207,7 +207,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Current Status</label>
-                        <span class="badge bg-info text-dark badge-status text-capitalize">{{ $blotter->current_status }}</span>
+                        <span class="badge bg-info text-dark badge-status text-capitalize">{{ $statusLabels[$blotter->current_status] ?? ucfirst(str_replace('_', ' ', $blotter->current_status)) }}</span>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Blotter #</label>
@@ -239,7 +239,10 @@
                                 <div class="timeline-body">
                                     <div class="timeline-header">
                                         <div class="d-flex align-items-center gap-2 flex-wrap">
-                                            <span class="timeline-badge {{ $badgeClass }}">{{ ucwords(str_replace('_',' ', $hist->status)) }}</span>
+                                            @php
+                                                $displayLabel = $statusLabels[$hist->status] ?? ucwords(str_replace('_', ' ', $hist->status));
+                                            @endphp
+                                            <span class="timeline-badge {{ $badgeClass }}">{{ $displayLabel }}</span>
                                         </div>
                                         <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
                                     </div>
@@ -299,9 +302,10 @@
                             @php
                                 $isUsed = isset($usedStatuses) && in_array($status, $usedStatuses, true);
                                 $isSelected = $selectedStatus === $status;
+                                $displayLabel = $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status));
                             @endphp
-                            <option value=" {{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isUsed && !$isSelected ? 'disabled' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $status)) }}{{ $isUsed && !$isSelected ? ' (already used)' : '' }}
+                            <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isUsed && !$isSelected ? 'disabled' : '' }}>
+                                {{ $displayLabel }}{{ $isUsed && !$isSelected ? ' (already used)' : '' }}
                             </option>
     
                         @endforeach

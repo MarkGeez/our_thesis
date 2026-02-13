@@ -94,6 +94,7 @@
             cursor: pointer;
             z-index: 100;
         }
+        @page { size: A4; margin: 0; } html, body { width: 210mm; height: 297mm; } body { margin: 0; background: #f0f0f0; font-family: 'Times New Roman', serif; color: var(--text); display: flex; justify-content: center; } .page { width: 210mm; height: 297mm; /* fixed height */ padding: 18mm; /* slightly reduced */ background: white; position: relative; box-sizing: border-box; overflow: hidden; /* prevents overflow to page 2 */ } .cert-title { margin: 40px 0; /* reduced from 60px */ } .paragraph { margin-bottom: 22px; /* reduced spacing */ text-indent: 50px; } .signature-section { position: absolute; /* prevents pushing content down */ bottom: 40mm; right: 20mm; width: 300px; text-align: center; } @media print { body { background: white; padding: 0; } .page { box-shadow: none; overflow: hidden; page-break-after: avoid; page-break-inside: avoid; } .no-print { display: none !important; } }
     </style>
 </head>
 <body>

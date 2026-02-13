@@ -89,8 +89,8 @@ public function searchResidents(Request $request)
 
         // Create resident
         $resident = Resident::create($validated);
-$household = Household::firstOrCreate(['house_id' => $validated['house_id']]);        
-HouseholdResident::create([
+$household = Household::firstOrCreate(['house_id' => $validated['house_id']]);  
+        HouseholdResident::create([
     'household_id' => $household->id,
     'resident_id'  => $resident->id,
     'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,]);
