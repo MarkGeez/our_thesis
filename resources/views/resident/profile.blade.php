@@ -211,7 +211,12 @@
 </div>
     </div>
 
-   @include('profileforms.displayMembers')
+@if($members->count() > 0)
+    @include('profileforms.displayMembers')
+@else
+    {{-- No family members encoded --}}
+@endif
+
 
    <div class="row">
         <div class="col-12">
