@@ -112,29 +112,41 @@ $user = auth()->user();
     
         <div class="col-md-4">
             <label for="current_password" class="form-label">Current Password</label>
-        <div class="input-group">
-            <input type="password" class="form-control" id="current_password" name="current_password">
-            <span class="input-group-text" onclick="togglePassword('current_password')">
-                <i class="fas fa-eye"></i>
-            </span>
-        </div>
+            <div class="input-group">
+                <input type="password" class="form-control" id="current_password" name="current_password">
+                <span class="input-group-text" onclick="togglePassword('current_password')" style="cursor: pointer;">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
         </div>
         <div class="col-md-4">
-            <label class="form-label">New Password</label>
-            <input
-                type="password"
-                name="password"
-                class="form-control form-control-lg"
-            >
+            <label for="password" class="form-label">New Password</label>
+            <div class="input-group">
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    class="form-control"
+                >
+                <span class="input-group-text" onclick="togglePassword('password')" style="cursor: pointer;">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
         </div>
 
         <div class="col-md-4">
-            <label class="form-label">Confirm New Password</label>
-            <input
-                type="password"
-                name="password_confirmation"
-                class="form-control form-control-lg"
-            >
+            <label for="password_confirmation" class="form-label">Confirm New Password</label>
+            <div class="input-group">
+                <input
+                    type="password"
+                    name="password_confirmation"
+                    id="password_confirmation"
+                    class="form-control"
+                >
+                <span class="input-group-text" onclick="togglePassword('password_confirmation')" style="cursor: pointer;">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
         </div>
     </div>
 

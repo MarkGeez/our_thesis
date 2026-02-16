@@ -8,32 +8,316 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
     <style>
-        .modal-body section {
-            margin-bottom: 24px;
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
         }
-        .table-wrapper {
-            margin: 0 1em;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
         }
-        
+
+        .main.users.chart-page {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .main-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            margin: 0 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            color: #000;
+            padding: 26px 26px;
+        }
+
+        .page-header-inner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 260px;
+        }
+
+        .page-header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.45);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: var(--primary-color);
+            flex: 0 0 auto;
+        }
+
+        .page-header-title {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #000;
+            line-height: 1.1;
+        }
+
+        .page-header-subtitle {
+            margin: 4px 0 0 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .page-header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-weight: 600;
+            padding: 0.625rem 1.1rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
+        }
+
+        .btn-outline-primary {
+            border-width: 2px;
+        }
+
+        .content-wrap {
+            padding: 18px 22px 0 22px;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-container {
+            padding: 18px 22px 22px 22px;
+        }
+
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .results-count {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .results-count .count-number {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
         table th,
         table td {
             vertical-align: middle;
         }
 
-        /* Pagination styling */
-        .pagination-wrapper {
-            margin: 2rem 1em;
+        .table {
+            margin-bottom: 0;
+            font-size: 0.92rem;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.75rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+        }
+
+        .action-buttons {
             display: flex;
-            justify-content: space-between;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn-sm {
+            padding: 0.42rem 0.85rem;
+            font-size: 0.82rem;
+            border-radius: 10px;
+        }
+
+        .btn-action {
+            display: inline-flex;
             align-items: center;
+            gap: 0.45rem;
+            white-space: nowrap;
+        }
+
+        .btn-action i {
+            font-size: 0.9rem;
+        }
+
+        .pagination-container {
+            padding: 18px 22px 22px 22px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin: 0;
         }
 
         .pagination-info {
-            color: #6c757d;
-            margin-right: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-info-text {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            background: #fff;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .pagination-info-text i {
+            color: var(--primary-color);
+        }
+
+        .pagination {
+            margin: 0;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.58rem 0.95rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            background: #fff;
+            min-width: 44px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .pagination .page-link:hover:not(.disabled) {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+            transform: scale(1.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .modal-body section {
+            margin-bottom: 24px;
         }
 
         .modal-body h6 {
@@ -43,14 +327,14 @@
             letter-spacing: 0.5px;
             color: #4b5563;
             margin-bottom: 12px;
-            border-left: 4px solid #0d6efd;
+            border-left: 4px solid var(--primary-color);
             padding-left: 10px;
         }
 
         .info-box {
             background-color: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 16px;
         }
 
@@ -84,8 +368,8 @@
 
         .form-control:focus,
         .form-select:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.12);
         }
 
         .edit-section-title {
@@ -97,27 +381,6 @@
             border-bottom: 2px solid #f3f4f6;
         }
 
-        @media (max-width: 576px) {
-            .blotter-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .blotter-header h2 {
-                margin-bottom: 0;
-            }
-
-            .blotter-header .encode-btn-wrapper {
-                width: 100%;
-            }
-
-            .blotter-header .encode-btn-wrapper button {
-                width: 100%;
-            }
-        }
-
-        /* --- IMPROVED STATUS BADGES --- */
         .status-badge {
             padding: 6px 14px;
             border-radius: 50px;
@@ -167,12 +430,46 @@
         }
         .status-default .status-dot { background-color: #adb5bd; }
 
-        /* Style for IDs */
         .case-number {
-         
             font-size: 0.85rem;
-            color: #0d6efd;
-            font-weight: 600;
+            color: var(--primary-color);
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .table-wrapper {
+            margin: 0;
+        }
+
+        @media (max-width: 576px) {
+            .main-container {
+                margin: 0 0.75rem;
+            }
+
+            .page-header {
+                padding: 18px 18px;
+            }
+
+            .content-wrap,
+            .table-container,
+            .pagination-container {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .page-header-actions {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .page-header-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -187,232 +484,271 @@
             @include('admin.admin-header', ['admin' => auth()->user()])
 
             <main class="main users chart-page" id="skip-target">
-                <div class="container-fluid px-3 pb-4">
-                    <div class="d-flex align-items-center flex-wrap gap-3 mb-4 blotter-header">
-                        <div>
-                            <p class="text-muted mb-1">Dispute records</p>
-                            <h2 class="mb-0 fw-bold" style="color:#000000;">Manage Blotters</h2>
-                        </div>
+                <div class="main-container">
+                    <div class="page-header">
+                        <div class="page-header-inner">
+                            <div class="page-header-left">
+                                <div class="page-header-icon">
+                                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                                </div>
+                                <div>
+                                    <h2 class="page-header-title">Manage Blotters</h2>
+                                    <p class="page-header-subtitle">Dispute records</p>
+                                </div>
+                            </div>
 
-                        <div class="ms-auto encode-btn-wrapper">
-                            <button class="btn btn-primary d-flex align-items-center shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#blotterModal">
-                                <i class="fa fa-plus me-2"></i>
-                                Submit Blotter
-                            </button>
+                            <div class="page-header-actions">
+                                <button class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#blotterModal">
+                                    <i class="fa fa-plus"></i>
+                                    <span>Submit Blotter</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    @if (session('success'))
-                        <div class="alert alert-success shadow-sm" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                     @if(session('error'))
-                        <div class="alert alert-danger shadow-sm" role="alert">
-                            {{ session('error') }}
-                        </div>
-                     @endif
-                    
+                    <div class="content-wrap">
+                        @if (session('success'))
+                            <div class="alert alert-success shadow-sm mb-3" role="alert">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger shadow-sm mb-3" role="alert">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+                    </div>
+
                     @if($blotters->isEmpty())
-                        <div class="container bg-light p-3 m-3 alert alert-info">No blotter records found.</div>
+                        <div class="content-wrap pt-0">
+                            <div class="alert alert-info mb-4">
+                                No blotter records found.
+                            </div>
+                        </div>
                     @else
-                        <div class="table-responsive table-wrapper">
-                            <table class="table table-bordered table-hover bg-white shadow-sm">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th style="width: 120px;">Blotter No</th>
-                                        <th>Complainant (Nagrereklamo)</th>
-                                        <th>Respondent (Nirereklamo)</th>
-                                        <th style="width: 150px;">Status</th>
-                                        <th class="text-center" style="width: 130px;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($blotters as $blotter)
-                                        @php
-                                            $status = strtolower($blotter->current_status ?? '');
-                                            if (str_contains($status, 'pending')) {
-                                                $uiClass = 'status-pending';
-                                            } elseif (str_contains($status, 'ongoing')) {
-                                                $uiClass = 'status-ongoing';
-                                            } elseif (str_contains($status, 'closed')) {
-                                                $uiClass = 'status-closed';
-                                            } else {
-                                                $uiClass = 'status-default';
-                                            }
-                                        @endphp
+                        <div class="table-container pt-0">
+                            <div class="results-info">
+                                <div class="results-count">
+                                    Records: <span class="count-number">{{ $blotters->total() }}</span>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive table-wrapper">
+                                <table class="table table-hover align-middle">
+                                    <thead>
                                         <tr>
-                                            <td class="case-number">#{{ $blotter->id }}</td>
-                                            <td class="">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
-                                            <td class="">{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
-                                            
-                                            <td>
-                                                <div class="status-badge {{ $uiClass }}">
-                                                    <span class="status-dot"></span>
-                                                    {{ $blotter->current_status ?? 'N/A' }}
-                                                </div>
-                                            </td>
-
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
-                                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" 
-                                                            type="button" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
-                                                        <i class="fa fa-eye fa-fw"></i><span>View</span>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-primary border shadow-sm d-inline-flex align-items-center gap-1" 
-                                                            type="button" data-bs-toggle="modal" data-bs-target="#updateBlotterModal" 
-                                                            data-blotter-id="{{ $blotter->id }}">
-                                                        <i class="fa fa-pen-to-square fa-fw"></i><span>Update</span>
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            <th style="width: 120px;">Blotter No</th>
+                                            <th>Complainant (Nagrereklamo)</th>
+                                            <th>Respondent (Nirereklamo)</th>
+                                            <th style="width: 150px;">Status</th>
+                                            <th class="text-center" style="width: 150px;">Action</th>
                                         </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($blotters as $blotter)
+                                            @php
+                                                $status = strtolower($blotter->current_status ?? '');
+                                                if (str_contains($status, 'pending')) {
+                                                    $uiClass = 'status-pending';
+                                                } elseif (str_contains($status, 'ongoing')) {
+                                                    $uiClass = 'status-ongoing';
+                                                } elseif (str_contains($status, 'closed')) {
+                                                    $uiClass = 'status-closed';
+                                                } else {
+                                                    $uiClass = 'status-default';
+                                                }
+                                            @endphp
 
-                                        {{-- View Modal --}}
-                                        <div class="modal fade" id="viewBlotter{{ $blotter->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            <tr>
+                                                <td class="case-number">#{{ $blotter->id }}</td>
+                                                <td>{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
+                                                <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
+                                                <td>
+                                                    <div class="status-badge {{ $uiClass }}">
+                                                        <span class="status-dot"></span>
+                                                        {{ $blotter->current_status ?? 'N/A' }}
                                                     </div>
-                                                    <div class="modal-body p-4">
-                                                        <section>
-                                                            <h6>Complainant Information</h6>
-                                                            <div class="info-box">
-                                                                <div class="row gy-3">
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Full Name</div>
-                                                                        <div class="info-value">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffMiddleName }} {{ $blotter->plaintiffLastName }}</div>
-                                                                    </div>
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Age</div>
-                                                                        <div class="info-value">{{ $blotter->plaintiffAge ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <div class="info-label">Address</div>
-                                                                        <div class="info-value">{{ $blotter->plaintiffAddress ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Contact Number</div>
-                                                                        <div class="info-value">{{ $blotter->plaintiffContactNumber ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </section>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="action-buttons">
+                                                        <button class="btn btn-sm btn-primary btn-action"
+                                                                type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#viewBlotter{{ $blotter->id }}">
+                                                            <i class="fa fa-eye"></i>
+                                                            <span>View</span>
+                                                        </button>
 
-                                                        <section>
-                                                            <h6>Respondent Information</h6>
-                                                            <div class="info-box">
-                                                                <div class="row gy-3">
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Full Name</div>
-                                                                        <div class="info-value">{{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</div>
-                                                                    </div>
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Age</div>
-                                                                        <div class="info-value">{{ $blotter->defendantAge ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <div class="info-label">Address</div>
-                                                                        <div class="info-value">{{ $blotter->defendantAddress ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Contact Number</div>
-                                                                        <div class="info-value">{{ $blotter->defendantContactNumber ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </section>
+                                                        <button class="btn btn-sm btn-outline-primary btn-action shadow-sm"
+                                                                type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#updateBlotterModal"
+                                                                data-blotter-id="{{ $blotter->id }}">
+                                                            <i class="fa fa-pen-to-square"></i>
+                                                            <span>Update</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
 
-                                                        @if($blotter->witnessName)
+                                            <div class="modal fade" id="viewBlotter{{ $blotter->id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body p-4">
                                                             <section>
-                                                                <h6>Witness Information</h6>
+                                                                <h6>Complainant Information</h6>
                                                                 <div class="info-box">
                                                                     <div class="row gy-3">
                                                                         <div class="col-sm-6">
-                                                                            <div class="info-label">Witness Name</div>
-                                                                            <div class="info-value">{{ $blotter->witnessName }}</div>
+                                                                            <div class="info-label">Full Name</div>
+                                                                            <div class="info-value">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffMiddleName }} {{ $blotter->plaintiffLastName }}</div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Age</div>
+                                                                            <div class="info-value">{{ $blotter->plaintiffAge ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <div class="info-label">Address</div>
+                                                                            <div class="info-value">{{ $blotter->plaintiffAddress ?? 'N/A' }}</div>
                                                                         </div>
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Contact Number</div>
-                                                                            <div class="info-value">{{ $blotter->witnessContactNumber ?? 'N/A' }}</div>
+                                                                            <div class="info-value">{{ $blotter->plaintiffContactNumber ?? 'N/A' }}</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </section>
-                                                        @endif
 
-                                                        <section>
-                                                            <h6>Incident Description</h6>
-                                                            <div class="info-box">
-                                                                <div class="info-label mb-1">Details</div>
-                                                                <div class="info-value" style="white-space: pre-line; line-height: 1.6;">
-                                                                    {{ $blotter->blotterDescription }}
-                                                                </div>
-                                                            </div>
-                                                        </section>
-
-                                                        @if($blotter->proof)
                                                             <section>
-                                                                <h6>Evidence / Proof Submitted</h6>
+                                                                <h6>Respondent Information</h6>
+                                                                <div class="info-box">
+                                                                    <div class="row gy-3">
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Full Name</div>
+                                                                            <div class="info-value">{{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Age</div>
+                                                                            <div class="info-value">{{ $blotter->defendantAge ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-12">
+                                                                            <div class="info-label">Address</div>
+                                                                            <div class="info-value">{{ $blotter->defendantAddress ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Contact Number</div>
+                                                                            <div class="info-value">{{ $blotter->defendantContactNumber ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+
+                                                            @if($blotter->witnessName)
+                                                                <section>
+                                                                    <h6>Witness Information</h6>
+                                                                    <div class="info-box">
+                                                                        <div class="row gy-3">
+                                                                            <div class="col-sm-6">
+                                                                                <div class="info-label">Witness Name</div>
+                                                                                <div class="info-value">{{ $blotter->witnessName }}</div>
+                                                                            </div>
+                                                                            <div class="col-sm-6">
+                                                                                <div class="info-label">Contact Number</div>
+                                                                                <div class="info-value">{{ $blotter->witnessContactNumber ?? 'N/A' }}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </section>
+                                                            @endif
+
+                                                            <section>
+                                                                <h6>Incident Description</h6>
+                                                                <div class="info-box">
+                                                                    <div class="info-label mb-1">Details</div>
+                                                                    <div class="info-value" style="white-space: pre-line; line-height: 1.6;">
+                                                                        {{ $blotter->blotterDescription }}
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+
+                                                            @if($blotter->proof)
+                                                                <section>
+                                                                    <h6>Evidence / Proof Submitted</h6>
+                                                                    <div class="info-box">
+                                                                        <div class="row gy-2">
+                                                                            <div class="col-12">
+                                                                                <img src="{{ Storage::url($blotter->proof) }}"
+                                                                                     alt="Evidence for blotter #{{ $blotter->id }}"
+                                                                                     class="img-fluid rounded border evidence-img"
+                                                                                     style="max-height: 400px; object-fit: contain; cursor: pointer;"
+                                                                                     onclick="showImageModal('{{ Storage::url($blotter->proof) }}', '#{{ $blotter->id }}')"
+                                                                                     title="Click to view full size">
+                                                                            </div>
+                                                                            <div class="col-12">
+                                                                                <small class="text-muted">
+                                                                                    <i class="fa fa-info-circle me-1"></i> Click image to view full size
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </section>
+                                                            @endif
+
+                                                            <section>
+                                                                <h6>Status Information</h6>
                                                                 <div class="info-box">
                                                                     <div class="row gy-2">
-                                                                        <div class="col-12">
-                                                                            <img src="{{ Storage::url($blotter->proof) }}" 
-                                                                                 alt="Evidence for blotter #{{ $blotter->id }}" 
-                                                                                 class="img-fluid rounded border evidence-img"
-                                                                                 style="max-height: 400px; object-fit: contain; cursor: pointer;"
-                                                                                 onclick="showImageModal('{{ Storage::url($blotter->proof) }}', '#{{ $blotter->id }}')"
-                                                                                 title="Click to view full size">
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Current Status</div>
+                                                                            <div class="status-badge {{ $uiClass }}">
+                                                                                <span class="status-dot"></span>
+                                                                                {{ $blotter->current_status ?? 'N/A' }}
+                                                                            </div>
                                                                         </div>
-                                                                        <div class="col-12">
-                                                                            <small class="text-muted">
-                                                                                <i class="fa fa-info-circle me-1"></i> Click image to view full size
-                                                                            </small>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Date Filed</div>
+                                                                            <div class="info-value">{{ $blotter->created_at->format('M d, Y h:i A') }}</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </section>
-                                                        @endif
-
-                                                        <section>
-                                                            <h6>Status Information</h6>
-                                                            <div class="info-box">
-                                                                <div class="row gy-2">
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Current Status</div>
-                                                                        <div class="status-badge {{ $uiClass }}">
-                                                                            <span class="status-dot"></span>
-                                                                            {{ $blotter->current_status ?? 'N/A' }}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-sm-6">
-                                                                        <div class="info-label">Date Filed</div>
-                                                                        <div class="info-value">{{ $blotter->created_at->format('M d, Y h:i A') }}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </section>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        {{-- Pagination --}}
                         @if($blotters->hasPages())
-                            <div class="pagination-wrapper">
-                                <div class="pagination-info">
-                                    Showing {{ $blotters->firstItem() }} to {{ $blotters->lastItem() }} of {{ $blotters->total() }} results
+                            <div class="pagination-container">
+                                <div class="pagination-wrapper">
+                                    <div class="pagination-info">
+                                        <div class="pagination-info-text">
+                                            <i class="fa-solid fa-list-check"></i>
+                                            <span>
+                                                Showing <span class="pagination-info-numbers">{{ $blotters->firstItem() }}</span>
+                                                to <span class="pagination-info-numbers">{{ $blotters->lastItem() }}</span>
+                                                of <span class="pagination-info-numbers">{{ $blotters->total() }}</span> results
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {{ $blotters->appends(request()->query())->links('pagination::bootstrap-5') }}
                                 </div>
-                                {{ $blotters->appends(request()->query())->links('pagination::bootstrap-5') }}
                             </div>
                         @endif
                     @endif
@@ -459,7 +795,6 @@
                     </div>
                 </div>
 
-                {{-- Image Viewer Modal --}}
                 <div class="modal fade" id="imageViewerModal" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-fullscreen">
                         <div class="modal-content bg-dark">
@@ -473,6 +808,7 @@
                         </div>
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
@@ -481,7 +817,7 @@
     <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
     <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
     <script src="{{ asset('template/js/script.js') }}"></script>
-    
+
     <script>
         const updateBlotterModal = document.getElementById('updateBlotterModal');
         if (updateBlotterModal) {
@@ -506,14 +842,10 @@
         }
 
         function initializeDatePickers() {
-            // Only attach click handler to calendar icon triggers
             document.querySelectorAll('[id^="date_trigger_"]').forEach(trigger => {
                 trigger.removeEventListener('click', handleDateTrigger);
                 trigger.addEventListener('click', handleDateTrigger);
             });
-
-            // Date inputs are now fully editable by typing
-            // No auto-open picker behavior attached
         }
 
         function handleDateTrigger(event) {
@@ -526,10 +858,6 @@
             }
         }
 
-        // Allow manual typing in date inputs - remove auto-open on focus/click
-        // Only trigger picker when clicking the calendar icon
-
-        // Image viewer modal function
         function showImageModal(imageUrl, blotterId) {
             const modal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
             document.getElementById('modalImage').src = imageUrl;
@@ -537,7 +865,7 @@
             modal.show();
         }
     </script>
-    
+
     @yield('scripts')
 </body>
 </html>

@@ -10,7 +10,6 @@
                 <tr>
                     <th>Cert ID</th>
                     <th>Requester</th>
-                    <th class="text-center">History</th>
                     <th>Certificate Type</th>
                     <th>Purpose</th>
                     <th>Status</th>
@@ -31,21 +30,6 @@
                                 {{ ucwords(strtolower($request->user->firstName . ' ' . $request->user->lastName)) }}
                             @endif
                         </button>
-                    </td>
-                    <td class="text-center">
-                        @php
-                            $stats = $requestStats[$request->user_id] ?? null;
-                        @endphp
-                        @if($stats)
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-history-user-id="{{ $request->user_id }}" title="View full history">
-                                <i class="fas fa-history me-1"></i>
-                                <span class="badge bg-primary">{{ $stats->total }}</span>
-                                <span class="badge bg-success">{{ $stats->approved }}</span>
-                                <span class="badge bg-danger">{{ $stats->declined }}</span>
-                            </button>
-                        @else
-                            <span class="text-muted">-</span>
-                        @endif
                     </td>
                     <td><span >{{ ucfirst($request->certificate_type) }}</span></td>
                     <td>

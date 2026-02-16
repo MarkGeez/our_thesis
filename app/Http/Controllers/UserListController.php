@@ -56,18 +56,25 @@ class UserListController extends Controller
 
     public function updateProfile(Request $request, $id)
     {
-        // Validate the request
-        $validated = $request->validate([
+        // Find the user
+        $user = User::findOrFail($id);
+
+        $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:20',
             'birthday' => 'required|date',
-            'password' => 'nullable|min:6|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
-        
-        // Find the user
-        $user = User::findOrFail($id);
+        ];
+
+        // If password change is attempted, validate current password and new password
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required|current_password';
+            $rules['password'] = 'required|min:8|confirmed';
+        }
+
+        // Validate the request
+        $validated = $request->validate($rules);
         
         // Update basic info
         $user->email = $validated['email'];
@@ -75,7 +82,7 @@ class UserListController extends Controller
         $user->birthday = $validated['birthday'];
         
         // Update password if provided
-        if (!empty($validated['password'])) {
+        if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 

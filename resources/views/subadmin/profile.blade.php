@@ -302,12 +302,11 @@
     
 </div>
 
-@if(!$resident)
-    not a household head cant add member
-@elseif($resident->household->is_household_head === true)
-        @include('profileforms.addMember')
-@endif
-
+@php
+$head = $resident
+? $resident->households->contains(fn($h) => (bool) ($h->pivot->is_household_head ?? false))
+: false;
+@endphp
 
 </div>
 </main>

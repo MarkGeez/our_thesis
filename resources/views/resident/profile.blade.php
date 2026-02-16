@@ -280,10 +280,18 @@
         </div>
     @endif
 
-    @if(!$resident)
-    not a household head cant add member
-@elseif($resident->household->is_household_head === true)
+    @if (!$resident)
+    Not a household head, Can't add member.
+@else
+    @php
+        $head = $resident->households?->first()?->pivot?->is_household_head ?? false;
+    @endphp
+
+    @if ($head)
         @include('profileforms.addMember')
+    @else
+        Not a household head, Can't add member.
+    @endif
 @endif
 
     
