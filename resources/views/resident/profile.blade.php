@@ -212,14 +212,18 @@
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
                     Edit Resident Info
                 </button>
-                @include('profileforms.addMember')
             @endif
         </div>
     </div>
 </div>
     </div>
 
-   @include('profileforms.displayMembers')
+@if($members->count() > 0)
+    @include('profileforms.displayMembers')
+@else
+    {{-- No family members encoded --}}
+@endif
+
 
    <div class="row">
         <div class="col-12">
@@ -254,7 +258,6 @@
                 </div>
             @endif
 
-            @include('profileforms.addMember')
         </div>
     </div>
 
@@ -276,6 +279,13 @@
             </div>
         </div>
     @endif
+
+    @if(!$resident)
+    not a household head cant add member
+@elseif($resident->household->is_household_head === true)
+        @include('profileforms.addMember')
+@endif
+
     
 </div>
 

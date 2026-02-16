@@ -140,11 +140,12 @@
         
     </div>
 </div>
-    @if($resident)
-            @include('profileforms.displayMembers')
-    @elseif(!$resident)
-
+   @if($members->count() > 0)
+    @include('profileforms.displayMembers')
+    @else
+    {{-- No family members encoded --}}
     @endif
+
     {{--  @else
     <div class="row mt-4">
         <div class="col-12">
@@ -215,6 +216,10 @@
             </div>
         </div>
     @endif
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 14290fddbeafbe804f8082141f49d23c8d4c51ca
 @if (!$resident)
     not a household head cant add member
 @else
@@ -224,8 +229,11 @@
 
     @if ($head)
         @include('profileforms.addMember')
+    @else
+        not a household head cant add member
     @endif
 @endif
+
 
 
 </div>
