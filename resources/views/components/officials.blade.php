@@ -9,6 +9,7 @@
 @endphp
 
 <style>
+    
   .resident-dropdown {
     position: absolute;
     width: 100%;
@@ -139,6 +140,23 @@
     font-size: 0.8rem;
     color: #94a3b8;
   }
+  .input-group-text{
+    background-color:#f1f3f5;
+    border:1.5px solid #ced4da;
+    cursor:pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+    opacity:1;
+    cursor:pointer;
+}
+
+/* keeps the date field aligned and full width inside input-group */
+.input-group > .form-control[type="date"]{
+    flex:1 1 auto;
+    width:1%;
+    min-width:0;
+    font-size: 0.9rem
+}
 </style>
 
 <div class="row g-4">
@@ -199,36 +217,66 @@
                             <input type="hidden" name="position" value="{{ $slot }}">
 
                             <div class="col-12 position-relative">
-                                <label class="form-label">Search Resident</label>
-                                <input type="text"
-                                    class="form-control resident-search-input"
-                                    placeholder="Type name or ID"
-                                    autocomplete="off"
-                                    value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
+    <label class="form-label">Search Resident</label>
+    <div class="input-group">
+        <input type="text"
+            class="form-control resident-search-input"
+            placeholder="Type name then Enter or Search"
+            autocomplete="off"
+            value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
+        
+        <button type="button" class="btn btn-outline-primary resident-search-btn">
+            <i class="fa fa-search"></i>
+        </button>
+    </div>
 
-                                <input type="hidden"
-                                    name="resident_id"
-                                    class="resident-id-input"
-                                    value="{{ $official->resident_id ?? '' }}">
+    <input type="hidden"
+        name="resident_id"
+        class="resident-id-input"
+        value="{{ $official->resident_id ?? '' }}">
 
-                                <div class="resident-dropdown d-none"></div>
-                                <small class="search-help">Select a resident from the list.</small>
-                            </div>
+    <div class="resident-dropdown d-none"></div>
+    <small class="search-help">Click search to see matching residents.</small>
+</div>
 
                             <div class="col-12">
                                 <label class="form-label">Term / Notes</label>
                                 <input type="text" name="details" class="form-control" placeholder="e.g. 2024-2027 term" value="{{ $official ? $official->details : '' }}">
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" name="start" class="form-control" value="{{ $official ? $official->start : now()->toDateString() }}">
-                            </div>
+                           <div class="col-12">
+    <label class="form-label">Start Date</label>
+    <div class="input-group mb-3 w-100">
+        <input
+            type="date"
+            name="start"
+            class="form-control form-control-lg official-start-date"
+            value="{{ $official ? $official->start : now()->toDateString() }}"
+            data-raw="{{ old('start', $official ? $official->start : now()->toDateString()) }}"
+            required
+        >
+        <span class="input-group-text official-start-open">
+            <i class="fa fa-calendar"></i>
+        </span>
+    </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">End Date</label>
-                                <input type="date" name="end" class="form-control" value="{{ $official ? $official->end : now()->copy()->addYears(3)->toDateString() }}">
-                            </div>
+    <label class="form-label">End Date</label>
+    <div class="input-group w-100">
+        <input
+            type="date"
+            name="end"
+            class="form-control form-control-lg official-end-date"
+            value="{{ $official ? $official->end : now()->copy()->addYears(3)->toDateString() }}"
+            data-raw="{{ old('end', $official ? $official->end : now()->copy()->addYears(3)->toDateString()) }}"
+            required
+        >
+        <span class="input-group-text official-end-open">
+            <i class="fa fa-calendar"></i>
+        </span>
+    </div>
+</div>
+
+
 
                             <div class="col-12 d-flex gap-2 mt-2">
                                 <button type="submit" class="btn btn-primary flex-grow-1">
@@ -255,82 +303,133 @@
 
 @if($showControls)
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const residents = @json($residents);
+document.addEventListener('DOMContentLoaded', function () {
+    const residents = @json($residents);
 
-            document.querySelectorAll('.official-assign-form').forEach(function (form) {
-                const searchInput = form.querySelector('.resident-search-input');
-                const hiddenInput = form.querySelector('.resident-id-input');
-                const dropdown = form.querySelector('.resident-dropdown');
+    document.querySelectorAll('.official-assign-form').forEach(function (form) {
+        const searchInput = form.querySelector('.resident-search-input');
+        const searchBtn = form.querySelector('.resident-search-btn');
+        const hiddenInput = form.querySelector('.resident-id-input');
+        const dropdown = form.querySelector('.resident-dropdown');
 
-                function closeDropdown() {
-                    dropdown.classList.add('d-none');
-                }
+        // DATE INPUTS (same behavior as users.blade)
+        const startInput = form.querySelector('.official-start-date');
+        const startOpen = form.querySelector('.official-start-open');
+        const endInput = form.querySelector('.official-end-date');
+        const endOpen = form.querySelector('.official-end-open');
 
-                function formatName(name) {
-                    if (!name) return '';
-                    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-                }
+        function normalizeToYmd(raw) {
+            if (!raw) return '';
+            const d = new Date(raw);
+            if (isNaN(d)) return '';
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
 
-                searchInput.addEventListener('input', function () {
-                    const query = searchInput.value.toLowerCase().trim();
-                    dropdown.innerHTML = '';
-                    hiddenInput.value = '';
+        if (startInput) {
+            const rawStart = startInput.getAttribute('data-raw') || startInput.value;
+            const formattedStart = normalizeToYmd(rawStart);
+            if (formattedStart) startInput.value = formattedStart;
+        }
 
-                    if (!query) {
-                        closeDropdown();
-                        return;
-                    }
+        if (endInput) {
+            const rawEnd = endInput.getAttribute('data-raw') || endInput.value;
+            const formattedEnd = normalizeToYmd(rawEnd);
+            if (formattedEnd) endInput.value = formattedEnd;
+        }
 
-                    const matches = residents.filter(function (person) {
-                        const fullName = (
-                            person.lastName + ' ' +
-                            person.firstName + ' ' +
-                            (person.middleName ?? '')
-                        ).toLowerCase();
-                        return fullName.includes(query) || person.id.toString().includes(query);
-                    }).slice(0, 5);
+        function openPicker(inputEl) {
+            if (!inputEl) return;
+            if (inputEl.showPicker) inputEl.showPicker();
+            else inputEl.focus();
+        }
 
-                    if (matches.length === 0) {
-                        closeDropdown();
-                        return;
-                    }
-
-                    matches.forEach(function (person) {
-                        const option = document.createElement('div');
-                        option.classList.add('resident-option');
-
-                        const last = formatName(person.lastName);
-                        const first = formatName(person.firstName);
-                        const middle = formatName(person.middleName);
-
-                        option.textContent = last + ', ' + first + (middle ? ' ' + middle : '') + ' (ID: ' + person.id + ')';
-
-                        option.addEventListener('click', function () {
-                            searchInput.value = option.textContent;
-                            hiddenInput.value = person.id;
-                            closeDropdown();
-                        });
-                        dropdown.appendChild(option);
-                    });
-
-                    dropdown.classList.remove('d-none');
-                });
-
-                form.addEventListener('submit', function (e) {
-                    if (!hiddenInput.value) {
-                        e.preventDefault();
-                        alert('Please select a resident from the dropdown.');
-                        searchInput.focus();
-                    }
-                });
-
-                document.addEventListener('click', function (e) {
-                    if (!form.contains(e.target)) {
-                        closeDropdown();
-                    }
-                });
+        if (startOpen && startInput) {
+            startOpen.addEventListener('click', function () {
+                openPicker(startInput);
             });
+        }
+
+        if (endOpen && endInput) {
+            endOpen.addEventListener('click', function () {
+                openPicker(endInput);
+            });
+        }
+
+        // your existing resident search code continues here...
+        function closeDropdown() {
+            dropdown.classList.add('d-none');
+            dropdown.innerHTML = '';
+        }
+
+        function formatName(name) {
+            if (!name) return '';
+            return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        }
+
+        function runSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            dropdown.innerHTML = '';
+            hiddenInput.value = '';
+
+            if (!query) {
+                closeDropdown();
+                return;
+            }
+
+            const matches = residents.filter(function (person) {
+                const fullName = (
+                    person.lastName + ' ' +
+                    person.firstName + ' ' +
+                    (person.middleName ?? '')
+                ).toLowerCase();
+                return fullName.includes(query) || person.id.toString().includes(query);
+            }).slice(0, 8);
+
+            if (matches.length === 0) {
+                closeDropdown();
+                return;
+            }
+
+            matches.forEach(function (person) {
+                const option = document.createElement('div');
+                option.classList.add('resident-option');
+
+                const last = formatName(person.lastName);
+                const first = formatName(person.firstName);
+                const middle = formatName(person.middleName);
+
+                option.textContent = last + ', ' + first + (middle ? ' ' + middle : '') + ' (ID: ' + person.id + ')';
+
+                option.addEventListener('click', function () {
+                    searchInput.value = option.textContent;
+                    hiddenInput.value = person.id;
+                    closeDropdown();
+                });
+
+                dropdown.appendChild(option);
+            });
+
+            dropdown.classList.remove('d-none');
+        }
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                runSearch();
+            }
         });
-    </script>
+
+        searchBtn.addEventListener('click', function () {
+            runSearch();
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!form.contains(e.target)) closeDropdown();
+        });
+    });
+});
+</script>
 @endif
