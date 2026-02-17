@@ -216,18 +216,38 @@
             </div>
         </div>
     @endif
-<<<<<<< HEAD
-=======
-    
->>>>>>> 14290fddbeafbe804f8082141f49d23c8d4c51ca
 @if (!$resident)
     not a household head cant add member
 @else
     @php
-        $head = $resident->households?->first()?->pivot?->is_household_head ?? false;
+        $head = $resident->households()
+                        ->wherePivot('is_household_head', true)
+                        ->exists();
     @endphp
 
     @if ($head)
+        {{-- Show members list if they exist --}}
+        @if($members->count() > 0)
+            @include('profileforms.displayMembers')
+        @else
+            {{-- Show "Add Member" button even if no members exist --}}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members (0)</h6>
+                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#addHouseholdMemberModal">
+                                <i class="fas fa-plus"></i> Add Family Member
+                            </button>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No family members added yet. Click the button above to add your first family member.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         @include('profileforms.addMember')
     @else
         not a household head cant add member

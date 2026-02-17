@@ -30,10 +30,9 @@ class ResidentController extends Controller
     {
         $user = auth()->user();
     
-    // Try to find resident by matching firstName, lastName
+    // Find resident by user_id
     $resident = Resident::with('households.house.street')
-                        ->where('firstName', $user->firstName)
-                        ->where('lastName', $user->lastName)
+                        ->where('user_id', $user->id)
                         ->first();
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
     $residents = Resident::select('id','firstName','middleName','lastName')->get();

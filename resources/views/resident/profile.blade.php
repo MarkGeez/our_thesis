@@ -32,12 +32,24 @@
         </div>
     @endif
 
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-12">
             <h3 class="mb-4">Profile Overview</h3>
+           
         </div>
     </div>
-
+    
     <div class="row mb-4">
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
@@ -93,7 +105,7 @@
                         <div class="col-5 text-muted">Proof of Identity</div>
                         <div class="col-7">
                             @if($user->proofOfIdentity)
-                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#proofModalResident">
+                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#proofModalAdmin">
                                     View Proof
                                 </button>
                             @else
@@ -102,10 +114,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-5 text-muted">House No.</div>
-                        <div class="col-7">{{ $user->houseNo }}</div>
-                    </div>
+                    
                 </div>
 
                 <div class="card-footer text-end">
@@ -122,108 +131,34 @@
             <h6 class="mb-0">Resident Information</h6>
         </div>
 
-        <div class="card-body">
-            @if($resident)
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Resident Name</div>
-                    <div class="col-7">
-                        {{ ucwords($resident->firstName ?? $user->firstName) }}
-                        {{ ucwords($resident->middleName ?? $user->middleName) }}
-                        {{ ucwords($resident->lastName ?? $user->lastName) }}
-                    </div>
-                </div>
 
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Contact No.</div>
-                    <div class="col-7">{{ $resident->contactNo ?? 'N/A' }}</div>
-                </div>
+        @include('components.displayFamily')
 
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Address</div>
-                    <div class="col-7">
-                        @if($resident && $resident->households->first() && $resident->households->first()->house)
-                            @php
-                                $house = $resident->households->first()->house;
-                                $street = optional($house)->street;
-                            @endphp
-                            {{ $house->house_no ?? 'N/A' }} {{ optional($street)->street_name ?? '' }}
-                        @else
-                            N/A
-                        @endif
-                    </div>
-                </div>
 
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Birthday</div>
-                    <div class="col-7">{{ $resident->birthday ? \Carbon\Carbon::parse($resident->birthday)->format('F d, Y') : 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Age / Sex</div>
-                    <div class="col-7">{{ $resident->age ?? 'N/A' }} / <span class="text-capitalize">{{ $resident->sex ?? 'N/A' }}</span></div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Parent Status</div>
-                    <div class="col-7 text-capitalize">{{ $resident->parent ?? 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Enrolled</div>
-                    <div class="col-7 text-capitalize">{{ $resident->enrolled ?? 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Head of Family</div>
-                    <div class="col-7 text-capitalize">{{ $resident->headOfFamily ?? 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Education</div>
-                    <div class="col-7">{{ $resident->educationalAttainment ?? 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Religion</div>
-                    <div class="col-7">{{ $resident->religion ?? 'Not specified' }}</div>
-                </div>
-
-                <hr>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Emergency Contact</div>
-                    <div class="col-7">{{ $resident->emergencyContactName ?? 'N/A' }}</div>
-                </div>
-
-                <div class="row mb-2">
-                    <div class="col-5 text-muted">Emergency No.</div>
-                    <div class="col-7">{{ $resident->emergencyContactNo ?? 'N/A' }}</div>
-                </div>
-
-            @else
-                <div class="alert alert-warning mb-0">
-                    No resident information retrieved.
-                </div>
-            @endif
-        </div>
-
-        <div class="card-footer text-end">
-            @if($resident)
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editResidentModal">
-                    Edit Resident Info
-                </button>
-            @endif
-        </div>
+        
     </div>
 </div>
+   @if($members->count() > 0)
+    @include('profileforms.displayMembers')
+    @else
+    {{-- No family members encoded --}}
+    @endif
+
+    {{--  @else
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center">
+                <i class="fas fa-info-circle fs-4 me-3"></i>
+                <div>
+                    <strong>No family members listed.</strong> 
+                    You can add members using the button in the Resident Information section.
+                </div>
+            </div>
+        </div>
     </div>
 
-@if($members->count() > 0)
-    @include('profileforms.displayMembers')
-@else
-    {{-- No family members encoded --}}
-@endif
-
+    @endif
+--}}
 
    <div class="row">
         <div class="col-12">
@@ -262,11 +197,11 @@
     </div>
 
     @if($user->proofOfIdentity)
-        <div class="modal fade" id="proofModalResident" tabindex="-1" aria-labelledby="proofModalResidentLabel" aria-hidden="true">
+        <div class="modal fade" id="proofModalAdmin" tabindex="-1" aria-labelledby="proofModalAdminLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="proofModalResidentLabel">Proof of Identity</h5>
+                        <h5 class="modal-title" id="proofModalAdminLabel">Proof of Identity</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
@@ -279,11 +214,42 @@
             </div>
         </div>
     @endif
-
-    @if(!$resident)
+@if (!$resident)
     not a household head cant add member
-@elseif($resident->household->is_household_head === true)
+@else
+    @php
+        $head = $resident->households()
+                        ->wherePivot('is_household_head', true)
+                        ->exists();
+    @endphp
+
+    @if ($head)
+        {{-- Show members list if they exist --}}
+        @if($members->count() > 0)
+            @include('profileforms.displayMembers')
+        @else
+            {{-- Show "Add Member" button even if no members exist --}}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
+                            <h6 class="mb-0"><i class="fas fa-users me-2"></i>Family Members (0)</h6>
+                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#addHouseholdMemberModal">
+                                <i class="fas fa-plus"></i> Add Family Member
+                            </button>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No family members added yet. Click the button above to add your first family member.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         @include('profileforms.addMember')
+    @else
+        not a household head cant add member
+    @endif
 @endif
 
     

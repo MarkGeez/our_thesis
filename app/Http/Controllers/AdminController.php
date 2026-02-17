@@ -41,11 +41,19 @@ class AdminController extends Controller
 {
     $user = auth()->user();
     
-    // Try to find resident by matching firstName, lastName
+    // Try to find resident by user_id first (consistent with other roles)
     $resident = Resident::with('households.house.street')
-                        ->where('firstName', $user->firstName)
-                        ->where('lastName', $user->lastName)
+                        ->where('user_id', $user->id)
                         ->first();
+    
+    // Fall back to name matching if user_id not found
+    if (!$resident) {
+        $resident = Resident::with('households.house.street')
+                            ->where('firstName', $user->firstName)
+                            ->where('lastName', $user->lastName)
+                            ->first();
+    }
+    
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
     $residents = Resident::select('id','firstName','middleName','lastName')->get();
     return view('admin.profile', compact('user', 'resident', 'members', 'residents'));
