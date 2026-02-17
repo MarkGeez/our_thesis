@@ -238,7 +238,13 @@
         </div>
     @endif
 @if (!$resident)
-    not a household head cant add member
+    <div class="alert alert-warning d-flex align-items-start mb-0" role="alert">
+                    <i class="fas fa-circle-info me-2 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">You cannot add family members.</div>
+                        <div class="small">Only the household head can add or update members. Please contact your household head.</div>
+                    </div>
+                </div>
 @else
     @php
         $head = $resident->households()
@@ -249,7 +255,7 @@
     @if ($head)
         {{-- Show members list if they exist --}}
         @if($members->count() > 0)
-            @include('profileforms.displayMembers')
+             {{-- @include('profileforms.displayMembers')--}}
         @else
             {{-- Show "Add Member" button even if no members exist --}}
             <div class="row mt-4">
@@ -271,9 +277,18 @@
         @endif
         @include('profileforms.addMember')
     @else
-        not a household head cant add member
+        <div class="card-body">
+                <div class="alert alert-warning d-flex align-items-start mb-0" role="alert">
+                    <i class="fas fa-circle-info me-2 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">You cannot add family members.</div>
+                        <div class="small">Only the household head can add or update members. Please contact your household head.</div>
+                    </div>
+                </div>
+            </div>
     @endif
 @endif
+
 
 
 </div>

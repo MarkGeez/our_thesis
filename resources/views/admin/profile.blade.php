@@ -8,7 +8,9 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
-    <style> .form-control, .form-select { background-color: #ffffff; border: 1.5px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-size: 14px; } .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25); } .form-label { font-weight: 600; margin-bottom: 6px; } .input-group-text { background-color: #f1f3f5; cursor: pointer; } </style>
+    <style> .form-control, .form-select { background-color: #ffffff; border: 1.5px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-size: 14px; } .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25); } .form-label { font-weight: 600; margin-bottom: 6px; } .input-group-text { background-color: #f1f3f5; cursor: pointer; } 
+        
+    </style>
 
 </head>
 
@@ -216,8 +218,14 @@
             </div>
         </div>
     @endif
+    
 @if (!$resident)
-    not a household head cant add member
+    <div class="alert alert-warning d-flex align-items-center shadow-sm mt-3" role="alert">
+        <i class="fas fa-user-slash me-2"></i>
+        <div>
+            No resident profile found. You cannot add a household member.
+        </div>
+    </div>
 @else
     @php
         $head = $resident->households()
@@ -228,7 +236,7 @@
     @if ($head)
         {{-- Show members list if they exist --}}
         @if($members->count() > 0)
-            @include('profileforms.displayMembers')
+            {{-- @include('profileforms.displayMembers')--}}
         @else
             {{-- Show "Add Member" button even if no members exist --}}
             <div class="row mt-4">
@@ -250,7 +258,12 @@
         @endif
         @include('profileforms.addMember')
     @else
-        not a household head cant add member
+         <div class="alert alert-secondary d-flex align-items-center shadow-sm mt-3" role="alert">
+        <i class="fas fa-lock me-2"></i>
+        <div>
+            Not a household head. You are not allowed to add members.
+        </div>
+    </div>
     @endif
 @endif
 

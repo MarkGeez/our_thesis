@@ -25,7 +25,9 @@
 <div class="main-wrapper">
            
     @include('admin.admin-header', ['admin' => auth()->user()])
-            <main class="main users chart-page" id="skip-target"></main>
+            <main class="main users chart-page" id="skip-target">
+
+                
 
 </main>
 
