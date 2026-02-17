@@ -76,7 +76,7 @@ class AdminController extends Controller
             'approver:id,firstName,middleName,lastName'
         ])
             ->latest()
-            ->get();
+            ->paginate(10);
         
         // Get request stats for each user
         $requestStats = CertificateRequest::selectRaw('user_id, COUNT(*) as total, 

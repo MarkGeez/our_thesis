@@ -4,6 +4,12 @@
 @if($filteredRequests->isEmpty())
     <div class="alert alert-info">No certificate requests in this category.</div>
 @else
+    <div class="results-info">
+        <div class="results-count ms-3">
+            Records: <span class="count-number">{{ $filteredRequests instanceof \Illuminate\Pagination\Paginator ? $filteredRequests->total() : $filteredRequests->count() }}</span>
+        </div>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-hover bg-white">
             <thead class="table-primary">
@@ -84,4 +90,22 @@
             </tbody>
         </table>
     </div>
+
+    @if($filteredRequests instanceof \Illuminate\Pagination\Paginator && $filteredRequests->hasPages())
+        <div class="pagination-container">
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    <div class="pagination-info-text">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>
+                            Showing <span class="pagination-info-numbers">{{ $filteredRequests->firstItem() }}</span>
+                            to <span class="pagination-info-numbers">{{ $filteredRequests->lastItem() }}</span>
+                            of <span class="pagination-info-numbers">{{ $filteredRequests->total() }}</span> results
+                        </span>
+                    </div>
+                </div>
+                {{ $filteredRequests->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        </div>
+    @endif
 @endif

@@ -551,6 +551,126 @@
             font-size: 1.1rem;
             opacity: 0.95;
         }
+
+        /* Pagination Styles */
+        .pagination-container {
+            padding: 18px 22px 22px 22px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin: 0;
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pagination-info-text {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            background: #fff;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .pagination-info-text i {
+            color: var(--primary-color);
+        }
+
+        .pagination {
+            margin: 0;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.58rem 0.95rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            background: #fff;
+            min-width: 44px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .pagination .page-link:hover:not(.disabled) {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+            transform: scale(1.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            background-color: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Results Info */
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .results-count {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .results-count .count-number {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        @media (max-width: 576px) {
+            .pagination-container {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -616,13 +736,13 @@
                         @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests, 'requestStats' => $requestStats ?? collect()])
                     </div>
                     <div class="tab-pane fade" id="pending" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests->where('status', 'pending'), 'requestStats' => $requestStats ?? collect()])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->where('status', 'pending'), 'requestStats' => $requestStats ?? collect()])
                     </div>
                     <div class="tab-pane fade" id="approved" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests->whereIn('status', ['approved', 'picked_up']), 'requestStats' => $requestStats ?? collect()])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->whereIn('status', ['approved', 'picked_up']), 'requestStats' => $requestStats ?? collect()])
                     </div>
                     <div class="tab-pane fade" id="declined" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests->where('status', 'declined'), 'requestStats' => $requestStats ?? collect()])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->where('status', 'declined'), 'requestStats' => $requestStats ?? collect()])
                     </div>
                 </div>
             </div>
