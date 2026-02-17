@@ -98,6 +98,25 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    @if($requests->hasPages())
+                        <div style="padding: 18px 22px 22px 22px; background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%); border-top: 2px solid #e2e8f0; margin-top: 0;">
+                            <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin: 0;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center; color: #64748b; font-size: 0.9rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.55rem; background: #fff; padding: 0.6rem 1rem; border-radius: 10px; border: 2px solid #e2e8f0; font-weight: 600;">
+                                        <i class="fa-solid fa-list-check" style="color: #2563eb;"></i>
+                                        <span>
+                                            Showing <span style="color: #2563eb; font-weight: 700; font-size: 1.05rem;">{{ $requests->firstItem() }}</span>
+                                            to <span style="color: #2563eb; font-weight: 700; font-size: 1.05rem;">{{ $requests->lastItem() }}</span>
+                                            of <span style="color: #2563eb; font-weight: 700; font-size: 1.05rem;">{{ $requests->total() }}</span> results
+                                        </span>
+                                    </div>
+                                </div>
+                                {{ $requests->appends(request()->query())->links('pagination::bootstrap-5') }}
+                            </div>
+                        </div>
+                    @endif
+                
                 @endif
             </div>
         </main>

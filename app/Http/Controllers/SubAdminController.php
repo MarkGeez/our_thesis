@@ -164,14 +164,14 @@ $user = auth()->user();
     public function certificateRequest(): View
     {
         $subadmin = Auth::user();
-        $requests = $subadmin->certificateRequests()->latest()->get();
+        $requests = $subadmin->certificateRequests()->latest()->paginate(10);
         return view("subadmin.certificateRequest", compact('subadmin', 'requests'));
     }
 
     public function subadminCertificate(): View
     {
         $subadmin = Auth::user();
-        $requests = $subadmin->certificateRequests()->latest()->get();
+        $requests = $subadmin->certificateRequests()->latest()->paginate(10);
         return view("subadmin.subadminCertificate", compact('subadmin', 'requests'));
     }
 
