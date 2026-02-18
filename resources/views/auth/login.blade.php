@@ -166,7 +166,7 @@
                 <label for="RememberMe" class="m-0">Remember Me</label>
             </div>
 
-            <a href="#" class="text-white fw-bold">Forgot Password?</a>
+            <a href="{{ route('password.request') }}" class="text-white fw-bold">Forgot Password?</a>
         </div>
 
 
