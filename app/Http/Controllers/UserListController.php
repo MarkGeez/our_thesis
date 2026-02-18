@@ -25,7 +25,7 @@ class UserListController extends Controller
             return $query-> where(function($q) use ($search){
                 $q->where('firstName', 'like', "{$search}")->orWhere('lastName', 'like', "{$search}")->orWhere('id', 'like', "{$search}");
             });
-        })->paginate(10);
+        })->paginate(20);
 
         return view($user->role . '.users', compact('user', 'search', 'userList'));
     }

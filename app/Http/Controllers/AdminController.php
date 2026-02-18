@@ -251,7 +251,7 @@ class AdminController extends Controller
     public function archives(): View
     {
     $admin = Auth::user();
-    $archive = Archive::latest()->get();
+    $archive = Archive::latest()->paginate(10);
     return view("admin.archives", compact('admin', 'archive'));
     }
 

@@ -27,6 +27,11 @@ class ResidentListController extends Controller
     }
     
     $searchTerm = $request->input('search');
+
+    $residentCount = Resident::count();
+    $maleCount = Resident::where('sex', 'male')->count();
+    $femaleCount = Resident::where('sex', 'female')->count();
+    $seniorCount = Resident::where('age', '>=', 60)->count();
     
     $residents = Resident::with(['user:id,firstName,lastname', 'official', 'households.house.street'])
         ->when($searchTerm, function($query, $searchTerm) {
@@ -37,10 +42,12 @@ class ResidentListController extends Controller
                   ->orWhere('id', 'like', "%{$searchTerm}%");
             });
         })
+        ->latest()
         ->paginate(20);
 
     return view($user->role . '.residents', compact(
-    'user', 'residents', 'searchTerm', 'streets', 'houses'
+    'user', 'residents', 'searchTerm', 'streets', 'houses',
+    'residentCount', 'maleCount', 'femaleCount', 'seniorCount'
 ));
 }
 

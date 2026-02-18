@@ -349,13 +349,13 @@
                         <span class="icon"><i class="fa-solid fa-bullhorn"></i></i></span>Announcements
                     </a>
                 </li>
-                
+                {{--  
                 <li>
                     <a class="{{ Request::routeIs('admin.census') ? 'active' : '' }}"
                        href="{{ route('admin.census') }}">
                         <span class="icon"><i class="fa-solid fa-address-book"></i></i></span>Census
                     </a>
-                </li>
+                </li>--}}
                 <li>
                     <a class="{{ Request::routeIs('admin.residents') ? 'active' : '' }}"
                        href="{{ route('admin.residents') }}">

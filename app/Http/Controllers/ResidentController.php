@@ -8,6 +8,7 @@ use App\Models\HouseholdResident;
 use App\Models\House;
 use App\Models\Street;
 use App\Models\Official;
+use App\Models\Feedbacks;
 
 use App\Models\FamilyMember;
 
@@ -178,7 +179,18 @@ class ResidentController extends Controller
     public function feedback()
     {
         $resident = auth()->user();
-        return view('resident.feedback', compact('resident'));
+        $latestFeedback = Feedbacks::where('user_id', $resident->id)
+            ->latest()
+            ->first();
+
+        $previousFeedbacks = Feedbacks::where('user_id', $resident->id)
+            ->when($latestFeedback, function ($query) use ($latestFeedback) {
+                $query->where('id', '!=', $latestFeedback->id);
+            })
+            ->latest()
+            ->paginate(5);
+
+        return view('resident.feedback', compact('resident', 'latestFeedback', 'previousFeedbacks'));
     }
 
     public function contactus()

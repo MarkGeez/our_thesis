@@ -1,11 +1,10 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Boldonse&family=Chicle&family=Exo:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Metal+Mania&family=Mochiy+Pop+P+One&family=Oi&family=Oswald:wght@200..700&family=Quicksand:wght@600&family=Reggae+One&family=Teko:wght@300..700&family=Yesteryear&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Boldonse&family=Chicle&family=Exo:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Metal+Mania&family=Mochiy+Pop+P+One&family=Oi&family=Oswald:wght@200..700&family=Quicksand:wght@600&family=Reggae+One&family=Teko:wght@300..700&family=Yesteryear&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <style>
         .oswald-regular {
@@ -216,7 +215,6 @@
             margin: 15px auto !important;
             font-size: 0.95rem;
         }
-
         .welcome-card {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -252,19 +250,19 @@
 <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
 
 <div class="page-flex">
-    @include('admin.admin-sidebar', ['admin' => auth()->user()])
+    @include('subadmin.subadmin-sidebar', ['subadmin' => auth()->user()])
 
     <div class="main-wrapper">
-        @include('admin.admin-header', ['admin' => auth()->user()])
+        @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
 
         <main class="main users chart-page" id="skip-target">
             <div class="main-container">
                 <div class="welcome-card">
                                 <h3>Welcome, {{ ucwords(auth()->user()->firstName) }}!</h3>
                                 <p>Here's what's happening in your community.</p>
-                            </div>
+                </div>
 
-                <div class="container-fluid px-3 m-4 ">
+                <div class="container-fluid px-3 mb-4">
                     <div class="row g-3">
                         <div class="col-12 col-sm-6 col-lg-3">
                             <div class="card shadow-sm border-0 h-100">
@@ -308,7 +306,7 @@
                             </div>
                         </div>
 
-                        <div class="col-12 col-sm-6 col-lg-3 me-1">
+                        <div class="col-12 col-sm-6 col-lg-3">
                             <div class="card shadow-sm border-0 h-100">
                                 <div class="card-body d-flex align-items-center gap-3">
                                     <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
@@ -337,21 +335,132 @@
                         </div>
                     </div>
                 </div>
-                
+
+                {{-- ===== CHARTS SECTION ===== --}}
+                <div class="charts-section px-3 mb-4">
+                    <div class="row g-3">
+
+                        {{-- Gender Distribution Doughnut --}}
+                        <div class="col-12 col-md-5">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-muted mb-1" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        <i class="fa-solid fa-venus-mars me-1 text-primary"></i> Gender Distribution
+                                    </h6>
+                                    <div style="position: relative; height: 230px; display:flex; align-items:center; justify-content:center;">
+                                        <canvas id="genderChart"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-center gap-4 mt-2" style="font-size: 0.82rem;">
+                                        <span><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#3b82f6;margin-right:5px;"></span>Male</span>
+                                        <span><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#e83e8c;margin-right:5px;"></span>Female</span>
+                                        {{-- <span><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#d1d5db;margin-right:5px;"></span>Unspecified</span> --}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Population Breakdown Bar Chart --}}
+                        <div class="col-12 col-md-7">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-muted mb-1" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        <i class="fa-solid fa-chart-bar me-1 text-primary"></i> Population Overview
+                                    </h6>
+                                    <div style="position: relative; height: 230px;">
+                                        <canvas id="populationChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Senior Citizen Progress --}}
+                        <div class="col-12">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-muted mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        <i class="fa-solid fa-chart-simple me-1 text-primary"></i> Demographic Breakdown
+                                    </h6>
+
+                                    @php
+                                        $unspecifiedCount = max(0, $residentCount - $maleCount - $femaleCount);
+                                        $nonSeniorCount   = max(0, $residentCount - $seniorCount);
+                                        $malePercent      = $residentCount > 0 ? round(($maleCount / $residentCount) * 100) : 0;
+                                        $femalePercent    = $residentCount > 0 ? round(($femaleCount / $residentCount) * 100) : 0;
+                                        $seniorPercent    = $residentCount > 0 ? round(($seniorCount / $residentCount) * 100) : 0;
+                                        $unspecPercent    = $residentCount > 0 ? round(($unspecifiedCount / $residentCount) * 100) : 0;
+                                    @endphp
+
+                                    <div class="row g-3">
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+                                                <span class="fw-semibold">Male</span>
+                                                <span class="text-muted">{{ $maleCount }} ({{ $malePercent }}%)</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px; border-radius: 99px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {{ $malePercent }}%; background: #3b82f6; border-radius: 99px;"
+                                                     aria-valuenow="{{ $malePercent }}" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+                                                <span class="fw-semibold">Female</span>
+                                                <span class="text-muted">{{ $femaleCount }} ({{ $femalePercent }}%)</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px; border-radius: 99px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {{ $femalePercent }}%; background: #e83e8c; border-radius: 99px;"
+                                                     aria-valuenow="{{ $femalePercent }}" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+                                                <span class="fw-semibold">Senior Citizens</span>
+                                                <span class="text-muted">{{ $seniorCount }} ({{ $seniorPercent }}%)</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px; border-radius: 99px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {{ $seniorPercent }}%; background: #f59e0b; border-radius: 99px;"
+                                                     aria-valuenow="{{ $seniorPercent }}" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;">
+                                                <span class="fw-semibold">Unspecified</span>
+                                                <span class="text-muted">{{ $unspecifiedCount }} ({{ $unspecPercent }}%)</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px; border-radius: 99px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {{ $unspecPercent }}%; background: #d1d5db; border-radius: 99px;"
+                                                     aria-valuenow="{{ $unspecPercent }}" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {{-- ===== END CHARTS SECTION ===== --}}
 
                 @if(session("success"))
-                    <div id="successAlert" class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm">
-                        <h6>{{ session("success") }}</h6>
+                <div id="successAlert">
+                    <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="success-body">
+                        <p class="success-title">Success!</p>
+                        <p class="success-message">{{ session("success") }}</p>
                     </div>
-
-                    <script>
-                        setTimeout(function() {
-                            const alertBox = document.getElementById("successAlert");
-                            if (alertBox) {
-                                alertBox.style.display = "none";
-                            }
-                        }, 10000);
-                    </script>
+                    <button class="success-close" onclick="dismissAlert()"><i class="fa-solid fa-xmark"></i></button>
+                    <div class="success-progress-bar"></div>
+                </div>
                 @endif
 
                 <div class="announcements-grid">
@@ -449,3 +558,152 @@
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+
+<style>
+/* ── Charts Section ── */
+.charts-section .card { border-radius: 12px; }
+.charts-section .card-body { padding: 18px 20px; }
+
+/* ── Improved Success Alert ── */
+#successAlert {
+    position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+    display: flex; align-items: center; gap: 14px;
+    background: #fff; border-left: 5px solid #22c55e;
+    border-radius: 12px; padding: 16px 20px 22px 18px;
+    min-width: 300px; max-width: 420px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(34,197,94,0.15);
+    animation: slideInRight 0.4s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+    overflow: hidden;
+}
+#successAlert.fade-out { animation: slideOutRight 0.4s cubic-bezier(0.55,0,1,0.45) forwards; }
+.success-icon  { font-size: 1.8rem; color: #22c55e; flex-shrink: 0; }
+.success-body  { flex: 1; }
+.success-title { font-size: 0.78rem; font-weight: 700; color: #22c55e; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 2px; }
+.success-message { font-size: 0.92rem; color: #374151; margin: 0; line-height: 1.4; }
+.success-close { background: none; border: none; color: #9ca3af; font-size: 1rem; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; align-self: flex-start; }
+.success-close:hover { color: #374151; }
+.success-progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, #22c55e, #86efac);
+    border-radius: 0 0 0 12px; width: 100%;
+    animation: shrink 8s linear forwards;
+}
+@keyframes slideInRight  { from{opacity:0;transform:translateX(110%)} to{opacity:1;transform:translateX(0)} }
+@keyframes slideOutRight { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(110%)} }
+@keyframes shrink        { from{width:100%} to{width:0%} }
+@media (max-width: 576px) {
+    #successAlert { bottom: 16px; right: 12px; left: 12px; min-width: unset; max-width: unset; }
+}
+</style>
+
+<script>
+// ── Success Alert dismiss ──
+function dismissAlert() {
+    const el = document.getElementById('successAlert');
+    if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 400); }
+}
+setTimeout(dismissAlert, 8000);
+
+// ── Chart.js defaults ──
+if (typeof Chart !== 'undefined') {
+    Chart.defaults.font.family = "'Oswald', sans-serif";
+}
+
+// ── Data from Blade ──
+const maleCount     = {{ $maleCount }};
+const femaleCount   = {{ $femaleCount }};
+const residentCount = {{ $residentCount }};
+const seniorCount   = {{ $seniorCount }};
+const userCount     = {{ $userCount }};
+const unspecified   = Math.max(0, residentCount - maleCount - femaleCount);
+
+// ── 1. Gender Doughnut Chart ──
+const genderCtx = document.getElementById('genderChart').getContext('2d');
+new Chart(genderCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Male', 'Female', 'Unspecified'],
+        datasets: [{
+            data: [maleCount, femaleCount, unspecified],
+            backgroundColor: ['#3b82f6', '#e83e8c', '#d1d5db'],
+            borderWidth: 2,
+            borderColor: '#fff',
+            hoverOffset: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => {
+                        const pct = residentCount > 0 ? Math.round((ctx.parsed / residentCount) * 100) : 0;
+                        return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                    }
+                }
+            }
+        }
+    },
+    plugins: [{
+        id: 'centerText',
+        beforeDraw(chart) {
+            const { ctx, chartArea: { left, right, top, bottom } } = chart;
+            const cx = (left + right) / 2, cy = (top + bottom) / 2;
+            ctx.save();
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#111'; ctx.font = 'bold 22px Oswald, sans-serif';
+            ctx.fillText(residentCount, cx, cy - 8);
+            ctx.fillStyle = '#9ca3af'; ctx.font = '11px Oswald, sans-serif';
+            ctx.fillText('Residents', cx, cy + 12);
+            ctx.restore();
+        }
+    }]
+});
+
+// ── 2. Population Bar Chart ──
+const popCtx = document.getElementById('populationChart').getContext('2d');
+new Chart(popCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Total Residents', 'Male', 'Female', 'Senior Citizens', 'System Users'],
+        datasets: [{
+            label: 'Count',
+            data: [residentCount, maleCount, femaleCount, seniorCount, userCount],
+            backgroundColor: [
+                'rgba(99,102,241,0.85)',
+                'rgba(59,130,246,0.85)',
+                'rgba(232,62,140,0.85)',
+                'rgba(245,158,11,0.85)',
+                'rgba(100,116,139,0.85)'
+            ],
+            borderRadius: 6,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} people` } }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 11 } }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                ticks: {
+                    stepSize: 1,
+                    callback: val => Number.isInteger(val) ? val : ''
+                }
+            }
+        }
+    }
+});
+</script>
