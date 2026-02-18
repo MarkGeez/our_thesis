@@ -186,7 +186,7 @@
                         </p>
 
                         @if($official && $official->details)
-                            <p class="official-meta mb-0">Notes: {{ $official->details }}</p>
+                            <p class="official-meta mb-0 mt-1">{{ $official->details }}</p>
                         @endif
                     </div>
                 </div>
