@@ -1,10 +1,46 @@
 <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
 
 <style>
+<<<<<<< HEAD
 .sidebar{
     background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
     height: 100vh;
     overflow: hidden;
+=======
+    
+  .resident-dropdown {
+    position: absolute;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+
+  .resident-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .resident-option:hover {
+    background: #f1f5f9;
+  }
+
+  .official-card {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+>>>>>>> 9ea40ac5cf61fb52008b8b0fb38abf0df1b62142
     display: flex;
     flex-direction: column;
 }
@@ -103,6 +139,7 @@
     animation: pulse 2s ease-in-out infinite;
 }
 
+<<<<<<< HEAD
 /* Glowing effect on the right edge */
 .sidebar-body-menu a.active::after,
 .cat-sub-menu a.active::after {
@@ -259,6 +296,28 @@
     display: flex;
     align-items: center;
     gap: 10px; /* space between icon and text */
+=======
+  .search-help {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+  .input-group-text{
+    background-color:#f1f3f5;
+    border:1.5px solid #ced4da;
+    cursor:pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+    opacity:1;
+    cursor:pointer;
+}
+
+/* keeps the date field aligned and full width inside input-group */
+.input-group > .form-control[type="date"]{
+    flex:1 1 auto;
+    width:1%;
+    min-width:0;
+    font-size: 0.9rem
+>>>>>>> 9ea40ac5cf61fb52008b8b0fb38abf0df1b62142
 }
 </style>
 
@@ -282,12 +341,131 @@
                 </div>
             </a>
 
+<<<<<<< HEAD
             <button class="sidebar-toggle transparent-btn" type="button">
                 <span class="sr-only">Toggle menu</span>
                 <span class="icon menu-toggle"></span>
             </button>
+=======
+                <div class="official-card-body">
+                    <div class="avatar-ring">
+                        <img src="{{ $avatar }}" alt="Official Photo" class="official-avatar">
+                    </div>
+                    <div class="flex-grow-1">
+                        @if($resident)
+                            <p class="official-name mb-1">{{ ucwords(strtolower($resident->firstName.' '.$resident->lastName)) }}</p>
+                        @elseif($showControls)
+                            <p class="official-name mb-1">No resident assigned</p>
+                        @endif
+
+                        <p class="official-meta mb-0">
+                            @if($official && $official->start && $official->end)
+                                Term: {{ date('M d, Y', strtotime($official->start)) }} - {{ date('M d, Y', strtotime($official->end)) }}
+                            @elseif($official)
+                                Term dates not set yet.
+                            @elseif($showControls)
+                                Tag a resident to display in this slot.
+                            @endif
+                        </p>
+
+                        @if($official && $official->details)
+                            <p class="official-meta mb-0">Notes: {{ $official->details }}</p>
+                        @endif
+                    </div>
+                </div>
+
+                @if($showControls)
+                    <div class="official-card-actions">
+                        <p class="official-action-title mb-2">Assign / Update Resident</p>
+                        <form method="POST" action="{{ route('admin.assign.official') }}" class="row g-2 official-assign-form">
+                            @csrf
+                            <input type="hidden" name="position" value="{{ $slot }}">
+
+                            <div class="col-12 position-relative">
+    <label class="form-label">Search Resident</label>
+    <div class="input-group">
+        <input type="text"
+            class="form-control resident-search-input"
+            placeholder="Type name then Enter or Search"
+            autocomplete="off"
+            value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
+        
+        <button type="button" class="btn btn-outline-primary resident-search-btn">
+            <i class="fa fa-search"></i>
+        </button>
+    </div>
+
+    <input type="hidden"
+        name="resident_id"
+        class="resident-id-input"
+        value="{{ $official->resident_id ?? '' }}">
+
+    <div class="resident-dropdown d-none"></div>
+    <small class="search-help">Click search to see matching residents.</small>
+</div>
+
+                            <div class="col-12">
+                                <label class="form-label">Term / Notes</label>
+                                <input type="text" name="details" class="form-control" placeholder="e.g. 2024-2027 term" value="{{ $official ? $official->details : '' }}">
+                            </div>
+
+                           <div class="col-12">
+    <label class="form-label">Start Date</label>
+    <div class="input-group mb-3 w-100">
+        <input
+            type="date"
+            name="start"
+            class="form-control form-control-lg official-start-date"
+            value="{{ $official ? $official->start : now()->toDateString() }}"
+            data-raw="{{ old('start', $official ? $official->start : now()->toDateString()) }}"
+            required
+        >
+        <span class="input-group-text official-start-open">
+            <i class="fa fa-calendar"></i>
+        </span>
+    </div>
+
+    <label class="form-label">End Date</label>
+    <div class="input-group w-100">
+        <input
+            type="date"
+            name="end"
+            class="form-control form-control-lg official-end-date"
+            value="{{ $official ? $official->end : now()->copy()->addYears(3)->toDateString() }}"
+            data-raw="{{ old('end', $official ? $official->end : now()->copy()->addYears(3)->toDateString()) }}"
+            required
+        >
+        <span class="input-group-text official-end-open">
+            <i class="fa fa-calendar"></i>
+        </span>
+    </div>
+</div>
+
+
+
+                            <div class="col-12 d-flex gap-2 mt-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="fa fa-save me-1"></i> Save Assignment
+                                </button>
+                            </div>
+                        </form>
+
+                        @if($official)
+                            <form method="POST" action="{{ route('admin.untag.official', $official->id) }}" class="mt-2" onsubmit="return confirm('Remove the resident from this position?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fa fa-times me-1"></i> Clear Assignment
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @endif
+            </div>
+>>>>>>> 9ea40ac5cf61fb52008b8b0fb38abf0df1b62142
         </div>
 
+<<<<<<< HEAD
 
         <div class="sidebar-body">
             <ul class="sidebar-body-menu">
@@ -471,3 +649,137 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+=======
+@if($showControls)
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const residents = @json($residents);
+
+    document.querySelectorAll('.official-assign-form').forEach(function (form) {
+        const searchInput = form.querySelector('.resident-search-input');
+        const searchBtn = form.querySelector('.resident-search-btn');
+        const hiddenInput = form.querySelector('.resident-id-input');
+        const dropdown = form.querySelector('.resident-dropdown');
+
+        // DATE INPUTS (same behavior as users.blade)
+        const startInput = form.querySelector('.official-start-date');
+        const startOpen = form.querySelector('.official-start-open');
+        const endInput = form.querySelector('.official-end-date');
+        const endOpen = form.querySelector('.official-end-open');
+
+        function normalizeToYmd(raw) {
+            if (!raw) return '';
+            const d = new Date(raw);
+            if (isNaN(d)) return '';
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        if (startInput) {
+            const rawStart = startInput.getAttribute('data-raw') || startInput.value;
+            const formattedStart = normalizeToYmd(rawStart);
+            if (formattedStart) startInput.value = formattedStart;
+        }
+
+        if (endInput) {
+            const rawEnd = endInput.getAttribute('data-raw') || endInput.value;
+            const formattedEnd = normalizeToYmd(rawEnd);
+            if (formattedEnd) endInput.value = formattedEnd;
+        }
+
+        function openPicker(inputEl) {
+            if (!inputEl) return;
+            if (inputEl.showPicker) inputEl.showPicker();
+            else inputEl.focus();
+        }
+
+        if (startOpen && startInput) {
+            startOpen.addEventListener('click', function () {
+                openPicker(startInput);
+            });
+        }
+
+        if (endOpen && endInput) {
+            endOpen.addEventListener('click', function () {
+                openPicker(endInput);
+            });
+        }
+
+        // your existing resident search code continues here...
+        function closeDropdown() {
+            dropdown.classList.add('d-none');
+            dropdown.innerHTML = '';
+        }
+
+        function formatName(name) {
+            if (!name) return '';
+            return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        }
+
+        function runSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            dropdown.innerHTML = '';
+            hiddenInput.value = '';
+
+            if (!query) {
+                closeDropdown();
+                return;
+            }
+
+            const matches = residents.filter(function (person) {
+                const fullName = (
+                    person.lastName + ' ' +
+                    person.firstName + ' ' +
+                    (person.middleName ?? '')
+                ).toLowerCase();
+                return fullName.includes(query) || person.id.toString().includes(query);
+            }).slice(0, 8);
+
+            if (matches.length === 0) {
+                closeDropdown();
+                return;
+            }
+
+            matches.forEach(function (person) {
+                const option = document.createElement('div');
+                option.classList.add('resident-option');
+
+                const last = formatName(person.lastName);
+                const first = formatName(person.firstName);
+                const middle = formatName(person.middleName);
+
+                option.textContent = last + ', ' + first + (middle ? ' ' + middle : '') + ' (ID: ' + person.id + ')';
+
+                option.addEventListener('click', function () {
+                    searchInput.value = option.textContent;
+                    hiddenInput.value = person.id;
+                    closeDropdown();
+                });
+
+                dropdown.appendChild(option);
+            });
+
+            dropdown.classList.remove('d-none');
+        }
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                runSearch();
+            }
+        });
+
+        searchBtn.addEventListener('click', function () {
+            runSearch();
+            searchInput.focus();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!form.contains(e.target)) closeDropdown();
+        });
+    });
+});
+</script>
+@endif
+>>>>>>> 9ea40ac5cf61fb52008b8b0fb38abf0df1b62142

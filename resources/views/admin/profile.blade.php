@@ -1,6 +1,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -9,7 +9,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
     <style> .form-control, .form-select { background-color: #ffffff; border: 1.5px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-size: 14px; } .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25); } .form-label { font-weight: 600; margin-bottom: 6px; } .input-group-text { background-color: #f1f3f5; cursor: pointer; } 
-        
+        .page-header {
+       background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+            color: black;
+            border-radius: 15px;
+            padding: 30px;
+            
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        margin: 1.5em 1em 2em 2em;
+        width : 95% ;
+    }
+
+    .page-header h2 {
+        color: rgb(0, 0, 0);
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-header-icon {
+        width: 48px;
+        height: 48px;
+         background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    
     </style>
 
 </head>
@@ -48,10 +96,14 @@
     @endif
 
     <div class="row">
-        <div class="col-12">
-            <h3 class="mb-4">Profile Overview</h3>
-           
-        </div>
+        <div class="page-header">
+                    <h2>
+                        <div class="page-header-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        Profile Management
+                    </h2>
+                </div>
     </div>
     
     <div class="row mb-4">

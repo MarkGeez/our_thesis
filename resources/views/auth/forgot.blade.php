@@ -179,7 +179,7 @@
                 <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" value="{{ old('email') }}" required>
                 <i class="fa-solid fa-envelope input-icon"></i>
                 @error('email')
-                    <div class="text-danger small">{{ $message }}</div>
+                    <div class="bg-danger rounded text-light small m-2">{{ $message }}</div>
                 @enderror
             </div>
 
