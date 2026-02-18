@@ -8,13 +8,24 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-         <style>
+        <style>
     
     .card {
       width: 12rem;
     }
     .section-title {
       margin-bottom: 20px;
+    }
+    
+    /* Override official card text to black for this page */
+    .official-card .official-slot,
+    .official-card .official-name,
+    .official-card .official-meta {
+      color: rgba(0, 0, 0, 0.836) !important;
+    }
+    
+    .official-card .official-card-header {
+      border-bottom-color: rgba(0, 0, 0, 0.15) !important;
     }
   </style>
 </head>
@@ -35,17 +46,15 @@
           <div class="section-title">
             <div class="d-flex justify-content-center mb-3">
               <h4 class="h4">Barangay Officials</h4>
-                  @include('components.officials', [
-                      'positions' => $positions,
-                      'officialsByPosition' => $officialsByPosition,
-                      'showControls' => false,
-                  ])
-
             </div>
           </div>
-
           
-          
+              @include('components.officials', [
+                  'positions' => $positions,
+                  'officialsByPosition' => $officialsByPosition,
+                  'showControls' => false,
+              ])
+{{--
           
           <!-- Developers Section -->
           <div class="section-title">
@@ -95,6 +104,7 @@
               </div>
             </div>
           </div>
+         --}}
         </div>
             </main>
 
@@ -104,7 +114,6 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-
 
 
 

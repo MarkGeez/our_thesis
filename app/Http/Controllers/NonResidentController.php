@@ -128,7 +128,7 @@ class NonResidentController extends Controller
     public function contactus()
     {
         $nonResident = auth()->user();
-        return view('resident.contactus', compact('resident'));
+        return view('non-resident.contactus', compact('nonResident'));
     }
 
     public function aboutus()
