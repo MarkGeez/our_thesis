@@ -78,13 +78,21 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        $requests = CertificateRequest::with([
+        $baseQuery = CertificateRequest::with([
             'user:id,firstName,middleName,lastName,role,email,contactNumber,birthday,profile_image',
             'resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path',
             'approver:id,firstName,middleName,lastName'
         ])
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        $requests = (clone $baseQuery)->paginate(10, ['*'], 'all_page');
+        $pendingRequests = (clone $baseQuery)->where('status', 'pending')->paginate(10, ['*'], 'pending_page');
+        $approvedRequests = (clone $baseQuery)->whereIn('status', ['approved', 'picked_up'])->paginate(10, ['*'], 'approved_page');
+        $declinedRequests = (clone $baseQuery)->where('status', 'declined')->paginate(10, ['*'], 'declined_page');
+        $activeTab = request('tab', 'all');
+        if (!in_array($activeTab, ['all', 'pending', 'approved', 'declined'], true)) {
+            $activeTab = 'all';
+        }
         
         // Get request stats for each user
         $requestStats = CertificateRequest::selectRaw('user_id, COUNT(*) as total, 
@@ -95,7 +103,15 @@ class AdminController extends Controller
             ->get()
             ->keyBy('user_id');
         
-        return view("admin.certificateRequest", compact('admin', 'requests', 'requestStats'));
+        return view("admin.certificateRequest", compact(
+            'admin',
+            'requests',
+            'pendingRequests',
+            'approvedRequests',
+            'declinedRequests',
+            'activeTab',
+            'requestStats'
+        ));
     }
 
     public function getCertificateRequestDetails(int $id)

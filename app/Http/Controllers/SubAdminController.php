@@ -194,7 +194,7 @@ $user = auth()->user();
     public function complaintRequest(): View
     {
         $subadmin = Auth::user();
-        $complaints = Complaints::orderByDesc('created_at')->get();
+        $complaints = Complaints::latest()->paginate(10);
         return view('subadmin.complaintRequest', compact('subadmin', 'complaints'));
     }
 

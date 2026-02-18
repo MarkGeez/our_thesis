@@ -1,12 +1,13 @@
 @php
     $filteredRequests = $filteredRequests ?? collect();
+    $tab = $tab ?? 'all';
 @endphp
 @if($filteredRequests->isEmpty())
     <div class="alert alert-info">No certificate requests in this category.</div>
 @else
     <div class="results-info">
         <div class="results-count ms-3">
-            Records: <span class="count-number">{{ $filteredRequests instanceof \Illuminate\Pagination\Paginator ? $filteredRequests->total() : $filteredRequests->count() }}</span>
+            Records: <span class="count-number">{{ $filteredRequests instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator ? $filteredRequests->total() : $filteredRequests->count() }}</span>
         </div>
     </div>
 
@@ -91,7 +92,7 @@
         </table>
     </div>
 
-    @if($filteredRequests instanceof \Illuminate\Pagination\Paginator && $filteredRequests->hasPages())
+    @if($filteredRequests instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator && $filteredRequests->hasPages())
         <div class="pagination-container">
             <div class="pagination-wrapper">
                 <div class="pagination-info">
@@ -104,7 +105,7 @@
                         </span>
                     </div>
                 </div>
-                {{ $filteredRequests->appends(request()->query())->links('pagination::bootstrap-5') }}
+                {{ $filteredRequests->appends(['tab' => $tab])->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif

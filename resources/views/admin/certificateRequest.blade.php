@@ -709,22 +709,22 @@
                 <!-- Enhanced Tab Navigation -->
                 <ul class="nav nav-tabs mb-3" id="certTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                        <button class="nav-link {{ ($activeTab ?? 'all') === 'all' ? 'active' : '' }}" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
                             <i class="fas fa-list me-2"></i>All Requests
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                        <button class="nav-link {{ ($activeTab ?? 'all') === 'pending' ? 'active' : '' }}" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
                             <i class="fas fa-clock me-2"></i>Pending
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
+                        <button class="nav-link {{ ($activeTab ?? 'all') === 'approved' ? 'active' : '' }}" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved" type="button" role="tab">
                             <i class="fas fa-check-circle me-2"></i>Approved
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="declined-tab" data-bs-toggle="tab" data-bs-target="#declined" type="button" role="tab">
+                        <button class="nav-link {{ ($activeTab ?? 'all') === 'declined' ? 'active' : '' }}" id="declined-tab" data-bs-toggle="tab" data-bs-target="#declined" type="button" role="tab">
                             <i class="fas fa-times-circle me-2"></i>Declined
                         </button>
                     </li>
@@ -732,17 +732,17 @@
 
                 <!-- Tab Content -->
                 <div class="tab-content" id="certTabContent">
-                    <div class="tab-pane fade show active" id="all" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests, 'requestStats' => $requestStats ?? collect()])
+                    <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'all' ? 'show active' : '' }}" id="all" role="tabpanel">
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'all'])
                     </div>
-                    <div class="tab-pane fade" id="pending" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->where('status', 'pending'), 'requestStats' => $requestStats ?? collect()])
+                    <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'pending' ? 'show active' : '' }}" id="pending" role="tabpanel">
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $pendingRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'pending'])
                     </div>
-                    <div class="tab-pane fade" id="approved" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->whereIn('status', ['approved', 'picked_up']), 'requestStats' => $requestStats ?? collect()])
+                    <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'approved' ? 'show active' : '' }}" id="approved" role="tabpanel">
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $approvedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'approved'])
                     </div>
-                    <div class="tab-pane fade" id="declined" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => collect($requests)->where('status', 'declined'), 'requestStats' => $requestStats ?? collect()])
+                    <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'declined' ? 'show active' : '' }}" id="declined" role="tabpanel">
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $declinedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'declined'])
                     </div>
                 </div>
             </div>
