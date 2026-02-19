@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $report->report_name }} - Print</title>
     <style>
@@ -285,15 +286,19 @@
 
             <div class="footer-content">
                 <div class="footer-contact">
-                    <div class="footer-contact-row">
-                        <span class="dot"></span>
-                        <span>{{ \App\Models\Setting::get('contact_address', 'JX8H+H57, Yakal St, Tondo, Manila') }}</span>
-                    </div>
-                    <div class="footer-contact-row">
-                        <span class="dot"></span>
-                        <span>{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</span>
-                    </div>
-                </div>
+    <div class="footer-contact-row">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>{{ \App\Models\Setting::get('contact_address', 'JX8H+H57, Yakal St, Tondo, Manila') }}</span>
+    </div>
+    <div class="footer-contact-row">
+        <i class="fas fa-envelope"></i>
+        <span>{{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}</span>
+    </div>
+    <div class="footer-contact-row">
+        <i class="fas fa-phone-alt"></i>
+        <span>{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</span>
+    </div>
+</div>
 
                 <div class="footer-center">
                     <div class="footer-date-label">Date Printed</div>
