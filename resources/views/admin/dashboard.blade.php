@@ -250,10 +250,10 @@
 <a class="skip-link sr-only" href="#skip-target">Skip to content</a>
 
 <div class="page-flex">
-    @include('subadmin.subadmin-sidebar', ['subadmin' => auth()->user()])
+    @include('admin.admin-sidebar', ['admin' => auth()->user()])
 
     <div class="main-wrapper">
-        @include('subadmin.subadmin-header', ['subadmin' => auth()->user()])
+        @include('admin.admin-header', ['admin' => auth()->user()])
 
         <main class="main users chart-page" id="skip-target">
             <div class="main-container">
