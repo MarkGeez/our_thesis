@@ -166,6 +166,48 @@
             font-size: 1.05rem;
         }
 
+        .table-filter-bar {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .table-filter-bar .form-control,
+        .table-filter-bar .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            height: 38px;
+            max-width: 220px;
+        }
+
+        .table-filter-bar .form-control:focus,
+        .table-filter-bar .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
         table th,
         table td {
             vertical-align: middle;
@@ -535,10 +577,55 @@
                                 <div class="results-count">
                                     Records: <span class="count-number">{{ $blotters->total() }}</span>
                                 </div>
+                                <form method="GET" action="{{ route('admin.blotter.index') }}" class="table-filter-bar">
+                                    <div class="flex-grow-1" style="min-width: 250px;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                                <i class="fa fa-search"></i>
+                                            </span>
+                                            <input type="text" name="search"
+                                                class="form-control border-start-0 ps-0"
+                                                placeholder="Search complainant, respondent, or status..."
+                                                value="{{ request('search') }}">
+                                            <button type="submit" class="btn btn-primary px-3">Apply</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="filter-group">
+                                            <span class="filter-label d-none d-md-inline">Status:</span>
+                                            <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                                                <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                <option value="ongoing" {{ request('status_filter') === 'ongoing' ? 'selected' : '' }}>On-going</option>
+                                                <option value="closed" {{ request('status_filter') === 'closed' ? 'selected' : '' }}>Closed</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="filter-group">
+                                            <span class="filter-label d-none d-md-inline">Sort:</span>
+                                            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Desc</option>
+                                                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Asc</option>
+                                                <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
+                                                <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
+                                                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
+                                                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="vr mx-1 d-none d-md-block"></div>
+                                        <a href="{{ route('admin.blotter.index') }}"
+                                           class="btn btn-link btn-sm text-secondary text-decoration-none px-2"
+                                           title="Reset Filters">
+                                            <i class="fa fa-undo me-1"></i>Reset
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
 
                             <div class="table-responsive table-wrapper">
-                                <table class="table table-hover align-middle">
+                                <table id="blotterTable" class="table table-hover align-middle">
                                     <thead>
                                         <tr>
                                             <th style="width: 120px;">Blotter No</th>
@@ -548,7 +635,7 @@
                                             <th class="text-center" style="width: 150px;">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="blotterTableBody">
                                         @foreach($blotters as $blotter)
                                             @php
                                                 $status = strtolower($blotter->current_status ?? '');

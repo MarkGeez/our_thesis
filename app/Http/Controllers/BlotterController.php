@@ -34,10 +34,56 @@ class BlotterController extends Controller
     }
 
     // LIST ALL BLOTTERS (ADMIN)
-    public function index()
+    public function index(Request $request)
     {
-        $blotters = Blotter::with(['updates.updater'])->latest()->paginate(10);
-        return view('admin.Blotter', compact('blotters'));
+        $search = trim((string) $request->query('search', ''));
+        $statusFilter = (string) $request->query('status_filter', 'all');
+        $sort = (string) $request->query('sort', 'id_desc');
+
+        $query = Blotter::with(['updates.updater']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('plaintiffName', 'like', '%' . $search . '%')
+                    ->orWhere('plaintiffLastName', 'like', '%' . $search . '%')
+                    ->orWhere('defendantName', 'like', '%' . $search . '%')
+                    ->orWhere('defendantLastName', 'like', '%' . $search . '%')
+                    ->orWhere('current_status', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($statusFilter === 'pending') {
+            $query->whereIn('current_status', ['first', 'second', 'third']);
+        } elseif ($statusFilter === 'ongoing') {
+            $query->where('current_status', 'brgyHearing');
+        } elseif ($statusFilter === 'closed') {
+            $query->whereIn('current_status', ['coldCase', 'criminalCase']);
+        }
+
+        switch ($sort) {
+            case 'id_asc':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'complainant_asc':
+                $query->orderBy('plaintiffName', 'asc')->orderBy('plaintiffLastName', 'asc');
+                break;
+            case 'complainant_desc':
+                $query->orderBy('plaintiffName', 'desc')->orderBy('plaintiffLastName', 'desc');
+                break;
+            case 'status_asc':
+                $query->orderBy('current_status', 'asc')->orderBy('id', 'desc');
+                break;
+            case 'status_desc':
+                $query->orderBy('current_status', 'desc')->orderBy('id', 'desc');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        $blotters = $query->paginate(10)->appends($request->query());
+        return view('admin.Blotter', compact('blotters', 'search', 'statusFilter', 'sort'));
     }
 
     // SHOW CREATE FORM

@@ -37,21 +37,60 @@ class ComplaintController extends Controller
 
     }
 
-    public function showComplaints(){
-        $user= Auth::user();
+    public function showComplaints(Request $request){
+        $user = Auth::user();
         $activeTab = request('tab', 'all');
         if (!in_array($activeTab, ['all', 'pending', 'on-going', 'rejected', 'resolved'], true)) {
             $activeTab = 'all';
         }
 
-        $query = Complaints::query()->latest();
+        $search = trim((string) $request->query('search', ''));
+        $statusFilter = (string) $request->query('status_filter', 'all');
+        $sort = (string) $request->query('sort', 'id_desc');
+
+        $query = Complaints::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('complainantName', 'like', '%' . $search . '%')
+                    ->orWhere('address', 'like', '%' . $search . '%')
+                    ->orWhere('details', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%');
+            });
+        }
+
         if ($activeTab !== 'all') {
             $query->where('status', $activeTab);
         }
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
 
-        $complaints = $query->paginate(10)->appends(['tab' => $activeTab]);
+        switch ($sort) {
+            case 'id_asc':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'complainant_asc':
+                $query->orderBy('complainantName', 'asc');
+                break;
+            case 'complainant_desc':
+                $query->orderBy('complainantName', 'desc');
+                break;
+            case 'status_asc':
+                $query->orderBy('status', 'asc')->latest('id');
+                break;
+            case 'status_desc':
+                $query->orderBy('status', 'desc')->latest('id');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        $complaints = $query->paginate(10)->appends($request->query());
         $route = $user->role . ".complaintRequest";
-        return view($route, compact ('complaints', 'activeTab'));
+        return view($route, compact('complaints', 'activeTab', 'search', 'statusFilter', 'sort'));
         
     }
 

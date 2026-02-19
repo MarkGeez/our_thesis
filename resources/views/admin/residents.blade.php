@@ -147,6 +147,32 @@
             font-size: 1.1rem;
         }
 
+        .table-filter-bar {
+            background: #f8fafc;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
         .table {
             margin-bottom: 0;
             font-size: 0.9rem;
@@ -418,6 +444,8 @@
                 {{-- Search Form --}}
                 <div class="search-section">
                     <form action="{{ route($user->role . '.residents') }}" method="get">
+                        <input type="hidden" name="sex_filter" value="{{ request('sex_filter', 'all') }}">
+                        <input type="hidden" name="sort" value="{{ request('sort', 'id_desc') }}">
                         <div class="row g-2 align-items-end">
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-semibold">Search Resident</label>
@@ -450,6 +478,29 @@
                             <div class="results-count">
                                 Records: <span class="count-number">{{ $residents->total() }}</span>
                             </div>
+                            <form method="GET" action="{{ route($user->role . '.residents') }}" class="table-filter-bar">
+                                <input type="hidden" name="search" value="{{ request('search') }}">
+                                <div class="filter-group">
+                                    <span class="filter-label">Sex</span>
+                                    <select name="sex_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="all" {{ request('sex_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="male" {{ request('sex_filter') === 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ request('sex_filter') === 'female' ? 'selected' : '' }}>Female</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <span class="filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                        <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
+                                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name: Z-A</option>
+                                    </select>
+                                </div>
+                                <a href="{{ route($user->role . '.residents', array_filter(['search' => request('search')])) }}" class="btn btn-link btn-sm text-secondary text-decoration-none">
+                                    <i class="fa fa-undo me-1"></i>Reset
+                                </a>
+                            </form>
                         </div>
 
                         <div class="table-responsive table-wrapper">

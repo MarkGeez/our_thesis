@@ -312,12 +312,11 @@
 
                 @php
                     $servicesActive = Request::routeIs(
-                        'admin.blotter.*',
-                        'admin.adminCertificate*',
-                        'admin.adminServices*',
-                        'admin.adminComplaint*'
+                    'admin.adminCertificate*',
+                    'admin.adminComplaint*',
+                    'admin.adminServices*'
                     );
-                @endphp
+                    @endphp
                 <li>
                     <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="#">
                          E-Barangay Services

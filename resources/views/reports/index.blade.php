@@ -246,7 +246,7 @@
         <div class="col-md-4">
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalBlotterReport">
                 <div class="card-body py-4">
-                    <i class="fas fa-scale-balanced fa-3x text-warning mb-3"></i>
+                    <i class="fas fa-scale-balanced fa-3x text-danger mb-3"></i>
                     <h5 class="fw-bold mb-1">Blotter Report</h5>
                     <p class="text-muted small mb-0">Finished case records within selected dates</p>
                 </div>
@@ -435,7 +435,7 @@
             <input type="hidden" name="report_form_type" value="blotter">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-scale-balanced me-2 text-warning"></i>Generate Blotter Report</h5>
+                    <h5 class="modal-title"><i class="fas fa-scale-balanced me-2 text-danger"></i>Generate Blotter Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -459,7 +459,7 @@
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning text-white px-4">Generate Report</button>
+                    <button type="submit" class="btn btn-danger text-white px-4">Generate Report</button>
                 </div>
             </div>
         </form>

@@ -78,22 +78,89 @@ class AdminController extends Controller
     public function certificateRequest(): View
     {
         $admin = Auth::user();
-        $baseQuery = CertificateRequest::with([
-            'user:id,firstName,middleName,lastName,role,email,contactNumber,birthday,profile_image',
-            'resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path',
-            'approver:id,firstName,middleName,lastName'
-        ])
-            ->latest();
-
-        $requests = (clone $baseQuery)->paginate(10, ['*'], 'all_page');
-        $pendingRequests = (clone $baseQuery)->where('status', 'pending')->paginate(10, ['*'], 'pending_page');
-        $approvedRequests = (clone $baseQuery)->whereIn('status', ['approved', 'picked_up'])->paginate(10, ['*'], 'approved_page');
-        $declinedRequests = (clone $baseQuery)->where('status', 'declined')->paginate(10, ['*'], 'declined_page');
+        $search = trim((string) request('search', ''));
+        $sort = (string) request('sort', 'date_desc');
+        $statusFilter = (string) request('status_filter', 'all');
         $activeTab = request('tab', 'all');
         if (!in_array($activeTab, ['all', 'pending', 'approved', 'declined'], true)) {
             $activeTab = 'all';
         }
-        
+
+        $baseQuery = CertificateRequest::with([
+            'user:id,firstName,middleName,lastName,role,email,contactNumber,birthday,profile_image',
+            'resident:id,firstName,middleName,lastName,contactNo,birthday,age,sex,image_path',
+            'approver:id,firstName,middleName,lastName'
+        ]);
+
+        $applyCommonFilters = function ($query) use ($search, $sort, $statusFilter, $activeTab) {
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('id', 'like', '%' . $search . '%')
+                        ->orWhere('certificate_type', 'like', '%' . $search . '%')
+                        ->orWhere('purpose', 'like', '%' . $search . '%')
+                        ->orWhere('status', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('firstName', 'like', '%' . $search . '%')
+                                ->orWhere('lastName', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('resident', function ($residentQuery) use ($search) {
+                            $residentQuery->where('firstName', 'like', '%' . $search . '%')
+                                ->orWhere('lastName', 'like', '%' . $search . '%');
+                        });
+                });
+            }
+
+            if ($activeTab === 'all' && $statusFilter !== 'all') {
+                $query->where('status', $statusFilter);
+            }
+
+            switch ($sort) {
+                case 'id_asc':
+                    $query->orderBy('id', 'asc');
+                    break;
+                case 'id_desc':
+                    $query->orderBy('id', 'desc');
+                    break;
+                case 'date_asc':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'type_asc':
+                    $query->orderBy('certificate_type', 'asc')->latest('id');
+                    break;
+                case 'type_desc':
+                    $query->orderBy('certificate_type', 'desc')->latest('id');
+                    break;
+                case 'status_asc':
+                    $query->orderBy('status', 'asc')->latest('id');
+                    break;
+                case 'status_desc':
+                    $query->orderBy('status', 'desc')->latest('id');
+                    break;
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+        };
+
+        $requestsQuery = clone $baseQuery;
+        $applyCommonFilters($requestsQuery);
+
+        $pendingQuery = clone $baseQuery;
+        $applyCommonFilters($pendingQuery);
+        $pendingQuery->where('status', 'pending');
+
+        $approvedQuery = clone $baseQuery;
+        $applyCommonFilters($approvedQuery);
+        $approvedQuery->whereIn('status', ['approved', 'picked_up']);
+
+        $declinedQuery = clone $baseQuery;
+        $applyCommonFilters($declinedQuery);
+        $declinedQuery->where('status', 'declined');
+
+        $requests = $requestsQuery->paginate(10, ['*'], 'all_page')->appends(request()->query());
+        $pendingRequests = $pendingQuery->paginate(10, ['*'], 'pending_page')->appends(request()->query());
+        $approvedRequests = $approvedQuery->paginate(10, ['*'], 'approved_page')->appends(request()->query());
+        $declinedRequests = $declinedQuery->paginate(10, ['*'], 'declined_page')->appends(request()->query());
         // Get request stats for each user
         $requestStats = CertificateRequest::selectRaw('user_id, COUNT(*) as total, 
             SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved,
@@ -110,7 +177,10 @@ class AdminController extends Controller
             'approvedRequests',
             'declinedRequests',
             'activeTab',
-            'requestStats'
+            'requestStats',
+            'search',
+            'sort',
+            'statusFilter'
         ));
     }
 

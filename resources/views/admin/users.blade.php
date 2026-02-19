@@ -4,7 +4,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 <style>
     :root {
         --primary-color: #2563eb;
@@ -143,6 +143,32 @@
         color: var(--primary-color);
         font-weight: 700;
         font-size: 1.1rem;
+    }
+
+    .table-filter-bar {
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
     }
 
     .table {
@@ -672,6 +698,9 @@
                 <!-- Search Section -->
                 <div class="search-section">
                     <form action="{{ route($user->role . '.users') }}" method="get">
+                        <input type="hidden" name="status_filter" value="{{ request('status_filter', 'all') }}">
+                        <input type="hidden" name="role_filter" value="{{ request('role_filter', 'all') }}">
+                        <input type="hidden" name="sort" value="{{ request('sort', 'id_desc') }}">
                         <div class="row g-3 align-items-end">
                             <div class="col-12 col-md-8">
                                 <label class="form-label">Search User</label>
@@ -710,6 +739,44 @@
                                 <i class="fas fa-user-check me-2 text-primary"></i>
                                 Found <span class="count-number">{{ $userList->total() }}</span> user{{ $userList->total() !== 1 ? 's' : '' }}
                             </div>
+                            <form method="GET" action="{{ route($user->role . '.users') }}" class="table-filter-bar">
+                                <input type="hidden" name="search" value="{{ request('search') }}">
+                                <div class="filter-group">
+                                    <span class="filter-label">Status</span>
+                                    <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Approved</option>
+                                        <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="declined" {{ request('status_filter') === 'declined' ? 'selected' : '' }}>Declined</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <span class="filter-label">Role</span>
+                                    <select name="role_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="all" {{ request('role_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="admin" {{ request('role_filter') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                        <option value="subadmin" {{ request('role_filter') === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
+                                        <option value="resident" {{ request('role_filter') === 'resident' ? 'selected' : '' }}>Resident</option>
+                                        <option value="non-resident" {{ request('role_filter') === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <span class="filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                        <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
+                                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name: Z-A</option>
+                                        <option value="role_asc" {{ request('sort') === 'role_asc' ? 'selected' : '' }}>Role: A-Z</option>
+                                        <option value="role_desc" {{ request('sort') === 'role_desc' ? 'selected' : '' }}>Role: Z-A</option>
+                                        <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
+                                        <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+                                    </select>
+                                </div>
+                                <a href="{{ route($user->role . '.users', array_filter(['search' => request('search')])) }}" class="btn btn-link btn-sm text-secondary text-decoration-none">
+                                    <i class="fa fa-undo me-1"></i>Reset
+                                </a>
+                            </form>
                         </div>
 
                         <div class="table-responsive">

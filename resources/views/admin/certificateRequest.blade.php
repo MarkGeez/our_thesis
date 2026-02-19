@@ -665,6 +665,19 @@
             font-size: 1.05rem;
         }
 
+        .table-filter-bar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0 1rem 1rem 1rem;
+        }
+
+        .table-filter-bar .form-control,
+        .table-filter-bar .form-select {
+            max-width: 230px;
+        }
+
         @media (max-width: 576px) {
             .pagination-container {
                 padding-left: 14px;

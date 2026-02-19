@@ -145,6 +145,19 @@
         .pagination-info-text i {
             color: var(--primary-color);
         }
+
+        .table-filter-bar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 1rem 1rem 0 1rem;
+        }
+
+        .table-filter-bar .form-control,
+        .table-filter-bar .form-select {
+            max-width: 240px;
+        }
     </style>
 
 
@@ -171,8 +184,21 @@
 
         <div class="records-container">
             @if($archive->count() > 0)
+                <form method="GET" action="{{ route('admin.archives') }}" class="table-filter-bar">
+                    <input type="text" name="search" class="form-control" placeholder="Search records..." value="{{ request('search') }}">
+                    <select name="sort" class="form-select">
+                        <option value="date_desc" {{ request('sort', 'date_desc') === 'date_desc' ? 'selected' : '' }}>Date: Newest First</option>
+                        <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Date: Oldest First</option>
+                        <option value="type_asc" {{ request('sort') === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
+                        <option value="type_desc" {{ request('sort') === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
+                        <option value="archived_by_asc" {{ request('sort') === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
+                        <option value="archived_by_desc" {{ request('sort') === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="{{ route('admin.archives') }}" class="btn btn-outline-secondary">Reset</a>
+                </form>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table id="archivesTable" class="table table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">Archived Type</th>
@@ -181,7 +207,7 @@
                                 <th scope="col">Original Record Details</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="archivesTableBody">
                             @foreach($archive as $item)
                             <tr>
                                 <td>
@@ -245,4 +271,3 @@
 <script src="{{ asset('template/js/script.js') }}"></script>
 <!--    -- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-

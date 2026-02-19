@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ResidentListController extends Controller
 {
-   public function showResidents(Request $request)
+public function showResidents(Request $request)
 {
     $streets = Street::has('houses')->get();
     $houses  = House::all();
@@ -27,6 +27,8 @@ class ResidentListController extends Controller
     }
     
     $searchTerm = $request->input('search');
+    $sexFilter = $request->input('sex_filter', 'all');
+    $sort = $request->input('sort', 'id_desc');
 
     $residentCount = Resident::count();
     $maleCount = Resident::where('sex', 'male')->count();
@@ -42,12 +44,31 @@ class ResidentListController extends Controller
                   ->orWhere('id', 'like', "%{$searchTerm}%");
             });
         })
-        ->latest()
-        ->paginate(20);
+        ->when(in_array($sexFilter, ['male', 'female'], true), function ($query) use ($sexFilter) {
+            return $query->where('sex', $sexFilter);
+        });
+
+    switch ($sort) {
+        case 'id_asc':
+            $residents->orderBy('id', 'asc');
+            break;
+        case 'name_asc':
+            $residents->orderBy('lastName', 'asc')->orderBy('firstName', 'asc');
+            break;
+        case 'name_desc':
+            $residents->orderBy('lastName', 'desc')->orderBy('firstName', 'desc');
+            break;
+        case 'id_desc':
+        default:
+            $residents->orderBy('id', 'desc');
+            break;
+    }
+
+    $residents = $residents->paginate(20)->appends($request->query());
 
     return view($user->role . '.residents', compact(
     'user', 'residents', 'searchTerm', 'streets', 'houses',
-    'residentCount', 'maleCount', 'femaleCount', 'seniorCount'
+    'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'sexFilter', 'sort'
 ));
 }
 

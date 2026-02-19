@@ -263,6 +263,19 @@
         background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         color: #fff;
     }
+
+    .table-filter-bar {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 0 1rem 0.5rem 1rem;
+    }
+
+    .table-filter-bar .form-control,
+    .table-filter-bar .form-select {
+        max-width: 220px;
+    }
 </style>
 </head>
 
@@ -292,27 +305,27 @@
                 <div class="records-container">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('admin.complaintRequest', ['tab' => 'all']) }}" class="nav-link {{ $activeTab === 'all' ? 'active' : '' }}">
+                            <a href="{{ route('admin.complaintRequest', array_merge(request()->except(['tab', 'page']), ['tab' => 'all'])) }}" class="nav-link {{ $activeTab === 'all' ? 'active' : '' }}">
                                 <i class="fas fa-list me-2"></i>All Complaints
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('admin.complaintRequest', ['tab' => 'pending']) }}" class="nav-link {{ $activeTab === 'pending' ? 'active' : '' }}">
+                            <a href="{{ route('admin.complaintRequest', array_merge(request()->except(['tab', 'page']), ['tab' => 'pending'])) }}" class="nav-link {{ $activeTab === 'pending' ? 'active' : '' }}">
                                 <i class="fas fa-clock me-2"></i>Pending
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('admin.complaintRequest', ['tab' => 'on-going']) }}" class="nav-link {{ $activeTab === 'on-going' ? 'active' : '' }}">
+                            <a href="{{ route('admin.complaintRequest', array_merge(request()->except(['tab', 'page']), ['tab' => 'on-going'])) }}" class="nav-link {{ $activeTab === 'on-going' ? 'active' : '' }}">
                                 <i class="fas fa-spinner me-2"></i>On-going
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('admin.complaintRequest', ['tab' => 'rejected']) }}" class="nav-link {{ $activeTab === 'rejected' ? 'active' : '' }}">
+                            <a href="{{ route('admin.complaintRequest', array_merge(request()->except(['tab', 'page']), ['tab' => 'rejected'])) }}" class="nav-link {{ $activeTab === 'rejected' ? 'active' : '' }}">
                                 <i class="fas fa-times-circle me-2"></i>Rejected
                             </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('admin.complaintRequest', ['tab' => 'resolved']) }}" class="nav-link {{ $activeTab === 'resolved' ? 'active' : '' }}">
+                            <a href="{{ route('admin.complaintRequest', array_merge(request()->except(['tab', 'page']), ['tab' => 'resolved'])) }}" class="nav-link {{ $activeTab === 'resolved' ? 'active' : '' }}">
                                 <i class="fas fa-check-circle me-2"></i>Resolved
                             </a>
                         </li>
@@ -320,8 +333,29 @@
 
                     @if($complaints->count() > 0)
                     <div class="complaints-table-wrapper">
+                        <form method="GET" action="{{ route('admin.complaintRequest') }}" class="table-filter-bar">
+                            <input type="hidden" name="tab" value="{{ $activeTab }}">
+                            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search..." value="{{ request('search') }}">
+                            <select name="status_filter" class="form-select form-select-sm">
+                                <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                                <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="on-going" {{ request('status_filter') === 'on-going' ? 'selected' : '' }}>On-going</option>
+                                <option value="resolved" {{ request('status_filter') === 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                <option value="rejected" {{ request('status_filter') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                            <select name="sort" class="form-select form-select-sm">
+                                <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                                <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
+                                <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
+                                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
+                                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+                            <a href="{{ route('admin.complaintRequest', ['tab' => $activeTab]) }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                        </form>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover mb-0 shadow-sm bg-white">
+                            <table id="complaintTable" class="table table-bordered table-hover mb-0 shadow-sm bg-white">
                                 <thead class="table-primary">
                                     <tr>
                                         <th style="width: 80px;">ID</th>
@@ -333,7 +367,7 @@
                                     </tr>
                                 </thead>
 
-                                <tbody class="align-middle">
+                                <tbody id="complaintTableBody" class="align-middle">
                                     @foreach ($complaints as $complaint)
                                     <tr>
                                         <td class="text-center fw-bold">{{ $complaint->id }}</td>

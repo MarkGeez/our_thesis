@@ -18,16 +18,60 @@ class UserListController extends Controller
         }
 
         $search = $request->input('search');
+        $statusFilter = $request->input('status_filter', 'all');
+        $roleFilter = $request->input('role_filter', 'all');
+        $sort = $request->input('sort', 'id_desc');
         
          // $userList = User::with('resident:houseNo,street,emergencyContactNo,emergencyContactName,age,sex,parent,enrolled,educationalAttainment,headOfFamily,EncodedBy,user_id')
         $userList = User::with('resident:emergencyContactNo,emergencyContactName,age,sex,parent,enrolled,educationalAttainment,headOfFamily,EncodedBy,user_id')
         ->when($search, function($query, $search){
             return $query-> where(function($q) use ($search){
-                $q->where('firstName', 'like', "{$search}")->orWhere('lastName', 'like', "{$search}")->orWhere('id', 'like', "{$search}");
+                $q->where('firstName', 'like', "%{$search}%")
+                    ->orWhere('lastName', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
             });
-        })->paginate(20);
+        })
+        ->when(in_array($statusFilter, ['approved', 'pending', 'declined', 'rejected'], true), function ($query) use ($statusFilter) {
+            if ($statusFilter === 'declined') {
+                return $query->whereIn('status', ['declined', 'rejected']);
+            }
+            return $query->where('status', $statusFilter);
+        })
+        ->when(in_array($roleFilter, ['admin', 'subadmin', 'resident', 'non-resident'], true), function ($query) use ($roleFilter) {
+            return $query->where('role', $roleFilter);
+        });
 
-        return view($user->role . '.users', compact('user', 'search', 'userList'));
+        switch ($sort) {
+            case 'id_asc':
+                $userList->orderBy('id', 'asc');
+                break;
+            case 'name_asc':
+                $userList->orderBy('lastName', 'asc')->orderBy('firstName', 'asc');
+                break;
+            case 'name_desc':
+                $userList->orderBy('lastName', 'desc')->orderBy('firstName', 'desc');
+                break;
+            case 'role_asc':
+                $userList->orderBy('role', 'asc')->orderBy('id', 'desc');
+                break;
+            case 'role_desc':
+                $userList->orderBy('role', 'desc')->orderBy('id', 'desc');
+                break;
+            case 'status_asc':
+                $userList->orderBy('status', 'asc')->orderBy('id', 'desc');
+                break;
+            case 'status_desc':
+                $userList->orderBy('status', 'desc')->orderBy('id', 'desc');
+                break;
+            case 'id_desc':
+            default:
+                $userList->orderBy('id', 'desc');
+                break;
+        }
+
+        $userList = $userList->paginate(20)->appends($request->query());
+
+        return view($user->role . '.users', compact('user', 'search', 'userList', 'statusFilter', 'roleFilter', 'sort'));
     }
 
 

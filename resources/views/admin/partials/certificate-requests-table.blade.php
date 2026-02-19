@@ -1,3 +1,47 @@
+<style>
+    .table-filter-bar {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .table-filter-bar .form-control, 
+    .table-filter-bar .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        height: 38px; /* Standardize height */
+    }
+
+    /* Remove focus ring and use a cleaner border */
+    .table-filter-bar .form-control:focus,
+    .table-filter-bar .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+</style>
+
 @php
     $filteredRequests = $filteredRequests ?? collect();
     $tab = $tab ?? 'all';
@@ -5,6 +49,60 @@
 @if($filteredRequests->isEmpty())
     <div class="alert alert-info">No certificate requests in this category.</div>
 @else
+    <form method="GET" action="{{ route('admin.certificateRequest') }}" class="table-filter-bar">
+    <input type="hidden" name="tab" value="{{ $tab }}">
+
+    <div class="flex-grow-1" style="min-width: 250px;">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white border-end-0 text-muted">
+                <i class="fa fa-search"></i>
+            </span>
+            <input type="text" name="search" 
+                   class="form-control border-start-0 ps-0" 
+                   placeholder="Search requester or certificate type..." 
+                   value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary px-3">
+                Apply
+            </button>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        @if($tab === 'all')
+            <div class="filter-group">
+                <span class="filter-label d-none d-md-inline">Status:</span>
+                <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                    <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="picked_up" {{ request('status_filter') === 'picked_up' ? 'selected' : '' }}>Picked Up</option>
+                    <option value="declined" {{ request('status_filter') === 'declined' ? 'selected' : '' }}>Declined</option>
+                </select>
+            </div>
+        @endif
+
+        <div class="filter-group">
+            <span class="filter-label d-none d-md-inline">Sort:</span>
+            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="date_desc" {{ request('sort', 'date_desc') === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
+                <option value="id_desc" {{ request('sort') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                <option value="type_asc" {{ request('sort') === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
+                <option value="type_desc" {{ request('sort') === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
+                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
+                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+            </select>
+        </div>
+
+        <div class="vr mx-1 d-none d-md-block"></div> <a href="{{ route('admin.certificateRequest', ['tab' => $tab]) }}" 
+           class="btn btn-link btn-sm text-secondary text-decoration-none px-2" 
+           title="Reset Filters">
+            <i class="fa fa-undo me-1"></i>Reset
+        </a>
+    </div>
+</form>
+
     <div class="results-info">
         <div class="results-count ms-3">
             Records: <span class="count-number">{{ $filteredRequests instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator ? $filteredRequests->total() : $filteredRequests->count() }}</span>
@@ -105,7 +203,7 @@
                         </span>
                     </div>
                 </div>
-                {{ $filteredRequests->appends(['tab' => $tab])->links('pagination::bootstrap-5') }}
+                {{ $filteredRequests->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
         </div>
     @endif
