@@ -231,10 +231,10 @@ class AdminController extends Controller
         $admin = Auth::user();
         return view("admin.users", compact('admin'));
     }
-     public function reports(): View
+     public function reports()
     {
-        $admin = Auth::user();
-        return view("admin.reports", compact('admin'));
+        // legacy handler – forward to the dedicated ReportsController
+        return redirect()->route('admin.reports.index');
     }
    
 

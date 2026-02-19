@@ -37,8 +37,8 @@ class Blotter extends Model
     ];
 
     protected $casts = [
-      'is_finished'
-   ];
+        'is_finished' => 'boolean',
+    ];
 
    public function isFinished(): bool {
       return $this->is_finished === true;
