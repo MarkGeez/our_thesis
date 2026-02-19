@@ -25,9 +25,15 @@
 <div class="main-wrapper">
            
     @include('admin.admin-header', ['admin' => auth()->user()])
-            <main class="main users chart-page" id="skip-target"></main>
-
-</main>
+    <main class="main users chart-page" id="skip-target">
+        @if(isset($report) && isset($data))
+            {{-- show only the chosen report with back navigation --}}
+            @include('reports.view')
+        @else
+            {{-- generation forms and list --}}
+            @include('reports.index')
+        @endif
+    </main>
 
 </div>
 </div> 

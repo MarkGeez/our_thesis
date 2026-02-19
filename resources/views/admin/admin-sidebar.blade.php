@@ -152,14 +152,14 @@
                         <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints Records
                     </a>
                 </li>
-
+    {{--  
                 <li>
                     <a class="{{ Request::routeIs('admin.reports') ? 'active' : '' }}"
                        href="{{ route('admin.reports') }}">
                         <span class="icon"><i class="fa-solid fa-clipboard-list"></i></i></span>Reports
                     </a>
                 </li>
-
+--}}
                  <li>
                     <a class="{{ Request::routeIs('admin.archives') ? 'active' : '' }}"
                        href="{{ route('admin.archives') }}">

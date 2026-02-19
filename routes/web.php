@@ -19,6 +19,7 @@ use App\Http\Controllers\OfficialController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\HouseholdController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\ReportsController;
 
 
 
@@ -126,6 +127,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
     Route::get('/profile/search', [HouseholdController::class, 'search']);
 
+    //REPORTS
+
+     Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::post('/reports/generate/population', [ReportsController::class, 'generatePopulation'])->name('reports.population');
+    Route::post('/reports/generate/blotter', [ReportsController::class, 'generateBlotter'])->name('reports.blotter');
+    Route::post('/reports/generate/certificate', [ReportsController::class, 'generateCertificate'])->name('reports.certificate');
+    Route::get('/reports/view/{id}', [ReportsController::class, 'view'])->name('reports.view');
 
 
 
@@ -172,7 +180,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Use ActiveLogController here and avoid double "admin" in the path
     Route::get('/activityLogs', [ActiveLogController::class, 'logs'])->name('activityLogs');
 
-    Route::get('/reports', [AdminController::class,'reports'])->name('reports');
     Route::get('/adminCertificate', [AdminController::class,'adminCertificate'])->name('adminCertificate');
     Route::get( '/adminServices', [ServiceController::class,'adminIndex'])->name('adminServices');
     Route::post('/adminServices', [ServiceController::class,'store'])->name('services.store');
