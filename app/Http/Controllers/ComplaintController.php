@@ -39,9 +39,19 @@ class ComplaintController extends Controller
 
     public function showComplaints(){
         $user= Auth::user();
-        $complaints = Complaints::oldest()->get();
+        $activeTab = request('tab', 'all');
+        if (!in_array($activeTab, ['all', 'pending', 'on-going', 'rejected', 'resolved'], true)) {
+            $activeTab = 'all';
+        }
+
+        $query = Complaints::query()->latest();
+        if ($activeTab !== 'all') {
+            $query->where('status', $activeTab);
+        }
+
+        $complaints = $query->paginate(10)->appends(['tab' => $activeTab]);
         $route = $user->role . ".complaintRequest";
-        return view($route, compact ('complaints'));
+        return view($route, compact ('complaints', 'activeTab'));
         
     }
 

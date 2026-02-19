@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne; 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\URL;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\Mail; 
 
 class User extends Authenticatable
 {
@@ -90,6 +93,18 @@ class User extends Authenticatable
         return $this->hasMany(CertificateRequest::class, 'user_id');
     }
 
-   
+    /**
+     * Send the password reset notification via email.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $resetUrl = URL::temporarySignedRoute('password.reset', now()->addMinutes(60), ['token' => $token]);
+        
+        Mail::send(new PasswordResetMail($this, $resetUrl));
+    }
    
 }
+

@@ -57,20 +57,27 @@ $user = auth()->user();
             abort(403);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:20',
             'birthday' => 'required|date',
-            'password' => 'nullable|min:6|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
+        ];
+
+        // If password change is attempted, validate current password and new password
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required|current_password';
+            $rules['password'] = 'required|min:8|confirmed';
+        }
+
+        $validated = $request->validate($rules);
 
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
 
-        if (!empty($validated['password'])) {
+        if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -157,14 +164,14 @@ $user = auth()->user();
     public function certificateRequest(): View
     {
         $subadmin = Auth::user();
-        $requests = $subadmin->certificateRequests()->latest()->get();
+        $requests = $subadmin->certificateRequests()->latest()->paginate(10);
         return view("subadmin.certificateRequest", compact('subadmin', 'requests'));
     }
 
     public function subadminCertificate(): View
     {
         $subadmin = Auth::user();
-        $requests = $subadmin->certificateRequests()->latest()->get();
+        $requests = $subadmin->certificateRequests()->latest()->paginate(10);
         return view("subadmin.subadminCertificate", compact('subadmin', 'requests'));
     }
 
@@ -187,7 +194,7 @@ $user = auth()->user();
     public function complaintRequest(): View
     {
         $subadmin = Auth::user();
-        $complaints = Complaints::orderByDesc('created_at')->get();
+        $complaints = Complaints::latest()->paginate(10);
         return view('subadmin.complaintRequest', compact('subadmin', 'complaints'));
     }
 

@@ -1,6 +1,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -215,7 +215,13 @@
         </div>
     @endif
 @if (!$resident)
-    not a household head cant add member
+    <div class="alert alert-warning d-flex align-items-start mb-0" role="alert">
+                    <i class="fas fa-circle-info me-2 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">You cannot add family members.</div>
+                        <div class="small">Only the household head can add or update members. Please contact your household head.</div>
+                    </div>
+                </div>
 @else
     @php
         $head = $resident->households()
@@ -226,7 +232,7 @@
     @if ($head)
         {{-- Show members list if they exist --}}
         @if($members->count() > 0)
-            @include('profileforms.displayMembers')
+             {{-- @include('profileforms.displayMembers')--}}
         @else
             {{-- Show "Add Member" button even if no members exist --}}
             <div class="row mt-4">
@@ -248,7 +254,15 @@
         @endif
         @include('profileforms.addMember')
     @else
-        not a household head cant add member
+        <div class="card-body">
+                <div class="alert alert-warning d-flex align-items-start mb-0" role="alert">
+                    <i class="fas fa-circle-info me-2 mt-1"></i>
+                    <div>
+                        <div class="fw-semibold">You cannot add family members.</div>
+                        <div class="small">Only the household head can add or update members. Please contact your household head.</div>
+                    </div>
+                </div>
+            </div>
     @endif
 @endif
 

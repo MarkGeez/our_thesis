@@ -5,6 +5,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\FeedbackController;
@@ -40,6 +41,11 @@ Route::post('logout', [AuthController::class, 'logout'])->middleware('auth')->na
 Route::get('register', [RegistrationController::class,'showRegister'])->name('register');
 Route::post('register', [RegistrationController::class, 'register'])->name('register.attempt');
 
+// Password Reset Routes
+Route::get('/password/forgot', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+Route::post('/password/email', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+Route::get('/password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/update', [PasswordResetController::class, 'updatePassword'])->name('password.update');
 
 Route::get('/', [LandingController::class, 'display']);
 

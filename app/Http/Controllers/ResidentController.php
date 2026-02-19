@@ -8,6 +8,7 @@ use App\Models\HouseholdResident;
 use App\Models\House;
 use App\Models\Street;
 use App\Models\Official;
+use App\Models\Feedbacks;
 
 use App\Models\FamilyMember;
 
@@ -47,20 +48,27 @@ class ResidentController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:20',
             'birthday' => 'required|date',
-            'password' => 'nullable|min:6|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
+        ];
+
+        // If password change is attempted, validate current password and new password
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required|current_password';
+            $rules['password'] = 'required|min:8|confirmed';
+        }
+
+        $validated = $request->validate($rules);
 
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
 
-        if (!empty($validated['password'])) {
+        if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -171,7 +179,18 @@ class ResidentController extends Controller
     public function feedback()
     {
         $resident = auth()->user();
-        return view('resident.feedback', compact('resident'));
+        $latestFeedback = Feedbacks::where('user_id', $resident->id)
+            ->latest()
+            ->first();
+
+        $previousFeedbacks = Feedbacks::where('user_id', $resident->id)
+            ->when($latestFeedback, function ($query) use ($latestFeedback) {
+                $query->where('id', '!=', $latestFeedback->id);
+            })
+            ->latest()
+            ->paginate(5);
+
+        return view('resident.feedback', compact('resident', 'latestFeedback', 'previousFeedbacks'));
     }
 
     public function contactus()

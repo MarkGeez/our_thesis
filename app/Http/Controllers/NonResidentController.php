@@ -34,21 +34,28 @@ class NonResidentController extends Controller
         if ((int) $user->id !== (int) $id) {
             abort(403);
         }
-        
-        $validated = $request->validate([
+
+        $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:20',
             'birthday' => 'required|date',
-            'password' => 'nullable|min:6|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
+        ];
+
+        // If password change is attempted, validate current password and new password
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required|current_password';
+            $rules['password'] = 'required|min:8|confirmed';
+        }
+        
+        $validated = $request->validate($rules);
         
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
 
-        if (!empty($validated['password'])) {
+        if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -121,7 +128,7 @@ class NonResidentController extends Controller
     public function contactus()
     {
         $nonResident = auth()->user();
-        return view('resident.contactus', compact('resident'));
+        return view('non-resident.contactus', compact('nonResident'));
     }
 
     public function aboutus()

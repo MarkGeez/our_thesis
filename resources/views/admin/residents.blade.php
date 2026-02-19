@@ -13,6 +13,261 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+            --danger-color: #dc2626;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        .main.users.chart-page {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            margin: 0 1.5rem;
+            overflow: hidden;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+            color: black;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 0 0 1rem 0;
+        }
+
+        .page-header h2 {
+            color: rgb(0, 0, 0);
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .search-section {
+            background: #f8fafc;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-section .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-section .input-group-text {
+            background-color: white;
+            border-right: none;
+            color: var(--text-secondary);
+        }
+
+        .search-section .form-control {
+            border-left: none;
+            padding: 0.625rem 1rem;
+        }
+
+        .search-section .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+        }
+
+        .table-container {
+            padding: 2rem;
+        }
+
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .results-count {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .results-count .count-number {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.75rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+        }
+
+        .btn {
+            font-weight: 600;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.85rem;
+            font-size: 0.8rem;
+        }
+
+        .action-btns .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination-container {
+            padding: 2rem;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+            border-top: 2px solid var(--border-color);
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .pagination {
+            margin: 0;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.625rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .pagination .page-link:hover:not(.disabled) {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .stats-row {
+            padding: 0 2rem 1rem 2rem;
+        }
+
+        .stats-row .card {
+            border: 0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
         .modal-content .form-control, 
         .modal-content .form-select {
             border: 2px solid #dddddd !important;
@@ -38,12 +293,6 @@
         .invalid-feedback {
             font-weight: 500;
         }
-        
-        .action-btns .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
     </style>
 </head>
 <body>
@@ -57,17 +306,22 @@
         @include('admin.admin-header', ['admin' => auth()->user()])
 
         <main class="main users chart-page" id="skip-target">
-            <div class="container mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Resident List</h1>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
-                        <i class="fas fa-plus me-2"></i> Encode Resident
-                    </button>
+            <div class="main-container">
+                <div class="page-header">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <h2>
+                            <span class="page-header-icon"><i class="fas fa-users"></i></span>
+                            Resident Management
+                        </h2>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#encodeResidentModal">
+                            <i class="fas fa-plus me-2"></i>Encode Resident
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Success Message --}}
                 @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #198754;">
+                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mx-4 mt-3 mb-0" role="alert" style="border-radius: 8px; border-left: 5px solid #198754;">
                         <i class="fas fa-check-circle me-3" style="font-size: 1.5rem;"></i>
                         <div>{{ session('success') }}</div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -76,7 +330,7 @@
 
                 {{-- Error Messages --}}
                 @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
+                    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm mx-4 mt-3 mb-0" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
                         <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
                         <div>{{ session('error') }}</div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -85,7 +339,7 @@
 
                 {{-- Validation Errors --}}
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm mx-4 mt-3 mb-0" role="alert" style="border-radius: 8px; border-left: 5px solid #dc3545;">
                         <div class="d-flex align-items-start">
                             <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
                             <div class="flex-grow-1">
@@ -101,67 +355,138 @@
                     </div>
                 @endif
 
-                {{-- Search Form --}}
-                <form action="{{ route($user->role . '.residents') }}" method="get" class="mb-4">
-                    <div class="row g-2 align-items-end">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label fw-semibold">Search Resident</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light">
-                                    <i class="fa fa-search"></i>
-                                </span>
-                                <input type="text" name="search" class="form-control" placeholder="Enter name or ID here..." value="{{ request('search') }}">
+                <div class="stats-row">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Total Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $residentCount }}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-auto d-flex gap-2">
-                            <button type="submit" class="btn btn-primary px-4">Search</button>
-                            @if(request('search'))
-                                <a href="{{ route($user->role . '.residents') }}" class="btn btn-outline-secondary px-4">
-                                    <i class="fas fa-times me-2"></i> Clear
-                                </a>
-                            @endif
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-person"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Male Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $maleCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #e83e8c;">
+                                        <i class="fa-solid fa-person-dress"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Female Residents</div>
+                                        <div class="fs-4 fw-bold">{{ $femaleCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card h-100">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fa-solid fa-person-cane"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small">Senior Citizens</div>
+                                        <div class="fs-4 fw-bold">{{ $seniorCount }}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
+
+                {{-- Search Form --}}
+                <div class="search-section">
+                    <form action="{{ route($user->role . '.residents') }}" method="get">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">Search Resident</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input type="text" name="search" class="form-control" placeholder="Enter name or ID here..." value="{{ request('search') }}">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-auto d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4">Search</button>
+                                @if(request('search'))
+                                    <a href="{{ route($user->role . '.residents') }}" class="btn btn-outline-secondary px-4">
+                                        <i class="fas fa-times me-2"></i>Clear
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
                 @if($residents->isEmpty())
-                    <div class="alert alert-info">No residents found.</div>
+                    <div class="table-container">
+                        <div class="alert alert-info">No residents found.</div>
+                    </div>
                 @else
-                    <div class="table-responsive table-wrapper">
-                        <table class="table table-bordered table-hover bg-white">
-                            <thead class="table-primary text-nowrap">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Full Name</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($residents as $resident)
+                    <div class="table-container">
+                        <div class="results-info">
+                            <div class="results-count">
+                                Records: <span class="count-number">{{ $residents->total() }}</span>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive table-wrapper">
+                            <table class="table table-bordered table-hover bg-white">
+                                <thead class="table-primary text-nowrap">
                                     <tr>
-                                        <td class="align-middle">{{ $resident->id }}</td>
-                                        <td class="align-middle"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </td>
-                                        <td class="text-center text-nowrap">
-                                            <div class="d-flex justify-content-center align-items-center gap-2 action-btns">
-                                                <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#viewResident{{ $resident->id }}">
-                                                    <i class="fa fa-eye"></i><span>View</span>
-                                                </button>
-                                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#updateResident{{ $resident->id }}">
-                                                    <i class="fa fa-edit"></i><span>Edit</span>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addOfficial{{ $resident->id }}">
-                                                    <i class="fa fa-user-tie"></i><span>{{ $resident->official ? 'Edit Official' : 'Set Official' }}</span>
-                                                </button>
-                                                <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                                        <i class="fa fa-trash"></i><span>Inactive</span>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($residents as $resident)
+                                        <tr>
+                                            <td class="align-middle">{{ $resident->id }}</td>
+                                            <td class="align-middle"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </td>
+                                            <td class="text-center text-nowrap">
+                                                <div class="d-flex justify-content-center align-items-center gap-2 action-btns">
+                                                    <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#viewResident{{ $resident->id }}">
+                                                        <i class="fa fa-eye"></i><span>View</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#updateResident{{ $resident->id }}">
+                                                        <i class="fa fa-edit"></i><span>Edit</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addOfficial{{ $resident->id }}">
+                                                        <i class="fa fa-user-tie"></i><span>{{ $resident->official ? 'Edit Official' : 'Set Official' }}</span>
+                                                    </button>
+                                                    <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                                            <i class="fa fa-trash"></i><span>Inactive</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
 
                                     {{-- Modal: View Resident --}}
                                     {{-- View Modal --}}
@@ -554,16 +879,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     @if($residents->hasPages())
-                        <div class="pagination-wrapper">
-                            <div class="pagination-info">
-                                Showing {{ $residents->firstItem() }} to {{ $residents->lastItem() }} of {{ $residents->total() }} results
+                        <div class="pagination-container">
+                            <div class="pagination-wrapper">
+                                <div class="pagination-info">
+                                    Showing {{ $residents->firstItem() }} to {{ $residents->lastItem() }} of {{ $residents->total() }} results
+                                </div>
+                                {{ $residents->appends(request()->query())->links('pagination::bootstrap-5') }}
                             </div>
-                            {{ $residents->appends(request()->query())->links('pagination::bootstrap-5') }}
                         </div>
                     @endif
                 @endif

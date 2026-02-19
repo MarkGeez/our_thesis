@@ -16,7 +16,7 @@ class ActiveLogController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        $logs = ActiveLog::with('user')->latest()->paginate(20);
+        $logs = ActiveLog::with('user')->latest()->paginate(10);
 
         return view('admin.activityLogs', compact('logs', 'user'));
     }
