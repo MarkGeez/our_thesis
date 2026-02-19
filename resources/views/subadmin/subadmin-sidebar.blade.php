@@ -224,7 +224,7 @@
 
 /* Active with gradient background variant */
 .sidebar-body-menu a.active,
-.cat-sub-menu a.active {
+.show-cat-btn.active {
     background: linear-gradient(
         90deg, 
         rgba(255, 255, 255, 0.3) 0%, 
@@ -256,6 +256,22 @@
     display: flex;
     align-items: center;
     gap: 10px; /* space between icon and text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Keep icon flex-shrink so it never gets squished */
+.sidebar-body-menu a .icon,
+.cat-sub-menu a .icon,
+.show-cat-btn .icon {
+    flex-shrink: 0;
+}
+
+/* Shrink font slightly for long labels only, keeps them readable */
+.sidebar-body-menu a,
+.cat-sub-menu a {
+    font-size: 0.875rem;
 }
 </style>
 
@@ -295,112 +311,121 @@
 
             <span class="system-menu__title">Personal</span>
 
-            <ul class="sidebar-body-menu">
-                <li>
-                    <a class="{{ Request::routeIs('subadmin.profile') ? 'active' : '' }}" href="{{ route('subadmin.profile') }}">
-                        <span class="icon"><i class="fa-solid fa-user"></i></span>Profile
-                    </a>
-                </li>
+<ul class="sidebar-body-menu">
+    <li>
+        <a class="{{ Request::routeIs('subadmin.profile') ? 'active' : '' }}" href="{{ route('subadmin.profile') }}">
+            <span class="icon"><i class="fa-solid fa-user"></i></span>Profile
+        </a>
+    </li>
 
-                @php
-                    $servicesActive = Request::routeIs(
-                        'subadmin.subadminBlotter*',
-                        'subadmin.subadminCertificate*',
-                        'subadmin.subadminServices*',
-                        'subadmin.complaint*'
-                    );
-                @endphp
+    @php
+        // Only active for "My" services, NOT for "Complaints Records"
+        $servicesActive = Request::routeIs(
+            'subadmin.subadminCertificate*',
+            'subadmin.complaint'
+        );
+    @endphp
 
-                <li>
-                    <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="##">
-                        <span class="icon"></span>E-Barangay Services
-                        <span class="category__btn transparent-btn" title="Open list">
-                            <span class="sr-only">Open list</span>
-                            <span class="icon arrow-down" aria-hidden="true"></span>
-                        </span>
-                    </a>
-                    <ul class="cat-sub-menu">
-                        <li>
-                            <a class="{{ Request::routeIs('subadmin.blotterRequest') ? 'active' : '' }}" href="{{ route('subadmin.blotterRequest') }}">
-                                <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>My Blotter
-                            </a>
-                        </li>
-                        <li>
-                            <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
-                                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
-                            </a>
-                        </li>
-                        <li>
-                            <a class="{{ Request::routeIs('subadmin.subadminServices*') ? 'active' : '' }}" href="{{ route('subadmin.subadminServices') }}">
-                                <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>My Services
-                            </a>
-                        </li>
-                        <li>
-                            <a class="{{ Request::routeIs('subadmin.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
-                                <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+    <li>
+    <a class="show-cat-btn {{ $servicesActive ? 'show' : '' }}" href="javascript:void(0)">
+         E-Barangay Services
+        <span class="category__btn transparent-btn" title="Open list">
+            <span class="sr-only">Open list</span>
+            <span class="icon arrow-down" aria-hidden="true"></span>
+        </span>
+    </a>
+    <ul class="cat-sub-menu" style="{{ $servicesActive ? 'display:block;' : 'display:none;' }}">
+        <li>
+            <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
+                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
+            </a>
+        </li>
+        <li>
+            <a class="{{ Request::routeIs('subadmin.complaint*') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
+                <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
+            </a>
+        </li>
+    </ul>
+</li>
+</ul>
 
-            <span class="system-menu__title">Manage System</span>
+<span class="system-menu__title">Manage System</span>
 
-            <ul class="sidebar-body-menu">
-                <li>
-                    <a class="{{ Request::routeIs('subadmin.announcements') ? 'active' : '' }}" href="{{ route('subadmin.announcements') }}">
-                        <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>Announcements
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::routeIs('subadmin.blotterRequest') ? 'active' : '' }}" href="{{ route('subadmin.blotterRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>Blotter Requests
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::routeIs('subadmin.serviceRequest') ? 'active' : '' }}" href="{{ route('subadmin.serviceRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>Service Requests
-                    </a>
-                </li>
-                <li>
-                    <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints Records
-                    </a>
-                </li>
-            </ul>
+<ul class="sidebar-body-menu">
+    <li>
+        <a class="{{ Request::routeIs('subadmin.announcements') ? 'active' : '' }}" href="{{ route('subadmin.announcements') }}">
+            <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>Announcements
+        </a>
+    </li>
+    <li>
+        <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
+                                    <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
+        </a>
+    </li>
+    <li>
+        <a class="{{ Request::routeIs('subadmin.aboutus') ? 'active' : '' }}" href="{{ route('subadmin.aboutus') }}">
+            <span class="icon"><i class="fa-solid fa-circle-info"></i></span>About Us
+        </a>
+    </li>
+    <li>
+        <a class="{{ Request::routeIs('subadmin.contactus') ? 'active' : '' }}" href="{{ route('subadmin.contactus') }}">
+            <span class="icon"><i class="fa-solid fa-address-book"></i></span>Contact Us
+        </a>
+    </li>
+    
+</ul>
         </div>
     </div>
 </aside>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // 1. SELECT ALL TOGGLE BUTTONS
+    const menuToggles = document.querySelectorAll('.show-cat-btn');
+
+    menuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const submenu = this.nextElementSibling;
+            
+            // Toggle the 'show' class for arrow rotation
+            this.classList.toggle('show');
+
+            // Toggle the submenu visibility
+            if (submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+            } else {
+                submenu.style.display = 'block';
+            }
+        });
+    });
+
+    // 2. AUTO-OPEN ACTIVE SUBMENU ON LOAD
     const activeItem = document.querySelector('.sidebar .active');
-    if (!activeItem) return;
+    if (activeItem) {
+        const submenu = activeItem.closest('.cat-sub-menu');
+        if (submenu) {
+            submenu.style.display = 'block';
+            const toggle = submenu.previousElementSibling;
+            if (toggle && toggle.classList.contains('show-cat-btn')) {
+                toggle.classList.add('show'); 
+                // Note: We don't add 'active' here so the parent stays dark
+            }
+        }
 
-    // ensure parent submenu is open if a child is active
-    const submenu = activeItem.closest('.cat-sub-menu');
-    if (submenu) {
-        submenu.style.display = 'block';
-        const toggle = submenu.previousElementSibling;
-        if (toggle) toggle.classList.add('active');
-    }
-
-    // scroll active item into view within sidebar-body only
-    const sidebarBody = document.querySelector('.sidebar-body');
-    if (sidebarBody && activeItem) {
-        // Small delay to ensure DOM is fully rendered
-        setTimeout(function() {
-            const activeRect = activeItem.getBoundingClientRect();
-            const bodyRect = sidebarBody.getBoundingClientRect();
-            
-            // Calculate scroll position to center the active item in sidebar-body
-            const offset = activeRect.top - bodyRect.top - (bodyRect.height / 2) + (activeRect.height / 2);
-            
-            sidebarBody.scrollTo({
-                top: sidebarBody.scrollTop + offset,
-                behavior: 'smooth'
-            });
-        }, 100);
+        // 3. SCROLL ACTIVE INTO VIEW
+        const sidebarBody = document.querySelector('.sidebar-body');
+        if (sidebarBody) {
+            setTimeout(function() {
+                const activeRect = activeItem.getBoundingClientRect();
+                const bodyRect = sidebarBody.getBoundingClientRect();
+                const offset = activeRect.top - bodyRect.top - (bodyRect.height / 2) + (activeRect.height / 2);
+                
+                sidebarBody.scrollTo({
+                    top: sidebarBody.scrollTop + offset,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
     }
 });
 </script>

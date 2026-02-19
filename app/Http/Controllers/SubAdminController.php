@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Announcement;
 use App\Models\Complaints;
 use App\Models\Resident;
+use App\Models\Official;
 use App\Models\Household;
 use App\Models\HouseholdResident;
 use App\Models\House;
@@ -186,16 +187,110 @@ $user = auth()->user();
         $subadmin = Auth::user();
         return view("subadmin.serviceRequest", compact('subadmin'));
     }
+
+    public function contactus(): View
+    {
+        $subadmin = auth()->user();
+        return view('subadmin.contactus', compact('subadmin'));
+    }
+
+    public function aboutus(): View
+    {
+        $positions = [
+            'Barangay Chairman',
+            'Barangay Secretary',
+            'Barangay Treasurer',
+            'Kagawad 1',
+            'Kagawad 2',
+            'Kagawad 3',
+            'Kagawad 4',
+            'Kagawad 5',
+            'Kagawad 6',
+            'Kagawad 7',
+            'SK Chairman',
+            'SK Kagawad 1',
+            'SK Kagawad 2',
+            'SK Kagawad 3',
+            'SK Kagawad 4',
+            'SK Kagawad 5',
+            'SK Kagawad 6',
+            'SK Kagawad 7',
+        ];
+
+        $officialsByPosition = Official::with('resident:id,firstName,middleName,lastName,image_path')
+            ->whereIn('position', $positions)
+            ->get()
+            ->keyBy('position');
+
+        $subadmin = auth()->user();
+        return view('subadmin.aboutus', compact('subadmin', 'positions', 'officialsByPosition'));
+    }
     public function subadminBlotter(): View
     {
         $subadmin = Auth::user();
         return view("subadmin.subadminBlotter", compact('subadmin'));
     }
-    public function complaintRequest(): View
+    public function complaintRequest(Request $request): View
     {
         $subadmin = Auth::user();
-        $complaints = Complaints::latest()->paginate(10);
-        return view('subadmin.complaintRequest', compact('subadmin', 'complaints'));
+        $activeTab = $request->query('tab', 'all');
+        if (!in_array($activeTab, ['all', 'pending', 'on-going', 'rejected', 'resolved'], true)) {
+            $activeTab = 'all';
+        }
+
+        $search = trim((string) $request->query('search', ''));
+        $statusFilter = (string) $request->query('status_filter', 'all');
+        $sort = (string) $request->query('sort', 'id_desc');
+
+        $query = Complaints::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('complainantName', 'like', '%' . $search . '%')
+                    ->orWhere('address', 'like', '%' . $search . '%')
+                    ->orWhere('details', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($activeTab !== 'all') {
+            $query->where('status', $activeTab);
+        }
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        switch ($sort) {
+            case 'id_asc':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'complainant_asc':
+                $query->orderBy('complainantName', 'asc');
+                break;
+            case 'complainant_desc':
+                $query->orderBy('complainantName', 'desc');
+                break;
+            case 'status_asc':
+                $query->orderBy('status', 'asc')->latest('id');
+                break;
+            case 'status_desc':
+                $query->orderBy('status', 'desc')->latest('id');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        $complaints = $query->paginate(10)->appends($request->query());
+        return view('subadmin.complaintRequest', compact(
+            'subadmin',
+            'complaints',
+            'activeTab',
+            'search',
+            'statusFilter',
+            'sort'
+        ));
     }
 
     public function updateComplaint(Request $request, int $id)

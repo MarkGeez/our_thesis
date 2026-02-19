@@ -62,7 +62,7 @@
                    placeholder="Search requester or certificate type..." 
                    value="{{ request('search') }}">
             <button type="submit" class="btn btn-primary px-3">
-                Apply
+                Search
             </button>
         </div>
     </div>

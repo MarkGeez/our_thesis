@@ -1,7 +1,9 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
+    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -164,8 +166,7 @@ object-fit: cover;
          @endif
 </div>  
          <div class="announcement-meta">
-           Posted by: {{ ucwords($announcements->user->firstName) }} {{ ucwords($announcements->user->lastName) }}<br>
-           Posted on: {{ date('M d, Y g:i A', strtotime($announcements->created_at)) }}
+           Posted by: {{ ucwords($announcements->user->firstName) }} {{ ucwords($announcements->user->lastName) }}
          </div>
          <div class="announcement-actions">
           <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAnnouncement{{ $announcements->id }}">

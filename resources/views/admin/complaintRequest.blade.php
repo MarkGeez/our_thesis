@@ -265,16 +265,44 @@
     }
 
     .table-filter-bar {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
         display: flex;
-        gap: 0.75rem;
-        align-items: center;
         flex-wrap: wrap;
-        margin: 0 1rem 0.5rem 1rem;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
     }
 
     .table-filter-bar .form-control,
     .table-filter-bar .form-select {
-        max-width: 220px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        height: 38px;
+    }
+
+    .table-filter-bar .form-control:focus,
+    .table-filter-bar .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
     }
 </style>
 </head>
@@ -335,24 +363,45 @@
                     <div class="complaints-table-wrapper">
                         <form method="GET" action="{{ route('admin.complaintRequest') }}" class="table-filter-bar">
                             <input type="hidden" name="tab" value="{{ $activeTab }}">
-                            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search..." value="{{ request('search') }}">
-                            <select name="status_filter" class="form-select form-select-sm">
-                                <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
-                                <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="on-going" {{ request('status_filter') === 'on-going' ? 'selected' : '' }}>On-going</option>
-                                <option value="resolved" {{ request('status_filter') === 'resolved' ? 'selected' : '' }}>Resolved</option>
-                                <option value="rejected" {{ request('status_filter') === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                            </select>
-                            <select name="sort" class="form-select form-select-sm">
-                                <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
-                                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
-                                <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
-                                <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
-                                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
-                                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                            <a href="{{ route('admin.complaintRequest', ['tab' => $activeTab]) }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                            <div class="flex-grow-1" style="min-width: 250px;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0 text-muted">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Search complainant or details..." value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-primary px-3">Search</button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="filter-group">
+                                    <span class="filter-label d-none d-md-inline">Status:</span>
+                                    <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                                        <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="on-going" {{ request('status_filter') === 'on-going' ? 'selected' : '' }}>On-going</option>
+                                        <option value="resolved" {{ request('status_filter') === 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                        <option value="rejected" {{ request('status_filter') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <span class="filter-label d-none d-md-inline">Sort:</span>
+                                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                        <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                                        <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
+                                        <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
+                                        <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
+                                        <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+                                    </select>
+                                </div>
+
+                                <div class="vr mx-1 d-none d-md-block"></div>
+                                <a href="{{ route('admin.complaintRequest', ['tab' => $activeTab]) }}" class="btn btn-link btn-sm text-secondary text-decoration-none px-2" title="Reset Filters">
+                                    <i class="fa fa-undo me-1"></i>Reset
+                                </a>
+                            </div>
                         </form>
                         <div class="table-responsive">
                             <table id="complaintTable" class="table table-bordered table-hover mb-0 shadow-sm bg-white">

@@ -244,6 +244,8 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
         
 
         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
+        Route::get('/aboutus', [SubAdminController::class,'aboutus'])->name('aboutus');
+        Route::get('/contactus', [SubAdminController::class,'contactus'])->name('contactus');
 
 
          Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement.form');
@@ -282,5 +284,4 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
         
     });
 });
-
 
