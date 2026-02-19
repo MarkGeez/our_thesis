@@ -18,7 +18,8 @@
             font-family: 'Times New Roman', serif;
             color: var(--text);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
         }
 
@@ -30,11 +31,12 @@
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 20mm;
+            padding: 8mm 14mm 12mm 14mm;
             background: white;
             position: relative;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             box-sizing: border-box;
+            margin-bottom: 20px;
         }
 
         .header-container {
@@ -43,7 +45,7 @@
             align-items: center;
             text-align: center;
             border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
+            padding-bottom: 6px;
         }
 
         .header-logo { width: 80px; height: auto; }
@@ -65,33 +67,15 @@
             font-weight: normal;
             color: var(--header-blue);
             letter-spacing: 8px;
-            margin: 30px 0 20px 0;
+            margin: 12px 0 8px 0;
             text-transform: uppercase;
         }
 
         .report-info {
             text-align: center;
             font-size: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: var(--muted);
-        }
-
-        .filter-info {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 10px 15px;
-            font-size: 12px;
-            margin-bottom: 20px;
-        }
-
-        .filter-tag {
-            display: inline-block;
-            background: #e2e8f0;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin: 3px;
-            font-size: 11px;
         }
 
         .content-body {
@@ -103,7 +87,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
-            font-size: 12px;
+            font-size: 11px; /* Slightly smaller to ensure 28 rows fit comfortably */
         }
 
         .table th {
@@ -117,84 +101,107 @@
         }
 
         .table td {
-            padding: 6px;
+            padding: 5px 6px;
             border: 1px solid #e2e8f0;
             vertical-align: middle;
         }
 
-        .table tbody tr:nth-child(even) {
-            background: #f8fafc;
-        }
+        .table tbody tr:nth-child(even) { background: #f8fafc; }
 
-        .table tbody tr:hover {
-            background: #f1f5f9;
-        }
-
-        /* Footer */
         .footer {
             position: absolute;
-            bottom: 15mm;
-            left: 20mm;
-            right: 20mm;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-            color: var(--muted);
+            bottom: 6mm;
+            left: 14mm;
+            right: 14mm;
             font-family: Arial, sans-serif;
-            font-size: 10px;
+        }
+
+        .footer-rule {
+            height: 3px;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--header-blue) 100%);
+            border-radius: 2px;
+            margin-bottom: 0;
+        }
+        .footer-rule-thin {
+            height: 1px;
+            background: #d1dff5;
+            margin-bottom: 6px;
+            margin-top: 2px;
         }
 
         .footer-content {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-start;
+            gap: 12px;
         }
 
+        .footer-contact {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .footer-contact-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 8.5px;
+            color: #444;
+            line-height: 1.4;
+        }
+        .footer-contact-row .dot {
+            width: 3px; height: 3px; border-radius: 50%;
+            background: var(--header-blue); flex-shrink: 0;
+        }
+
+        .footer-center { text-align: center; flex-shrink: 0; }
+        .footer-date-label { font-size: 7.5px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .footer-date-value { font-size: 9px; font-weight: 700; color: var(--navy); }
+        .footer-page { margin-top: 3px; font-size: 11px; color: #888; }
+
+        .footer-office { text-align: right; font-size: 8.5px; color: #444; line-height: 1.5; }
+        .footer-office-name { font-weight: 700; font-size: 9px; color: var(--navy); text-transform: uppercase; }
+
         .confidential-notice {
-            text-align: center;
-            font-size: 9px;
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: 5px; padding: 3px 10px;
+            background: linear-gradient(90deg, #f0f4ff 0%, #e8eeff 100%);
+            border: 1px solid #c7d4f0; border-radius: 3px;
+            text-align: center; font-size: 7.5px; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--navy); font-weight: 600;
         }
 
         @media print {
             body { background: white; padding: 0; }
-            .page { box-shadow: none; width: 100%; height: 100%; }
-            .print-button { display: none; }
+            .page { 
+                box-shadow: none; 
+                margin-bottom: 0; 
+                page-break-after: always; 
+            }
+            .page:last-child { page-break-after: auto; }
+            .print-button, .back-button { display: none; }
         }
 
-        .print-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 18px;
-            background: var(--navy);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            z-index: 100;
+        .print-button, .back-button {
+            position: fixed; bottom: 20px; padding: 10px 18px;
+            color: white; border: none; border-radius: 4px;
+            cursor: pointer; z-index: 100; text-decoration: none; font-size: 14px;
         }
-
-        .back-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 18px;
-            background: #666;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            z-index: 100;
-        }
+        .print-button { right: 20px; background: var(--navy); }
+        .back-button { left: 20px; background: #666; }
     </style>
 </head>
 <body>
     <a href="{{ route('admin.reports.view', $report->id) }}" class="back-button">← Back to Report</a>
     <button class="print-button" onclick="window.print()">Print Report</button>
 
+    @php 
+        $type = strtolower($report->report_type);
+        // Chunk the data into sets of 28 rows
+        $chunks = collect($data)->chunk(25);
+        $totalPages = count($chunks);
+    @endphp
+
+    @foreach($chunks as $index => $rowChunk)
     <div class="page">
         <div class="header-container">
             <img src="{{ asset('images/Brgy-logo-1.png') }}" class="header-logo" alt="Barangay Logo">
@@ -212,29 +219,16 @@
 
         <div class="cert-title">{{ strtoupper($report->report_type) }} Reports</div>
 
+        {{-- Only show report summary info on the first page --}}
+        @if($loop->first)
         <div class="report-info">
-            <div><strong>Report Title:</strong> {{ $report->report_name }}</div>
+            <div><strong>Report Name:</strong> {{ $report->report_name }}</div>
             <div><strong>Generated:</strong> {{ $report->created_at->format('M d, Y h:i A') }}</div>
             <div><strong>Total Records:</strong> {{ number_format($report->total_records) }}</div>
         </div>
-
-        {{-- @if($report->filters_used)
-            @php $used = json_decode($report->filters_used, true); @endphp
-            <div class="filter-info">
-                <strong>Applied Filters:</strong><br>
-                @foreach($used as $key => $val)
-                    @continue(in_array($key, ['report_name', 'generated_by', 'report_form_type']))
-                    @continue($val === null || $val === '')
-                    <span class="filter-tag">
-                        <strong>{{ ucwords(str_replace(['_', '-'], ' ', $key)) }}:</strong> {{ is_array($val) ? json_encode($val) : $val }}
-                    </span>
-                @endforeach
-            </div>
-        @endif  --}}
+        @endif
 
         <div class="content-body">
-            @php $type = strtolower($report->report_type); @endphp
-            
             <table class="table">
                 <thead>
                     <tr>
@@ -259,7 +253,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($data as $row)
+                    @foreach($rowChunk as $row)
                         <tr>
                             @if($type == 'population')
                                 <td data-col="full_name">{{ ucwords(strtolower($row->firstName)) }} {{ ucwords(strtolower($row->middleName)) }} {{ ucwords(strtolower($row->lastName)) }}</td>
@@ -272,72 +266,87 @@
                                     <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                 @endif
                             @elseif($type == 'blotter')
-                                <td data-col="plaintiff">{{ $row->plaintiffName }} {{ $row->plaintiffLastName }}</td>
-                                <td data-col="defendant">{{ $row->defendantName }} {{ $row->defendantLastName }}</td>
+                                <td data-col="plaintiff">{{ ucwords(strtolower($row->plaintiffName)) }} {{ ucwords(strtolower($row->plaintiffLastName)) }}</td>
+                                <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
                                 <td data-col="status">{{ ucfirst($row->status) }}</td>
                             @elseif($type == 'certificate')
-                                <td data-col="resident">{{ $row->requesterName }}</td>
+                                <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                             @endif
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" style="text-align: center; color: #666;">No records matched the selected filters.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
 
         <footer class="footer">
+            <div class="footer-rule"></div>
+            <div class="footer-rule-thin"></div>
+
             <div class="footer-content">
-                <div>
-                    <div>Date Printed: <span id="print-date"></span></div>
+                <div class="footer-contact">
+                    <div class="footer-contact-row">
+                        <span class="dot"></span>
+                        <span>{{ \App\Models\Setting::get('contact_address', 'JX8H+H57, Yakal St, Tondo, Manila') }}</span>
+                    </div>
+                    <div class="footer-contact-row">
+                        <span class="dot"></span>
+                        <span>{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</span>
+                    </div>
                 </div>
-                <div style="text-align: right;">
-                    <div>Barangay 249, Zone 23, District II</div>
-                    <div>Page 1 of 1</div>
+
+                <div class="footer-center">
+                    <div class="footer-date-label">Date Printed</div>
+                    <div class="footer-date-value print-date-display">—</div>
+                    <div class="footer-page">Page {{ $index + 1 }} of {{ $totalPages }}</div>
+                </div>
+
+                <div class="footer-office">
+                    <div class="footer-office-name">Barangay 249</div>
+                    <div>Tondo, Manila</div>
                 </div>
             </div>
+
             <div class="confidential-notice">
-                This document is for official use only. Unauthorized reproduction is strictly prohibited.
+                &#9632;&nbsp; For Official Use Only &mdash; Unauthorized Reproduction is Strictly Prohibited &nbsp;&#9632;
             </div>
         </footer>
     </div>
+    @endforeach
 
     <script>
-        // Automatically sets the current date and time in the footer
-        const now = new Date();
-        document.getElementById('print-date').innerText = now.toLocaleString();
-
-        // Handle column visibility based on URL parameters
         document.addEventListener('DOMContentLoaded', function() {
+            // Set Print Date for all pages
+            const now = new Date();
+            const dateStr = now.toLocaleString('en-PH', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+            document.querySelectorAll('.print-date-display').forEach(el => el.innerText = dateStr);
+
+            // Handle column visibility
             const params = new URLSearchParams(window.location.search);
             const colsParam = params.get('cols');
             
             if (colsParam) {
                 const visibleCols = new Set(colsParam.split(','));
-                const table = document.querySelector('.table');
-                
-                if (table) {
-                    // Hide header columns
+                document.querySelectorAll('.table').forEach(table => {
                     const headerCells = table.querySelectorAll('thead th');
-                    headerCells.forEach((th, index) => {
-                        const isVisible = visibleCols.has(th.getAttribute('data-col') || `col_${index}`);
+                    headerCells.forEach((th, idx) => {
+                        const isVisible = visibleCols.has(th.getAttribute('data-col') || `col_${idx}`);
                         th.style.display = isVisible ? '' : 'none';
                     });
                     
-                    // Hide body columns
                     const rows = table.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         const cells = row.querySelectorAll('td');
-                        cells.forEach((td, index) => {
+                        cells.forEach((td, idx) => {
                             const dataCol = td.getAttribute('data-col');
-                            const isVisible = visibleCols.has(dataCol || `col_${index}`);
+                            const isVisible = visibleCols.has(dataCol || `col_${idx}`);
                             td.style.display = isVisible ? '' : 'none';
                         });
                     });
-                }
+                });
             }
         });
     </script>

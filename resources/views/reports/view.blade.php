@@ -111,11 +111,11 @@
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                     @endif
                                 @elseif($type == 'blotter')
-                                    <td data-col="plaintiff">{{ $row->plaintiffName }} {{ $row->plaintiffLastName }}</td>
-                                    <td data-col="defendant">{{ $row->defendantName }} {{ $row->defendantLastName }}</td>
+                                    <td data-col="plaintiff">{{ ucwords(strtolower($row->plaintiffName)) }} {{ ucwords(strtolower($row->plaintiffLastName)) }}</td>
+                                    <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
                                     <td data-col="status">{{ ucfirst($row->status) }}</td>
                                 @elseif($type == 'certificate')
-                                    <td data-col="resident">{{ $row->requesterName }}</td>
+                                    <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                 @endif
                             </tr>
