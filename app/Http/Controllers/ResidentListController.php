@@ -99,7 +99,21 @@ public function searchResidents(Request $request)
             'house_id' => 'required|exists:houses,id',
         ]);
 
+        // Check for duplicate resident (same firstName, middleName, lastName, and birthday)
+        $firstNameLower = strtolower(trim($validated['firstName']));
+        $middleNameLower = strtolower(trim($validated['middleName']));
+        $lastNameLower = strtolower(trim($validated['lastName']));
+        $birthday = $validated['birthday'];
 
+        $duplicateResident = Resident::where('firstName', $firstNameLower)
+            ->where('middleName', $middleNameLower)
+            ->where('lastName', $lastNameLower)
+            ->where('birthday', $birthday)
+            ->first();
+
+        if ($duplicateResident) {
+            return redirect()->back()->with('error', 'A resident with the same first name, middle name, last name, and birthday already exists. Please verify the information before encoding.');
+        }
 
         // Handle image upload
         if($request->hasFile('image_path')){
@@ -108,9 +122,9 @@ public function searchResidents(Request $request)
         }
 
         // Format names
-        $validated['firstName'] = strtolower(trim($validated['firstName']));
-        $validated['middleName'] = strtolower(trim($validated['middleName']));
-        $validated['lastName'] = strtolower(trim($validated['lastName']));
+        $validated['firstName'] = $firstNameLower;
+        $validated['middleName'] = $middleNameLower;
+        $validated['lastName'] = $lastNameLower;
         
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
