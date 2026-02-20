@@ -349,6 +349,61 @@
         @include('admin.admin-header', ['admin' => auth()->user()])
 
         <main class="main users chart-page" id="skip-target">
+            @php
+                $religionOptions = [
+                    'Unknown',
+                    'Roman Catholic',
+                    'Iglesia ni Cristo',
+                    'Born Again Christian',
+                    'Baptist',
+                    'Methodist',
+                    'Lutheran',
+                    'Presbyterian',
+                    'Anglican',
+                    'Seventh-day Adventist',
+                    "Jehovah's Witnesses",
+                    'Church of Christ',
+                    'Philippine Independent Church or Aglipayan Church',
+                    'Church of Jesus Christ of Latter-day Saints',
+                    'Islam',
+            
+                    'Lumad indigenous religions',
+                    'Anitism',
+                    'Buddhism',
+                    'Hinduism',
+                    'Judaism',
+                    "Baha'i Faith",
+                    'Taoism',
+                    'Confucianism',
+                    'Atheist',
+                    'Agnostic',
+                    'Non-religious',
+                ];
+
+                $educationOptions = [
+                    'Unknown',
+                    'No Formal Education',
+                    'Day Care',
+                    'Kindergarten',
+                    'Elementary Level',
+                    'Elementary Graduate',
+                    'Junior High School Level',
+                    'Junior High School Graduate',
+                    'Senior High School Level',
+                    'Senior High School Graduate',
+                    'Technical Vocational Education and Training Graduate',
+                    'TESDA Certificate holder',
+                    'College Level',
+                    'Associate Degree',
+                    "Bachelor's Degree",
+                    'Post Baccalaureate Certificate',
+                    'Professional Degree (Medicine, Law, Dentistry, Veterinary Medicine)',
+                    "Master's Degree Graduate",
+                    'Doctorate Degree Graduate',
+                    'Alternative Learning System Graduate',
+                    'Special Education',
+                ];
+            @endphp
             <div class="main-container">
                 <div class="page-header">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -581,13 +636,7 @@
                                                                             alt="Profile Picture" 
                                                                             class="img-thumbnail rounded shadow-sm"
                                                                             style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
-                                                                              @if(auth()->user()->profile_image)
-                                                                                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="img-thumbnail rounded shadow-sm"
-                                                                            style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
-                                                                                @else
-                                                                                    <img src="{{ asset('images/default_profile.jpg') }}" alt="User name" class="img-thumbnail rounded shadow-sm"
-                                                                            style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
-                                                                                @endif
+                                                                             
                                                                     </div>
                                                                 </div>
 
@@ -876,12 +925,32 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Educational Attainment</label>
-                                                                <input type="text" name="educationalAttainment" class="form-control" value="{{ old('educationalAttainment', $resident->educationalAttainment) }}" placeholder="e.g., College Graduate">
+                                                                @php
+                                                                    $selectedEducation = old('educationalAttainment', $resident->educationalAttainment ?? 'Unknown');
+                                                                    if (!in_array($selectedEducation, $educationOptions, true)) {
+                                                                        $selectedEducation = 'Unknown';
+                                                                    }
+                                                                @endphp
+                                                                <select name="educationalAttainment" class="form-select">
+                                                                    @foreach ($educationOptions as $option)
+                                                                        <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </div>
                                                         </div>
 
                                                         <label>Religion</label>
-                                                        <input type="text" name="religion" class="form-control" value="{{ old('religion', $resident->religion) }}" placeholder="e.g., Roman Catholic">
+                                                        @php
+                                                            $selectedReligion = old('religion', $resident->religion ?? 'Unknown');
+                                                            if (!in_array($selectedReligion, $religionOptions, true)) {
+                                                                $selectedReligion = 'Unknown';
+                                                            }
+                                                        @endphp
+                                                        <select name="religion" class="form-select">
+                                                            @foreach ($religionOptions as $option)
+                                                                <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endforeach
+                                                        </select>
 
                                                         <label for="age{{ $resident->id }}">Age</label>
                                                         <input type="number" id="age{{ $resident->id }}" name="age" class="form-control @error('age') is-invalid @enderror" value="{{ old('age', $resident->age) }}" placeholder="0" min="0" max="255" required readonly>
@@ -936,10 +1005,30 @@
                                                         </select>
 
                                                         <label for="educationalAttainment{{ $resident->id }}">Educational Attainment</label>
-                                                        <input type="text" id="educationalAttainment{{ $resident->id }}" name="educationalAttainment" class="form-control @error('educationalAttainment') is-invalid @enderror" value="{{ old('educationalAttainment', $resident->educationalAttainment) }}" placeholder="e.g. College Graduate">
+                                                        @php
+                                                            $selectedEducation = old('educationalAttainment', $resident->educationalAttainment ?? 'Unknown');
+                                                            if (!in_array($selectedEducation, $educationOptions, true)) {
+                                                                $selectedEducation = 'Unknown';
+                                                            }
+                                                        @endphp
+                                                        <select id="educationalAttainment{{ $resident->id }}" name="educationalAttainment" class="form-select @error('educationalAttainment') is-invalid @enderror">
+                                                            @foreach ($educationOptions as $option)
+                                                                <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endforeach
+                                                        </select>
 
                                                         <label for="religion{{ $resident->id }}">Religion</label>
-                                                        <input type="text" id="religion{{ $resident->id }}" name="religion" class="form-control @error('religion') is-invalid @enderror" value="{{ old('religion', $resident->religion) }}" placeholder="e.g. Catholic">
+                                                        @php
+                                                            $selectedReligion = old('religion', $resident->religion ?? 'Unknown');
+                                                            if (!in_array($selectedReligion, $religionOptions, true)) {
+                                                                $selectedReligion = 'Unknown';
+                                                            }
+                                                        @endphp
+                                                        <select id="religion{{ $resident->id }}" name="religion" class="form-select @error('religion') is-invalid @enderror">
+                                                            @foreach ($religionOptions as $option)
+                                                                <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endforeach
+                                                        </select>
 
                                                         <label for="headOfFamily{{ $resident->id }}">Head of Family</label>
                                                         <select id="headOfFamily{{ $resident->id }}" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
@@ -1140,16 +1229,34 @@
 
     <!-- Educational Attainment -->
     <label for="educationalAttainment">Educational Attainment</label>
-    <input type="text" id="educationalAttainment" name="educationalAttainment" class="form-control @error('educationalAttainment') is-invalid @enderror" 
-           value="{{ old('educationalAttainment') }}" placeholder="Enter Educational Attainment here">
+    @php
+        $selectedEducation = old('educationalAttainment', 'Unknown');
+        if (!in_array($selectedEducation, $educationOptions, true)) {
+            $selectedEducation = 'Unknown';
+        }
+    @endphp
+    <select id="educationalAttainment" name="educationalAttainment" class="form-select @error('educationalAttainment') is-invalid @enderror">
+        @foreach ($educationOptions as $option)
+            <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
+        @endforeach
+    </select>
     @error('educationalAttainment')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 
     <!-- Religion -->
     <label for="religion">Religion</label>
-    <input type="text" name="religion" class="form-control @error('religion') is-invalid @enderror" 
-           value="{{ old('religion') }}" placeholder="Enter Religion here">
+    @php
+        $selectedReligion = old('religion', 'Unknown');
+        if (!in_array($selectedReligion, $religionOptions, true)) {
+            $selectedReligion = 'Unknown';
+        }
+    @endphp
+    <select id="religion" name="religion" class="form-select @error('religion') is-invalid @enderror">
+        @foreach ($religionOptions as $option)
+            <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+        @endforeach
+    </select>
     @error('religion')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

@@ -1,5 +1,5 @@
 <head>
-    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
+    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
@@ -229,6 +229,7 @@
                 grid-template-columns: 1fr;
             }
         }
+
         .remarks-box {
             background-color: #f1f5f9;
             border-left: 4px solid #0d6efd;
@@ -252,6 +253,24 @@
             align-items: flex-start;
             gap: 8px;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
     </style>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -261,7 +280,6 @@
 
 <div class="page-flex">
    @include('resident.resident-sidebar', ['resident' => auth()->user()])
-   
 
     <div class="main-wrapper">
         @include('resident.resident-header', ['resident' => auth()->user()])
@@ -271,55 +289,73 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="ms-3" style="color:#000000;">My Complaints</h2>
                     <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#complaintModal">
-                        Create Complaint <i class="fa-solid fa-plus"></i>
+                        Create Complaint  <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
 
                 <!-- Modal ng Submit Complaint -->
-                <div class="modal fade" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
+                <div class="modal fade complaint-modal" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form action="{{ route('resident.submit.complaint') }}" method="POST">
+                            <form action="{{ route('resident.submit.complaint') }}" method="POST" id="complaintForm">
                                 @csrf
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="complaintModalLabel">Submit Complaint</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title" id="complaintModalLabel">
+                                        <i class="fas fa-file-alt"></i>
+                                        Submit a Complaint
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                 </div>
 
                                 <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="address" class="form-label fw-semibold">Address location</label>
+                                    <div class="form-group-wrapper">
+                                        <label for="address" class="form-label">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Incident Location
+                                        </label>
                                         <input 
                                             type="text"
                                             name="address"
                                             id="address"
                                             value="{{ old('address') }}"
-                                            class="form-control border-dark"
+                                            class="form-control"
+                                            placeholder="Enter the specific address or location of the incident"
                                             required
                                         >
                                         @error('address')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
                                         @enderror
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="details" class="form-label fw-semibold">Details of complaint</label>
+                                    <div class="form-group-wrapper">
+                                        <label for="details" class="form-label">
+                                            <i class="fas fa-pen-fancy"></i>
+                                            Complaint Details
+                                        </label>
                                         <textarea
                                             name="details"
                                             id="details"
-                                            rows="5"
-                                            class="form-control border-dark"
+                                            class="form-control"
+                                            placeholder="Please provide detailed information about your complaint, including what happened, when it occurred, and any relevant details..."
                                             required
+                                            maxlength="1000"
                                         >{{ old('details') }}</textarea>
+                                        <div class="char-counter">
+                                            <span id="charCount">0</span> / 1000 characters
+                                        </div>
                                         @error('details')
-                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button class="btn btn-primary" type="submit">Submit Complaint</button>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -327,18 +363,19 @@
                 </div>
 
                 <div class="m-4 ms-3">
-                    <div class="complaints-grid mt-3">
-                        @foreach ($myComplaints as $complaints)
-                            <div class="complaint-card">
-                                <div class="complaint-header">
-                                    <span class="complaint-id">Complaint ID: {{ $complaints->complainant_id }}</span>
-                                    <span class="complaint-date">
-                                        {{ date('M d, Y g:i A', strtotime($complaints->created_at)) }}
-                                    </span>
-                                </div>
-                                
-                                <div class="complaint-details">
-                                        <span class="remarks-label">Complaint Details</span>hr
+                    @if($myComplaints->count() > 0)
+                        <div class="complaints-grid mt-3">
+                            @foreach ($myComplaints as $complaints)
+                                <div class="complaint-card">
+                                    <div class="complaint-header">
+                                        <span class="complaint-id">Complaint ID: {{ $complaints->complainant_id }}</span>
+                                        <span class="complaint-date">
+                                            {{ date('M d, Y g:i A', strtotime($complaints->created_at)) }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="complaint-details">
+                                        <span class="remarks-label">Complaint Details</span>
                                         {{ $complaints->details }}
                                     </div>
                                     
@@ -357,9 +394,18 @@
                                             </div>
                                         @endif
                                     </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-inbox"></i>
                             </div>
-                        @endforeach
-                    </div>
+                            <div class="empty-state-text">No Complaints Yet</div>
+                            <p class="text-muted" style="margin: 0;">You haven't submitted any complaints. Create one to get started!</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </main>

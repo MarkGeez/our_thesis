@@ -238,12 +238,7 @@
                     </a>
                 </li>
 
-                <li>
-                    <a class="{{ Request::routeIs('resident.service') ? 'active' : '' }}"
-                       href="{{ route('resident.service') }}">
-                        <span class="icon"><i class="fa-solid fa-hand-holding-heart"></i></span>My Services
-                    </a>
-                </li>
+                
 
                 <li>
                     <a class="{{ Request::routeIs('resident.complaint') ? 'active' : '' }}"

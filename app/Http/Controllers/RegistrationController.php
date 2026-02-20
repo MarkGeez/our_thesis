@@ -76,6 +76,8 @@ class RegistrationController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('status', 'Registration successful! Awaiting Administrator Review to Access Our Services');
+            ->with('auth_success', $role === 'resident'
+                ? 'Registration successful. Your account is tagged for resident access. You will be directed to the Resident dashboard after login.'
+                : 'Registration successful. Your account is tagged for non-resident access. You will be directed to the Non-Resident dashboard after login.');
     }
 }
