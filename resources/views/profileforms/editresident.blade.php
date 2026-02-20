@@ -34,6 +34,62 @@
             $currentHouse = optional($resident->households->first())->house;
             $currentStreetId = optional($currentHouse)->street_id;
             $currentHouseId = optional($currentHouse)->id;
+
+            $religionOptions = [
+                'Unknown',
+                    'Not Available',
+                    'Roman Catholic',
+                    'Iglesia ni Cristo',
+                    'Born Again Christian',
+                    'Baptist',
+                    'Methodist',
+                    'Lutheran',
+                    'Presbyterian',
+                    'Anglican',
+                    'Seventh-day Adventist',
+                    "Jehovah's Witnesses",
+                    'Church of Christ',
+                    'Philippine Independent Church or Aglipayan Church',
+                    'Church of Jesus Christ of Latter-day Saints',
+                    'Islam',
+            
+                    'Lumad indigenous religions',
+                    'Anitism',
+                    'Buddhism',
+                    'Hinduism',
+                    'Judaism',
+                    "Baha'i Faith",
+                    'Taoism',
+                    'Confucianism',
+                    'Atheist',
+                    'Agnostic',
+                    'Non-religious',
+                    'Others',
+            ];
+
+            $educationOptions = [
+                'Unknown',
+                'No Formal Education',
+                'Day Care',
+                'Kindergarten',
+                'Elementary Level',
+                'Elementary Graduate',
+                'Junior High School Level',
+                'Junior High School Graduate',
+                'Senior High School Level',
+                'Senior High School Graduate',
+                'Technical Vocational Education and Training Graduate',
+                'TESDA Certificate holder',
+                'College Level',
+                'Associate Degree',
+                "Bachelor's Degree",
+                'Post Baccalaureate Certificate',
+                'Professional Degree (Medicine, Law, Dentistry, Veterinary Medicine)',
+                "Master's Degree Graduate",
+                'Doctorate Degree Graduate',
+                'Alternative Learning System Graduate',
+                'Special Education',
+            ];
         @endphp
 
         {{--  <h6 class="text-muted mb-3">Address Information</h6>--}}
@@ -117,8 +173,17 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Educational Attainment</label>
-                <input type="text" name="educationalAttainment" class="form-control form-control-lg"
-                       value="{{ old('educationalAttainment', $resident->educationalAttainment) }}">
+                @php
+                    $selectedEducation = old('educationalAttainment', $resident->educationalAttainment ?? 'Unknown');
+                    if (!in_array($selectedEducation, $educationOptions, true)) {
+                        $selectedEducation = 'Unknown';
+                    }
+                @endphp
+                <select name="educationalAttainment" class="form-select form-control-lg">
+                    @foreach ($educationOptions as $option)
+                        <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="col-md-6">
@@ -134,8 +199,17 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <label class="form-label">Religion</label>
-                <input type="text" name="religion" class="form-control form-control-lg"
-                       value="{{ old('religion', $resident->religion) }}">
+                @php
+                    $selectedReligion = old('religion', $resident->religion ?? 'Unknown');
+                    if (!in_array($selectedReligion, $religionOptions, true)) {
+                        $selectedReligion = 'Unknown';
+                    }
+                @endphp
+                <select name="religion" class="form-select form-control-lg">
+                    @foreach ($religionOptions as $option)
+                        <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
     </div>

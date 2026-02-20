@@ -237,6 +237,27 @@
             display: block;
             font-weight: bold;
         }
+        .proof-instruction {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid #6fb1ff;
+    padding: 8px 12px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.proof-instruction p {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    font-weight: normal;
+}
+
+.proof-instruction i {
+    margin-right: 5px;
+    color: #6fb1ff;
+}
     </style>
 </head>
 
@@ -320,10 +341,19 @@
 
                 <div class="mb-3">
                     <label class="form-label">Proof of Identity</label>
+                    
+                    <div class="proof-instruction">
+                        <p>
+                            <i class="fas fa-info-circle"></i> 
+                            Submit a clear photo of your valid ID or any image proof to verify your residency in Barangay 249.
+                        </p>
+                    </div>
+
                     <input type="file" accept=".jpg, .jpeg, .png" name="proofOfIdentity"
-                    id="proofOfIdentity" class="form-control">
+                        id="proofOfIdentity" class="form-control">
+                        
                     @error('proofOfIdentity')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                        <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
