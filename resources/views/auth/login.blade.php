@@ -101,6 +101,41 @@
             font-size: 0.9rem;
         }
 
+        .auth-alert {
+            border-radius: 12px;
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 0.9rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            border: 1px solid transparent;
+        }
+
+        .auth-alert i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .auth-alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #ecfdf5;
+            border-color: rgba(16, 185, 129, 0.55);
+        }
+
+        .auth-alert-error {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.55);
+        }
+
+        .auth-alert-info {
+            background: rgba(14, 165, 233, 0.2);
+            color: #f0f9ff;
+            border-color: rgba(14, 165, 233, 0.55);
+        }
+
         #textforlogin {
             font-size: 1rem;
             font-weight: normal;
@@ -138,8 +173,25 @@
         <h3>Login</h3>
         <form action="{{ route('login.attempt') }}" method="post">
             @csrf
-            @if(session('status'))
-                <div class="bg-warning text-dark small mb-2 rounded p-2">{{ session('status') }}</div>
+            @if(session('auth_success'))
+                <div class="auth-alert auth-alert-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>{{ session('auth_success') }}</div>
+                </div>
+            @endif
+
+            @if(session('auth_error'))
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div>{{ session('auth_error') }}</div>
+                </div>
+            @endif
+
+            @if(session('status') && !session('auth_success') && !session('auth_error'))
+                <div class="auth-alert auth-alert-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>{{ session('status') }}</div>
+                </div>
             @endif
 
             <div class="input-with-icon">
