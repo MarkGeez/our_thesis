@@ -38,7 +38,12 @@ public function generatePopulation(Request $request)
         'birthday_to' => 'nullable|date_format:Y-m-d',
     ]);
 
-    $query = Resident::query();
+    $query = \App\Models\Resident::query()
+        ->leftJoin('household_resident', 'residents.id', '=', 'household_resident.resident_id')
+        ->leftJoin('households', 'household_resident.household_id', '=', 'households.id')
+        ->leftJoin('houses', 'households.house_id', '=', 'houses.id')
+        ->leftJoin('streets', 'houses.street_id', '=', 'streets.id')
+        ->select('residents.*', 'streets.street_name as street_name', 'houses.house_no as house_no');
 
     // backward compatibility for old 'filter' parameter
     if (!$request->filled('age_group') && $request->filled('filter')) {
@@ -72,7 +77,7 @@ public function generatePopulation(Request $request)
 
     // Street
     if ($request->filled('street')) {
-        $query->where('street', $request->street);
+        $query->where('streets.street_name', $request->street);
     }
 
     // Parent status
@@ -194,7 +199,12 @@ public function view($id)
     $filters = json_decode($report->filters_used, true);
 
     if ($report->report_type == 'population') {
-        $query = Resident::query();
+        $query = \App\Models\Resident::query()
+            ->leftJoin('household_resident', 'residents.id', '=', 'household_resident.resident_id')
+            ->leftJoin('households', 'household_resident.household_id', '=', 'households.id')
+            ->leftJoin('houses', 'households.house_id', '=', 'houses.id')
+            ->leftJoin('streets', 'houses.street_id', '=', 'streets.id')
+            ->select('residents.*', 'streets.street_name as street_name', 'houses.house_no as house_no');
 
         // backward compatibility: old reports used 'filter' => 'senior'
         if (empty($filters['age_group']) && isset($filters['filter']) && $filters['filter'] === 'senior') {
@@ -224,7 +234,7 @@ public function view($id)
         }
 
         if (!empty($filters['street'])) {
-            $query->where('street', $filters['street']);
+            $query->where('streets.street_name', $filters['street']);
         }
 
         if (!empty($filters['parent'])) {
