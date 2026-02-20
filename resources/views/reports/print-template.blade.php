@@ -249,6 +249,12 @@
 
     @php 
         $type = strtolower($report->report_type);
+        $filtersUsed = is_array($report->filters_used)
+            ? $report->filters_used
+            : (json_decode($report->filters_used, true) ?? []);
+        $householdScope = ($type === 'household' && (($filtersUsed['report_scope'] ?? 'summary') === 'family_members'))
+            ? 'family_members'
+            : 'summary';
         $allData = collect($data);
         $chunks = $allData->chunk(25);
         $totalPages = count($chunks);
@@ -325,10 +331,23 @@
                     $stats[] = ['label' => 'Not A Parent', 'value' => $notParentCount, 'color' => 'black'];
                 }
             }
+        } elseif ($type === 'household') {
+            if ($householdScope === 'family_members') {
+                $stats[] = ['label' => 'Tagged Members', 'value' => $allData->count(), 'color' => 'black'];
+                $stats[] = ['label' => 'Families (Heads)', 'value' => $allData->pluck('encoded_by')->filter()->unique()->count(), 'color' => 'black'];
+                $stats[] = ['label' => 'Houses Covered', 'value' => $allData->pluck('household.house_id')->filter()->unique()->count(), 'color' => 'black'];
+                $stats[] = ['label' => 'Streets Covered', 'value' => $allData->pluck('household.house.street.street_name')->filter()->unique()->count(), 'color' => 'black'];
+            } else {
+                $stats[] = ['label' => 'Total Households', 'value' => $allData->count(), 'color' => 'black'];
+                $stats[] = ['label' => 'Total House Heads', 'value' => $allData->sum(fn($r) => (int) ($r->head_count ?? 0)), 'color' => 'black'];
+                $stats[] = ['label' => 'Family Members', 'value' => $allData->sum(fn($r) => (int) ($r->family_members_count ?? 0)), 'color' => 'black'];
+                $stats[] = ['label' => 'Houses Covered', 'value' => $allData->pluck('house_id')->filter()->unique()->count(), 'color' => 'black'];
+                $stats[] = ['label' => 'Streets Covered', 'value' => $allData->pluck('house.street.street_name')->filter()->unique()->count(), 'color' => 'black'];
+            }
         }
 
         // Remove zero-value stats (cleaner output)
-        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || $s['label'] === 'Total Cases' || $s['label'] === 'Total Requests' || $s['label'] === 'Total Residents');
+        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Residents', 'Total Households']));
     @endphp
 
     @foreach($chunks as $index => $rowChunk)
@@ -393,6 +412,18 @@
                             <th data-col="certificate_type">Certificate Type</th>
                             <th data-col="certificate_status">Status</th>
                             <th data-col="certificate_date">Date</th>
+                        @elseif($type == 'household' && $householdScope === 'family_members')
+                            <th data-col="house_head">House Head</th>
+                            <th data-col="family_member">Family Member</th>
+                            <th data-col="relationship">Relationship</th>
+                            <th data-col="street">Street</th>
+                            <th data-col="house_no">House No.</th>
+                        @elseif($type == 'household')
+                            <th data-col="household_id">Household ID</th>
+                            <th data-col="house_heads">House Head(s)</th>
+                            <th data-col="street">Street</th>
+                            <th data-col="house_no">House No.</th>
+                            <th data-col="family_members">Family Members</th>
                         @endif
                     </tr>
                 </thead>
@@ -418,6 +449,31 @@
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                 <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
                                 <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                            @elseif($type == 'household' && $householdScope === 'family_members')
+                                <td data-col="house_head">
+                                    {{ trim(ucwords(strtolower(($row->user->firstName ?? '') . ' ' . ($row->user->middleName ?? '') . ' ' . ($row->user->lastName ?? '')))) ?: 'N/A' }}
+                                </td>
+                                <td data-col="family_member">
+                                    {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
+                                </td>
+                                <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
+                                <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
+                                <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
+                            @elseif($type == 'household')
+                                @php
+                                    $houseHeads = $row->residents
+                                        ->filter(fn($r) => (bool) data_get($r, 'pivot.is_household_head'))
+                                        ->map(function ($r) {
+                                            return trim(ucwords(strtolower(($r->firstName ?? '') . ' ' . ($r->middleName ?? '') . ' ' . ($r->lastName ?? ''))));
+                                        })
+                                        ->filter()
+                                        ->values();
+                                @endphp
+                                <td data-col="household_id">{{ $row->id }}</td>
+                                <td data-col="house_heads">{{ $houseHeads->isNotEmpty() ? $houseHeads->implode(', ') : 'N/A' }}</td>
+                                <td data-col="street">{{ $row->house->street->street_name ?? 'N/A' }}</td>
+                                <td data-col="house_no">{{ $row->house->house_no ?? 'N/A' }}</td>
+                                <td data-col="family_members">{{ number_format((int) ($row->family_members_count ?? 0)) }}</td>
                             @endif
                         </tr>
                     @endforeach

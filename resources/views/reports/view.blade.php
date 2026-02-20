@@ -20,6 +20,7 @@
     .col-check:hover { background: #f1f5f9; }
     .col-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
     .col-actions .btn { border-radius: 10px; }
+    .sort-controls { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; }
 </style>
 
 <div class="report-view-container">
@@ -48,7 +49,11 @@
 
         <div class="card-body p-4">
             @if($report->filters_used)
-                @php $used = json_decode($report->filters_used, true); @endphp
+                @php
+                    $used = is_array($report->filters_used)
+                        ? $report->filters_used
+                        : (json_decode($report->filters_used, true) ?? []);
+                @endphp
                 <div class="filter-box mb-4">
                     <div class="fw-semibold mb-2">Applied Filters</div>
                     @foreach($used as $key => $val)
@@ -61,7 +66,12 @@
                 </div>
             @endif
 
-            @php $type = strtolower($report->report_type); @endphp
+            @php
+                $type = strtolower($report->report_type);
+                $householdScope = ($type === 'household' && (($used['report_scope'] ?? 'summary') === 'family_members'))
+                    ? 'family_members'
+                    : 'summary';
+            @endphp
 
             <div class="col-controls mb-3 no-print" id="colControls">
                 <div class="col-controls-title">Show or hide columns</div>
@@ -72,6 +82,36 @@
                     <button type="button" class="btn btn-primary btn-sm" id="btnColsApply">Apply</button>
                 </div>
             </div>
+            @if($type === 'household')
+                <div class="sort-controls mb-3 no-print">
+                    <div class="col-controls-title">Sort Household View</div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Sort By</label>
+                            <select id="householdSortBy" class="form-select form-select-sm">
+                                <option value="letter">By Letter</option>
+                                <option value="house_head">By House Head</option>
+                                <option value="street">Street</option>
+                                <option value="house_no">House No.</option>
+                                @if($householdScope === 'family_members')
+                                    <option value="relationship">Relationship</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Order</label>
+                            <select id="householdSortOrder" class="form-select form-select-sm">
+                                <option value="asc">A - Z</option>
+                                <option value="desc">Z - A</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button type="button" class="btn btn-primary btn-sm" id="btnHouseholdSortApply">Apply Sort</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnHouseholdSortReset">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle" id="reportTable">
@@ -96,6 +136,18 @@
                                 <th data-col="certificate_type">Certificate Type</th>
                                 <th data-col="certificate_status">Status</th>
                                 <th data-col="certificate_date">Date</th>
+                            @elseif($type == 'household' && $householdScope === 'family_members')
+                                <th data-col="house_head">House Head</th>
+                                <th data-col="family_member">Family Member</th>
+                                <th data-col="relationship">Relationship</th>
+                                <th data-col="street">Street</th>
+                                <th data-col="house_no">House No.</th>
+                            @elseif($type == 'household')
+                                <th data-col="household_id">Household ID</th>
+                                <th data-col="house_heads">House Head(s)</th>
+                                <th data-col="street">Street</th>
+                                <th data-col="house_no">House No.</th>
+                                <th data-col="family_members">Family Members</th>
                             @endif
                         </tr>
                     </thead>
@@ -121,6 +173,31 @@
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                     <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
                                     <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                                @elseif($type == 'household' && $householdScope === 'family_members')
+                                    <td data-col="house_head">
+                                        {{ trim(ucwords(strtolower(($row->user->firstName ?? '') . ' ' . ($row->user->middleName ?? '') . ' ' . ($row->user->lastName ?? '')))) ?: 'N/A' }}
+                                    </td>
+                                    <td data-col="family_member">
+                                        {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
+                                    </td>
+                                    <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
+                                    <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
+                                    <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
+                                @elseif($type == 'household')
+                                    @php
+                                        $houseHeads = $row->residents
+                                            ->filter(fn($r) => (bool) data_get($r, 'pivot.is_household_head'))
+                                            ->map(function ($r) {
+                                                return trim(ucwords(strtolower(($r->firstName ?? '') . ' ' . ($r->middleName ?? '') . ' ' . ($r->lastName ?? ''))));
+                                            })
+                                            ->filter()
+                                            ->values();
+                                    @endphp
+                                    <td data-col="household_id">{{ $row->id }}</td>
+                                    <td data-col="house_heads">{{ $houseHeads->isNotEmpty() ? $houseHeads->implode(', ') : 'N/A' }}</td>
+                                    <td data-col="street">{{ $row->house->street->street_name ?? 'N/A' }}</td>
+                                    <td data-col="house_no">{{ $row->house->house_no ?? 'N/A' }}</td>
+                                    <td data-col="family_members">{{ number_format((int) ($row->family_members_count ?? 0)) }}</td>
                                 @endif
                             </tr>
                         @empty
@@ -138,12 +215,17 @@
 <script>
     (function () {
         const reportType = @json(strtolower($report->report_type));
-        const storageKey = "report_cols_visible_" + reportType;
+        const householdScope = @json(($householdScope ?? 'summary'));
+        const storageKey = "report_cols_visible_" + reportType + (reportType === "household" ? "_" + householdScope : "");
         const table = document.getElementById("reportTable");
         const grid = document.getElementById("colCheckboxGrid");
         const btnAll = document.getElementById("btnColsAll");
         const btnNone = document.getElementById("btnColsNone");
         const btnApply = document.getElementById("btnColsApply");
+        const householdSortBy = document.getElementById("householdSortBy");
+        const householdSortOrder = document.getElementById("householdSortOrder");
+        const btnHouseholdSortApply = document.getElementById("btnHouseholdSortApply");
+        const btnHouseholdSortReset = document.getElementById("btnHouseholdSortReset");
 
         if (!table || !grid) return;
 
@@ -208,6 +290,55 @@
         renderChecks(saved);
         applySelected(Array.isArray(saved) && saved.length > 0 ? saved : columns.map(c => c.key));
 
+        function getCellText(row, colKey) {
+            const cell = row.querySelector(`td[data-col="${colKey}"]`);
+            return ((cell && cell.textContent) ? cell.textContent : "").trim();
+        }
+
+        const sortableRows = Array.from(table.querySelectorAll("tbody tr"))
+            .filter(row => row.querySelector("td[data-col]"));
+        sortableRows.forEach((row, idx) => {
+            row.dataset.originalIndex = String(idx);
+        });
+
+        function sortHouseholdRows(sortBy, sortOrder) {
+            if (reportType !== "household" || sortableRows.length === 0) return;
+
+            const rows = Array.from(sortableRows);
+            if (!sortBy) {
+                rows.sort((a, b) => Number(a.dataset.originalIndex) - Number(b.dataset.originalIndex));
+            } else {
+                rows.sort((a, b) => {
+                    let aVal = "";
+                    let bVal = "";
+
+                    if (sortBy === "house_head") {
+                        const headCol = householdScope === "family_members" ? "house_head" : "house_heads";
+                        aVal = getCellText(a, headCol);
+                        bVal = getCellText(b, headCol);
+                    } else if (sortBy === "street") {
+                        aVal = getCellText(a, "street");
+                        bVal = getCellText(b, "street");
+                    } else if (sortBy === "house_no") {
+                        aVal = getCellText(a, "house_no");
+                        bVal = getCellText(b, "house_no");
+                    } else if (sortBy === "relationship") {
+                        aVal = getCellText(a, "relationship");
+                        bVal = getCellText(b, "relationship");
+                    } else {
+                        aVal = getCellText(a, "street");
+                        bVal = getCellText(b, "street");
+                    }
+
+                    const cmp = aVal.localeCompare(bVal, undefined, { sensitivity: "base", numeric: true });
+                    return sortOrder === "desc" ? -cmp : cmp;
+                });
+            }
+
+            const tbody = table.querySelector("tbody");
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
         if (btnAll) btnAll.addEventListener("click", () => setAllChecks(true));
         if (btnNone) btnNone.addEventListener("click", () => setAllChecks(false));
         if (btnApply) {
@@ -221,6 +352,21 @@
                 }
                 saveSelected(selected);
                 applySelected(selected);
+            });
+        }
+
+        if (btnHouseholdSortApply) {
+            btnHouseholdSortApply.addEventListener("click", () => {
+                sortHouseholdRows(
+                    householdSortBy ? householdSortBy.value : "letter",
+                    householdSortOrder ? householdSortOrder.value : "asc"
+                );
+            });
+        }
+
+        if (btnHouseholdSortReset) {
+            btnHouseholdSortReset.addEventListener("click", () => {
+                sortHouseholdRows("", "asc");
             });
         }
     })();

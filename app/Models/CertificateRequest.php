@@ -53,9 +53,7 @@ class CertificateRequest extends Model
         }
         $u = $this->user;
         return trim("{$u->firstName} {$u->middleName} {$u->lastName}");
-    }
-
-    public function getRequesterAddressAttribute(): string
+    }    public function getRequesterAddressAttribute(): string
     {
         if ($this->resident) {
             return trim("{$this->resident->houseNo} {$this->resident->street}");
