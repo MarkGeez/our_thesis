@@ -81,9 +81,23 @@ class AdminController extends Controller
         $search = trim((string) request('search', ''));
         $sort = (string) request('sort', 'date_desc');
         $statusFilter = (string) request('status_filter', 'all');
+        $certificateTypeFilter = (string) request('certificate_type_filter', 'all');
         $activeTab = request('tab', 'all');
         if (!in_array($activeTab, ['all', 'pending', 'approved', 'declined'], true)) {
             $activeTab = 'all';
+        }
+
+        $certificateTypeOptions = CertificateRequest::query()
+            ->select('certificate_type')
+            ->whereNotNull('certificate_type')
+            ->distinct()
+            ->orderBy('certificate_type')
+            ->pluck('certificate_type')
+            ->filter()
+            ->values();
+
+        if ($certificateTypeFilter !== 'all' && !$certificateTypeOptions->contains($certificateTypeFilter)) {
+            $certificateTypeFilter = 'all';
         }
 
         $baseQuery = CertificateRequest::with([
@@ -92,7 +106,7 @@ class AdminController extends Controller
             'approver:id,firstName,middleName,lastName'
         ]);
 
-        $applyCommonFilters = function ($query) use ($search, $sort, $statusFilter, $activeTab) {
+        $applyCommonFilters = function ($query) use ($search, $sort, $statusFilter, $activeTab, $certificateTypeFilter) {
             if ($search !== '') {
                 $query->where(function ($q) use ($search) {
                     $q->where('id', 'like', '%' . $search . '%')
@@ -112,6 +126,10 @@ class AdminController extends Controller
 
             if ($activeTab === 'all' && $statusFilter !== 'all') {
                 $query->where('status', $statusFilter);
+            }
+
+            if ($certificateTypeFilter !== 'all') {
+                $query->where('certificate_type', $certificateTypeFilter);
             }
 
             switch ($sort) {
@@ -180,7 +198,9 @@ class AdminController extends Controller
             'requestStats',
             'search',
             'sort',
-            'statusFilter'
+            'statusFilter',
+            'certificateTypeFilter',
+            'certificateTypeOptions'
         ));
     }
 

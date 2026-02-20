@@ -746,16 +746,16 @@
                 <!-- Tab Content -->
                 <div class="tab-content" id="certTabContent">
                     <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'all' ? 'show active' : '' }}" id="all" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'all'])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $requests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'all', 'certificateTypeOptions' => $certificateTypeOptions ?? collect()])
                     </div>
                     <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'pending' ? 'show active' : '' }}" id="pending" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $pendingRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'pending'])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $pendingRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'pending', 'certificateTypeOptions' => $certificateTypeOptions ?? collect()])
                     </div>
                     <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'approved' ? 'show active' : '' }}" id="approved" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $approvedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'approved'])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $approvedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'approved', 'certificateTypeOptions' => $certificateTypeOptions ?? collect()])
                     </div>
                     <div class="tab-pane fade {{ ($activeTab ?? 'all') === 'declined' ? 'show active' : '' }}" id="declined" role="tabpanel">
-                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $declinedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'declined'])
+                        @include('admin.partials.certificate-requests-table', ['filteredRequests' => $declinedRequests, 'requestStats' => $requestStats ?? collect(), 'tab' => 'declined', 'certificateTypeOptions' => $certificateTypeOptions ?? collect()])
                     </div>
                 </div>
             </div>

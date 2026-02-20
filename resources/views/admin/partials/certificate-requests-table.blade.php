@@ -45,6 +45,13 @@
 @php
     $filteredRequests = $filteredRequests ?? collect();
     $tab = $tab ?? 'all';
+    $certificateTypeOptions = collect($certificateTypeOptions ?? [])->filter()->unique()->values();
+    $typeLabelMap = [
+        'bonafide' => 'Bonafide',
+        'indigency' => 'Indigency',
+        'soloparent' => 'Solo Parent',
+        'senior' => 'Senior Citizen',
+    ];
 @endphp
 @if($filteredRequests->isEmpty())
     <div class="alert alert-info">No certificate requests in this category.</div>
@@ -80,6 +87,18 @@
                 </select>
             </div>
         @endif
+
+        <div class="filter-group">
+            <span class="filter-label d-none d-md-inline">Certificate:</span>
+            <select name="certificate_type_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="all" {{ request('certificate_type_filter', 'all') === 'all' ? 'selected' : '' }}>All Types</option>
+                @foreach($certificateTypeOptions as $certificateType)
+                    <option value="{{ $certificateType }}" {{ request('certificate_type_filter') === $certificateType ? 'selected' : '' }}>
+                        {{ $typeLabelMap[$certificateType] ?? ucwords(str_replace('_', ' ', $certificateType)) }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
         <div class="filter-group">
             <span class="filter-label d-none d-md-inline">Sort:</span>
@@ -167,23 +186,34 @@
                     </td>
                     <td>{{ $request->created_at->format('M d, Y H:i') }}</td>
                     <td class="text-center">
-                        <div class="d-flex flex-wrap justify-content-center gap-2 action-btns">
-                            @if($request->status === 'pending')
-                                <form action="{{ route('admin.certificate.approve', $request->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Approve this certificate request?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check me-1"></i>Approve</button>
-                                </form>
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal" data-reject-id="{{ $request->id }}"><i class="fas fa-times me-1"></i>Reject</button>
-                            @endif
-                            @if($request->status === 'approved')
-                                <button type="button" class="btn btn-sm btn-info text-white" data-preview-id="{{ $request->id }}"><i class="fas fa-print me-1"></i>Generate Certificate</button>
-                                {{--<a href="{{ route('admin.certificate.generate', $request->id) }}" target="_blank" class="btn btn-sm btn-primary"><i class="fas fa-print me-1"></i>Print</a>--}}
-                            @endif
-                            @if($request->status === 'declined' && $request->decline_reason)
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#declineReasonModal" data-reason="{{ $request->decline_reason }}">Reason</button>
-                            @endif
-                        </div>
-                    </td>
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 action-btns">
+        @if($request->status === 'pending')
+            {{-- Added d-inline-block to the form to prevent it from affecting height --}}
+            <form action="{{ route('admin.certificate.approve', $request->id) }}" method="POST" class="d-inline-block m-0" onsubmit="return confirm('Approve this certificate request?');">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="fas fa-check me-1"></i>Approve
+                </button>
+            </form>
+            
+            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal" data-reject-id="{{ $request->id }}">
+                <i class="fas fa-times me-1"></i>Reject
+            </button>
+        @endif
+
+        @if($request->status === 'approved')
+            <button type="button" class="btn btn-sm btn-info text-white" data-preview-id="{{ $request->id }}">
+                <i class="fas fa-print me-1"></i>Generate Certificate
+            </button>
+        @endif
+
+        @if($request->status === 'declined' && $request->decline_reason)
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#declineReasonModal" data-reason="{{ $request->decline_reason }}">
+                Reason
+            </button>
+        @endif
+    </div>
+</td>
                 </tr>
                 @endforeach
             </tbody>
