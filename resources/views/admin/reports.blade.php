@@ -471,9 +471,7 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-=======
 
 <script>
     // Report Type Selection
@@ -627,7 +625,6 @@
         const formData = new FormData();
         formData.append('date_from', document.getElementById('dateFrom').value);
         formData.append('date_to', document.getElementById('dateTo').value);
-
         // Add report-specific filters
         switch(reportType) {
             case 'blotter':
@@ -653,15 +650,15 @@
                 formData.append('street', document.getElementById('streetName').value);
                 break;
         }
-
+        /*
         const endpointMap = {
             'blotter': '{{ route("admin.reports.blotter") }}',
             'certificate': '{{ route("admin.reports.certificate") }}',
-            'active_log': '{{ route("admin.reports.active-log") }}',
-            'population': '{{ route("admin.reports.population") }}',
-            'household': '{{ route("admin.reports.household") }}'
+            'active_log': '{{-- route("admin.reports.active-log") --}}',
+            'population': '{{-- route("admin.reports.population") --}}',
+            'household': '{{-- route("admin.reports.household") --}}'
         };
-
+        */
         fetch(endpointMap[reportType], {
             method: 'POST',
             body: formData,
@@ -791,13 +788,14 @@
     }
 
     function exportToPdf(reportType) {
-        const endpointMap = {
+        /*const endpointMap = {
             'blotter': '{{ route("admin.reports.blotter") }}',
             'certificate': '{{ route("admin.reports.certificate") }}',
-            'active_log': '{{ route("admin.reports.active-log") }}',
-            'population': '{{ route("admin.reports.population") }}',
-            'household': '{{ route("admin.reports.household") }}'
-        };
+                        'active_log': '{{-- route("admin.reports.active-log") --}}',
+            'population': '{{-- route("admin.reports.population") --}}',
+            'household': '{{-- route("admin.reports.household") --}}'
+
+        }; */
 
         const payload = {
             export: 'pdf',
@@ -867,4 +865,3 @@
     document.getElementById('dateFrom').valueAsDate = new Date();
     document.getElementById('dateTo').valueAsDate = new Date();
 </script>
->>>>>>> d597613ae1fc3c3c1453b878dee7b7fc6d947438
