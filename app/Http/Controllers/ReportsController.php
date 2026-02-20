@@ -139,11 +139,36 @@ public function generateCertificate(Request $request)
 {
     $request->validate([
         'report_name' => 'required',
+        'certificate_status' => 'required|in:All,Pending,Approved,Declined',
+        'certificate_type' => 'required|in:All,bonafide,indigency,soloparent,senior,Bonafide,Indigency,Solo-Parent,Senior',
         'date_from' => 'required|date',
         'date_to' => 'required|date'
     ]);
 
-    $query = CertificateRequest::where('status', 'picked_up');
+    $query = CertificateRequest::with(['user:id,firstName,middleName,lastName', 'resident:id,firstName,middleName,lastName']);
+
+    // Normalize certificate status (map display values to database values)
+    if ($request->certificate_status !== 'All') {
+        $statusMap = [
+            'Pending' => 'pending',
+            'Approved' => 'approved',
+            'Declined' => 'declined'
+        ];
+        $status = $statusMap[$request->certificate_status] ?? strtolower($request->certificate_status);
+        $query->where('status', $status);
+    }
+
+    // Normalize certificate type (map display values to database values)
+    if ($request->certificate_type !== 'All') {
+        $typeMap = [
+            'Bonafide' => 'bonafide',
+            'Indigency' => 'indigency',
+            'Solo-Parent' => 'soloparent',
+            'Senior' => 'senior'
+        ];
+        $type = $typeMap[$request->certificate_type] ?? strtolower($request->certificate_type);
+        $query->where('certificate_type', $type);
+    }
 
     $query->whereBetween('created_at', [
         $request->date_from,
@@ -228,11 +253,40 @@ public function view($id)
     }
 
     if ($report->report_type == 'certificate') {
-        $data = CertificateRequest::where('status', 'picked_up')
-            ->whereBetween('created_at', [
+        $query = CertificateRequest::with(['user:id,firstName,middleName,lastName', 'resident:id,firstName,middleName,lastName']);
+
+        // Apply status filter
+        if (!empty($filters['certificate_status']) && $filters['certificate_status'] !== 'All') {
+            $statusMap = [
+                'Pending' => 'pending',
+                'Approved' => 'approved',
+                'Declined' => 'declined'
+            ];
+            $status = $statusMap[$filters['certificate_status']] ?? strtolower($filters['certificate_status']);
+            $query->where('status', $status);
+        }
+
+        // Apply type filter
+        if (!empty($filters['certificate_type']) && $filters['certificate_type'] !== 'All') {
+            $typeMap = [
+                'Bonafide' => 'bonafide',
+                'Indigency' => 'indigency',
+                'Solo-Parent' => 'soloparent',
+                'Senior' => 'senior'
+            ];
+            $type = $typeMap[$filters['certificate_type']] ?? strtolower($filters['certificate_type']);
+            $query->where('certificate_type', $type);
+        }
+
+        // Apply date range filter
+        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+            $query->whereBetween('created_at', [
                 $filters['date_from'],
                 $filters['date_to']
-            ])->get();
+            ]);
+        }
+
+        $data = $query->get();
     }
 
     // also pass list so admin wrapper can render index
@@ -307,11 +361,40 @@ public function printTemplate($id)
     }
 
     if ($report->report_type == 'certificate') {
-        $data = CertificateRequest::where('status', 'picked_up')
-            ->whereBetween('created_at', [
+        $query = CertificateRequest::with(['user:id,firstName,middleName,lastName', 'resident:id,firstName,middleName,lastName']);
+
+        // Apply status filter
+        if (!empty($filters['certificate_status']) && $filters['certificate_status'] !== 'All') {
+            $statusMap = [
+                'Pending' => 'pending',
+                'Approved' => 'approved',
+                'Declined' => 'declined'
+            ];
+            $status = $statusMap[$filters['certificate_status']] ?? strtolower($filters['certificate_status']);
+            $query->where('status', $status);
+        }
+
+        // Apply type filter
+        if (!empty($filters['certificate_type']) && $filters['certificate_type'] !== 'All') {
+            $typeMap = [
+                'Bonafide' => 'bonafide',
+                'Indigency' => 'indigency',
+                'Solo-Parent' => 'soloparent',
+                'Senior' => 'senior'
+            ];
+            $type = $typeMap[$filters['certificate_type']] ?? strtolower($filters['certificate_type']);
+            $query->where('certificate_type', $type);
+        }
+
+        // Apply date range filter
+        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+            $query->whereBetween('created_at', [
                 $filters['date_from'],
                 $filters['date_to']
-            ])->get();
+            ]);
+        }
+
+        $data = $query->get();
     }
 
     return view('reports.print-template', compact('report', 'data'));

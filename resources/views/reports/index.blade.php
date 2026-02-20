@@ -482,6 +482,28 @@
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
                             <input type="text" name="report_name" class="form-control" required>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Certificate Status <span class="text-danger">*</span></label>
+                            <select type="text" name="certificate_status" class="form-control" required>
+                                <option value="">-- Select Status --</option>
+                                <option value="All" selected>All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Declined">Declined</option>
+                                <option value="Approved">Approved</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Certificate Type <span class="text-danger">*</span></label>
+                            <select type="text" name="certificate_type" class="form-control" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="All" selected>All Types</option>
+                                <option value="Bonafide">Bonafide</option>
+                                <option value="Indigency">Indigency</option>
+                                <option value="Solo-Parent">Solo-Parent</option>
+                                <option value="Senior">Senior</option>
+                                
+                            </select>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-danger">*</span></label>
                             <input type="date" name="date_from" class="form-control" required>
@@ -491,7 +513,7 @@
                             <input type="date" name="date_to" class="form-control" required>
                         </div>
                         <div class="col-12">
-                            <small class="text-muted">Only certificate requests with picked up status are included.</small>
+                            <small class="text-muted">Only certificate requests with selected status are included.</small>
                         </div>
                     </div>
                 </div>
