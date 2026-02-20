@@ -524,19 +524,19 @@
                                                 <div class="modal-body p-4">
                                                     <label class="fw-bold mb-3 d-block">Select New Status</label>
                                                     <div class="btn-group w-100 mb-4" role="group">
-                                                        <input type="radio" class="btn-check" name="status" id="res{{ $complaint->id }}" value="resolved" {{ $complaint->status == 'resolved' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="res{{ $complaint->id }}" value="resolved" required>
                                                         <label class="btn btn-outline-success" for="res{{ $complaint->id }}">Resolved</label>
 
-                                                        <input type="radio" class="btn-check" name="status" id="on{{ $complaint->id }}" value="on-going" {{ $complaint->status == 'on-going' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="on{{ $complaint->id }}" value="on-going" required>
                                                         <label class="btn btn-outline-warning" for="on{{ $complaint->id }}">On-going</label>
 
-                                                        <input type="radio" class="btn-check" name="status" id="rej{{ $complaint->id }}" value="rejected" {{ $complaint->status == 'rejected' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="rej{{ $complaint->id }}" value="rejected" required>
                                                         <label class="btn btn-outline-danger" for="rej{{ $complaint->id }}">Rejected</label>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label class="fw-bold mb-2">Internal Remarks</label>
-                                                        <textarea name="remarks" class="form-control" rows="4" placeholder="Enter resolution details...">{{ old('remarks', $complaint->remarks) }}</textarea>
+                                                        <textarea name="remarks" class="form-control complaint-remarks-input" rows="4" placeholder="Select a status first, then enter resolution details..." disabled></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -584,4 +584,33 @@
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const actionModals = document.querySelectorAll('[id^="complaintActionModal"]');
+
+        actionModals.forEach(function (modalEl) {
+            const statusRadios = modalEl.querySelectorAll('.complaint-status-radio');
+            const remarksInput = modalEl.querySelector('.complaint-remarks-input');
+
+            if (!remarksInput || statusRadios.length === 0) return;
+
+            const syncRemarksState = function () {
+                const hasSelectedStatus = Array.from(statusRadios).some(radio => radio.checked);
+                remarksInput.disabled = !hasSelectedStatus;
+                if (hasSelectedStatus) {
+                    remarksInput.placeholder = 'Enter resolution details...';
+                } else {
+                    remarksInput.placeholder = 'Select a status first, then enter resolution details...';
+                }
+            };
+
+            statusRadios.forEach(function (radio) {
+                radio.addEventListener('change', syncRemarksState);
+            });
+
+            modalEl.addEventListener('shown.bs.modal', syncRemarksState);
+            syncRemarksState();
+        });
+    });
+</script>
 
