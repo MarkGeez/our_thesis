@@ -56,9 +56,8 @@ class ResidentController extends Controller
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ];
 
-        // If password change is attempted, validate current password and new password
+        // If password change is attempted, validate only the new password + confirmation
         if ($request->filled('password')) {
-            $rules['current_password'] = 'required|current_password';
             $rules['password'] = 'required|min:8|confirmed';
         }
 
