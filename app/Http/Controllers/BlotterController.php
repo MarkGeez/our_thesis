@@ -83,7 +83,8 @@ class BlotterController extends Controller
         }
 
         $blotters = $query->paginate(10)->appends($request->query());
-        return view('admin.Blotter', compact('blotters', 'search', 'statusFilter', 'sort'));
+        $statusLabels = self::getStatusLabels();
+        return view('admin.Blotter', compact('blotters', 'search', 'statusFilter', 'sort', 'statusLabels'));
     }
 
     // SHOW CREATE FORM
@@ -137,7 +138,7 @@ $blotter = Blotter::create([
 UpdateBlotter::create([
     'blotter_id' => $blotter->id,
     'status' => 'first',
-    'remarks' => 'Initial blotter record',
+    'remarks' => $request->blotterDescription,
     'updated_by' => Auth::id(),
     'photo_path' => $proofPath,
     'date' => now(),

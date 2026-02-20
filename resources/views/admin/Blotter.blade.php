@@ -483,6 +483,119 @@
             margin: 0;
         }
 
+        /* Timeline styles for status history in modal */
+        .timeline {
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #0d6efd, #79a7ff);
+            opacity: 0.35;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0.75rem 0 0.75rem 14px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -2px;
+            top: 1.1rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+            background: #0d6efd;
+        }
+
+        .timeline-body {
+            background: #f9fbff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.65rem 0.85rem;
+            box-shadow: 0 6px 12px rgba(15, 23, 42, 0.03);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .timeline-meta {
+            font-size: 0.8rem;
+            color: #6b7280;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .timeline-remarks {
+            font-size: 0.9rem;
+            color: #111827;
+            margin-bottom: 0.4rem;
+            white-space: pre-wrap;
+        }
+
+        .timeline-photo {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .timeline-photo img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .timeline-badge {
+            padding: 0.2rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .timeline-badge.pending { background: #fff7e6; color: #b45309; border: 1px solid #fde68a; }
+        .timeline-badge.ongoing { background: #e0f2fe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .timeline-badge.closed { background: #ecfdf3; color: #15803d; border: 1px solid #bbf7d0; }
+        .timeline-badge.scheduled { background: #eff6ff; color: #1e3a8a; border: 1px solid #dbeafe; }
+        .timeline-badge.cold { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+        .timeline-badge.resolved { background: #eefcf6; color: #0f766e; border: 1px solid #c5f3e5; }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #f0f0f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            background: #fff;
+        }
+
         @media (max-width: 576px) {
             .main-container {
                 margin: 0 0.75rem;
@@ -605,8 +718,8 @@
                                         <div class="filter-group">
                                             <span class="filter-label d-none d-md-inline">Sort:</span>
                                             <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Desc</option>
-                                                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Asc</option>
+                                                <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                                <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
                                                 <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
                                                 <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
                                                 <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
@@ -807,6 +920,68 @@
                                                                     </div>
                                                                 </div>
                                                             </section>
+
+                                                            @if($blotter->updates->count() > 0)
+                                                                <section>
+                                                                    <h6>Status History</h6>
+                                                                    <div class="history-list timeline">
+                                                                        @foreach ($blotter->updates as $hist)
+                                                                            @php
+                                                                                $normalized = strtolower($hist->status ?? '');
+                                                                                $badgeClass = match(true) {
+                                                                                    str_contains($normalized, 'first')      => 'pending',
+                                                                                    str_contains($normalized, 'second')     => 'pending',
+                                                                                    str_contains($normalized, 'third')      => 'pending',
+                                                                                    str_contains($normalized, 'brgyHearing')=> 'ongoing',
+                                                                                    str_contains($normalized, 'coldCase')   => 'closed',
+                                                                                    str_contains($normalized, 'criminalCase') => 'closed',
+                                                                                    default                                 => 'pending',
+                                                                                };
+                                                                            @endphp
+                                                                            <div class="timeline-item">
+                                                                                <span class="timeline-dot"></span>
+                                                                                <div class="timeline-body">
+                                                                                    <div class="timeline-header">
+                                                                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                                            @php
+                                                                                                $displayLabel = $statusLabels[$hist->status] ?? ucwords(str_replace('_', ' ', $hist->status));
+                                                                                            @endphp
+                                                                                            <span class="timeline-badge {{ $badgeClass }}">{{ $displayLabel }}</span>
+                                                                                        </div>
+                                                                                        <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
+                                                                                    </div>
+                                                                                    <div class="timeline-remarks">{{ $hist->remarks }}</div>
+                                                                                    @php
+                                                                                        $updaterName = null;
+                                                                                        if ($hist->updater) {
+                                                                                            $updaterName = trim(($hist->updater->firstName ?? '') . ' ' . ($hist->updater->lastName ?? ''));
+                                                                                            if ($updaterName === '') {
+                                                                                                $updaterName = $hist->updater->email ?? null;
+                                                                                            }
+                                                                                        }
+                                                                                    @endphp
+                                                                                    <div class="timeline-meta">
+                                                                                        <span><i class="fa fa-calendar me-1 text-primary"></i>{{ $hist->created_at->format('M d, Y h:i A') }}</span>
+                                                                                        <span><i class="fa fa-user-shield me-1 text-primary"></i>{{ ucwords($updaterName ?? 'Unknown') }}</span>
+                                                                                    </div>
+                                                                                    @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
+                                                                                        <div class="timeline-photo mt-2">
+                                                                                            <img src="{{ Storage::url($hist->photo_path) }}" 
+                                                                                                 alt="Status proof for blotter {{ $blotter->id }}"
+                                                                                                 style="cursor: pointer;"
+                                                                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')"
+                                                                                                 title="Click to view full size">
+                                                                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')">
+                                                                                                <i class="fa fa-search-plus me-1"></i>View evidence
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    @endif
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+                                                                </section>
+                                                            @endif
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
