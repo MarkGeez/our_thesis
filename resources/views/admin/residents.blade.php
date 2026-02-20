@@ -122,6 +122,23 @@
             box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
         }
 
+        .resident-date-group .input-group-text {
+            background-color: #f1f3f5;
+            border: 1.5px solid #ced4da;
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .resident-date-group > .form-control[type="date"] {
+            flex: 1 1 auto;
+            width: 1%;
+            min-width: 0;
+        }
+
         .table-container {
             padding: 2rem;
         }
@@ -564,6 +581,13 @@
                                                                             alt="Profile Picture" 
                                                                             class="img-thumbnail rounded shadow-sm"
                                                                             style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
+                                                                              @if(auth()->user()->profile_image)
+                                                                                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="img-thumbnail rounded shadow-sm"
+                                                                            style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
+                                                                                @else
+                                                                                    <img src="{{ asset('images/default_profile.jpg') }}" alt="User name" class="img-thumbnail rounded shadow-sm"
+                                                                            style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
+                                                                                @endif
                                                                     </div>
                                                                 </div>
 
@@ -789,7 +813,20 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <label>Birthday</label>
-                                                                <input type="text" name="birthday" class="form-control date-picker-edit" data-age-target="ageEdit{{ $resident->id }}" value="{{ old('birthday', $resident->birthday) }}" required>
+                                                                <div class="input-group resident-date-group w-100">
+                                                                    <input
+                                                                        type="date"
+                                                                        name="birthday"
+                                                                        class="form-control resident-date-input"
+                                                                        data-age-target="ageEdit{{ $resident->id }}"
+                                                                        data-raw="{{ old('birthday', $resident->birthday) }}"
+                                                                        value="{{ old('birthday', $resident->birthday) }}"
+                                                                        required
+                                                                    >
+                                                                    <span class="input-group-text resident-date-open">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Age</label>
@@ -986,8 +1023,21 @@
 
     <!-- Birthday -->
     <label>Birthday</label>
-    <input type="text" id="birthdayCreate" name="birthday" class="form-control date-picker @error('birthday') is-invalid @enderror" 
-           placeholder="Select Birthday" value="{{ old('birthday') }}" required>
+    <div class="input-group resident-date-group w-100">
+        <input
+            type="date"
+            id="birthdayCreate"
+            name="birthday"
+            class="form-control resident-date-input @error('birthday') is-invalid @enderror"
+            data-age-target="ageCreate"
+            data-raw="{{ old('birthday') }}"
+            value="{{ old('birthday') }}"
+            required
+        >
+        <span class="input-group-text resident-date-open">
+            <i class="fa fa-calendar"></i>
+        </span>
+    </div>
     @error('birthday')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1195,23 +1245,45 @@
             document.getElementById(targetInputId).value = age;
         }
 
-        // Initialize Flatpickr for Create Modal
-        flatpickr(".date-picker", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            onChange: function (selectedDates) {
-                if (selectedDates.length) calculateAge(selectedDates[0], "ageCreate");
-            }
+        function normalizeToYmd(raw) {
+            if (!raw) return '';
+            const d = new Date(raw);
+            if (isNaN(d)) return '';
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        function openPicker(inputEl) {
+            if (!inputEl) return;
+            if (inputEl.showPicker) inputEl.showPicker();
+            else inputEl.focus();
+        }
+
+        document.querySelectorAll('.resident-date-input').forEach(function (input) {
+            const raw = input.getAttribute('data-raw') || input.value;
+            const formatted = normalizeToYmd(raw);
+            if (formatted) input.value = formatted;
+            input.max = normalizeToYmd(new Date()) || input.max;
         });
 
-        // Initialize Flatpickr for Edit Modals
-        flatpickr(".date-picker-edit", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            onChange: function (selectedDates, dateStr, instance) {
-                const targetId = instance.element.getAttribute('data-age-target');
-                if (selectedDates.length) calculateAge(selectedDates[0], targetId);
-            }
+        document.querySelectorAll('.resident-date-open').forEach(function (trigger) {
+            trigger.addEventListener('click', function () {
+                const wrapper = trigger.closest('.input-group');
+                const input = wrapper ? wrapper.querySelector('.resident-date-input') : null;
+                openPicker(input);
+            });
+        });
+
+        document.querySelectorAll('.resident-date-input').forEach(function (input) {
+            input.addEventListener('change', function () {
+                if (!input.value) return;
+                const targetId = input.getAttribute('data-age-target');
+                if (!targetId) return;
+                const parsed = new Date(input.value);
+                if (isNaN(parsed)) return;
+                calculateAge(parsed, targetId);
+            });
         });
 
         // --- NEW: Initialize Flatpickr for Official Assignment dates ---

@@ -183,6 +183,23 @@
         box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
     }
 
+    .input-group-text {
+        background-color: #f1f3f5;
+        border: 1.5px solid #ced4da;
+        cursor: pointer;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    .input-group > .form-control[type="date"] {
+        flex: 1 1 auto;
+        width: 1%;
+        min-width: 0;
+    }
+
     @media (max-width: 768px) {
         .reports-container {
             padding: 1rem;
@@ -409,12 +426,34 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Birthday From</label>
-                            <input type="date" name="birthday_from" class="form-control" value="{{ old('birthday_from') }}">
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="birthday_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('birthday_from') }}"
+                                    data-raw="{{ old('birthday_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                             <small class="text-muted d-block mt-1">Start of birthday period (e.g., Jan 1)</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Birthday To</label>
-                            <input type="date" name="birthday_to" class="form-control" value="{{ old('birthday_to') }}">
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="birthday_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('birthday_to') }}"
+                                    data-raw="{{ old('birthday_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                             <small class="text-muted d-block mt-1">End of birthday period (e.g., Dec 31)</small>
                         </div>
                     </div>
@@ -446,11 +485,35 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-danger">*</span></label>
-                            <input type="date" name="date_from" class="form-control" required>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_from') }}"
+                                    data-raw="{{ old('date_from') }}"
+                                    required
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">To Date <span class="text-danger">*</span></label>
-                            <input type="date" name="date_to" class="form-control" required>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_to') }}"
+                                    data-raw="{{ old('date_to') }}"
+                                    required
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-12">
                             <small class="text-muted">Only blotter cases marked as finished are included.</small>
@@ -506,11 +569,35 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-danger">*</span></label>
-                            <input type="date" name="date_from" class="form-control" required>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_from') }}"
+                                    data-raw="{{ old('date_from') }}"
+                                    required
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">To Date <span class="text-danger">*</span></label>
-                            <input type="date" name="date_to" class="form-control" required>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_to') }}"
+                                    data-raw="{{ old('date_to') }}"
+                                    required
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-12">
                             <small class="text-muted">Only certificate requests with selected status are included.</small>
@@ -542,3 +629,36 @@
         });
     </script>
 @endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function normalizeToYmd(raw) {
+            if (!raw) return '';
+            const d = new Date(raw);
+            if (isNaN(d)) return '';
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        function openPicker(inputEl) {
+            if (!inputEl) return;
+            if (inputEl.showPicker) inputEl.showPicker();
+            else inputEl.focus();
+        }
+
+        document.querySelectorAll('.report-date-input').forEach(function (input) {
+            const raw = input.getAttribute('data-raw') || input.value;
+            const formatted = normalizeToYmd(raw);
+            if (formatted) input.value = formatted;
+        });
+
+        document.querySelectorAll('.report-date-open').forEach(function (trigger) {
+            trigger.addEventListener('click', function () {
+                const wrapper = trigger.closest('.input-group');
+                const input = wrapper ? wrapper.querySelector('.report-date-input') : null;
+                openPicker(input);
+            });
+        });
+    });
+</script>
