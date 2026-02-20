@@ -95,6 +95,7 @@
                                 <th data-col="resident">Resident</th>
                                 <th data-col="certificate_type">Certificate Type</th>
                                 <th data-col="certificate_status">Status</th>
+                                <th data-col="certificate_date">Date</th>
                             @endif
                         </tr>
                     </thead>
@@ -119,6 +120,7 @@
                                     <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                     <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
+                                    <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
                                 @endif
                             </tr>
                         @empty

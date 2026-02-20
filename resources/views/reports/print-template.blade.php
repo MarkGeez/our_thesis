@@ -163,6 +163,58 @@
         .footer-office { text-align: right; font-size: 8.5px; color: #444; line-height: 1.5; }
         .footer-office-name { font-weight: 700; font-size: 9px; color: var(--navy); text-transform: uppercase; }
 
+        .report-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: var(--muted);
+        }
+
+        .report-info-left {
+            text-align: left;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(3, auto);
+            justify-content: end;
+            align-content: start;
+            column-gap: 56px;
+            gap: 2px;
+            
+        }
+
+        .stat-pill {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            white-space: nowrap;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            font-size: 12px;
+            background: transparent;
+            font-weight: 400;
+            color: #334155;
+        }
+
+        .stat-pill .stat-count {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stat-pill .stat-label {
+            color: #334155;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
         .confidential-notice {
             margin-top: 5px; padding: 3px 10px;
             background: linear-gradient(90deg, #f0f4ff 0%, #e8eeff 100%);
@@ -197,9 +249,86 @@
 
     @php 
         $type = strtolower($report->report_type);
-        // Chunk the data into sets of 28 rows
-        $chunks = collect($data)->chunk(25);
+        $allData = collect($data);
+        $chunks = $allData->chunk(25);
         $totalPages = count($chunks);
+
+        // ── Stats computation ─────────────────────────────────────────────
+        $stats = [];
+
+        if ($type === 'blotter') {
+            $statusGroups = $allData->groupBy(fn($r) => strtolower($r->status ?? 'unknown'));
+            $stats[] = ['label' => 'Total Cases',     'value' => $allData->count(),                            'color' => 'black'];
+            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->get('pending',   collect())->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'Resolved',        'value' => $statusGroups->get('resolved',  collect())->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Dismissed',       'value' => $statusGroups->get('dismissed', collect())->count(), 'color' => 'slate'];
+
+        } elseif ($type === 'certificate') {
+            $statusGroups  = $allData->groupBy(fn($r) => strtolower($r->status ?? 'unknown'));
+            $stats[] = ['label' => 'Total Requests', 'value' => $allData->count(),                              'color' => 'black'];
+            $stats[] = ['label' => 'Approved',        'value' => ($statusGroups->get('approved',  collect())->count() ?: $statusGroups->get('released', collect())->count()),  'color' => 'green'];
+            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->get('pending',    collect())->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'Rejected',        'value' => $statusGroups->get('rejected',   collect())->count(), 'color' => 'red'];
+
+        } elseif ($type === 'population') {
+            $params     = request()->input('cols', '');
+            $visCols    = $params ? explode(',', $params) : [];
+            $showSex    = empty($visCols) || in_array('sex', $visCols);
+            $showParent = empty($visCols) || in_array('parent_status', $visCols);
+            $showAge    = empty($visCols) || in_array('age', $visCols);
+            $showCivil  = empty($visCols) || in_array('civil_status', $visCols);
+
+            $stats[] = ['label' => 'Total Residents', 'value' => $allData->count(), 'color' => 'black'];
+
+            if ($showSex) {
+                $sexGroups = $allData->groupBy(fn($r) => strtolower($r->sex ?? 'unknown'));
+                $stats[] = ['label' => 'Male',   'value' => ($sexGroups->get('male',   collect())->count() ?: $sexGroups->get('m', collect())->count()), 'color' => 'black'];
+                $stats[] = ['label' => 'Female', 'value' => ($sexGroups->get('female', collect())->count() ?: $sexGroups->get('f', collect())->count()), 'color' => 'black'];
+            }
+
+            if ($showAge) {
+                $minors  = $allData->filter(fn($r) => (int)($r->age ?? 0) < 18)->count();
+                $seniors = $allData->filter(fn($r) => (int)($r->age ?? 0) >= 60)->count();
+                $stats[] = ['label' => 'Minors (< 18)',    'value' => $minors,  'color' => 'black'];
+                $stats[] = ['label' => 'Seniors (60+)',    'value' => $seniors, 'color' => 'black'];
+            }
+
+            if ($showParent) {
+                $parentGroups = $allData->groupBy(fn($r) => strtolower($r->parent ?? 'unknown'));
+                $parentCount = 0;
+                $notParentCount = 0;
+
+                foreach ($parentGroups as $pKey => $pGroup) {
+                    $normalized = trim(strtolower((string) $pKey));
+                    if (in_array($normalized, ['', 'unknown', 'n/a'])) {
+                        continue;
+                    }
+
+                    if (in_array($normalized, ['no', 'n', 'false', '0', 'not a parent', 'not parent', 'non-parent'])) {
+                        $notParentCount += $pGroup->count();
+                        continue;
+                    }
+
+                    if (str_contains($normalized, 'not') && str_contains($normalized, 'parent')) {
+                        $notParentCount += $pGroup->count();
+                        continue;
+                    }
+
+                    $parentCount += $pGroup->count();
+                }
+
+                if ($parentCount > 0) {
+                    $stats[] = ['label' => 'Parent', 'value' => $parentCount, 'color' => 'black'];
+                }
+
+                if ($notParentCount > 0) {
+                    $stats[] = ['label' => 'Not A Parent', 'value' => $notParentCount, 'color' => 'black'];
+                }
+            }
+        }
+
+        // Remove zero-value stats (cleaner output)
+        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || $s['label'] === 'Total Cases' || $s['label'] === 'Total Requests' || $s['label'] === 'Total Residents');
     @endphp
 
     @foreach($chunks as $index => $rowChunk)
@@ -222,10 +351,22 @@
 
         {{-- Only show report summary info on the first page --}}
         @if($loop->first)
-        <div class="report-info">
-            <div><strong>Report Name:</strong> {{ $report->report_name }}</div>
-            <div><strong>Generated:</strong> {{ $report->created_at->format('M d, Y h:i A') }}</div>
-            <div><strong>Total Records:</strong> {{ number_format($report->total_records) }}</div>
+        <div class="report-info-row">
+            <div class="report-info-left">
+                <div><strong>Report Name:</strong> {{ $report->report_name }}</div>
+                <div><strong>Generated:</strong> {{ $report->created_at->format('M d, Y h:i A') }}</div>
+                <div><strong>Total Records:</strong> {{ number_format($report->total_records) }}</div>
+            </div>
+            @if(!empty($stats))
+                <div class="stats-summary">
+                    @foreach($stats as $stat)
+                        <div class="stat-pill {{ $stat['color'] }}">
+                            <span class="stat-label">{{ $stat['label'] }}:</span>
+                            <span class="stat-count">{{ number_format($stat['value']) }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
         @endif
 
@@ -251,6 +392,7 @@
                             <th data-col="resident">Resident</th>
                             <th data-col="certificate_type">Certificate Type</th>
                             <th data-col="certificate_status">Status</th>
+                            <th data-col="certificate_date">Date</th>
                         @endif
                     </tr>
                 </thead>
@@ -275,6 +417,7 @@
                                 <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                 <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
+                                <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
                             @endif
                         </tr>
                     @endforeach
@@ -294,7 +437,7 @@
     </div>
     <div class="footer-contact-row">
         <i class="fas fa-envelope"></i>
-        <span>{{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}</span>
+        <span>{{ \App\Models\Setting::get('contact_email', '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bfddcdd8c68d8b86ffdad2ded6d391dcd0d2">[email&#160;protected]</a>') }}</span>
     </div>
     <div class="footer-contact-row">
         <i class="fas fa-phone-alt"></i>
@@ -320,7 +463,6 @@
         </footer>
     </div>
     @endforeach
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set Print Date for all pages
