@@ -30,7 +30,7 @@
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 20mm;
+            padding: 10mm;
             background: white;
             position: relative;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -46,26 +46,39 @@
             padding-bottom: 10px;
         }
 
-        .header-logo { width: 80px; height: auto; }
-        .header-text { flex-grow: 1; }
-        .republic { font-size: 14px; margin-bottom: 2px; }
-        
-        .office-title { 
-            font-size: 22px; 
-            font-family: 'Goudy Text MT', 'Old English Text MT', serif; 
+        .header-logo {
+            width: 50px;   /* smaller logo */
+            height: auto;  /* keep aspect ratio */
+        }
+
+        .header-text {
+            flex-grow: 1;
+        }
+
+        .republic {
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .office-title {
+            font-size: 14px;
+            font-family: 'Goudy Text MT', 'Old English Text MT', serif;
             font-weight: bold;
             margin: 0;
         }
 
-        .address-line { font-size: 13px; margin-top: 2px; }
+        .address-line {
+            font-size: 9px;
+            margin-top: 2px;
+        }
 
         .cert-title {
             text-align: center;
-            font-size: 32px;
+            font-size: 18px;
             font-weight: normal;
             color: var(--header-blue);
-            letter-spacing: 12px;
-            margin: 60px 0;
+            letter-spacing: 4px;
+            margin: 20px 0;
             text-transform: uppercase;
         }
 
@@ -93,16 +106,19 @@
             padding: 0 20px;
         }
 
-        .chairman-title { font-size: 16px; margin-top: 5px; }
+        .chairman-title {
+            font-size: 16px;
+            margin-top: 5px;
+        }
 
-        /* --- NEW FOOTER STYLES --- */
+        /* --- FOOTER STYLES --- */
         .footer {
             position: absolute;
             bottom: 15mm;
-            left: 20mm;
-            right: 20mm;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            left: 10mm;
+            right: 10mm;
+            border-top: 1px solid #ddd;
+            padding-top: 6px;
             color: var(--muted);
             font-family: Arial, sans-serif;
         }
@@ -110,20 +126,50 @@
         .footer-content {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            font-size: 10px;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 9px;
         }
 
-        .system-tag {
-            font-style: italic;
+        .footer-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .footer-contact {
+            max-width: 30%;
+        }
+
+        .footer-barangay {
+            text-align: right;
+        }
+
+        .footer-label {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 8px;
             color: var(--navy);
             font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .footer-text {
+            line-height: 1.3;
+        }
+
+        .footer-meta {
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 8px;
+            color: var(--muted);
         }
 
         .confidential-notice {
             text-align: center;
-            font-size: 9px;
-            margin-top: 5px;
+            font-size: 8px;
+            margin-top: 4px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -151,57 +197,76 @@
 </head>
 <body>
 
-    <button class="print-button" onclick="window.print()">Print Certificate</button>
+<button class="print-button" onclick="window.print()">Print Certificate</button>
 
-    <div class="page">
-        <div class="header-container">
-            <img src="{{ asset('images/Brgy-logo-1.png') }}" class="header-logo" alt="Barangay Logo">
-            <div class="header-text">
-                <div class="republic">Republic of the Philippines</div>
-                <h1 class="office-title">Office of the Barangay Chairman</h1>
-                <div class="address-line">Barangay 249 Zone 23 District II Tondo Manila</div>
-                <div class="address-line">City of Manila</div>
+<div class="page">
+    <div class="header-container">
+        <img src="{{ asset('images/Brgy-logo-1.png') }}" class="header-logo" alt="Barangay Logo">
+
+        <div class="header-text">
+            <div class="republic">Republic of the Philippines</div>
+            <h1 class="office-title">Office of the Barangay Chairman</h1>
+            <div class="address-line">Barangay 249 Zone 23 District II Tondo Manila</div>
+            <div class="address-line">City of Manila</div>
+        </div>
+
+        <div style="display: flex; gap: 5px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Ph_seal_ncr_manila.svg/250px-Ph_seal_ncr_manila.svg.png" class="header-logo" style="width: 60px;" alt="Manila Seal">
+            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="header-logo" style="width: 60px;" alt="Bagong Pilipinas">
+        </div>
+    </div>
+
+    <div class="cert-title">Reports</div>
+
+    <div class="content-body">
+        <!-- Your report content goes here -->
+    </div>
+
+    <!--
+    <div class="signature-section">
+        <div class="chairman-name">Rolando O. Del Rosario</div>
+        <div class="chairman-title">Barangay Chairman</div>
+    </div>
+    -->
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column footer-contact">
+                <div class="footer-label">Address</div>
+                <div class="footer-text">
+                    {{ \App\Models\Setting::get('contact_address', 'JX8H+H57, Yakal St, Tondo, Manila') }}
+                </div>
             </div>
-            <div style="display: flex; gap: 5px;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Ph_seal_ncr_manila.svg/250px-Ph_seal_ncr_manila.svg.png" class="header-logo" style="width: 60px;" alt="Manila Seal">
-                <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" class="header-logo" style="width: 60px;" alt="Bagong Pilipinas">
+
+            <div class="footer-column footer-contact">
+                <div class="footer-label">Contact</div>
+                <div class="footer-text">
+                    {{ \App\Models\Setting::get('contact_number', '0999-123-4567') }} ·
+                    {{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}
+                </div>
+            </div>
+
+            <div class="footer-column footer-barangay">
+                <div class="footer-label">Barangay Details</div>
+                <div class="footer-text">Barangay 249, Zone 23, District II</div>
+                <div class="footer-text">City of Manila</div>
+                <div class="footer-meta">
+                    <span>Date Printed: <span id="print-date"></span></span>
+                    <span>Page 1 of 1</span>
+                </div>
             </div>
         </div>
 
-        <div class="cert-title">Reports</div>
-
-        <div class="content-body">
-            </div>
-
-        <!--
-<div class="signature-section">
-    <div class="chairman-name">Rolando O. Del Rosario</div>
-    <div class="chairman-title">Barangay Chairman</div>
+        <div class="confidential-notice">
+            This document is for official use only. Unauthorized reproduction is strictly prohibited.
+        </div>
+    </footer>
 </div>
--->
 
+<script>
+    const now = new Date();
+    document.getElementById('print-date').innerText = now.toLocaleString();
+</script>
 
-        <footer class="footer">
-            <div class="footer-content">
-                <div>
-                    <!--<div>Generated by: <span class="system-tag">Barangay Information Management System</span></div>-->
-                    <div>Date Printed: <span id="print-date"></span></div>
-                </div>
-                <div style="text-align: right;">
-                    <div>Barangay 249, Zone 23, District II</div>
-                    <div>Page 1 of 1</div>
-                </div>
-            </div>
-            <div class="confidential-notice">
-                This document is for official use only. Unauthorized reproduction is strictly prohibited.
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        // Automatically sets the current date and time in the footer
-        const now = new Date();
-        document.getElementById('print-date').innerText = now.toLocaleString();
-    </script>
 </body>
 </html>
