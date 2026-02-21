@@ -188,11 +188,8 @@
 
             <div class="col-md-6">
                 <label class="form-label">Head of Family</label>
-                <select name="headOfFamily" class="form-select form-control-lg" required>
-                    <option value="">Select</option>
-                    <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) == 'yes' ? 'selected' : '' }}>Yes</option>
-                    <option value="no" {{ old('headOfFamily', $resident->headOfFamily) == 'no' ? 'selected' : '' }}>No</option>
-                </select>
+              <input type="text" class="form-control form-control-lg" 
+       value="{{ ucfirst(old('headOfFamily', $resident->headOfFamily)) }}" readonly>
             </div>
         </div>
 

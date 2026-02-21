@@ -207,7 +207,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Current Status</label>
-                        <span class="badge bg-info text-dark badge-status text-capitalize">{{ $statusLabels[$blotter->current_status] ?? ucfirst(str_replace('_', ' ', $blotter->current_status)) }}</span>
+                        <span class="badge bg-info text-dark badge-status">{{ $statusLabels[$blotter->current_status] ?? ucfirst(str_replace('_', ' ', $blotter->current_status)) }}</span>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Blotter #</label>
@@ -225,12 +225,14 @@
                             @php
                                 $normalized = strtolower($hist->status ?? '');
                                 $badgeClass = match(true) {
-                                    str_contains($normalized, 'pending')   => 'pending',
-                                    str_contains($normalized, 'ongoing')   => 'ongoing',
-                                    str_contains($normalized, 'closed')    => 'closed',
-                                    str_contains($normalized, 'scheduled') => 'scheduled',
+                                    str_contains($normalized, 'first')     => 'pending',
+                                    str_contains($normalized, 'second')    => 'pending',
+                                    str_contains($normalized, 'third')     => 'pending',
+                                    str_contains($normalized, 'brgy')      => 'ongoing',
+                                    str_contains($normalized, 'cold')      => 'closed',
+                                    str_contains($normalized, 'criminal')  => 'closed',
+                                    str_contains($normalized, 'referred')  => 'closed',
                                     str_contains($normalized, 'resolved')  => 'resolved',
-                                    str_contains($normalized, 'cold')      => 'cold',
                                     default                                => 'pending',
                                 };
                             @endphp
@@ -282,74 +284,76 @@
         </div>
     </div>
    
-    <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data">
-        
-        @csrf
-        @method('PUT')
+    @if(!($isTerminal ?? false))
+        <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-        <div class="light-card mb-4">
-            <h6 class="form-section-title text-primary mb-3"><i class="fa fa-pen-to-square me-2 opacity-50"></i>Add New Status Update</h6>
-            
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="status_{{ $blotter->id }}" class="form-label">New Status <span class="text-danger">*</span></label>
-                    @php
-                        $selectedStatus = old('status', $blotter->current_status);
-                    @endphp
-                    <select name="status" id="status_{{ $blotter->id }}" class="form-select" required>
-                        <option value="">-- Select Status --</option>
-                        @foreach($availableStatuses as $status)
-                            @php
-                                $isUsed = isset($usedStatuses) && in_array($status, $usedStatuses, true);
-                                $isSelected = $selectedStatus === $status;
-                                $displayLabel = $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status));
-                            @endphp
-                            <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isUsed && !$isSelected ? 'disabled' : '' }}>
-                                {{ $displayLabel }}{{ $isUsed && !$isSelected ? ' (already used)' : '' }}
-                            </option>
-    
-                        @endforeach
-                         @error('status')
+            <div class="light-card mb-4">
+                <h6 class="form-section-title text-primary mb-3"><i class="fa fa-pen-to-square me-2 opacity-50"></i>Add New Status Update</h6>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="status_{{ $blotter->id }}" class="form-label">New Status <span class="text-danger">*</span></label>
+                        @php
+                            $selectedStatus = old('status', $blotter->current_status);
+                        @endphp
+                        <select name="status" id="status_{{ $blotter->id }}" class="form-select" required>
+                            <option value="">-- Select Status --</option>
+                            @foreach($availableStatuses as $status)
+                                @php
+                                    $isSelected = $selectedStatus === $status;
+                                    $displayLabel = $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status));
+                                @endphp
+                                <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }}>
+                                    {{ $displayLabel }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('status')
                             <div class="error-text mt-1">{{ $message }}</div>
-                            @enderror
-                    </select>
-                    
-                </div>
-
-                <div class="col-md-6">
-                    <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
-                    <div class="input-group date-group">
-                        <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date', now()->toDateString()) }}" class="form-control" required>
-                        <span class="input-group-text" id="date_trigger_{{ $blotter->id }}" style="cursor: pointer;"><i class="fa fa-calendar"></i></span>
+                        @enderror
                     </div>
-                    @error('date')
-                        <div class="error-text mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
 
-                <div class="col-md-12">
-                    <label for="remarks_{{ $blotter->id }}" class="form-label">Remarks / Notes <span class="text-danger">*</span></label>
-                    <textarea name="remarks" id="remarks_{{ $blotter->id }}" class="form-control" value="{{ old('remarks') }}"rows="3" placeholder="Describe the update..." required>{{ old('remarks') }}</textarea>
-                    @error('remarks')
-                        <div class="error-text mt-1">{{ $message }}</div>
-                    @enderror
-                </div>
+                    <div class="col-md-6">
+                        <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
+                        <div class="input-group date-group">
+                            <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date', now()->toDateString()) }}" class="form-control" required>
+                            <span class="input-group-text" id="date_trigger_{{ $blotter->id }}" style="cursor: pointer;"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        @error('date')
+                            <div class="error-text mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                <div class="col-md-12">
-                    <label for="photo_path_{{ $blotter->id }}" class="form-label">Attach Photo (Optional)</label>
-                    <input type="file" name="photo_path" accept="image/jpg, image/jpeg, image/png" id="photo_path_{{ $blotter->id }}" class="form-control">
-                    <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
+                    <div class="col-md-12">
+                        <label for="remarks_{{ $blotter->id }}" class="form-label">Remarks / Notes <span class="text-danger">*</span></label>
+                        <textarea name="remarks" id="remarks_{{ $blotter->id }}" class="form-control" value="{{ old('remarks') }}"rows="3" placeholder="Describe the update..." required>{{ old('remarks') }}</textarea>
+                        @error('remarks')
+                            <div class="error-text mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="photo_path_{{ $blotter->id }}" class="form-label">Attach Photo (Optional)</label>
+                        <input type="file" name="photo_path" accept="image/jpg, image/jpeg, image/png" id="photo_path_{{ $blotter->id }}" class="form-control">
+                        <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-light text-decoration-none small fw-bold" data-bs-dismiss="modal">Discard</button>
-            <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 600; letter-spacing: 0.5px;">
-                Record Update
-            </button>
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light text-decoration-none small fw-bold" data-bs-dismiss="modal">Discard</button>
+                <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 600; letter-spacing: 0.5px;">
+                    Record Update
+                </button>
+            </div>
+        </form>
+    @else
+        <div class="alert alert-info mb-0">
+            This blotter is already in a terminal status (`{{ $statusLabels[$blotter->current_status] ?? $blotter->current_status }}`) and cannot be updated further.
         </div>
-    </form>
+    @endif
 </div>
 
 <script>

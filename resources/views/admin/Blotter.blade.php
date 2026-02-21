@@ -751,16 +751,16 @@
                                     <tbody id="blotterTableBody">
                                         @foreach($blotters as $blotter)
                                             @php
-                                                $status = strtolower($blotter->current_status ?? '');
-                                                if (str_contains($status, 'pending')) {
-                                                    $uiClass = 'status-pending';
-                                                } elseif (str_contains($status, 'ongoing')) {
-                                                    $uiClass = 'status-ongoing';
-                                                } elseif (str_contains($status, 'closed')) {
-                                                    $uiClass = 'status-closed';
-                                                } else {
-                                                    $uiClass = 'status-default';
-                                                }
+                                                $statusKey = $blotter->current_status ?? '';
+                                                $displayStatus = $statusLabels[$statusKey] ?? ucfirst(str_replace('_', ' ', $statusKey));
+                                                $terminalStatuses = ['referredToPnp', 'resolved'];
+                                                $isTerminal = in_array($statusKey, $terminalStatuses, true);
+                                                $uiClass = match ($statusKey) {
+                                                    'first', 'second', 'third' => 'status-pending',
+                                                    'brgyHearing' => 'status-ongoing',
+                                                    'coldCase', 'criminalCase', 'referredToPnp', 'resolved' => 'status-closed',
+                                                    default => 'status-default',
+                                                };
                                             @endphp
 
                                             <tr>
@@ -770,7 +770,7 @@
                                                 <td>
                                                     <div class="status-badge {{ $uiClass }}">
                                                         <span class="status-dot"></span>
-                                                        {{ $blotter->current_status ?? 'N/A' }}
+                                                        {{ $displayStatus ?: 'N/A' }}
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
@@ -783,14 +783,24 @@
                                                             <span>View</span>
                                                         </button>
 
-                                                        <button class="btn btn-sm btn-outline-primary btn-action shadow-sm"
-                                                                type="button"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#updateBlotterModal"
-                                                                data-blotter-id="{{ $blotter->id }}">
-                                                            <i class="fa fa-pen-to-square"></i>
-                                                            <span>Update</span>
-                                                        </button>
+                                                        @if($isTerminal)
+                                                            <button class="btn btn-sm btn-outline-secondary btn-action shadow-sm"
+                                                                    type="button"
+                                                                    disabled
+                                                                    title="This blotter is already closed and cannot be updated.">
+                                                                <i class="fa fa-lock"></i>
+                                                                <span>Closed</span>
+                                                            </button>
+                                                        @else
+                                                            <button class="btn btn-sm btn-outline-primary btn-action shadow-sm"
+                                                                    type="button"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#updateBlotterModal"
+                                                                    data-blotter-id="{{ $blotter->id }}">
+                                                                <i class="fa fa-pen-to-square"></i>
+                                                                <span>Update</span>
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -910,7 +920,7 @@
                                                                             <div class="info-label">Current Status</div>
                                                                             <div class="status-badge {{ $uiClass }}">
                                                                                 <span class="status-dot"></span>
-                                                                                {{ $blotter->current_status ?? 'N/A' }}
+                                                                                {{ $displayStatus ?: 'N/A' }}
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-sm-6">
@@ -935,6 +945,8 @@
                                                                                     str_contains($normalized, 'brgyHearing')=> 'ongoing',
                                                                                     str_contains($normalized, 'coldCase')   => 'closed',
                                                                                     str_contains($normalized, 'criminalCase') => 'closed',
+                                                                                    str_contains($normalized, 'referred')  => 'closed',
+                                                                                    str_contains($normalized, 'resolved')  => 'resolved',
                                                                                     default                                 => 'pending',
                                                                                 };
                                                                             @endphp
