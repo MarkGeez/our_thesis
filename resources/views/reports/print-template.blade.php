@@ -241,6 +241,11 @@
         }
         .print-button { right: 20px; background: var(--navy); }
         .back-button { left: 20px; background: #666; }
+
+        body.pdf-mode .print-button,
+        body.pdf-mode .back-button {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -350,6 +355,7 @@
         $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Residents', 'Total Households']));
     @endphp
 
+    <div id="pdfContent">
     @foreach($chunks as $index => $rowChunk)
     <div class="page">
         <div class="header-container">
@@ -399,6 +405,7 @@
                             <th data-col="age">Age</th>
                             <th data-col="sex">Sex</th>
                             <th data-col="street">Street</th>
+                            <th data-col="house_no">House No.</th>
                             <th data-col="parent_status">Parent Status</th>
                             @if(\Schema::hasColumn('residents', 'civil_status'))
                                 <th data-col="civil_status">Civil Status</th>
@@ -431,11 +438,17 @@
                     @foreach($rowChunk as $row)
                         <tr>
                             @if($type == 'population')
+                                @php
+                                    $residentHouse = optional(optional($row->households->first())->house);
+                                    $residentStreet = optional($residentHouse->street)->street_name ?? ($row->street ?? null);
+                                    $residentHouseNo = $residentHouse->house_no ?? ($row->houseNo ?? null);
+                                @endphp
                                 <td data-col="full_name">{{ ucwords(strtolower($row->firstName)) }} {{ ucwords(strtolower($row->middleName)) }} {{ ucwords(strtolower($row->lastName)) }}</td>
                                 <td data-col="birthdate">{{ $row->birthday }}</td>
                                 <td data-col="age">{{ $row->age }}</td>
                                 <td data-col="sex">{{ ucfirst($row->sex) }}</td>
-                                <td data-col="street">{{ $row->street }}</td>
+                                <td data-col="street">{{ $residentStreet ?? 'N/A' }}</td>
+                                <td data-col="house_no">{{ $residentHouseNo ?? 'N/A' }}</td>
                                 <td data-col="parent_status">{{ ucfirst($row->parent) }}</td>
                                 @if(\Schema::hasColumn('residents', 'civil_status'))
                                     <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
@@ -519,6 +532,8 @@
         </footer>
     </div>
     @endforeach
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Set Print Date for all pages
@@ -552,6 +567,32 @@
                         });
                     });
                 });
+            }
+
+            // Convert to PDF using the same print-template layout.
+            const mode = params.get('mode');
+            if (mode === 'pdf') {
+                document.body.classList.add('pdf-mode');
+                const fileSafeReportName = (@json($report->report_name) || 'report')
+                    .replace(/[<>:"/\\|?*]+/g, '_')
+                    .trim();
+                const filename = (fileSafeReportName || 'report') + '.pdf';
+                const content = document.getElementById('pdfContent');
+
+                if (content && window.html2pdf) {
+                    const options = {
+                        margin: 0,
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak: { mode: ['css', 'legacy'] },
+                    };
+
+                    setTimeout(function () {
+                        window.html2pdf().set(options).from(content).save();
+                    }, 150);
+                }
             }
         });
     </script>

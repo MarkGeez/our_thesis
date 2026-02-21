@@ -38,8 +38,11 @@
                 <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fa fa-arrow-left me-1"></i> Back
                 </a>
-                <a href="#" id="printTemplateBtn" class="btn btn-success btn-sm" target="_blank">
+                <a href="#" id="printTemplateBtn" class="btn btn-primary btn-sm" target="_blank">
                     <i class="fa fa-print me-1"></i> Print with Template
+                </a>
+                <a href="#" id="pdfTemplateBtn" class="btn btn-success btn-sm" target="_blank">
+                    <i class="fa fa-file-pdf me-1"></i> Convert to PDF
                 </a>{{--  
                 <button onclick="window.print()" class="btn btn-primary btn-sm">
                     <i class="fa fa-print me-1"></i> Print
@@ -123,6 +126,7 @@
                                 <th data-col="age">Age</th>
                                 <th data-col="sex">Sex</th>
                                 <th data-col="street">Street</th>
+                                <th data-col="house_no">House No.</th>
                                 <th data-col="parent_status">Parent Status</th>
                                 @if(\Schema::hasColumn('residents', 'civil_status'))
                                     <th data-col="civil_status">Civil Status</th>
@@ -155,11 +159,17 @@
                         @forelse($data as $row)
                             <tr>
                                 @if($type == 'population')
+                                    @php
+                                        $residentHouse = optional(optional($row->households->first())->house);
+                                        $residentStreet = optional($residentHouse->street)->street_name ?? ($row->street ?? null);
+                                        $residentHouseNo = $residentHouse->house_no ?? ($row->houseNo ?? null);
+                                    @endphp
                                     <td data-col="full_name">{{ ucwords(strtolower($row->firstName)) }} {{ ucwords(strtolower($row->middleName)) }} {{ ucwords(strtolower($row->lastName)) }}</td>
                                     <td data-col="birthdate">{{ $row->birthday }}</td>
                                     <td data-col="age">{{ $row->age }}</td>
                                     <td data-col="sex">{{ ucfirst($row->sex) }}</td>
-                                    <td data-col="street">{{ $row->street }}</td>
+                                    <td data-col="street">{{ $residentStreet ?? 'N/A' }}</td>
+                                    <td data-col="house_no">{{ $residentHouseNo ?? 'N/A' }}</td>
                                     <td data-col="parent_status">{{ ucfirst($row->parent) }}</td>
                                     @if(\Schema::hasColumn('residents', 'civil_status'))
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
@@ -371,17 +381,34 @@
         }
     })();
 
-    // Handle Print with Template button - pass visible columns to print template
+    // Handle Print/PDF template actions - pass visible columns to print template
     document.addEventListener('DOMContentLoaded', function() {
         const printTemplateBtn = document.getElementById('printTemplateBtn');
-        if (!printTemplateBtn) return;
-        
-        printTemplateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        const pdfTemplateBtn = document.getElementById('pdfTemplateBtn');
+
+        function buildTemplateUrl(mode) {
             const checks = Array.from(document.querySelectorAll("input[type='checkbox'][data-col]"));
             const visibleCols = checks.filter(c => c.checked).map(c => c.getAttribute('data-col')).join(',');
-            const url = "{{ route('admin.reports.print-template', $report->id) }}" + (visibleCols ? '?cols=' + encodeURIComponent(visibleCols) : '');
-            window.open(url, '_blank');
-        });
+            const params = new URLSearchParams();
+            if (visibleCols) params.set('cols', visibleCols);
+            if (mode) params.set('mode', mode);
+            const qs = params.toString();
+            return "{{ route('admin.reports.print-template', $report->id) }}" + (qs ? ('?' + qs) : '');
+        }
+
+        if (printTemplateBtn) {
+            printTemplateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open(buildTemplateUrl('print'), '_blank');
+            });
+        }
+
+        if (pdfTemplateBtn) {
+            pdfTemplateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.open(buildTemplateUrl('pdf'), '_blank');
+            });
+        }
+
     });
 </script>

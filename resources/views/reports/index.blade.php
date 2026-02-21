@@ -408,11 +408,26 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Street</label>
-                            <select name="street" class="form-select">
+                            <select name="street_id" class="form-select" id="populationStreetFilter">
                                 <option value="">All</option>
-                                @foreach($streets as $streetName)
-                                    <option value="{{ $streetName }}" {{ old('street') == $streetName ? 'selected' : '' }}>
-                                        {{ $streetName }}
+                                @foreach(($streetOptions ?? collect()) as $street)
+                                    <option value="{{ $street->id }}" {{ (string) old('street_id') === (string) $street->id ? 'selected' : '' }}>
+                                        {{ $street->street_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">House Number</label>
+                            <select name="house_id" class="form-select" id="populationHouseFilter">
+                                <option value="">All</option>
+                                @foreach(($houseOptions ?? collect()) as $house)
+                                    <option
+                                        value="{{ $house->id }}"
+                                        data-street-id="{{ $house->street_id }}"
+                                        {{ (string) old('house_id') === (string) $house->id ? 'selected' : '' }}
+                                    >
+                                        {{ $house->house_no }} - {{ $house->street->street_name ?? 'No Street' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -767,6 +782,8 @@
 
         const streetSelect = document.getElementById('householdStreetFilter');
         const houseSelect = document.getElementById('householdHouseFilter');
+        const populationStreetSelect = document.getElementById('populationStreetFilter');
+        const populationHouseSelect = document.getElementById('populationHouseFilter');
         const householdScopeSelect = document.getElementById('householdReportScope');
         const householdHeadSelect = document.querySelector("select[name='household_head_id']");
         const summaryOnlyBlocks = Array.from(document.querySelectorAll('.household-summary-only'));
@@ -793,12 +810,13 @@
             toggleHouseholdMode();
         }
 
-        if (streetSelect && houseSelect) {
-            const houseOptions = Array.from(houseSelect.querySelectorAll('option[data-street-id]'));
+        function bindStreetHouseFilter(streetEl, houseEl) {
+            if (!streetEl || !houseEl) return;
+            const houseOptions = Array.from(houseEl.querySelectorAll('option[data-street-id]'));
 
             function filterHouseOptions() {
-                const streetId = streetSelect.value;
-                const currentValue = houseSelect.value;
+                const streetId = streetEl.value;
+                const currentValue = houseEl.value;
                 let currentStillVisible = false;
 
                 houseOptions.forEach(function (option) {
@@ -810,12 +828,15 @@
                 });
 
                 if (streetId && !currentStillVisible) {
-                    houseSelect.value = '';
+                    houseEl.value = '';
                 }
             }
 
-            streetSelect.addEventListener('change', filterHouseOptions);
+            streetEl.addEventListener('change', filterHouseOptions);
             filterHouseOptions();
         }
+
+        bindStreetHouseFilter(streetSelect, houseSelect);
+        bindStreetHouseFilter(populationStreetSelect, populationHouseSelect);
     });
 </script>
