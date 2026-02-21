@@ -23,7 +23,7 @@ class UserListController extends Controller
         $sort = $request->input('sort', 'id_desc');
         
          // $userList = User::with('resident:houseNo,street,emergencyContactNo,emergencyContactName,age,sex,parent,enrolled,educationalAttainment,headOfFamily,EncodedBy,user_id')
-        $userList = User::with('resident:emergencyContactNo,emergencyContactName,age,sex,parent,enrolled,educationalAttainment,headOfFamily,EncodedBy,user_id')
+        $userList = User::with('resident:user_id,contactNo,birthday,age,sex,parent,enrolled,educationalAttainment,religion,headOfFamily,emergencyContactNo,emergencyContactName')
         ->when($search, function($query, $search){
             return $query-> where(function($q) use ($search){
                 $q->where('firstName', 'like', "%{$search}%")

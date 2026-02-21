@@ -1212,7 +1212,7 @@
     <!-- Emergency Contact Name -->
     <label for="emergencyContactName">Emergency Contact Name</label>
     <input type="text" id="emergencyContactName" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" 
-           value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here" required>
+           value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here (optional)">
     @error('emergencyContactName')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1220,7 +1220,7 @@
     <!-- Emergency Contact No -->
     <label for="emergencyContactNo">Emergency Contact No.</label>
     <input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
-           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx" required>
+           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx (optional)">
     @error('emergencyContactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

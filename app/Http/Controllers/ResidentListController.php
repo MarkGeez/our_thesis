@@ -86,8 +86,8 @@ public function searchResidents(Request $request)
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
             'birthday' => 'required|date',
-            'emergencyContactNo' => 'required|string|max:11',
-            'emergencyContactName' => 'required|string|max:255',
+            'emergencyContactNo' => 'nullable|string|max:11',
+            'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
             'sex' => 'nullable|in:male,female',
             'parent' => 'nullable|in:yes,no,single',
@@ -125,6 +125,12 @@ public function searchResidents(Request $request)
         $validated['firstName'] = $firstNameLower;
         $validated['middleName'] = $middleNameLower;
         $validated['lastName'] = $lastNameLower;
+        $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
+            ? trim($validated['emergencyContactName'])
+            : 'N/A';
+        $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
+            ? trim($validated['emergencyContactNo'])
+            : 'N/A';
         
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
