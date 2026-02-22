@@ -29,9 +29,11 @@
                                             'first' => 'First Summon',
                                             'second' => 'Second Summon',
                                             'third' => 'Third Summon',
-                                            'brgyHearing' => 'Brgy Hearing',
+                                            'brgyHearing' => 'Barangay Hearing',
                                             'coldCase' => 'Cold Case',
                                             'criminalCase' => 'Criminal Case',
+                                            'referredToPnp' => 'Referred to PNP',
+                                            'resolved' => 'Resolved',
                                         ];
                                         $currentStatus = $blotter->current_status ?? $blotter->status;
                                         $displayStatus = $statusLabels[$currentStatus] ?? ucfirst(strtolower($currentStatus));
@@ -41,6 +43,8 @@
                                             'brgyHearing' => 'warning text-dark',
                                             'coldCase' => 'secondary',
                                             'criminalCase' => 'danger',
+                                            'referredToPnp' => 'dark',
+                                            'resolved' => 'success',
                                             default => 'secondary'
                                         };
                                     @endphp
@@ -62,11 +66,14 @@
                             <label class="info-label">Select New Status *</label>
                             <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                                 <option value="" disabled>-- Choose Option --</option>
-                                <option value="PENDING" {{ old('status', $blotter->status) === 'PENDING' ? 'selected' : '' }}>Pending (Awaiting Action)</option>
-                                <option value="SCHEDULED" {{ old('status', $blotter->status) === 'SCHEDULED' ? 'selected' : '' }}>Scheduled (For Hearing)</option>
-                                <option value="COLD CASE" {{ old('status', $blotter->status) === 'COLD CASE' ? 'selected' : '' }}>Cold Case (Inactive)</option>
-                                <option value="RESOLVED" {{ old('status', $blotter->status) === 'RESOLVED' ? 'selected' : '' }}>Resolved (Settled)</option>
-                                <option value="CLOSED" {{ old('status', $blotter->status) === 'CLOSED' ? 'selected' : '' }}>Closed (Terminated)</option>
+                                <option value="first" {{ old('status', $blotter->status) === 'first' ? 'selected' : '' }}>First Summon</option>
+                                <option value="second" {{ old('status', $blotter->status) === 'second' ? 'selected' : '' }}>Second Summon</option>
+                                <option value="third" {{ old('status', $blotter->status) === 'third' ? 'selected' : '' }}>Third Summon</option>
+                                <option value="brgyHearing" {{ old('status', $blotter->status) === 'brgyHearing' ? 'selected' : '' }}>Barangay Hearing</option>
+                                <option value="coldCase" {{ old('status', $blotter->status) === 'coldCase' ? 'selected' : '' }}>Cold Case</option>
+                                <option value="criminalCase" {{ old('status', $blotter->status) === 'criminalCase' ? 'selected' : '' }}>Criminal Case</option>
+                                <option value="referredToPnp" {{ old('status', $blotter->status) === 'referredToPnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="resolved" {{ old('status', $blotter->status) === 'resolved' ? 'selected' : '' }}>Resolved</option>
                             </select>
                             @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>

@@ -86,8 +86,8 @@ public function searchResidents(Request $request)
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
             'birthday' => 'required|date',
-            'emergencyContactNo' => 'required|string|max:11',
-            'emergencyContactName' => 'required|string|max:255',
+            'emergencyContactNo' => 'nullable|string|max:11',
+            'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
             'sex' => 'nullable|in:male,female',
             'parent' => 'nullable|in:yes,no,single',
@@ -125,6 +125,12 @@ public function searchResidents(Request $request)
         $validated['firstName'] = $firstNameLower;
         $validated['middleName'] = $middleNameLower;
         $validated['lastName'] = $lastNameLower;
+        $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
+            ? trim($validated['emergencyContactName'])
+            : 'N/A';
+        $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
+            ? trim($validated['emergencyContactNo'])
+            : 'N/A';
         
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
@@ -237,7 +243,7 @@ $householdResident->update([
         'parent' => 'required|in:yes,no,single',
         'enrolled' => 'required|in:yes,no',
         'educationalAttainment' => 'nullable|string|max:255',
-        'headOfFamily' => 'required|in:yes,no',
+        'headOfFamily' => 'nullable|in:yes,no',
         'religion' => 'nullable|string|max:255'
     ]);
 
@@ -250,24 +256,10 @@ $householdResident->update([
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
 
-    // Update household assignment
-    $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
-    $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
-
-    if ($householdResident) {
-        $householdResident->update([
-            'household_id' => $household->id,
-            'is_household_head' => $validated['headOfFamily'] === 'yes',
-        ]);
-    } else {
-        HouseholdResident::create([
-            'household_id' => $household->id,
-            'resident_id' => $resident->id,
-            'is_household_head' => $validated['headOfFamily'] === 'yes',
-        ]);
+    // Keep existing head-of-family value if not provided in the update form.
+    if (!array_key_exists('headOfFamily', $validated)) {
+        $validated['headOfFamily'] = $resident->headOfFamily;
     }
-
-    unset($validated['house_id']);
 
     // Update the resident
     $resident->update($validated);

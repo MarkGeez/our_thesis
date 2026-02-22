@@ -149,6 +149,11 @@
         background: #d1fae5;
     }
 
+    .report-type-household {
+        color: #4c1d95;
+        background: #ede9fe;
+    }
+
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -251,7 +256,7 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalPopulationReport">
                 <div class="card-body py-4">
                     <i class="fas fa-people-group fa-3x text-primary mb-3"></i>
@@ -260,7 +265,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalBlotterReport">
                 <div class="card-body py-4">
                     <i class="fas fa-scale-balanced fa-3x text-danger mb-3"></i>
@@ -269,12 +274,21 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalCertificateReport">
                 <div class="card-body py-4">
                     <i class="fas fa-certificate fa-3x text-success mb-3"></i>
                     <h5 class="fw-bold mb-1">Certificate Report</h5>
                     <p class="text-muted small mb-0">Released certificate request records</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalHouseholdReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-house-user fa-3x mb-3" style="color:#7c3aed;"></i>
+                    <h5 class="fw-bold mb-1">Household Report</h5>
+                    <p class="text-muted small mb-0">Household, house head, and family member summaries</p>
                 </div>
             </div>
         </div>
@@ -314,6 +328,7 @@
                                     'population' => 'report-type-population',
                                     'blotter' => 'report-type-blotter',
                                     'certificate' => 'report-type-certificate',
+                                    'household' => 'report-type-household',
                                     default => 'report-type-population',
                                 };
                             @endphp
@@ -393,11 +408,26 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Street</label>
-                            <select name="street" class="form-select">
+                            <select name="street_id" class="form-select" id="populationStreetFilter">
                                 <option value="">All</option>
-                                @foreach($streets as $streetName)
-                                    <option value="{{ $streetName }}" {{ old('street') == $streetName ? 'selected' : '' }}>
-                                        {{ $streetName }}
+                                @foreach(($streetOptions ?? collect()) as $street)
+                                    <option value="{{ $street->id }}" {{ (string) old('street_id') === (string) $street->id ? 'selected' : '' }}>
+                                        {{ $street->street_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">House Number</label>
+                            <select name="house_id" class="form-select" id="populationHouseFilter">
+                                <option value="">All</option>
+                                @foreach(($houseOptions ?? collect()) as $house)
+                                    <option
+                                        value="{{ $house->id }}"
+                                        data-street-id="{{ $house->street_id }}"
+                                        {{ (string) old('house_id') === (string) $house->id ? 'selected' : '' }}
+                                    >
+                                        {{ $house->house_no }} - {{ $house->street->street_name ?? 'No Street' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -613,13 +643,102 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalHouseholdReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.household') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="household">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-house-user me-2" style="color:#7c3aed;"></i>Generate Household Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Report View</label>
+                            <select name="report_scope" class="form-select" id="householdReportScope">
+                                <option value="summary" {{ old('report_scope', 'family_members') === 'summary' ? 'selected' : '' }}>Household Summary</option>
+                                <option value="family_members" {{ old('report_scope', 'family_members') === 'family_members' ? 'selected' : '' }}>Tagged Family Members (by Head)</option>
+                            </select>
+                            <small class="text-muted d-block mt-1">Use this to generate a particular family under one house head.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Street</label>
+                            <select name="street_id" class="form-select" id="householdStreetFilter">
+                                <option value="">All</option>
+                                @foreach(($streetOptions ?? collect()) as $street)
+                                    <option value="{{ $street->id }}" {{ (string) old('street_id') === (string) $street->id ? 'selected' : '' }}>
+                                        {{ $street->street_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">House</label>
+                            <select name="house_id" class="form-select" id="householdHouseFilter">
+                                <option value="">All</option>
+                                @foreach(($houseOptions ?? collect()) as $house)
+                                    <option
+                                        value="{{ $house->id }}"
+                                        data-street-id="{{ $house->street_id }}"
+                                        {{ (string) old('house_id') === (string) $house->id ? 'selected' : '' }}
+                                    >
+                                        {{ $house->house_no }} - {{ $house->street->street_name ?? 'No Street' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 household-summary-only">
+                            <label class="form-label fw-semibold">House Head Presence</label>
+                            <select name="has_head" class="form-select">
+                                <option value="">All</option>
+                                <option value="yes" {{ old('has_head') === 'yes' ? 'selected' : '' }}>With House Head</option>
+                                <option value="no" {{ old('has_head') === 'no' ? 'selected' : '' }}>Without House Head</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Specific House Head</label>
+                            <select name="household_head_id" class="form-select">
+                                <option value="">All</option>
+                                @foreach(($houseHeadOptions ?? collect()) as $head)
+                                    <option value="{{ $head->id }}" {{ (string) old('household_head_id') === (string) $head->id ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower(trim(($head->firstName ?? '') . ' ' . ($head->middleName ?? '') . ' ' . ($head->lastName ?? '')))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 household-summary-only">
+                            <label class="form-label fw-semibold">Minimum Family Members</label>
+                            <input type="number" min="0" name="min_members" class="form-control" value="{{ old('min_members') }}" placeholder="e.g. 1">
+                        </div>
+                        <div class="col-md-6 household-summary-only">
+                            <label class="form-label fw-semibold">Maximum Family Members</label>
+                            <input type="number" min="0" name="max_members" class="form-control" value="{{ old('max_members') }}" placeholder="e.g. 10">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#7c3aed;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @if ($errors->any() && old('report_form_type'))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const modalMap = {
                 population: 'modalPopulationReport',
                 blotter: 'modalBlotterReport',
-                certificate: 'modalCertificateReport'
+                certificate: 'modalCertificateReport',
+                household: 'modalHouseholdReport'
             };
             const targetModalId = modalMap['{{ old('report_form_type') }}'];
             if (!targetModalId) return;
@@ -660,5 +779,64 @@
                 openPicker(input);
             });
         });
+
+        const streetSelect = document.getElementById('householdStreetFilter');
+        const houseSelect = document.getElementById('householdHouseFilter');
+        const populationStreetSelect = document.getElementById('populationStreetFilter');
+        const populationHouseSelect = document.getElementById('populationHouseFilter');
+        const householdScopeSelect = document.getElementById('householdReportScope');
+        const householdHeadSelect = document.querySelector("select[name='household_head_id']");
+        const summaryOnlyBlocks = Array.from(document.querySelectorAll('.household-summary-only'));
+
+        function toggleHouseholdMode() {
+            if (!householdScopeSelect) return;
+            const mode = householdScopeSelect.value || 'summary';
+            const isFamilyMembersMode = mode === 'family_members';
+
+            if (householdHeadSelect) {
+                householdHeadSelect.required = false;
+            }
+
+            summaryOnlyBlocks.forEach(function (el) {
+                el.style.display = isFamilyMembersMode ? 'none' : '';
+                el.querySelectorAll('input, select').forEach(function (field) {
+                    field.disabled = isFamilyMembersMode;
+                });
+            });
+        }
+
+        if (householdScopeSelect) {
+            householdScopeSelect.addEventListener('change', toggleHouseholdMode);
+            toggleHouseholdMode();
+        }
+
+        function bindStreetHouseFilter(streetEl, houseEl) {
+            if (!streetEl || !houseEl) return;
+            const houseOptions = Array.from(houseEl.querySelectorAll('option[data-street-id]'));
+
+            function filterHouseOptions() {
+                const streetId = streetEl.value;
+                const currentValue = houseEl.value;
+                let currentStillVisible = false;
+
+                houseOptions.forEach(function (option) {
+                    const matches = !streetId || option.getAttribute('data-street-id') === streetId;
+                    option.hidden = !matches;
+                    if (matches && option.value === currentValue) {
+                        currentStillVisible = true;
+                    }
+                });
+
+                if (streetId && !currentStillVisible) {
+                    houseEl.value = '';
+                }
+            }
+
+            streetEl.addEventListener('change', filterHouseOptions);
+            filterHouseOptions();
+        }
+
+        bindStreetHouseFilter(streetSelect, houseSelect);
+        bindStreetHouseFilter(populationStreetSelect, populationHouseSelect);
     });
 </script>

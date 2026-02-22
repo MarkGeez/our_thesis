@@ -42,7 +42,6 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => "required"
-            
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
@@ -59,11 +58,17 @@ class AuthController extends Controller
                 ->with('auth_error', 'Incorrect password. Please try again.');
         }
 
-        if (Auth::attempt($credentials)){
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            // Log user login
+            \App\Services\ActiveLogger::log(
+                'User',
+                'login',
+                $user->id,
+                'User logged in'
+            );
             return $this->redirect();
         }
-
 
         return back()
             ->withInput()
@@ -72,11 +77,19 @@ class AuthController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+        // Log user logout
+        if ($user) {
+            \App\Services\ActiveLogger::log(
+                'User',
+                'logout',
+                $user->id,
+                'User logged out'
+            );
+        }
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 

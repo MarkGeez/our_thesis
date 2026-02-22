@@ -6,6 +6,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Resident extends Model
+    protected static function booted()
+    {
+        static::created(function ($resident) {
+            ActiveLogger::log(
+                'Resident',
+                'created',
+                $resident->id,
+                'Created a new resident record'
+            );
+        });
+
+        static::updated(function ($resident) {
+            ActiveLogger::log(
+                'Resident',
+                'updated',
+                $resident->id,
+                'Updated a resident record'
+            );
+        });
+
+        static::deleted(function ($resident) {
+            ActiveLogger::log(
+                'Resident',
+                'deleted',
+                $resident->id,
+                'Deleted a resident record'
+            );
+        });
+    }
 {
     use HasFactory;
     

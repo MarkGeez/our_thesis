@@ -6,6 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CertificateRequest extends Model
+    protected static function booted()
+    {
+        static::created(function ($request) {
+            ActiveLogger::log(
+                'CertificateRequest',
+                'created',
+                $request->id,
+                'Created a new certificate request record'
+            );
+        });
+
+        static::updated(function ($request) {
+            ActiveLogger::log(
+                'CertificateRequest',
+                'updated',
+                $request->id,
+                'Updated a certificate request record'
+            );
+        });
+
+        static::deleted(function ($request) {
+            ActiveLogger::log(
+                'CertificateRequest',
+                'deleted',
+                $request->id,
+                'Deleted a certificate request record'
+            );
+        });
+    }
 {
     protected $table = 'certificate_requests';
 
@@ -53,9 +82,7 @@ class CertificateRequest extends Model
         }
         $u = $this->user;
         return trim("{$u->firstName} {$u->middleName} {$u->lastName}");
-    }
-
-    public function getRequesterAddressAttribute(): string
+    }    public function getRequesterAddressAttribute(): string
     {
         if ($this->resident) {
             return trim("{$this->resident->houseNo} {$this->resident->street}");

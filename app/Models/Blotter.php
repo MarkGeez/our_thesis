@@ -52,16 +52,34 @@ public function updates(): HasMany
 
 // Then update line 87 in your controller to keep using $blotter->updates
 
-    public static function booted(){
-      static::created(function ($blotter) {
-        ActiveLogger::log(
-            'Announcement',
-            'created',
-            $blotter->id,
-            'Created a new blotter record'
-        );
-    });
+    protected static function booted()
+    {
+        static::created(function ($blotter) {
+            ActiveLogger::log(
+                'Blotter',
+                'created',
+                $blotter->id,
+                'Created a new blotter record'
+            );
+        });
 
+        static::updated(function ($blotter) {
+            ActiveLogger::log(
+                'Blotter',
+                'updated',
+                $blotter->id,
+                'Updated a blotter record'
+            );
+        });
+
+        static::deleted(function ($blotter) {
+            ActiveLogger::log(
+                'Blotter',
+                'deleted',
+                $blotter->id,
+                'Deleted a blotter record'
+            );
+        });
     }
     
 }

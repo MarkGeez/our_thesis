@@ -6,9 +6,26 @@ use Illuminate\Http\Request;
 use App\Models\Blotter;
 use App\Models\UpdateBlotter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class BlotterController extends Controller
 {
+    private const STATUS_SEQUENCE = [
+        'first',
+        'second',
+        'third',
+        'brgyHearing',
+        'coldCase',
+        'criminalCase',
+        'referredToPnp',
+        'resolved',
+    ];
+
+    private const TERMINAL_STATUSES = [
+        'referredToPnp',
+        'resolved',
+    ];
+
     /**
      * Map status codes to human-readable labels
      */
@@ -18,9 +35,11 @@ class BlotterController extends Controller
             'first' => 'First Summon',
             'second' => 'Second Summon',
             'third' => 'Third Summon',
-            'brgyHearing' => 'Brgy Hearing',
+            'brgyHearing' => 'Barangay Hearing',
             'coldCase' => 'Cold Case',
             'criminalCase' => 'Criminal Case',
+            'referredToPnp' => 'Referred to PNP',
+            'resolved' => 'Resolved',
         ];
     }
 
@@ -58,7 +77,7 @@ class BlotterController extends Controller
         } elseif ($statusFilter === 'ongoing') {
             $query->where('current_status', 'brgyHearing');
         } elseif ($statusFilter === 'closed') {
-            $query->whereIn('current_status', ['coldCase', 'criminalCase']);
+            $query->whereIn('current_status', ['coldCase', 'criminalCase', 'referredToPnp', 'resolved']);
         }
 
         switch ($sort) {
@@ -156,26 +175,15 @@ return redirect()->route('admin.blotter.index')
         $blotter = Blotter::with(['updates.updater'])->findOrFail($id);
 
     $history = $blotter->updates->sortByDesc('date');
-    $statuses = [
-        'first',
-        'second',
-        'third',
-        'brgyHearing',
-        'coldCase',
-        'criminalCase',
-    ];
-
-    $usedStatuses = $blotter->update_blotter 
-        ? $blotter->update_blotter->pluck('status')->toArray() 
-        : [];
-
-    $availableStatuses = array_diff($statuses, $usedStatuses);
+    $usedStatuses = $blotter->updates->pluck('status')->toArray();
+    $isTerminal = in_array($blotter->current_status, self::TERMINAL_STATUSES, true);
+    $availableStatuses = $isTerminal ? [] : array_diff(self::STATUS_SEQUENCE, $usedStatuses);
     
     // Create status labels mapping for view
     $statusLabels = self::getStatusLabels();
 
     // Return the UPDATE FORM view, not the main Blotter index view
-    return view('forms.update', compact('blotter', 'availableStatuses', 'history', 'statusLabels'));
+    return view('forms.update', compact('blotter', 'availableStatuses', 'history', 'statusLabels', 'isTerminal'));
     }
 
     // STORE NEW UPDATE (NO EDITING)
@@ -183,10 +191,12 @@ return redirect()->route('admin.blotter.index')
     {
         $blotter = Blotter::findOrFail($id);
 
-        
+        if (in_array($blotter->current_status, self::TERMINAL_STATUSES, true)) {
+            return back()->with('error', 'This blotter is already closed and can no longer be updated.');
+        }
 
         $request->validate([
-            'status' => 'required',
+            'status' => ['required', Rule::in(self::STATUS_SEQUENCE)],
             'remarks' => 'required|string',
             'photo_path' => 'nullable|mimes:png,jpg,jpeg|max:4096',
             'date' => 'required|date',
@@ -216,6 +226,8 @@ return redirect()->route('admin.blotter.index')
 
         $blotter->update([
             'current_status' => $request->status,
+            'is_finished' => in_array($request->status, self::TERMINAL_STATUSES, true),
+            'finished_by' => in_array($request->status, self::TERMINAL_STATUSES, true) ? Auth::id() : null,
         ]);
     
         return back()->with('success', 'Blotter updated successfully.');

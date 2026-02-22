@@ -175,9 +175,11 @@
                                                     'first' => 'First Summon',
                                                     'second' => 'Second Summon',
                                                     'third' => 'Third Summon',
-                                                    'brgyHearing' => 'Brgy Hearing',
+                                                    'brgyHearing' => 'Barangay Hearing',
                                                     'coldCase' => 'Cold Case',
                                                     'criminalCase' => 'Criminal Case',
+                                                    'referredToPnp' => 'Referred to PNP',
+                                                    'resolved' => 'Resolved',
                                                 ];
                                                 $statusKey = $blotter->current_status ?? $blotter->status;
                                                 $displayStatus = $statusLabels[$statusKey] ?? ucfirst(strtolower($statusKey));
@@ -188,8 +190,11 @@
                                                     'brgyHearing' => 'warning text-dark',
                                                     'coldCase' => 'secondary',
                                                     'criminalCase' => 'danger',
+                                                    'referredToPnp' => 'dark',
+                                                    'resolved' => 'success',
                                                 ];
                                                 $statusClass = $statusClasses[$statusKey] ?? 'secondary';
+                                                $isTerminal = in_array($statusKey, ['referredToPnp', 'resolved'], true);
                                             @endphp
                                             <span class="badge badge-status bg-{{ $statusClass }}">
                                                 {{ $displayStatus }}
@@ -210,12 +215,18 @@
                                                 <button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#viewBlotter{{ $blotter->id }}">
                                                     <i class="fa fa-eye fa-fw"></i><span>View</span>
                                                 </button>
-                                                <button class="btn btn-sm btn-secondary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#updateBlotter{{ $blotter->id }}">
-                                                    <i class="fa fa-edit fa-fw"></i><span>Edit</span>
-                                                </button>
-                                                <button class="btn btn-sm btn-info d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#statusBlotter{{ $blotter->id }}">
-                                                    <i class="fa fa-flag fa-fw"></i><span>Status</span>
-                                                </button>
+                                                @if($isTerminal)
+                                                    <button class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" type="button" disabled title="This blotter is already closed.">
+                                                        <i class="fa fa-lock fa-fw"></i><span>Closed</span>
+                                                    </button>
+                                                @else
+                                                    <button class="btn btn-sm btn-secondary d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#updateBlotter{{ $blotter->id }}">
+                                                        <i class="fa fa-edit fa-fw"></i><span>Edit</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#statusBlotter{{ $blotter->id }}">
+                                                        <i class="fa fa-flag fa-fw"></i><span>Status</span>
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -332,4 +343,3 @@
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-

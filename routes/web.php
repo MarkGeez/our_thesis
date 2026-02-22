@@ -139,6 +139,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/reports/generate/population', [ReportsController::class, 'generatePopulation'])->name('reports.population');
     Route::post('/reports/generate/blotter', [ReportsController::class, 'generateBlotter'])->name('reports.blotter');
     Route::post('/reports/generate/certificate', [ReportsController::class, 'generateCertificate'])->name('reports.certificate');
+    Route::post('/reports/generate/household', [ReportsController::class, 'generateHousehold'])->name('reports.household');
     Route::get('/reports/view/{id}', [ReportsController::class, 'view'])->name('reports.view');
     Route::get('/reports/print-template/{id}', [ReportsController::class, 'printTemplate'])->name('reports.print-template');
 
@@ -284,4 +285,3 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
         
     });
 });
-
