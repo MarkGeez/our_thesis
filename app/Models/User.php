@@ -106,5 +106,18 @@ class User extends Authenticatable
         Mail::send(new PasswordResetMail($this, $resetUrl));
     }
    
+        protected static function booted()
+        {
+            static::created(function (self $user) {
+                if (class_exists(\App\Services\ActiveLogger::class)) {
+                    \App\Services\ActiveLogger::log('Users', 'created', $user->id, 'Created a new user record');
+                }
+            });
+            static::updated(function (self $user) {
+                if (class_exists(\App\Services\ActiveLogger::class)) {
+                    \App\Services\ActiveLogger::log('Users', 'updated', $user->id, 'Updated a user record');
+                }
+            });
+        }
 }
 

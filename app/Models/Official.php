@@ -22,3 +22,16 @@ class Official extends Model
     
    
 }
+        protected static function booted()
+        {
+            static::created(function (self $official) {
+                if (class_exists(\App\Services\ActiveLogger::class)) {
+                    \App\Services\ActiveLogger::log('Officials', 'created', $official->id, 'Created a new official record');
+                }
+            });
+            static::updated(function (self $official) {
+                if (class_exists(\App\Services\ActiveLogger::class)) {
+                    \App\Services\ActiveLogger::log('Officials', 'updated', $official->id, 'Updated an official record');
+                }
+            });
+        }

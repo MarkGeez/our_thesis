@@ -22,8 +22,8 @@ class Complaints extends Model
     protected static function booted()
     {
         static::created(function (self $complaint) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
+            if (class_exists(\App\Services\ActiveLogger::class)) {
+                \App\Services\ActiveLogger::log(
                     'Complaints',
                     'created',
                     $complaint->id,
@@ -33,8 +33,8 @@ class Complaints extends Model
         });
 
         static::updated(function (self $complaint) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
+            if (class_exists(\App\Services\ActiveLogger::class)) {
+                \App\Services\ActiveLogger::log(
                     'Complaints',
                     'updated',
                     $complaint->id,
@@ -44,8 +44,8 @@ class Complaints extends Model
         });
 
         static::deleted(function (self $complaint) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
+            if (class_exists(\App\Services\ActiveLogger::class)) {
+                \App\Services\ActiveLogger::log(
                     'Complaints',
                     'deleted',
                     $complaint->id,
