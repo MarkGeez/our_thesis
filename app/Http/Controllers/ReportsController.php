@@ -72,20 +72,15 @@ public function generateBlotter(Request $request)
 {
     $request->validate([
         'report_name' => 'required',
-        'date_from' => 'required|date',
-        'date_to' => 'required|date'
+        'blotter_status' => 'nullable|in:all,pending,ongoing,closed,first,second,third,brgyHearing,coldCase,criminalCase,referredToPnp,resolved',
+        'complainant_name' => 'nullable|string|max:150',
+        'date_from' => 'nullable|date',
+        'date_to' => 'nullable|date|after_or_equal:date_from',
     ]);
 
-    // only include blotters that have been marked finished
-    $query = Blotter::where('is_finished', true);
-
-    $query->whereBetween('created_at', [
-        $request->date_from,
-        $request->date_to
-    ]);
-
-    $blotters = $query->get();
     $filters = $request->except(['_token', 'report_form_type']);
+    $filters['blotter_status'] = $filters['blotter_status'] ?? 'all';
+    $blotters = $this->buildBlotterReportQuery($filters)->get();
 
     GeneratedReport::create([
         'report_name' => $request->report_name,
@@ -363,6 +358,44 @@ private function buildPopulationReportQuery(array $filters)
     return $query;
 }
 
+private function buildBlotterReportQuery(array $filters)
+{
+    $query = Blotter::query();
+    $status = $filters['blotter_status'] ?? 'all';
+
+    if (!empty($filters['complainant_name'])) {
+        $search = trim((string) $filters['complainant_name']);
+        $query->where(function ($q) use ($search) {
+            $q->where('plaintiffName', 'like', '%' . $search . '%')
+                ->orWhere('plaintiffMiddleName', 'like', '%' . $search . '%')
+                ->orWhere('plaintiffLastName', 'like', '%' . $search . '%')
+                ->orWhereRaw("CONCAT_WS(' ', plaintiffName, plaintiffMiddleName, plaintiffLastName) like ?", ['%' . $search . '%']);
+        });
+    }
+
+    if ($status !== 'all') {
+        if ($status === 'pending') {
+            $query->whereIn('current_status', ['first', 'second', 'third']);
+        } elseif ($status === 'ongoing') {
+            $query->where('current_status', 'brgyHearing');
+        } elseif ($status === 'closed') {
+            $query->whereIn('current_status', ['coldCase', 'criminalCase', 'referredToPnp', 'resolved']);
+        } else {
+            $query->where('current_status', $status);
+        }
+    }
+
+    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
+    } elseif (!empty($filters['date_from'])) {
+        $query->whereDate('created_at', '>=', $filters['date_from']);
+    } elseif (!empty($filters['date_to'])) {
+        $query->whereDate('created_at', '<=', $filters['date_to']);
+    }
+
+    return $query->latest();
+}
+
 public function view($id)
 {
     $report = GeneratedReport::findOrFail($id);
@@ -373,11 +406,7 @@ public function view($id)
     }
 
     if ($report->report_type == 'blotter') {
-        $data = Blotter::where('is_finished', true)
-            ->whereBetween('created_at', [
-                $filters['date_from'],
-                $filters['date_to']
-            ])->get();
+        $data = $this->buildBlotterReportQuery($filters)->get();
     }
 
     if ($report->report_type == 'certificate') {
@@ -449,11 +478,7 @@ public function printTemplate($id)
     }
 
     if ($report->report_type == 'blotter') {
-        $data = Blotter::where('is_finished', true)
-            ->whereBetween('created_at', [
-                $filters['date_from'],
-                $filters['date_to']
-            ])->get();
+        $data = $this->buildBlotterReportQuery($filters)->get();
     }
 
     if ($report->report_type == 'certificate') {

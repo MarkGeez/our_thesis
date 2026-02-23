@@ -268,11 +268,11 @@
         $stats = [];
 
         if ($type === 'blotter') {
-            $statusGroups = $allData->groupBy(fn($r) => strtolower($r->status ?? 'unknown'));
+            $statusGroups = $allData->groupBy(fn($r) => strtolower($r->current_status ?? $r->status ?? 'unknown'));
             $stats[] = ['label' => 'Total Cases',     'value' => $allData->count(),                            'color' => 'black'];
-            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->get('pending',   collect())->count(), 'color' => 'amber'];
-            $stats[] = ['label' => 'Resolved',        'value' => $statusGroups->get('resolved',  collect())->count(), 'color' => 'green'];
-            $stats[] = ['label' => 'Dismissed',       'value' => $statusGroups->get('dismissed', collect())->count(), 'color' => 'slate'];
+            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->only(['first', 'second', 'third'])->flatten(1)->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'Ongoing',         'value' => $statusGroups->only(['brgyhearing'])->flatten(1)->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Closed',          'value' => $statusGroups->only(['coldcase', 'criminalcase', 'referredtopnp', 'resolved'])->flatten(1)->count(), 'color' => 'slate'];
 
         } elseif ($type === 'certificate') {
             $statusGroups  = $allData->groupBy(fn($r) => strtolower($r->status ?? 'unknown'));
@@ -454,9 +454,22 @@
                                     <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                 @endif
                             @elseif($type == 'blotter')
-                                <td data-col="plaintiff">{{ ucwords(strtolower($row->plaintiffName)) }} {{ ucwords(strtolower($row->plaintiffLastName)) }}</td>
+                                @php
+                                    $blotterStatusMap = [
+                                        'first' => 'First Summon',
+                                        'second' => 'Second Summon',
+                                        'third' => 'Third Summon',
+                                        'brgyHearing' => 'Barangay Hearing',
+                                        'coldCase' => 'Cold Case',
+                                        'criminalCase' => 'Criminal Case',
+                                        'referredToPnp' => 'Referred To PNP',
+                                        'resolved' => 'Resolved',
+                                    ];
+                                    $blotterStatus = $row->current_status ?? $row->status;
+                                @endphp
+                                <td data-col="plaintiff">{{ trim(ucwords(strtolower(($row->plaintiffName ?? '') . ' ' . ($row->plaintiffMiddleName ?? '') . ' ' . ($row->plaintiffLastName ?? '')))) }}</td>
                                 <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
-                                <td data-col="status">{{ ucfirst($row->status) }}</td>
+                                <td data-col="status">{{ $blotterStatusMap[$blotterStatus] ?? ucfirst((string) $blotterStatus) }}</td>
                             @elseif($type == 'certificate')
                                 <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>

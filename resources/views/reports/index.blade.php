@@ -205,6 +205,12 @@
         min-width: 0;
     }
 
+    .optional-hint {
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
     @media (max-width: 768px) {
         .reports-container {
             padding: 1rem;
@@ -270,7 +276,7 @@
                 <div class="card-body py-4">
                     <i class="fas fa-scale-balanced fa-3x text-danger mb-3"></i>
                     <h5 class="fw-bold mb-1">Blotter Report</h5>
-                    <p class="text-muted small mb-0">Finished case records within selected dates</p>
+                    <p class="text-muted small mb-0">All or filtered blotter cases by status and complainant</p>
                 </div>
             </div>
         </div>
@@ -383,13 +389,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
                             <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Age Group</label>
+                            <label class="form-label fw-semibold">Age Group <span class="text-muted">(Optional)</span></label>
                             <select name="age_group" class="form-select">
                                 <option value="">All</option>
                                 <option value="children" {{ old('age_group') == 'children' ? 'selected' : '' }}>Children (0-12)</option>
@@ -399,7 +410,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Gender</label>
+                            <label class="form-label fw-semibold">Gender <span class="text-muted">(Optional)</span></label>
                             <select name="gender" class="form-select">
                                 <option value="">All</option>
                                 <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
@@ -407,7 +418,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Street</label>
+                            <label class="form-label fw-semibold">Street <span class="text-muted">(Optional)</span></label>
                             <select name="street_id" class="form-select" id="populationStreetFilter">
                                 <option value="">All</option>
                                 @foreach(($streetOptions ?? collect()) as $street)
@@ -418,7 +429,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">House Number</label>
+                            <label class="form-label fw-semibold">House Number <span class="text-muted">(Optional)</span></label>
                             <select name="house_id" class="form-select" id="populationHouseFilter">
                                 <option value="">All</option>
                                 @foreach(($houseOptions ?? collect()) as $house)
@@ -433,7 +444,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Parent Status</label>
+                            <label class="form-label fw-semibold">Parent Status <span class="text-muted">(Optional)</span></label>
                             <select name="parent" class="form-select">
                                 <option value="">All</option>
                                 <option value="yes" {{ old('parent') == 'yes' ? 'selected' : '' }}>Yes</option>
@@ -442,7 +453,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Civil Status</label>
+                            <label class="form-label fw-semibold">Civil Status <span class="text-muted">(Optional)</span></label>
                             <select name="civil_status" class="form-select">
                                 <option value="">All</option>
                                 <option value="single" {{ old('civil_status') == 'single' ? 'selected' : '' }}>Single</option>
@@ -455,7 +466,7 @@
                             <label class="form-label fw-semibold text-muted"><i class="fas fa-cake-candles me-1"></i>Birthday Range (Optional)</label>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Birthday From</label>
+                            <label class="form-label fw-semibold">Birthday From <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -471,7 +482,7 @@
                             <small class="text-muted d-block mt-1">Start of birthday period (e.g., Jan 1)</small>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Birthday To</label>
+                            <label class="form-label fw-semibold">Birthday To <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -485,6 +496,9 @@
                                 </span>
                             </div>
                             <small class="text-muted d-block mt-1">End of birthday period (e.g., Dec 31)</small>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Leave birthday dates blank to include all birthdays/dates.</small>
                         </div>
                     </div>
                 </div>
@@ -508,13 +522,45 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank. Leave date fields untouched to include all dates.
+                        </span>
+                    </div>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
-                            <input type="text" name="report_name" class="form-control" required>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">From Date <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Status <span class="text-muted">(Optional)</span></label>
+                            <select name="blotter_status" class="form-select">
+                                <option value="all" {{ old('blotter_status', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (First-Third Summon)</option>
+                                <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Hearing)</option>
+                                <option value="closed" {{ old('blotter_status') === 'closed' ? 'selected' : '' }}>Closed</option>
+                                <option value="first" {{ old('blotter_status') === 'first' ? 'selected' : '' }}>First Summon</option>
+                                <option value="second" {{ old('blotter_status') === 'second' ? 'selected' : '' }}>Second Summon</option>
+                                <option value="third" {{ old('blotter_status') === 'third' ? 'selected' : '' }}>Third Summon</option>
+                                <option value="brgyHearing" {{ old('blotter_status') === 'brgyHearing' ? 'selected' : '' }}>Barangay Hearing</option>
+                                <option value="coldCase" {{ old('blotter_status') === 'coldCase' ? 'selected' : '' }}>Cold Case</option>
+                                <option value="criminalCase" {{ old('blotter_status') === 'criminalCase' ? 'selected' : '' }}>Criminal Case</option>
+                                <option value="referredToPnp" {{ old('blotter_status') === 'referredToPnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="resolved" {{ old('blotter_status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Complainant Name <span class="text-muted">(Optional)</span></label>
+                            <input
+                                type="text"
+                                name="complainant_name"
+                                class="form-control"
+                                value="{{ old('complainant_name') }}"
+                                placeholder="e.g. Juan Dela Cruz"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -522,7 +568,6 @@
                                     class="form-control report-date-input"
                                     value="{{ old('date_from') }}"
                                     data-raw="{{ old('date_from') }}"
-                                    required
                                 >
                                 <span class="input-group-text report-date-open">
                                     <i class="fa fa-calendar"></i>
@@ -530,7 +575,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">To Date <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">To Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -538,7 +583,6 @@
                                     class="form-control report-date-input"
                                     value="{{ old('date_to') }}"
                                     data-raw="{{ old('date_to') }}"
-                                    required
                                 >
                                 <span class="input-group-text report-date-open">
                                     <i class="fa fa-calendar"></i>
@@ -546,7 +590,7 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <small class="text-muted">Only blotter cases marked as finished are included.</small>
+                            <small class="text-muted">Leave dates blank to include all blotters. Use status and complainant filters as needed.</small>
                         </div>
                     </div>
                 </div>
@@ -570,6 +614,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
@@ -660,7 +709,7 @@
                             <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Report View</label>
+                            <label class="form-label fw-semibold">Report View <span class="text-muted">(Optional)</span></label>
                             <select name="report_scope" class="form-select" id="householdReportScope">
                                 <option value="summary" {{ old('report_scope', 'family_members') === 'summary' ? 'selected' : '' }}>Household Summary</option>
                                 <option value="family_members" {{ old('report_scope', 'family_members') === 'family_members' ? 'selected' : '' }}>Tagged Family Members (by Head)</option>
@@ -668,7 +717,7 @@
                             <small class="text-muted d-block mt-1">Use this to generate a particular family under one house head.</small>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Street</label>
+                            <label class="form-label fw-semibold">Street <span class="text-muted">(Optional)</span></label>
                             <select name="street_id" class="form-select" id="householdStreetFilter">
                                 <option value="">All</option>
                                 @foreach(($streetOptions ?? collect()) as $street)
@@ -679,7 +728,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">House</label>
+                            <label class="form-label fw-semibold">House <span class="text-muted">(Optional)</span></label>
                             <select name="house_id" class="form-select" id="householdHouseFilter">
                                 <option value="">All</option>
                                 @foreach(($houseOptions ?? collect()) as $house)
@@ -694,7 +743,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 household-summary-only">
-                            <label class="form-label fw-semibold">House Head Presence</label>
+                            <label class="form-label fw-semibold">House Head Presence <span class="text-muted">(Optional)</span></label>
                             <select name="has_head" class="form-select">
                                 <option value="">All</option>
                                 <option value="yes" {{ old('has_head') === 'yes' ? 'selected' : '' }}>With House Head</option>
@@ -702,7 +751,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Specific House Head</label>
+                            <label class="form-label fw-semibold">Specific House Head <span class="text-muted">(Optional)</span></label>
                             <select name="household_head_id" class="form-select">
                                 <option value="">All</option>
                                 @foreach(($houseHeadOptions ?? collect()) as $head)
@@ -713,11 +762,11 @@
                             </select>
                         </div>
                         <div class="col-md-6 household-summary-only">
-                            <label class="form-label fw-semibold">Minimum Family Members</label>
+                            <label class="form-label fw-semibold">Minimum Family Members <span class="text-muted">(Optional)</span></label>
                             <input type="number" min="0" name="min_members" class="form-control" value="{{ old('min_members') }}" placeholder="e.g. 1">
                         </div>
                         <div class="col-md-6 household-summary-only">
-                            <label class="form-label fw-semibold">Maximum Family Members</label>
+                            <label class="form-label fw-semibold">Maximum Family Members <span class="text-muted">(Optional)</span></label>
                             <input type="number" min="0" name="max_members" class="form-control" value="{{ old('max_members') }}" placeholder="e.g. 10">
                         </div>
                     </div>

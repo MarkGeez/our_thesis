@@ -134,6 +134,54 @@
 
         .loading-spinner { text-align: center; padding: 40px; color: #64748b; }
         .no-data-message { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; font-size: 0.9rem; }
+
+        .stats-card {
+            border: none;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+            height: 100%;
+        }
+
+        .stats-card .card-body {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .stats-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+
+        .stats-title {
+            font-size: 0.78rem;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .stats-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.1;
+        }
+
+        .stats-caption {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
@@ -149,6 +197,57 @@
             <div class="container-fluid px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 style="color:#000000; margin: 20px 45px;">Household Management</h2>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <span class="stats-icon"><i class="fas fa-crown"></i></span>
+                                <div>
+                                    <div class="stats-title">Household Heads</div>
+                                    <div class="stats-number">{{ $stats['total_heads'] ?? 0 }}</div>
+                                    <div class="stats-caption">Heads tagged in households</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <span class="stats-icon"><i class="fas fa-users"></i></span>
+                                <div>
+                                    <div class="stats-title">Families Active</div>
+                                    <div class="stats-number">{{ $stats['families_with_members'] ?? 0 }}</div>
+                                    <div class="stats-caption">{{ $stats['head_engagement_rate'] ?? 0 }}% of heads added members</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <span class="stats-icon"><i class="fas fa-people-group"></i></span>
+                                <div>
+                                    <div class="stats-title">Tagged Members</div>
+                                    <div class="stats-number">{{ $stats['total_members'] ?? 0 }}</div>
+                                    <div class="stats-caption">Avg {{ $stats['average_members_per_family'] ?? 0 }} per active family</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <span class="stats-icon"><i class="fas fa-house"></i></span>
+                                <div>
+                                    <div class="stats-title">Household Coverage</div>
+                                    <div class="stats-number">{{ $stats['households_with_members'] ?? 0 }}/{{ $stats['total_households'] ?? 0 }}</div>
+                                    <div class="stats-caption">{{ $stats['household_coverage_rate'] ?? 0 }}% have members</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row g-4">

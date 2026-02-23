@@ -175,9 +175,24 @@
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                     @endif
                                 @elseif($type == 'blotter')
-                                    <td data-col="plaintiff">{{ ucwords(strtolower($row->plaintiffName)) }} {{ ucwords(strtolower($row->plaintiffLastName)) }}</td>
+                                    @php
+                                        $blotterStatusMap = [
+                                            'first' => 'First Summon',
+                                            'second' => 'Second Summon',
+                                            'third' => 'Third Summon',
+                                            'brgyHearing' => 'Barangay Hearing',
+                                            'coldCase' => 'Cold Case',
+                                            'criminalCase' => 'Criminal Case',
+                                            'referredToPnp' => 'Referred To PNP',
+                                            'resolved' => 'Resolved',
+                                        ];
+                                        $blotterStatus = $row->current_status ?? $row->status;
+                                    @endphp
+                                    <td data-col="plaintiff">
+                                        {{ trim(ucwords(strtolower(($row->plaintiffName ?? '') . ' ' . ($row->plaintiffMiddleName ?? '') . ' ' . ($row->plaintiffLastName ?? '')))) }}
+                                    </td>
                                     <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
-                                    <td data-col="status">{{ ucfirst($row->status) }}</td>
+                                    <td data-col="status">{{ $blotterStatusMap[$blotterStatus] ?? ucfirst((string) $blotterStatus) }}</td>
                                 @elseif($type == 'certificate')
                                     <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
