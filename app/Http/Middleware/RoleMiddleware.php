@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Resident;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
@@ -16,10 +16,48 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, $role): Response
     {
-        if(!auth()->user()|| auth()->user()->role !== $role){
+        $user = auth()->user();
+
+        if (!$user) {
             abort(404);
         }
 
+        // Keep role in sync: once a non-resident is encoded as resident, promote automatically.
+        if ($user->role === 'non-resident') {
+            $resident = Resident::where('user_id', $user->id)->first();
+
+            if (!$resident) {
+                $resident = Resident::whereRaw('LOWER(firstName) = ?', [strtolower((string) $user->firstName)])
+                    ->whereRaw('LOWER(middleName) = ?', [strtolower((string) $user->middleName)])
+                    ->whereRaw('LOWER(lastName) = ?', [strtolower((string) $user->lastName)])
+                    ->whereDate('birthday', $user->birthday)
+                    ->first();
+            }
+
+            if ($resident) {
+                if (!$resident->user_id) {
+                    $resident->update(['user_id' => $user->id]);
+                }
+                $user->update(['role' => 'resident']);
+                $user->refresh();
+            }
+        }
+
+        if ($user->role !== $role) {
+            if ($user->role === 'resident') {
+                return redirect('/resident/dashboard');
+            }
+            if ($user->role === 'non-resident') {
+                return redirect('/non-resident/dashboard');
+            }
+            if ($user->role === 'admin') {
+                return redirect('/admin/dashboard');
+            }
+            if ($user->role === 'subadmin') {
+                return redirect('/subadmin/dashboard');
+            }
+            abort(404);
+        }
 
         return $next($request);
     }

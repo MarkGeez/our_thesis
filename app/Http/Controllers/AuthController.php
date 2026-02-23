@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use App\Models\User;
+use App\Models\Resident;
 
 class AuthController extends Controller
 {
@@ -16,9 +17,35 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    private function syncResidentRole(User $user): void
+    {
+        if ($user->role !== 'non-resident') {
+            return;
+        }
+
+        $resident = Resident::where('user_id', $user->id)->first();
+
+        if (!$resident) {
+            $resident = Resident::whereRaw('LOWER(firstName) = ?', [strtolower((string) $user->firstName)])
+                ->whereRaw('LOWER(middleName) = ?', [strtolower((string) $user->middleName)])
+                ->whereRaw('LOWER(lastName) = ?', [strtolower((string) $user->lastName)])
+                ->whereDate('birthday', $user->birthday)
+                ->first();
+        }
+
+        if ($resident) {
+            if (!$resident->user_id) {
+                $resident->update(['user_id' => $user->id]);
+            }
+            $user->update(['role' => 'resident']);
+        }
+    }
+
     private function redirect(): RedirectResponse
 {
     $user = Auth::user();
+    $this->syncResidentRole($user);
+    $user->refresh();
 
     switch ($user->role) {
         case 'admin':

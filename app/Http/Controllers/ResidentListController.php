@@ -12,6 +12,7 @@ use App\Models\Household;
 use App\Models\HouseholdResident;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 
 class ResidentListController extends Controller
@@ -135,6 +136,19 @@ public function searchResidents(Request $request)
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
 
+        // If this resident already has a registered user account, auto-link it.
+        $matchedUser = User::whereRaw('LOWER(firstName) = ?', [$validated['firstName']])
+            ->whereRaw('LOWER(middleName) = ?', [$validated['middleName']])
+            ->whereRaw('LOWER(lastName) = ?', [$validated['lastName']])
+            ->whereDate('birthday', $validated['birthday'])
+            ->whereIn('role', ['resident', 'non-resident'])
+            ->whereDoesntHave('resident')
+            ->first();
+
+        if ($matchedUser) {
+            $validated['user_id'] = $matchedUser->id;
+        }
+
         // Create resident
         $resident = Resident::create($validated);
 $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);  
@@ -142,6 +156,11 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
     'household_id' => $household->id,
     'resident_id'  => $resident->id,
     'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,]);
+
+        // Auto-promote linked users to resident role once encoded by admin.
+        if ($matchedUser && $matchedUser->role !== 'resident') {
+            $matchedUser->update(['role' => 'resident']);
+        }
     
         return redirect()->back()->with('success', 'Resident encoded successfully!');
     
