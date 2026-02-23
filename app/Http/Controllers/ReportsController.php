@@ -53,67 +53,8 @@ public function generatePopulation(Request $request)
         'birthday_from' => 'nullable|date_format:Y-m-d',
         'birthday_to' => 'nullable|date_format:Y-m-d',
     ]);
-
-    $query = \App\Models\Resident::query()
-        ->leftJoin('household_resident', 'residents.id', '=', 'household_resident.resident_id')
-        ->leftJoin('households', 'household_resident.household_id', '=', 'households.id')
-        ->leftJoin('houses', 'households.house_id', '=', 'houses.id')
-        ->leftJoin('streets', 'houses.street_id', '=', 'streets.id')
-        ->select('residents.*', 'streets.street_name as street_name', 'houses.house_no as house_no');
-
-    // backward compatibility for old 'filter' parameter
-    if (!$request->filled('age_group') && $request->filled('filter')) {
-        if ($request->filter === 'senior') {
-            $request->merge(['age_group' => 'senior']);
-        }
-    }
-
-    // Age group filter
-    if ($request->filled('age_group')) {
-        switch ($request->age_group) {
-            case 'children':
-                $query->whereBetween('age', [0, 12]);
-                break;
-            case 'youth':
-                $query->whereBetween('age', [13, 17]);
-                break;
-            case 'adults':
-                $query->whereBetween('age', [18, 59]);
-                break;
-            case 'senior':
-                $query->where('age', '>=', 60);
-                break;
-        }
-    }
-
-    // Gender
-    if ($request->filled('gender')) {
-        $query->where('sex', $request->gender);
-    }
-
-    // Street
-    if ($request->filled('street')) {
-        $query->where('streets.street_name', $request->street);
-    }
-
-    // Parent status
-    if ($request->filled('parent')) {
-        $query->where('parent', $request->parent);
-    }
-
-    // Civil status (column may not exist, check first)
-    if ($request->filled('civil_status') && 
-        
-        \Schema::hasColumn('residents', 'civil_status')) {
-        $query->where('civil_status', $request->civil_status);
-    }
-
-    // Birthday range filter (optional) - filters by month-day regardless of year
-    if ($request->filled('birthday_from') && $request->filled('birthday_to')) {
-        $query->whereRaw("DATE_FORMAT(birthday, '%m-%d') BETWEEN DATE_FORMAT(?, '%m-%d') AND DATE_FORMAT(?, '%m-%d')", 
-                         [$request->birthday_from, $request->birthday_to]);
-    }
-
+    $filters = $request->except(['_token', 'report_form_type']);
+    $query = $this->buildPopulationReportQuery($filters);
     $residents = $query->get();
 
     GeneratedReport::create([
@@ -428,59 +369,7 @@ public function view($id)
     $filters = is_array($report->filters_used) ? $report->filters_used : (json_decode($report->filters_used, true) ?? []);
 
     if ($report->report_type == 'population') {
-        $query = \App\Models\Resident::query()
-            ->leftJoin('household_resident', 'residents.id', '=', 'household_resident.resident_id')
-            ->leftJoin('households', 'household_resident.household_id', '=', 'households.id')
-            ->leftJoin('houses', 'households.house_id', '=', 'houses.id')
-            ->leftJoin('streets', 'houses.street_id', '=', 'streets.id')
-            ->select('residents.*', 'streets.street_name as street_name', 'houses.house_no as house_no');
-
-        // backward compatibility: old reports used 'filter' => 'senior'
-        if (empty($filters['age_group']) && isset($filters['filter']) && $filters['filter'] === 'senior') {
-            $filters['age_group'] = 'senior';
-        }
-
-        // apply age grouping logic
-        if (!empty($filters['age_group'])) {
-            switch ($filters['age_group']) {
-                case 'children':
-                    $query->whereBetween('age', [0, 12]);
-                    break;
-                case 'youth':
-                    $query->whereBetween('age', [13, 17]);
-                    break;
-                case 'adults':
-                    $query->whereBetween('age', [18, 59]);
-                    break;
-                case 'senior':
-                    $query->where('age', '>=', 60);
-                    break;
-            }
-        }
-
-        if (!empty($filters['gender'])) {
-            $query->where('sex', $filters['gender']);
-        }
-
-        if (!empty($filters['street'])) {
-            $query->where('streets.street_name', $filters['street']);
-        }
-
-        if (!empty($filters['parent'])) {
-            $query->where('parent', $filters['parent']);
-        }
-
-        if (!empty($filters['civil_status']) && \Schema::hasColumn('residents', 'civil_status')) {
-            $query->where('civil_status', $filters['civil_status']);
-        }
-
-        // Apply birthday range filter if present
-        if (!empty($filters['birthday_from']) && !empty($filters['birthday_to'])) {
-            $query->whereRaw("DATE_FORMAT(birthday, '%m-%d') BETWEEN DATE_FORMAT(?, '%m-%d') AND DATE_FORMAT(?, '%m-%d')", 
-                             [$filters['birthday_from'], $filters['birthday_to']]);
-        }
-
-        $data = $query->get();
+        $data = $this->buildPopulationReportQuery($filters)->get();
     }
 
     if ($report->report_type == 'blotter') {

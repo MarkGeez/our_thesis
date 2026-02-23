@@ -125,7 +125,6 @@
                                 <th data-col="birthdate">Birthdate</th>
                                 <th data-col="age">Age</th>
                                 <th data-col="sex">Sex</th>
-                                <th data-col="house_no">House No</th>
                                 <th data-col="street">Street</th>
                                 <th data-col="house_no">House No.</th>
                                 <th data-col="parent_status">Parent Status</th>
@@ -169,8 +168,8 @@
                                     <td data-col="birthdate">{{ $row->birthday }}</td>
                                     <td data-col="age">{{ $row->age }}</td>
                                     <td data-col="sex">{{ ucfirst($row->sex) }}</td>
-                                    <td data-col="house_no">{{ $row->house_no ?? 'N/A' }}</td>
-                                    <td data-col="street">{{ $row->street_name ?? 'N/A' }}</td>
+                                    <td data-col="street">{{ $residentStreet ?? 'N/A' }}</td>
+                                    <td data-col="house_no">{{ $residentHouseNo ?? 'N/A' }}</td>
                                     <td data-col="parent_status">{{ ucfirst($row->parent) }}</td>
                                     @if(\Schema::hasColumn('residents', 'civil_status'))
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>

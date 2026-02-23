@@ -259,6 +259,22 @@
     display: flex;
     align-items: center;
     gap: 10px; /* space between icon and text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Keep icon flex-shrink so it never gets squished */
+.sidebar-body-menu a .icon,
+.cat-sub-menu a .icon,
+.show-cat-btn .icon {
+    flex-shrink: 0;
+}
+
+/* Shrink font slightly for long labels only, keeps them readable */
+.sidebar-body-menu a,
+.cat-sub-menu a {
+    font-size: 0.875rem;
 }
 </style>
 
@@ -312,12 +328,11 @@
 
                 @php
                     $servicesActive = Request::routeIs(
-                        'admin.blotter.*',
-                        'admin.adminCertificate*',
-                        'admin.adminServices*',
-                        'admin.adminComplaint*'
+                    'admin.adminCertificate*',
+                    'admin.adminComplaint*',
+                    'admin.adminServices*'
                     );
-                @endphp
+                    @endphp
                 <li>
                     <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="#">
                          E-Barangay Services
@@ -388,25 +403,28 @@
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Document Requests
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Document Requests</p>
                     </a>
                 </li>
 
                 <li>
                     <a class="{{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
                        href="{{ route('admin.complaintRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span>Complaints Records
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records</p>
                     </a>
                 </li>
-    {{--  
+ 
                 <li>
-                    <a class="{{ Request::routeIs('admin.reports') ? 'active' : '' }}"
-                       href="{{ route('admin.reports') }}">
-                        <span class="icon"><i class="fa-solid fa-clipboard-list"></i></i></span>Reports
+                    <a class="{{ Request::routeIs('admin.reports.*') ? 'active' : '' }}"
+                       href="{{ route('admin.reports.index') }}">
+                        <span class="icon"><i class="fa-solid fa-clipboard-list"></i></span>Reports
                     </a>
                 </li>
---}}
+
                  <li>
+
+
+
                     <a class="{{ Request::routeIs('admin.archives') ? 'active' : '' }}"
                        href="{{ route('admin.archives') }}">
                         <span class="icon"><i class="fa-solid fa-box-archive"></i></span>Archives
