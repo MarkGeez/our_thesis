@@ -471,6 +471,12 @@ public function view($id)
 public function printTemplate($id)
 {
     $report = GeneratedReport::findOrFail($id);
+    \App\Services\ActiveLogger::log(
+        'Reports',
+        'printed',
+        $report->id,
+        'Printed a report'
+    );
     $filters = is_array($report->filters_used) ? $report->filters_used : (json_decode($report->filters_used, true) ?? []);
 
     if ($report->report_type == 'population') {

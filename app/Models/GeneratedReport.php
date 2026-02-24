@@ -8,6 +8,7 @@ use App\Models\User;
 
 
 class GeneratedReport extends Model
+    
 {
     // table name does not follow Laravel's pluralization for this model
     protected $table = 'reports';
@@ -29,6 +30,28 @@ class GeneratedReport extends Model
     {
         return $this->belongsTo(User::class, 'generated_by');
     }
+    public function printReport()
+    {
+        // Add your report printing logic here
+        ActiveLogger::log(
+            'Reports',
+            'printed',
+            $this->id,
+            'Printed a report'
+        );
+    }
+
+    public function convertToPdf()
+    {
+        // Add your PDF conversion logic here
+        ActiveLogger::log(
+            'Reports',
+            'converted_to_pdf',
+            $this->id,
+            'Converted report to PDF'
+        );
+    }
+    
     protected static function booted()
     {
         static::created(function ($report) {

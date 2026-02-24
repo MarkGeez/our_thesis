@@ -251,6 +251,12 @@ class CertificateController extends Controller
         };
         
         $req->update(['status' => 'picked_up']);
+        \App\Services\ActiveLogger::log(
+            'Certificate',
+            'printed',
+            $req->id,
+            'Printed a certificate'
+        );
         
         return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
     }
