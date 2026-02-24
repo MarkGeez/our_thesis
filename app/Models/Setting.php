@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Services\ActiveLogger;
 
 class Setting extends Model
+
 {
     protected $table = 'settings';
     
@@ -17,6 +19,31 @@ class Setting extends Model
         'contact_email',
     ];
 
+      protected static function booted()
+    {
+        static::created(function ($setting) {
+            ActiveLogger::log(
+                'Setting',
+                'created',
+                $setting->id,
+                'Created a new setting'
+            );
+        });
+
+        static::updated(function ($setting) {
+            ActiveLogger::log(
+                'Setting',
+                'updated',
+                $setting->id,
+                'Updated a setting'
+            );
+        });
+
+        static::deleted(function($setting){
+            ActiveLogger::log('Setting', 'archived', $setting->id, 'Archived a setting');
+        });
+    }
+    
     public static function get($key, $default = null)
     {
         $setting = self::first();
