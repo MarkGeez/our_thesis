@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+    use App\Services\ActiveLogger;
+
 class Resident extends Model
 {
     use HasFactory;
@@ -30,22 +32,24 @@ class Resident extends Model
 
     protected static function booted()
     {
-        static::created(function (self $resident) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log('Residents', 'created', $resident->id, 'Created a new resident record');
-            }
+        static::created(function ($resident) {
+            ActiveLogger::log(
+                'Residents',
+                'created',
+                $resident->id,
+                'Created a new resident'
+            );
         });
-
-        static::updated(function (self $resident) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log('Residents', 'updated', $resident->id, 'Updated a resident record');
-            }
+        static::updated(function ($resident) {
+            ActiveLogger::log(
+                'Residents',
+                'updated',
+                $resident->id,
+                'Updated a resident'
+            );
         });
-
-        static::deleted(function (self $resident) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log('Residents', 'deleted', $resident->id, 'Deleted a resident record');
-            }
+        static::deleted(function($resident){
+            ActiveLogger::log('Residents', 'archived', $resident->id, 'Archived a resident');
         });
     }
 

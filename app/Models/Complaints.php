@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-// Import ActiveLogger if needed.
-// use App\Services\ActiveLogger;
+use App\Services\ActiveLogger;
 
 class Complaints extends Model
 {
@@ -21,37 +20,26 @@ class Complaints extends Model
 
     protected static function booted()
     {
-        static::created(function (self $complaint) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log(
-                    'Complaints',
-                    'created',
-                    $complaint->id,
-                    'Created a new complaint record'
-                );
-            }
+        static::created(function ($complaint) {
+            ActiveLogger::log(
+                'Complaints',
+                'created',
+                $complaint->id,
+                'Created a new complaint'
+            );
         });
 
-        static::updated(function (self $complaint) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log(
-                    'Complaints',
-                    'updated',
-                    $complaint->id,
-                    'Updated a complaint record'
-                );
-            }
+        static::updated(function ($complaint) {
+            ActiveLogger::log(
+                'Complaints',
+                'updated',
+                $complaint->id,
+                'Updated a complaint'
+            );
         });
 
-        static::deleted(function (self $complaint) {
-            if (class_exists(\App\Services\ActiveLogger::class)) {
-                \App\Services\ActiveLogger::log(
-                    'Complaints',
-                    'deleted',
-                    $complaint->id,
-                    'Deleted a complaint record'
-                );
-            }
+        static::deleted(function($complaint){
+            ActiveLogger::log('Complaints', 'archived', $complaint->id, 'Archived a complaint');
         });
     }
 

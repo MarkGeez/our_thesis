@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+    use \App\Services\ActiveLogger;
+
 
 class GeneratedReport extends Model
 {
@@ -27,17 +29,26 @@ class GeneratedReport extends Model
     {
         return $this->belongsTo(User::class, 'generated_by');
     }
-        protected static function booted()
-        {
-            static::created(function (self $report) {
-                if (class_exists(\App\Services\ActiveLogger::class)) {
-                    \App\Services\ActiveLogger::log('Reports', 'created', $report->id, 'Created a new report record');
-                }
-            });
-            static::updated(function (self $report) {
-                if (class_exists(\App\Services\ActiveLogger::class)) {
-                    \App\Services\ActiveLogger::log('Reports', 'updated', $report->id, 'Updated a report record');
-                }
-            });
-        }
+    protected static function booted()
+    {
+        static::created(function ($report) {
+            ActiveLogger::log(
+                'Reports',
+                'created',
+                $report->id,
+                'Created a new report'
+            );
+        });
+        static::updated(function ($report) {
+            ActiveLogger::log(
+                'Reports',
+                'updated',
+                $report->id,
+                'Updated a report'
+            );
+        });
+        static::deleted(function($report){
+            ActiveLogger::log('Reports', 'archived', $report->id, 'Archived a report');
+        });
+    }
 }

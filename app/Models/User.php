@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\URL;
 use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail; 
+use App\Services\ActiveLogger;
 
 class User extends Authenticatable
 {
@@ -106,18 +107,25 @@ class User extends Authenticatable
         Mail::send(new PasswordResetMail($this, $resetUrl));
     }
    
-        protected static function booted()
-        {
-            static::created(function (self $user) {
-                if (class_exists(\App\Services\ActiveLogger::class)) {
-                    \App\Services\ActiveLogger::log('Users', 'created', $user->id, 'Created a new user record');
-                }
-            });
-            static::updated(function (self $user) {
-                if (class_exists(\App\Services\ActiveLogger::class)) {
-                    \App\Services\ActiveLogger::log('Users', 'updated', $user->id, 'Updated a user record');
-                }
-            });
-        }
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            ActiveLogger::log(
+                'Users',
+                'created',
+                $user->id,
+                'Created a new user'
+            );
+        });
+        static::updated(function ($user) {
+            ActiveLogger::log(
+                'Users',
+                'updated',
+                $user->id,
+                'Updated a user'
+            );
+        });
+        
+    }
 }
 

@@ -20,9 +20,7 @@ class Official extends Model
         return $this->belongsTo(Resident::class, 'resident_id');
     }
     
-   
-}
-        protected static function booted()
+    protected static function booted()
         {
             static::created(function (self $official) {
                 if (class_exists(\App\Services\ActiveLogger::class)) {
@@ -35,3 +33,5 @@ class Official extends Model
                 }
             });
         }
+}
+       

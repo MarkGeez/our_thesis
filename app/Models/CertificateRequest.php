@@ -4,9 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-// Import ActiveLogger if it lives in another namespace.
-// Adjust the namespace if needed.
-// use App\Services\ActiveLogger;
+use App\Services\ActiveLogger;
 
 class CertificateRequest extends Model
 {
@@ -36,37 +34,26 @@ class CertificateRequest extends Model
 
     protected static function booted()
     {
-        static::created(function (self $request) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
-                    'CertificateRequest',
-                    'created',
-                    $request->id,
-                    'Created a new certificate request record'
-                );
-            }
+        static::created(function ($certificate) {
+            ActiveLogger::log(
+                'Certificate',
+                'created',
+                $certificate->id,
+                'Created a new certificate'
+            );
         });
 
-        static::updated(function (self $request) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
-                    'CertificateRequest',
-                    'updated',
-                    $request->id,
-                    'Updated a certificate request record'
-                );
-            }
+        static::updated(function ($certificate) {
+            ActiveLogger::log(
+                'Certificate',
+                'updated',
+                $certificate->id,
+                'Updated a certificate'
+            );
         });
 
-        static::deleted(function (self $request) {
-            if (class_exists(\ActiveLogger::class)) {
-                \ActiveLogger::log(
-                    'CertificateRequest',
-                    'deleted',
-                    $request->id,
-                    'Deleted a certificate request record'
-                );
-            }
+        static::deleted(function($certificate){
+            ActiveLogger::log('Certificate', 'archived', $certificate->id, 'Archived a certificate');
         });
     }
 
