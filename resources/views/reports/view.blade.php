@@ -135,6 +135,8 @@
                                 <th data-col="plaintiff">Plaintiff</th>
                                 <th data-col="defendant">Defendant</th>
                                 <th data-col="status">Status</th>
+                                <th data-col="details">Details</th>
+                                <th data-col="status_history">Status History</th>
                             @elseif($type == 'certificate')
                                 <th data-col="resident">Resident</th>
                                 <th data-col="certificate_type">Certificate Type</th>
@@ -187,12 +189,33 @@
                                             'resolved' => 'Resolved',
                                         ];
                                         $blotterStatus = $row->current_status ?? $row->status;
+                                        $historyUpdates = collect($row->updates ?? []);
                                     @endphp
                                     <td data-col="plaintiff">
                                         {{ trim(ucwords(strtolower(($row->plaintiffName ?? '') . ' ' . ($row->plaintiffMiddleName ?? '') . ' ' . ($row->plaintiffLastName ?? '')))) }}
                                     </td>
                                     <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
                                     <td data-col="status">{{ $blotterStatusMap[$blotterStatus] ?? ucfirst((string) $blotterStatus) }}</td>
+                                    <td data-col="details">{{ $row->blotterDescription ?? 'N/A' }}</td>
+                                    <td data-col="status_history">
+                                        @if($historyUpdates->isNotEmpty())
+                                            @foreach($historyUpdates as $history)
+                                                @php
+                                                    $historyStatus = $blotterStatusMap[$history->status] ?? ucfirst((string) $history->status);
+                                                    $historyDate = $history->date
+                                                        ? \Carbon\Carbon::parse($history->date)->format('M d, Y')
+                                                        : null;
+                                                @endphp
+                                                <div><strong>{{ $historyStatus }}</strong>{{ $historyDate ? ' - ' . $historyDate : '' }}</div>
+                                                <div class="small text-muted">{{ $history->remarks ?: 'No details provided.' }}</div>
+                                                @if(!$loop->last)
+                                                    <hr class="my-1">
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                 @elseif($type == 'certificate')
                                     <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
@@ -301,7 +324,9 @@
             const saved = new Set(savedKeys || []);
             const hasSaved = Array.isArray(savedKeys) && savedKeys.length > 0;
             grid.innerHTML = columns.map(col => {
-                const checked = hasSaved ? saved.has(col.key) : true;
+                const checked = hasSaved
+                    ? saved.has(col.key)
+                    : !(reportType === "blotter" && col.key === "details");
                 return `
                     <label class="col-check">
                         <input class="form-check-input" type="checkbox" data-col="${col.key}" ${checked ? "checked" : ""}>

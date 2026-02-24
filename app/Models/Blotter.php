@@ -7,27 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Services\ActiveLogger;
 
 class Blotter extends Model
-    public function printBlotter()
-    {
-        // Add your blotter printing logic here
-        ActiveLogger::log(
-            'Blotter',
-            'printed',
-            $this->id,
-            'Printed a blotter'
-        );
-    }
-
-    public function convertToPdf()
-    {
-        // Add your PDF conversion logic here
-        ActiveLogger::log(
-            'Blotter',
-            'converted_to_pdf',
-            $this->id,
-            'Converted blotter to PDF'
-        );
-    }
+    
 {
 
     protected $table = 'blotters';

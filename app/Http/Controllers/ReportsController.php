@@ -363,7 +363,11 @@ private function buildPopulationReportQuery(array $filters)
 
 private function buildBlotterReportQuery(array $filters)
 {
-    $query = Blotter::query();
+    $query = Blotter::query()->with([
+        'updates' => function ($q) {
+            $q->orderBy('date')->orderBy('id');
+        },
+    ]);
     $status = $filters['blotter_status'] ?? 'all';
 
     if (!empty($filters['complainant_name'])) {

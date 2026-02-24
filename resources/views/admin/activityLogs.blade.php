@@ -188,7 +188,7 @@
                                 <tbody>
                                     @forelse($logs as $log)
                                         <tr>
-                                            <td>{{ $log->id }}</td>
+                                            <td>{{ $logs->total() - (($logs->currentPage() - 1) * $logs->perPage() + $loop->index) }}</td>
                                             <td>
                                                 @php
                                                     $u = $log->user;

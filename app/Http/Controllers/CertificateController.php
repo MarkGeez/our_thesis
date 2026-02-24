@@ -40,6 +40,7 @@ class CertificateController extends Controller
             case 'senior':
                 // Validate senior specific fields
                 $request->validate([
+                    'form_data.certificate_name' => 'required|string|max:255',
                     'form_data.former_address' => 'nullable|string|max:255',
                     'form_data.new_address' => 'nullable|string|max:255',
                 ]);
@@ -68,6 +69,9 @@ class CertificateController extends Controller
         // For solo parent and senior, get form data
         if (in_array($validated['certificate_type'], ['soloparent', 'senior'])) {
             $formData = $request->form_data ?? [];
+            if ($validated['certificate_type'] === 'senior') {
+                $formData['certificate_name'] = $this->formatPersonName($formData['certificate_name'] ?? null);
+            }
             $data = array_merge($data, $formData);
         }
         
@@ -174,12 +178,17 @@ class CertificateController extends Controller
             }
             abort(403, 'Certificate is not yet approved.');
         }
-        $name = $request->input('name', ucwords(strtolower($req->requester_name)));
+        $name = $request->input('name', $this->getCertificateDisplayName($req));
+        $name = $this->formatPersonName($name) ?? $this->formatPersonName($req->requester_name) ?? $req->requester_name;
         $data = $req->request_data ?? [];
         $submitted = $request->input('request_data', []);
         
         foreach ($submitted as $k => $v) {
             $data[$k] = $v;
+        }
+
+        if ($req->certificate_type === 'senior') {
+            $data['certificate_name'] = $name;
         }
         
         // Auto-count number of children from the children array
@@ -335,7 +344,7 @@ class CertificateController extends Controller
         };
         
         $data = $req->request_data ?? [];
-        $name = ucwords(strtolower($req->requester_name));
+        $name = $this->getCertificateDisplayName($req);
         $address = match ($req->certificate_type) {
             'bonafide', 'indigency' => $req->address ?? $data['address'] ?? $data['postal_address'] ?? null,
             default => $data['former_address'] ?? null,
@@ -356,5 +365,33 @@ class CertificateController extends Controller
             ->keyBy('position');
         
         return view($view, compact('req', 'name', 'address', 'purpose', 'data', 'issued', 'forPrint', 'editable', 'officialsByPosition'));
+    }
+
+    private function getCertificateDisplayName(CertificateRequest $req): string
+    {
+        $data = $req->request_data ?? [];
+
+        if ($req->certificate_type === 'senior') {
+            $preferred = $this->formatPersonName($data['certificate_name'] ?? null);
+            if ($preferred) {
+                return $preferred;
+            }
+        }
+
+        return $this->formatPersonName($req->requester_name) ?? $req->requester_name;
+    }
+
+    private function formatPersonName(?string $name): ?string
+    {
+        if ($name === null) {
+            return null;
+        }
+
+        $normalized = preg_replace('/\s+/', ' ', trim($name));
+        if (!$normalized) {
+            return null;
+        }
+
+        return mb_convert_case($normalized, MB_CASE_TITLE, 'UTF-8');
     }
 }

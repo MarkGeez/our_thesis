@@ -293,6 +293,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Name to Appear on Certificate <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            name="form_data[certificate_name]"
+                            class="form-control"
+                            value="{{ old('form_data.certificate_name') }}"
+                            required
+                            placeholder="Enter complete name (e.g., Juan Dela Cruz)"
+                        >
+                        <small class="text-muted">This name will be used in the generated senior certificate.</small>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
                         <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
                     </div>

@@ -741,7 +741,7 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
-                            <input type="text" name="report_name" class="form-control" required>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Certificate Status <span class="text-danger">*</span></label>
@@ -1006,5 +1006,36 @@
 
         bindStreetHouseFilter(streetSelect, houseSelect);
         bindStreetHouseFilter(populationStreetSelect, populationHouseSelect);
+
+        function getDefaultReportTitle(label) {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-US', {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric'
+            });
+            return label + ' Report - ' + formattedDate;
+        }
+
+        function autoFillReportTitle(modalId, label) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            function applyDefaultIfEmpty() {
+                const titleInput = modal.querySelector("input[name='report_name']");
+                if (!titleInput) return;
+                if (!titleInput.value || !titleInput.value.trim()) {
+                    titleInput.value = getDefaultReportTitle(label);
+                }
+            }
+
+            modal.addEventListener('show.bs.modal', applyDefaultIfEmpty);
+            applyDefaultIfEmpty();
+        }
+
+        autoFillReportTitle('modalPopulationReport', 'Population');
+        autoFillReportTitle('modalBlotterReport', 'Blotter');
+        autoFillReportTitle('modalCertificateReport', 'Certificate');
+        autoFillReportTitle('modalHouseholdReport', 'Household');
     });
 </script>
