@@ -44,12 +44,38 @@ class CertificateRequest extends Model
         });
 
         static::updated(function ($certificate) {
-            ActiveLogger::log(
-                'Certificate',
-                'updated',
-                $certificate->id,
-                'Updated a certificate'
-            );
+            // Only log as 'updated' if not status change to 'picked_up' (print) or 'approved' (generate)
+            if ($certificate->isDirty('status')) {
+                if ($certificate->status === 'picked_up') {
+                    ActiveLogger::log(
+                        'Certificate',
+                        'printed',
+                        $certificate->id,
+                        'Printed a certificate'
+                    );
+                } elseif ($certificate->status === 'approved') {
+                    ActiveLogger::log(
+                        'Certificate',
+                        'generated',
+                        $certificate->id,
+                        'Generated a certificate'
+                    );
+                } else {
+                    ActiveLogger::log(
+                        'Certificate',
+                        'updated',
+                        $certificate->id,
+                        'Updated a certificate'
+                    );
+                }
+            } else {
+                ActiveLogger::log(
+                    'Certificate',
+                    'updated',
+                    $certificate->id,
+                    'Updated a certificate'
+                );
+            }
         });
 
         static::deleted(function($certificate){
