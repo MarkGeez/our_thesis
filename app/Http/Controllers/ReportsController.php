@@ -19,7 +19,10 @@ class ReportsController extends Controller
 public function index()
 {
     // show admin wrapper and report list
-    $reports = GeneratedReport::with('generator:id,firstName,lastName')->latest()->get();
+    $reports = GeneratedReport::with('generator:id,firstName,lastName')
+        ->latest()
+        ->paginate(10)
+        ->appends(request()->query());
 
     // grab street names for filter dropdown
     $streets = \App\Models\Street::orderBy('street_name')->pluck('street_name');
@@ -65,7 +68,7 @@ public function generatePopulation(Request $request)
         'total_records' => $residents->count(),
     ]);
 
-    return redirect()->back();
+    return redirect()->back()->with('success', 'Report generated successfully.');
 }
 
 public function generateBlotter(Request $request)
@@ -90,7 +93,7 @@ public function generateBlotter(Request $request)
         'total_records' => $blotters->count(),
     ]);
 
-    return redirect()->back();
+    return redirect()->back()->with('success', 'Report generated successfully.');
 }
 
 public function generateCertificate(Request $request)
@@ -144,7 +147,7 @@ public function generateCertificate(Request $request)
         'total_records' => $certificates->count(),
     ]);
 
-    return redirect()->back();
+    return redirect()->back()->with('success', 'Report generated successfully.');
 }
 
 public function generateHousehold(Request $request)
@@ -171,7 +174,7 @@ public function generateHousehold(Request $request)
         'total_records' => $data->count(),
     ]);
 
-    return redirect()->back();
+    return redirect()->back()->with('success', 'Report generated successfully.');
 }
 
 private function resolveHouseholdReportScope(array $filters): string
@@ -451,7 +454,10 @@ public function view($id)
     }
 
     // also pass list so admin wrapper can render index
-    $reports = GeneratedReport::with('generator:id,firstName,lastName')->latest()->get();
+    $reports = GeneratedReport::with('generator:id,firstName,lastName')
+        ->latest()
+        ->paginate(10)
+        ->appends(request()->query());
     $streets = Street::orderBy('street_name')->pluck('street_name');
     $streetOptions = Street::orderBy('street_name')->get(['id', 'street_name']);
     $houseOptions = House::with('street:id,street_name')
