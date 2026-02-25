@@ -85,6 +85,7 @@ $user = auth()->user();
                         id="user_birthday"
                         class="form-control form-control-lg"
                         value="{{ old('birthday', $user->birthday) }}"
+                        max="{{ now()->subDay()->format('Y-m-d') }}"
                         required
                     >
                     <span class="input-group-text" id="user_openDate">

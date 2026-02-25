@@ -235,7 +235,7 @@ class HouseholdController extends Controller
             'firstName' => 'required|string|max:100',
             'middleName' => 'nullable|string|max:100',
             'lastName' => 'required|string|max:100',
-            'birthdate' => 'required|date',
+            'birthdate' => 'required|date|before:today',
             'sex' => 'required|in:male,female',
             'relationship' => 'required|string|max:50',
             'contactNumber' => 'nullable|string|max:20',

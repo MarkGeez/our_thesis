@@ -39,7 +39,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="birthdate_{{ $member->id }}" class="form-label">Birthday <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="birthdate_{{ $member->id }}" name="birthdate" value="{{ old('birthdate', $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('Y-m-d') : '') }}" required>
+                            <input type="date" class="form-control" id="birthdate_{{ $member->id }}" name="birthdate" value="{{ old('birthdate', $member->birthdate ? \Carbon\Carbon::parse($member->birthdate)->format('Y-m-d') : '') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
                         </div>
 
                         <div class="col-md-6 mb-3">

@@ -60,6 +60,10 @@ public function generatePopulation(Request $request)
     $query = $this->buildPopulationReportQuery($filters);
     $residents = $query->get();
 
+    if ($residents->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No population records matched the selected filters.');
+    }
+
     GeneratedReport::create([
         'report_name' => $request->report_name,
         'report_type' => 'population',
@@ -68,7 +72,7 @@ public function generatePopulation(Request $request)
         'total_records' => $residents->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Report generated successfully.');
+    return redirect()->back()->with('success', 'Population report generated successfully.');
 }
 
 public function generateBlotter(Request $request)
@@ -85,6 +89,10 @@ public function generateBlotter(Request $request)
     $filters['blotter_status'] = $filters['blotter_status'] ?? 'all';
     $blotters = $this->buildBlotterReportQuery($filters)->get();
 
+    if ($blotters->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No blotter records matched the selected filters.');
+    }
+
     GeneratedReport::create([
         'report_name' => $request->report_name,
         'report_type' => 'blotter',
@@ -93,7 +101,7 @@ public function generateBlotter(Request $request)
         'total_records' => $blotters->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Report generated successfully.');
+    return redirect()->back()->with('success', 'Blotter report generated successfully.');
 }
 
 public function generateCertificate(Request $request)
@@ -102,8 +110,8 @@ public function generateCertificate(Request $request)
         'report_name' => 'required',
         'certificate_status' => 'required|in:All,Pending,Approved,Declined',
         'certificate_type' => 'required|in:All,bonafide,indigency,soloparent,senior,Bonafide,Indigency,Solo-Parent,Senior',
-        'date_from' => 'required|date',
-        'date_to' => 'required|date'
+        'date_from' => 'nullable|date',
+        'date_to' => 'nullable|date|after_or_equal:date_from',
     ]);
 
     $query = CertificateRequest::with(['user:id,firstName,middleName,lastName', 'resident:id,firstName,middleName,lastName']);
@@ -131,13 +139,23 @@ public function generateCertificate(Request $request)
         $query->where('certificate_type', $type);
     }
 
-    $query->whereBetween('created_at', [
-        $request->date_from,
-        $request->date_to
-    ]);
+    if (!empty($request->date_from) && !empty($request->date_to)) {
+        $query->whereBetween('created_at', [
+            $request->date_from,
+            $request->date_to
+        ]);
+    } elseif (!empty($request->date_from)) {
+        $query->whereDate('created_at', '>=', $request->date_from);
+    } elseif (!empty($request->date_to)) {
+        $query->whereDate('created_at', '<=', $request->date_to);
+    }
 
     $certificates = $query->get();
     $filters = $request->except(['_token', 'report_form_type']);
+
+    if ($certificates->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No certificate requests matched the selected filters.');
+    }
 
     GeneratedReport::create([
         'report_name' => $request->report_name,
@@ -147,7 +165,7 @@ public function generateCertificate(Request $request)
         'total_records' => $certificates->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Report generated successfully.');
+    return redirect()->back()->with('success', 'Certificate report generated successfully.');
 }
 
 public function generateHousehold(Request $request)
@@ -166,6 +184,10 @@ public function generateHousehold(Request $request)
     $filters = $request->except(['_token', 'report_form_type']);
     $data = $this->getHouseholdReportData($filters);
 
+    if ($data->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No household records matched the selected filters.');
+    }
+
     GeneratedReport::create([
         'report_name' => $request->report_name,
         'report_type' => 'household',
@@ -174,7 +196,7 @@ public function generateHousehold(Request $request)
         'total_records' => $data->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Report generated successfully.');
+    return redirect()->back()->with('success', 'Household report generated successfully.');
 }
 
 private function resolveHouseholdReportScope(array $filters): string
@@ -448,6 +470,10 @@ public function view($id)
                 $filters['date_from'],
                 $filters['date_to']
             ]);
+        } elseif (!empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        } elseif (!empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
         $data = $query->get();
@@ -529,6 +555,10 @@ public function printTemplate($id)
                 $filters['date_from'],
                 $filters['date_to']
             ]);
+        } elseif (!empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        } elseif (!empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
         $data = $query->get();

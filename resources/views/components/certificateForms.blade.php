@@ -348,6 +348,10 @@
         }
     });
 
+    const maxBirthDate = new Date();
+    maxBirthDate.setDate(maxBirthDate.getDate() - 1);
+    const maxBirthDateValue = maxBirthDate.toISOString().split('T')[0];
+
     // Handle children fields in Solo Parent Modal
     document.getElementById('solo_child_count')?.addEventListener('input', function () {
         const container = document.getElementById('solo_child_container');
@@ -365,7 +369,7 @@
                         </div>
                         <div class="col-md-5">
                             <label class="small fw-bold">Birth Date</label>
-                            <input type="date" name="form_data[children][${i}][dob]" class="form-control form-control-sm" required>
+                            <input type="date" name="form_data[children][${i}][dob]" class="form-control form-control-sm" max="${maxBirthDateValue}" required>
                         </div>
                     </div>
                 </div>`;

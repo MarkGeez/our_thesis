@@ -85,10 +85,9 @@
         .content-body {
             font-size: 13px;
             line-height: 1.6;
-            padding-bottom: 38mm; /* reserve vertical space for fixed footer */
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow: hidden;
+            flex: 1 1 0;       /* take ALL remaining space between header and footer */
+            min-height: 0;     /* allow shrinking below natural height */
+            overflow: hidden;  /* never let rows bleed out of the bounded box */
         }
 
         .table {
@@ -162,10 +161,10 @@
         }
 
         .footer {
-            position: absolute;
-            bottom: 6mm;
-            left: 14mm;
-            right: 14mm;
+            /* Flex child — always sits below content-body, never overlaps it */
+            flex-shrink: 0;
+            margin-top: auto;           /* push to bottom when content is short */
+            padding-top: 4px;
             font-family: Arial, sans-serif;
         }
 
@@ -321,7 +320,8 @@
         $allData = collect($data);
         $rowsPerPage = match ($type) {
             'blotter' => 8,
-            'certificate' => 16,
+            'certificate' => 25,
+            'population' => 25,
             'household' => $householdScope === 'family_members' ? 12 : 14,
             default => 18,
         };
@@ -453,6 +453,7 @@
     @endphp
 
     <div id="pdfContent">
+    @php $globalHeadCounter = 0; @endphp
     @foreach($chunks as $index => $rowChunk)
     <div class="page">
         <div class="header-container">
@@ -519,6 +520,7 @@
                             <th data-col="certificate_status">Status</th>
                             <th data-col="certificate_date">Date</th>
                         @elseif($type == 'household' && $householdScope === 'family_members')
+                            <th data-col="head_no">Head #</th>
                             <th data-col="house_head">House Head</th>
                             <th data-col="family_member">Family Member</th>
                             <th data-col="relationship">Relationship</th>
@@ -534,6 +536,45 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if($type == 'household' && $householdScope === 'family_members')
+                        @php
+                            $groupedByHead = collect($rowChunk)->groupBy(function ($row) {
+                                return trim(strtolower(
+                                    ($row->user->firstName ?? '') . ' ' .
+                                    ($row->user->middleName ?? '') . ' ' .
+                                    ($row->user->lastName ?? '')
+                                ));
+                            });
+                            $headCounter = $globalHeadCounter;
+                        @endphp
+                        @foreach($groupedByHead as $rows)
+                            @php
+                                $headCounter++;
+                                $firstRow = $rows->first();
+                                $headName = trim(ucwords(strtolower(
+                                    ($firstRow->user->firstName ?? '') . ' ' .
+                                    ($firstRow->user->middleName ?? '') . ' ' .
+                                    ($firstRow->user->lastName ?? '')
+                                ))) ?: 'N/A';
+                                $rowspan = max(1, $rows->count());
+                            @endphp
+                            @foreach($rows as $row)
+                                <tr>
+                                    @if($loop->first)
+                                        <td data-col="head_no" rowspan="{{ $rowspan }}">{{ $headCounter }}</td>
+                                        <td data-col="house_head" rowspan="{{ $rowspan }}">{{ $headName }}</td>
+                                    @endif
+                                    <td data-col="family_member">
+                                        {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
+                                    </td>
+                                    <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
+                                    <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
+                                    <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                        @php $globalHeadCounter = $headCounter; @endphp
+                    @else
                     @foreach($rowChunk as $row)
                         <tr>
                             @if($type == 'population')
@@ -593,18 +634,8 @@
                             @elseif($type == 'certificate')
                                 <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
-                                <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
+                                <td data-col="certificate_status">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->status))) }}</td>
                                 <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
-                            @elseif($type == 'household' && $householdScope === 'family_members')
-                                <td data-col="house_head">
-                                    {{ trim(ucwords(strtolower(($row->user->firstName ?? '') . ' ' . ($row->user->middleName ?? '') . ' ' . ($row->user->lastName ?? '')))) ?: 'N/A' }}
-                                </td>
-                                <td data-col="family_member">
-                                    {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
-                                </td>
-                                <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
-                                <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
-                                <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
                             @elseif($type == 'household')
                                 @php
                                     $houseHeads = $row->residents
@@ -623,6 +654,7 @@
                             @endif
                         </tr>
                     @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -690,22 +722,121 @@
                 const pages = Array.from(document.querySelectorAll('#pdfContent .page'));
                 if (!pages.length) return;
 
-                for (let i = 0; i < pages.length - 1; i++) {
-                    const currentPage = pages[i];
-                    const nextPage = pages[i + 1];
+                let i = 0;
+                while (i < document.querySelectorAll('#pdfContent .page').length) {
+                    const allPages = Array.from(document.querySelectorAll('#pdfContent .page'));
+                    const currentPage = allPages[i];
                     const currentBody = currentPage.querySelector('.content-body');
                     const currentTbody = currentBody ? currentBody.querySelector('tbody') : null;
+
+                    if (!currentBody || !currentTbody) { i++; continue; }
+
+                    const isOverflowing = () => currentBody.scrollHeight > currentBody.clientHeight + 2;
+
+                    if (!isOverflowing()) { i++; continue; }
+
+                    let nextPage = allPages[i + 1];
+                    if (!nextPage) {
+                        nextPage = clonePage(currentPage);
+                        currentPage.parentNode.insertBefore(nextPage, currentPage.nextSibling);
+                    }
+
                     const nextTbody = nextPage.querySelector('.content-body tbody');
-                    if (!currentBody || !currentTbody || !nextTbody) continue;
+                    if (!nextTbody) { i++; continue; }
 
                     let guard = 0;
-                    while (currentBody.scrollHeight > currentBody.clientHeight + 1 && currentTbody.rows.length > 1 && guard < 50) {
-                        nextTbody.insertBefore(currentTbody.lastElementChild, nextTbody.firstElementChild);
+                    while (isOverflowing() && currentTbody.rows.length > 0 && guard < 200) {
+                        const lastRow = currentTbody.lastElementChild;
+                        nextTbody.insertBefore(lastRow, nextTbody.firstElementChild);
                         guard++;
+                    }
+
+                    if (currentTbody.rows.length === 0) { i++; }
+                    i++;
+                }
+
+                updatePageNumbers();
+            }
+
+            // ---------------------------------------------------------------
+            // Consolidation pass: after overflow is resolved, pull rows from
+            // the NEXT page into the CURRENT page while there is still room.
+            // This fixes the "blank space" problem caused by the PHP weight-
+            // based chunker being overly conservative with blotter rows.
+            // ---------------------------------------------------------------
+            function consolidatePages() {
+                let changed = true;
+                // Repeat until no more rows can be pulled (handles chain reactions)
+                while (changed) {
+                    changed = false;
+                    const allPages = Array.from(document.querySelectorAll('#pdfContent .page'));
+
+                    for (let i = 0; i < allPages.length - 1; i++) {
+                        const currentPage = allPages[i];
+                        const nextPage    = allPages[i + 1];
+
+                        const currentBody  = currentPage.querySelector('.content-body');
+                        const currentTbody = currentBody ? currentBody.querySelector('tbody') : null;
+                        const nextBody     = nextPage.querySelector('.content-body');
+                        const nextTbody    = nextBody ? nextBody.querySelector('tbody') : null;
+
+                        if (!currentBody || !currentTbody || !nextBody || !nextTbody) continue;
+                        if (nextTbody.rows.length === 0) continue;
+
+                        const isOverflowing = () => currentBody.scrollHeight > currentBody.clientHeight + 2;
+
+                        // Try to pull rows one at a time from the top of the next page
+                        let guard = 0;
+                        while (nextTbody.rows.length > 0 && guard < 200) {
+                            const candidate = nextTbody.firstElementChild;
+
+                            // Tentatively move the row into the current page
+                            currentTbody.appendChild(candidate);
+
+                            if (isOverflowing()) {
+                                // Doesn't fit — put it back and stop pulling for this page
+                                nextTbody.insertBefore(candidate, nextTbody.firstElementChild);
+                                break;
+                            }
+
+                            // It fits — keep it and mark that we made progress
+                            changed = true;
+                            guard++;
+                        }
+
+                        // If the next page is now empty, remove it
+                        if (nextTbody.rows.length === 0) {
+                            nextPage.remove();
+                            break; // Restart the outer while-loop with a fresh page list
+                        }
                     }
                 }
 
                 updatePageNumbers();
+            }
+
+            // Deep-clone a page, clearing its tbody rows but keeping
+            // the header, footer, report-info, and empty tbody intact.
+            function clonePage(sourcePage) {
+                const clone = sourcePage.cloneNode(true);
+
+                // Remove report-info (only shown on first page)
+                const infoRow = clone.querySelector('.report-info-row');
+                if (infoRow) infoRow.remove();
+
+                // Clear the tbody of the clone — rows will be pushed in
+                const tbody = clone.querySelector('.content-body tbody');
+                if (tbody) tbody.innerHTML = '';
+
+                // Reset the page-number label — updatePageNumbers() will fix it
+                const pageLabel = clone.querySelector('.footer-page');
+                if (pageLabel) pageLabel.textContent = '';
+
+                // Reset the print-date (will be set by the date loop below)
+                const dateEl = clone.querySelector('.print-date-display');
+                if (dateEl) dateEl.textContent = '—';
+
+                return clone;
             }
 
             function fitTablesToPage() {
@@ -716,7 +847,7 @@
 
                     table.classList.remove('table-compact', 'table-ultra-compact');
 
-                    const isOverflowing = () => contentBody.scrollHeight > (contentBody.clientHeight + 1);
+                    const isOverflowing = () => contentBody.scrollHeight > contentBody.clientHeight + 2;
 
                     if (!isOverflowing()) return;
                     table.classList.add('table-compact');
@@ -725,13 +856,17 @@
                 });
             }
 
-            // Set Print Date for all pages
-            const now = new Date();
-            const dateStr = now.toLocaleString('en-PH', {
-                month: 'short', day: 'numeric', year: 'numeric',
-                hour: 'numeric', minute: '2-digit', hour12: true
-            });
-            document.querySelectorAll('.print-date-display').forEach(el => el.innerText = dateStr);
+            function stampDates() {
+                const now = new Date();
+                const dateStr = now.toLocaleString('en-PH', {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit', hour12: true
+                });
+                document.querySelectorAll('.print-date-display').forEach(el => el.innerText = dateStr);
+            }
+
+            // Set Print Date for all pages (including any that get cloned later)
+            stampDates();
 
             // Handle column visibility
             const params = new URLSearchParams(window.location.search);
@@ -759,10 +894,14 @@
             }
 
             moveOverflowRowsToNextPage();
+            consolidatePages();         // pull rows back up to fill gaps
             fitTablesToPage();
+            stampDates(); // re-stamp any pages that were cloned during overflow resolution
             window.addEventListener('beforeprint', function () {
                 moveOverflowRowsToNextPage();
+                consolidatePages();
                 fitTablesToPage();
+                stampDates();
             });
 
             // Convert to PDF using the same print-template layout.

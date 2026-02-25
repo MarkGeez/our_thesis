@@ -34,7 +34,7 @@ class CertificateController extends Controller
                     'form_data.partner_name' => 'nullable|string|max:255',
                     'form_data.separated_from' => 'nullable|string|max:255',
                     'form_data.since' => 'nullable|date',
-                    // Add children validation if needed
+                    'form_data.children.*.dob' => 'nullable|date|before:today',
                 ]);
                 break;
             case 'senior':

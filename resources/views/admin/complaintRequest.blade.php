@@ -324,9 +324,11 @@
                 </div>
 
                 @if (session('success'))
-                <div class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm" style="max-width: 325px;">
-                    <h6>{{ session('success') }}</h6>
-                </div>
+                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mx-4 mt-3 mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <div>{{ session('success') }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 @endif
 
                 @php $activeTab = $activeTab ?? 'all'; @endphp

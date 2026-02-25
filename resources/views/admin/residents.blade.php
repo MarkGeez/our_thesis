@@ -870,6 +870,7 @@
                                                                         data-age-target="ageEdit{{ $resident->id }}"
                                                                         data-raw="{{ old('birthday', $resident->birthday) }}"
                                                                         value="{{ old('birthday', $resident->birthday) }}"
+                                                                        max="{{ now()->subDay()->format('Y-m-d') }}"
                                                                         required
                                                                     >
                                                                     <span class="input-group-text resident-date-open">
@@ -1121,6 +1122,7 @@
             data-age-target="ageCreate"
             data-raw="{{ old('birthday') }}"
             value="{{ old('birthday') }}"
+            max="{{ now()->subDay()->format('Y-m-d') }}"
             required
         >
         <span class="input-group-text resident-date-open">

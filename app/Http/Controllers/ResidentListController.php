@@ -86,7 +86,7 @@ public function searchResidents(Request $request)
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
-            'birthday' => 'required|date',
+            'birthday' => 'required|date|before:today',
             'emergencyContactNo' => 'nullable|string|max:11',
             'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
@@ -181,7 +181,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
-            'birthday' => 'required|date',
+            'birthday' => 'required|date|before:today',
             'emergencyContactNo' => 'required|string|max:11',
             'emergencyContactName' => 'required|string|max:255',
             'age' => 'required|integer|min:0|max:255',
@@ -254,7 +254,7 @@ $householdResident->update([
     // Validate the request
     $validated = $request->validate([
         'contactNo' => 'required|string|max:11',
-        'birthday' => 'required|date',
+        'birthday' => 'required|date|before:today',
         'emergencyContactNo' => 'required|string|max:11',
         'emergencyContactName' => 'required|string|max:255',
         'age' => 'required|integer|min:0|max:255',

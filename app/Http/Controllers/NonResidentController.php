@@ -38,7 +38,7 @@ class NonResidentController extends Controller
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:20',
-            'birthday' => 'required|date',
+            'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ];
@@ -91,7 +91,7 @@ class NonResidentController extends Controller
             'houseNo' => 'required|string|max:255',
             'street' => 'required|string|max:255',
             'contactNo' => 'required|string|max:20',
-            'birthday' => 'required|date',
+            'birthday' => 'required|date|before:today',
             'age' => 'required|integer',
             'sex' => 'required|in:male,female',
             'parent' => 'required|in:yes,no,single',

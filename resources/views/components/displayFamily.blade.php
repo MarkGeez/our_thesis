@@ -142,7 +142,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="birthday" class="form-label">Birthday</label>
-                                <input type="date" class="form-control" id="birthday" name="birthday">
+                                <input type="date" class="form-control" id="birthday" name="birthday" max="{{ now()->subDay()->format('Y-m-d') }}">
                             </div>
                         </div>
                     </form>

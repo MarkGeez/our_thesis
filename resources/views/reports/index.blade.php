@@ -338,6 +338,14 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
+            <i class="fas fa-circle-exclamation me-3"></i>
+            <div>{{ session('error') }}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
             <div class="d-flex align-items-start">
@@ -766,7 +774,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">From Date <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -774,7 +782,6 @@
                                     class="form-control report-date-input"
                                     value="{{ old('date_from') }}"
                                     data-raw="{{ old('date_from') }}"
-                                    required
                                 >
                                 <span class="input-group-text report-date-open">
                                     <i class="fa fa-calendar"></i>
@@ -782,7 +789,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">To Date <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">To Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
                                 <input
                                     type="date"
@@ -790,7 +797,6 @@
                                     class="form-control report-date-input"
                                     value="{{ old('date_to') }}"
                                     data-raw="{{ old('date_to') }}"
-                                    required
                                 >
                                 <span class="input-group-text report-date-open">
                                     <i class="fa fa-calendar"></i>

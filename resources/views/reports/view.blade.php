@@ -39,7 +39,7 @@
                     <i class="fa fa-arrow-left me-1"></i> Back
                 </a>
                 <a href="#" id="printTemplateBtn" class="btn btn-primary btn-sm" target="_blank">
-                    <i class="fa fa-print me-1"></i> Print with Template
+                    <i class="fa fa-print me-1"></i> Print
                 </a>
                 <a href="#" id="pdfTemplateBtn" class="btn btn-success btn-sm" target="_blank">
                     <i class="fa fa-file-pdf me-1"></i> Convert to PDF
@@ -143,6 +143,7 @@
                                 <th data-col="certificate_status">Status</th>
                                 <th data-col="certificate_date">Date</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
+                                <th data-col="head_no">Head #</th>
                                 <th data-col="house_head">House Head</th>
                                 <th data-col="family_member">Family Member</th>
                                 <th data-col="relationship">Relationship</th>
@@ -158,6 +159,48 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @if($type == 'household' && $householdScope === 'family_members')
+                            @php
+                                $groupedByHead = collect($data)->groupBy(function ($row) {
+                                    return trim(strtolower(
+                                        ($row->user->firstName ?? '') . ' ' .
+                                        ($row->user->middleName ?? '') . ' ' .
+                                        ($row->user->lastName ?? '')
+                                    ));
+                                });
+                                $headCounter = 0;
+                            @endphp
+                            @forelse($groupedByHead as $rows)
+                                @php
+                                    $headCounter++;
+                                    $firstRow = $rows->first();
+                                    $headName = trim(ucwords(strtolower(
+                                        ($firstRow->user->firstName ?? '') . ' ' .
+                                        ($firstRow->user->middleName ?? '') . ' ' .
+                                        ($firstRow->user->lastName ?? '')
+                                    ))) ?: 'N/A';
+                                    $rowspan = max(1, $rows->count());
+                                @endphp
+                                @foreach($rows as $row)
+                                    <tr>
+                                        @if($loop->first)
+                                            <td data-col="head_no" rowspan="{{ $rowspan }}">{{ $headCounter }}</td>
+                                            <td data-col="house_head" rowspan="{{ $rowspan }}">{{ $headName }}</td>
+                                        @endif
+                                        <td data-col="family_member">
+                                            {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
+                                        </td>
+                                        <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
+                                        <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
+                                        <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
+                                    </tr>
+                                @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-4">No records matched the selected filters.</td>
+                                </tr>
+                            @endforelse
+                        @else
                         @forelse($data as $row)
                             <tr>
                                 @if($type == 'population')
@@ -219,18 +262,8 @@
                                 @elseif($type == 'certificate')
                                     <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
-                                    <td data-col="certificate_status">{{ ucfirst($row->status) }}</td>
+                                    <td data-col="certificate_status">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->status))) }}</td>
                                     <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
-                                @elseif($type == 'household' && $householdScope === 'family_members')
-                                    <td data-col="house_head">
-                                        {{ trim(ucwords(strtolower(($row->user->firstName ?? '') . ' ' . ($row->user->middleName ?? '') . ' ' . ($row->user->lastName ?? '')))) ?: 'N/A' }}
-                                    </td>
-                                    <td data-col="family_member">
-                                        {{ trim(ucwords(strtolower(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? '')))) ?: 'N/A' }}
-                                    </td>
-                                    <td data-col="relationship">{{ $row->relationship ?: 'N/A' }}</td>
-                                    <td data-col="street">{{ $row->household->house->street->street_name ?? 'N/A' }}</td>
-                                    <td data-col="house_no">{{ $row->household->house->house_no ?? 'N/A' }}</td>
                                 @elseif($type == 'household')
                                     @php
                                         $houseHeads = $row->residents
@@ -253,6 +286,7 @@
                                 <td colspan="10" class="text-center text-muted py-4">No records matched the selected filters.</td>
                             </tr>
                         @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>

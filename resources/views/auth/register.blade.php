@@ -333,7 +333,7 @@
                 <div class="mb-3">
                     <label for="birthday" class="form-label">Birthday</label>
                     <input type="date" name="birthday" id="birthday" class="form-control"
-                    value="{{ old('birthday') }}" required>
+                    value="{{ old('birthday') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
                     @error('birthday')
                     <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
                     @enderror

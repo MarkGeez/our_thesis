@@ -110,6 +110,7 @@
                 <div class="input-group">
                     <input type="date" name="birthday" id="resident_birthday"
                            class="form-control form-control-lg" required
+                           max="{{ now()->subDay()->format('Y-m-d') }}"
                            value="{{ old('birthday', $resident->birthday) }}">
                     <span class="input-group-text" id="resident_openDate">
                         <i class="fa fa-calendar"></i>
