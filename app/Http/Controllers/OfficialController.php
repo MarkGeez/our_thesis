@@ -177,7 +177,16 @@ class OfficialController extends Controller
 
     public function assign(Request $request)
     {
-        $this->persistOfficial($request->all());
+        $term = $request->validate([
+            'term_start' => ['required', 'date_format:Y-m-d'],
+            'term_end' => ['required', 'date_format:Y-m-d', 'after_or_equal:term_start'],
+        ]);
+
+        $data = $request->all();
+        $data['start'] = $term['term_start'];
+        $data['end'] = $term['term_end'];
+
+        $this->persistOfficial($data);
 
         return back()->with('success', 'Official slot updated successfully.');
     }

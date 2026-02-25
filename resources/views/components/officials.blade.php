@@ -140,6 +140,10 @@
     font-size: 0.8rem;
     color: #94a3b8;
   }
+  .term-help {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
   .input-group-text{
     background-color:#f1f3f5;
     border:1.5px solid #ced4da;
@@ -158,6 +162,57 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     font-size: 0.9rem
 }
 </style>
+
+@if($showControls)
+    @php
+        $termStart = old('term_start', now()->toDateString());
+        $termEnd = old('term_end', now()->copy()->addYears(3)->toDateString());
+    @endphp
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <h6 class="mb-3">Officials Term Range (Applies To All Assignments)</h6>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="globalTermStart">Start Date</label>
+                    <div class="input-group w-100">
+                        <input
+                            type="date"
+                            id="globalTermStart"
+                            class="form-control official-term-date-input"
+                            value="{{ $termStart }}"
+                            data-raw="{{ $termStart }}"
+                            required
+                        >
+                        <span class="input-group-text official-term-date-open">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="globalTermEnd">End Date</label>
+                    <div class="input-group w-100">
+                        <input
+                            type="date"
+                            id="globalTermEnd"
+                            class="form-control official-term-date-input"
+                            value="{{ $termEnd }}"
+                            data-raw="{{ $termEnd }}"
+                            required
+                        >
+                        <span class="input-group-text official-term-date-open">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <p class="term-help mb-0">
+                        Set the term once, then assign/update officials below. Every save will use this same term range.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
 
 <div class="row g-4">
     @foreach ($positions as $slot)
@@ -215,6 +270,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                         <form method="POST" action="{{ route('admin.assign.official') }}" class="row g-2 official-assign-form">
                             @csrf
                             <input type="hidden" name="position" value="{{ $slot }}">
+                            <input type="hidden" name="start" class="official-start-hidden" value="{{ $termStart ?? now()->toDateString() }}">
+                            <input type="hidden" name="end" class="official-end-hidden" value="{{ $termEnd ?? now()->copy()->addYears(3)->toDateString() }}">
+                            <input type="hidden" name="term_start" value="{{ $termStart ?? now()->toDateString() }}">
+                            <input type="hidden" name="term_end" value="{{ $termEnd ?? now()->copy()->addYears(3)->toDateString() }}">
 
                             <div class="col-12 position-relative">
     <label class="form-label">Search Resident</label>
@@ -244,40 +303,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                                 <input type="text" name="details" class="form-control" placeholder="e.g. 2024-2027 term" value="{{ $official ? $official->details : '' }}">
                             </div>
 
-                           <div class="col-12">
-    <label class="form-label">Start Date</label>
-    <div class="input-group mb-3 w-100">
-        <input
-            type="date"
-            name="start"
-            class="form-control form-control-lg official-start-date"
-            value="{{ $official ? $official->start : now()->toDateString() }}"
-            data-raw="{{ old('start', $official ? $official->start : now()->toDateString()) }}"
-            required
-        >
-        <span class="input-group-text official-start-open">
-            <i class="fa fa-calendar"></i>
-        </span>
-    </div>
-
-    <label class="form-label">End Date</label>
-    <div class="input-group w-100">
-        <input
-            type="date"
-            name="end"
-            class="form-control form-control-lg official-end-date"
-            value="{{ $official ? $official->end : now()->copy()->addYears(3)->toDateString() }}"
-            data-raw="{{ old('end', $official ? $official->end : now()->copy()->addYears(3)->toDateString()) }}"
-            required
-        >
-        <span class="input-group-text official-end-open">
-            <i class="fa fa-calendar"></i>
-        </span>
-    </div>
-</div>
-
-
-
                             <div class="col-12 d-flex gap-2 mt-2">
                                 <button type="submit" class="btn btn-primary flex-grow-1">
                                     <i class="fa fa-save me-1"></i> Save Assignment
@@ -305,57 +330,70 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     const residents = @json($residents);
+    const globalTermStart = document.getElementById('globalTermStart');
+    const globalTermEnd = document.getElementById('globalTermEnd');
+
+    function normalizeToYmd(raw) {
+        if (!raw) return '';
+        const d = new Date(raw);
+        if (isNaN(d)) return '';
+        return d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0');
+    }
+
+    function openPicker(inputEl) {
+        if (!inputEl) return;
+        if (inputEl.showPicker) inputEl.showPicker();
+        else inputEl.focus();
+    }
+
+    document.querySelectorAll('.official-term-date-input').forEach(function (input) {
+        const raw = input.getAttribute('data-raw') || input.value;
+        const formatted = normalizeToYmd(raw);
+        if (formatted) input.value = formatted;
+    });
+
+    document.querySelectorAll('.official-term-date-open').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+            const wrapper = trigger.closest('.input-group');
+            const input = wrapper ? wrapper.querySelector('.official-term-date-input') : null;
+            openPicker(input);
+        });
+    });
+
+    function syncSharedTermToForms() {
+        const startValue = globalTermStart ? globalTermStart.value : '';
+        const endValue = globalTermEnd ? globalTermEnd.value : '';
+
+        document.querySelectorAll('.official-start-hidden').forEach(function (input) {
+            input.value = startValue;
+        });
+
+        document.querySelectorAll('.official-end-hidden').forEach(function (input) {
+            input.value = endValue;
+        });
+
+        document.querySelectorAll('input[name="term_start"]').forEach(function (input) {
+            input.value = startValue;
+        });
+
+        document.querySelectorAll('input[name="term_end"]').forEach(function (input) {
+            input.value = endValue;
+        });
+    }
+
+    if (globalTermStart && globalTermEnd) {
+        syncSharedTermToForms();
+        globalTermStart.addEventListener('change', syncSharedTermToForms);
+        globalTermEnd.addEventListener('change', syncSharedTermToForms);
+    }
 
     document.querySelectorAll('.official-assign-form').forEach(function (form) {
         const searchInput = form.querySelector('.resident-search-input');
         const searchBtn = form.querySelector('.resident-search-btn');
         const hiddenInput = form.querySelector('.resident-id-input');
         const dropdown = form.querySelector('.resident-dropdown');
-
-        // DATE INPUTS (same behavior as users.blade)
-        const startInput = form.querySelector('.official-start-date');
-        const startOpen = form.querySelector('.official-start-open');
-        const endInput = form.querySelector('.official-end-date');
-        const endOpen = form.querySelector('.official-end-open');
-
-        function normalizeToYmd(raw) {
-            if (!raw) return '';
-            const d = new Date(raw);
-            if (isNaN(d)) return '';
-            return d.getFullYear() + '-' +
-                String(d.getMonth() + 1).padStart(2, '0') + '-' +
-                String(d.getDate()).padStart(2, '0');
-        }
-
-        if (startInput) {
-            const rawStart = startInput.getAttribute('data-raw') || startInput.value;
-            const formattedStart = normalizeToYmd(rawStart);
-            if (formattedStart) startInput.value = formattedStart;
-        }
-
-        if (endInput) {
-            const rawEnd = endInput.getAttribute('data-raw') || endInput.value;
-            const formattedEnd = normalizeToYmd(rawEnd);
-            if (formattedEnd) endInput.value = formattedEnd;
-        }
-
-        function openPicker(inputEl) {
-            if (!inputEl) return;
-            if (inputEl.showPicker) inputEl.showPicker();
-            else inputEl.focus();
-        }
-
-        if (startOpen && startInput) {
-            startOpen.addEventListener('click', function () {
-                openPicker(startInput);
-            });
-        }
-
-        if (endOpen && endInput) {
-            endOpen.addEventListener('click', function () {
-                openPicker(endInput);
-            });
-        }
 
         // your existing resident search code continues here...
         function closeDropdown() {
@@ -424,6 +462,25 @@ document.addEventListener('DOMContentLoaded', function () {
         searchBtn.addEventListener('click', function () {
             runSearch();
             searchInput.focus();
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (!globalTermStart || !globalTermEnd) return;
+
+            const startValue = globalTermStart.value;
+            const endValue = globalTermEnd.value;
+
+            if (!startValue || !endValue) {
+                e.preventDefault();
+                alert('Please set the shared Start Date and End Date first.');
+                return;
+            }
+
+            if (new Date(endValue) < new Date(startValue)) {
+                e.preventDefault();
+                alert('End Date must be on or after Start Date.');
+                return;
+            }
         });
 
         document.addEventListener('click', function (e) {
