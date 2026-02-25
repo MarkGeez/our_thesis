@@ -91,11 +91,31 @@ class UserListController extends Controller
     public function updateStatus(Request $request, $id){
         $user = User::findOrFail($id);
         $request->validate(['status'=> "required"]);
-        $user->status = $request->status;
-        $user->save();
-        
-        return redirect()->back()->with('success', 'user status updated');
+        $newStatus = $request->status;
 
+        if ($newStatus === 'approved') {
+            // Bind user to resident if exists
+            $resident = \App\Models\Resident::where('firstName', $user->firstName)
+                ->where('middleName', $user->middleName)
+                ->where('lastName', $user->lastName)
+                ->where('birthday', $user->birthday)
+                ->first();
+            if ($resident) {
+                $user->resident()->associate($resident);
+                $user->save();
+            }
+            // Decline all other users with same name and birthday
+            \App\Models\User::where('id', '!=', $user->id)
+                ->where('firstName', $user->firstName)
+                ->where('middleName', $user->middleName)
+                ->where('lastName', $user->lastName)
+                ->where('birthday', $user->birthday)
+                ->where('status', 'pending')
+                ->update(['status' => 'declined']);
+        }
+        $user->status = $newStatus;
+        $user->save();
+        return redirect()->back()->with('success', 'user status updated');
     }
 
     public function updateProfile(Request $request, $id)

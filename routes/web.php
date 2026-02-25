@@ -21,6 +21,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\HouseholdController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SuperAdminController;
 
 
 
@@ -49,7 +50,13 @@ Route::post('/password/update', [PasswordResetController::class, 'updatePassword
 
 Route::get('/', [LandingController::class, 'display']);
 
-
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::prefix('/superadmin')->name('superadmin.')->group(function(){
+        Route::get('/users', [SuperAdminController::class, 'displayUsers']);
+        Route::put('/users/{id}/status', [SuperAdminController::class, 'updateRole'])->name('updateRole');
+});
+    
+});
 
 // Resident Routes
 Route::middleware(['auth', 'role:resident'])->group(function(){

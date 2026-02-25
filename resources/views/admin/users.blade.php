@@ -963,6 +963,18 @@
                                                      {{ ucwords(strtolower($list->middleName)) }}
                                                     {{ ucwords(strtolower($list->lastName)) }}
                                                 </button>
+                                                @if($list->status === 'pending')
+                                                    @php
+                                                        $duplicateResident = \App\Models\Resident::where('firstName', $list->firstName)
+                                                            ->where('middleName', $list->middleName)
+                                                            ->where('lastName', $list->lastName)
+                                                            ->where('birthday', $list->birthday)
+                                                            ->exists();
+                                                    @endphp
+                                                    @if($duplicateResident)
+                                                        <span class="badge bg-warning text-dark ms-2">Duplicate in residents</span>
+                                                    @endif
+                                                @endif
                                             </td>
                                             <td class="text-muted">{{ $list->email }}</td>
                                             <td>
@@ -1003,12 +1015,14 @@
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-outline-success btn-action" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#statusModal{{ $list->id }}">
-                                                        <i class="fas fa-sync-alt"></i> Status
-                                                    </button>
+                                                    @if($list->status === 'pending')
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-success btn-action" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#statusModal{{ $list->id }}">
+                                                            <i class="fas fa-sync-alt"></i> Status
+                                                        </button>
+                                                    @endif
                                                     <button type="button" 
                                                             class="btn btn-sm btn-outline-primary btn-action" 
                                                             data-bs-toggle="modal" 
