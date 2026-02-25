@@ -666,14 +666,35 @@
 
                     <div class="content-wrap">
                         @if (session('success'))
-                            <div class="alert alert-success shadow-sm mb-3" role="alert">
-                                {{ session('success') }}
+                            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <div>{{ session('success') }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         @endif
 
                         @if(session('error'))
-                            <div class="alert alert-danger shadow-sm mb-3" role="alert">
-                                {{ session('error') }}
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-3" role="alert">
+                                <i class="fas fa-circle-exclamation me-2"></i>
+                                <div>{{ session('error') }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        @if($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-circle-exclamation me-2 mt-1"></i>
+                                    <div>
+                                        <div class="fw-semibold mb-1">Blotter submission failed. Please fix the following:</div>
+                                        <ul class="mb-0 ps-3">
+                                            @foreach($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         @endif
                     </div>
@@ -844,11 +865,11 @@
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Full Name</div>
                                                                             <div class="info-value">{{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</div>
-                                                                        </div>
+                                                                        </div>{{-- 
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Age</div>
                                                                             <div class="info-value">{{ $blotter->defendantAge ?? 'N/A' }}</div>
-                                                                        </div>
+                                                                        </div> --}}
                                                                         <div class="col-12">
                                                                             <div class="info-label">Address</div>
                                                                             <div class="info-value">{{ $blotter->defendantAddress ?? 'N/A' }}</div>
@@ -861,7 +882,11 @@
                                                                 </div>
                                                             </section>
 
-                                                            @if($blotter->witnessName)
+                                                            @php
+                                                                $hasWitnessDetails = filled(trim((string) ($blotter->witnessName ?? '')))
+                                                                    || filled(trim((string) ($blotter->witnessContactNumber ?? '')));
+                                                            @endphp
+                                                            @if($hasWitnessDetails)
                                                                 <section>
                                                                     <h6>Witness Information</h6>
                                                                     <div class="info-box">
@@ -1138,6 +1163,14 @@
             document.getElementById('modalBlotterId').textContent = blotterId;
             modal.show();
         }
+
+        @if($errors->any() && (old('plaintiffName') || old('plaintiffLastName') || old('blotterDescription')))
+            const submitBlotterModalEl = document.getElementById('blotterModal');
+            if (submitBlotterModalEl) {
+                const submitBlotterModal = new bootstrap.Modal(submitBlotterModalEl);
+                submitBlotterModal.show();
+            }
+        @endif
     </script>
 
     @yield('scripts')

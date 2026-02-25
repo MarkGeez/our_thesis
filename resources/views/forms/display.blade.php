@@ -98,7 +98,11 @@
                                         </div>
                                     </section>
 
-                                    @if($blotter->witnessName)
+                                    @php
+                                        $hasWitnessDetails = filled(trim((string) ($blotter->witnessName ?? '')))
+                                            || filled(trim((string) ($blotter->witnessContactNumber ?? '')));
+                                    @endphp
+                                    @if($hasWitnessDetails)
                                         <section>
                                             <h6>Witness Information</h6>
                                             <div class="info-box">

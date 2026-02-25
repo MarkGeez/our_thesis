@@ -264,10 +264,14 @@
                                                         </div>
                                                     </section>
 
-                                                    @if($blotter->witnessName)
-                                                        <section>
-                                                            <h6>Witness Information</h6>
-                                                            <div class="info-box">
+                                    @php
+                                        $hasWitnessDetails = filled(trim((string) ($blotter->witnessName ?? '')))
+                                            || filled(trim((string) ($blotter->witnessContactNumber ?? '')));
+                                    @endphp
+                                    @if($hasWitnessDetails)
+                                        <section>
+                                            <h6>Witness Information</h6>
+                                            <div class="info-box">
                                                                 <div class="row gy-3">
                                                                     <div class="col-sm-6">
                                                                         <div class="info-label">Witness Name</div>

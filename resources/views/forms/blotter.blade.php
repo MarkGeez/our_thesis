@@ -130,9 +130,13 @@
                 <label class="form-label">Last Name</label>
                 <input name="defendantLastName" class="form-control" placeholder="...">
             </div>
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <label class="form-label">Last Known Residence</label>
                 <input name="defendantAddress" class="form-control" placeholder="Neighborhood or specific location">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Contact Number <span class="text-muted">(Optional)</span></label>
+                <input name="defendantContactNumber" class="form-control" placeholder="09xx-xxx-xxxx">
             </div>
         </div>
     </div>
@@ -153,14 +157,14 @@
 
         <div class="col-md-6">
             <div class="light-card">
-                <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Procedure</h6>
+                <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Procedure</h6>{{--  
                 <div class="mb-3">
                     <label class="form-label">Scheduled Hearing Date</label>
                     <div class="input-group date-group">
                         <input type="date" name="schedule" id="blotter_schedule" class="form-control">
                         <span class="input-group-text schedule-trigger"><i class="fa fa-calendar"></i></span>
                     </div>
-                </div>
+                </div>--}}
                 <label class="form-label">Attach Evidence/Proof (Optional)</label>
                 <input type="file" name="proof" accept="image/jpg, image/jpeg, image/png" class="form-control">
                 <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
