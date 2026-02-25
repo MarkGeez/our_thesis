@@ -32,12 +32,15 @@
         .page {
             width: 210mm;
             min-height: 297mm;
+            height: 297mm;
             padding: 8mm 14mm 12mm 14mm;
             background: white;
             position: relative;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             box-sizing: border-box;
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .header-container {
@@ -83,6 +86,9 @@
             font-size: 13px;
             line-height: 1.6;
             padding-bottom: 38mm; /* reserve vertical space for fixed footer */
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .table {
@@ -101,6 +107,7 @@
             text-align: left;
             border: 1px solid #cbd5e1;
             white-space: nowrap;
+            overflow-wrap: anywhere;
         }
 
         .table td {
@@ -108,6 +115,8 @@
             border: 1px solid #e2e8f0;
             vertical-align: middle;
             word-break: break-word;
+            overflow-wrap: anywhere;
+            hyphens: auto;
             white-space: normal;
         }
 
@@ -115,6 +124,41 @@
         .table tbody tr {
             break-inside: avoid;
             page-break-inside: avoid;
+        }
+
+        .table td[data-col="details"],
+        .table td[data-col="status_history"] {
+            line-height: 1.35;
+            font-size: 10px;
+        }
+
+        .table.blotter-table th[data-col="plaintiff"],
+        .table.blotter-table td[data-col="plaintiff"] { width: 16%; }
+        .table.blotter-table th[data-col="defendant"],
+        .table.blotter-table td[data-col="defendant"] { width: 16%; }
+        .table.blotter-table th[data-col="status"],
+        .table.blotter-table td[data-col="status"] { width: 10%; }
+        .table.blotter-table th[data-col="details"],
+        .table.blotter-table td[data-col="details"] { width: 24%; }
+        .table.blotter-table th[data-col="status_history"],
+        .table.blotter-table td[data-col="status_history"] { width: 34%; }
+
+        .table.table-compact {
+            font-size: 10px;
+        }
+
+        .table.table-compact th,
+        .table.table-compact td {
+            padding: 4px 5px;
+        }
+
+        .table.table-ultra-compact {
+            font-size: 9px;
+        }
+
+        .table.table-ultra-compact th,
+        .table.table-ultra-compact td {
+            padding: 3px 4px;
         }
 
         .footer {
@@ -238,6 +282,12 @@
                 margin-bottom: 0; 
                 page-break-after: always; 
             }
+            .table thead { display: table-header-group; }
+            .table tfoot { display: table-footer-group; }
+            .table tbody tr {
+                break-inside: auto;
+                page-break-inside: auto;
+            }
             .page:last-child { page-break-after: auto; }
             .print-button, .back-button { display: none; }
         }
@@ -275,7 +325,40 @@
             'household' => $householdScope === 'family_members' ? 12 : 14,
             default => 18,
         };
-        $chunks = $allData->chunk($rowsPerPage);
+        if ($type === 'blotter') {
+            // Variable-height blotter rows are weighted so long entries are moved to the next page.
+            $maxPageWeight = $rowsPerPage;
+            $chunks = collect();
+            $currentChunk = collect();
+            $currentWeight = 0;
+
+            foreach ($allData as $blotterRow) {
+                $detailsText = (string) ($blotterRow->blotterDescription ?? '');
+                $historyText = collect($blotterRow->updates ?? [])->map(function ($update) {
+                    return trim((string) ($update->status ?? '') . ' ' . (string) ($update->remarks ?? ''));
+                })->implode(' ');
+
+                $detailsPenalty = intdiv(strlen($detailsText), 180);
+                $historyPenalty = intdiv(strlen($historyText), 220);
+                $rowWeight = max(1, min(4, 1 + $detailsPenalty + $historyPenalty));
+
+                if ($currentChunk->isNotEmpty() && ($currentWeight + $rowWeight > $maxPageWeight)) {
+                    $chunks->push($currentChunk);
+                    $currentChunk = collect();
+                    $currentWeight = 0;
+                }
+
+                $currentChunk->push($blotterRow);
+                $currentWeight += $rowWeight;
+            }
+
+            if ($currentChunk->isNotEmpty()) {
+                $chunks->push($currentChunk);
+            }
+        } else {
+            $chunks = $allData->chunk($rowsPerPage);
+        }
+
         $totalPages = count($chunks);
 
         // ── Stats computation ─────────────────────────────────────────────
@@ -410,7 +493,7 @@
         @endif
 
         <div class="content-body">
-            <table class="table">
+            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }}">
                 <thead>
                     <tr>
                         @if($type == 'population')
@@ -592,6 +675,56 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            function updatePageNumbers() {
+                const pages = document.querySelectorAll('#pdfContent .page');
+                const total = pages.length;
+                pages.forEach((page, index) => {
+                    const pageLabel = page.querySelector('.footer-page');
+                    if (pageLabel) {
+                        pageLabel.textContent = `Page ${index + 1} of ${total}`;
+                    }
+                });
+            }
+
+            function moveOverflowRowsToNextPage() {
+                const pages = Array.from(document.querySelectorAll('#pdfContent .page'));
+                if (!pages.length) return;
+
+                for (let i = 0; i < pages.length - 1; i++) {
+                    const currentPage = pages[i];
+                    const nextPage = pages[i + 1];
+                    const currentBody = currentPage.querySelector('.content-body');
+                    const currentTbody = currentBody ? currentBody.querySelector('tbody') : null;
+                    const nextTbody = nextPage.querySelector('.content-body tbody');
+                    if (!currentBody || !currentTbody || !nextTbody) continue;
+
+                    let guard = 0;
+                    while (currentBody.scrollHeight > currentBody.clientHeight + 1 && currentTbody.rows.length > 1 && guard < 50) {
+                        nextTbody.insertBefore(currentTbody.lastElementChild, nextTbody.firstElementChild);
+                        guard++;
+                    }
+                }
+
+                updatePageNumbers();
+            }
+
+            function fitTablesToPage() {
+                document.querySelectorAll('.page').forEach(page => {
+                    const contentBody = page.querySelector('.content-body');
+                    const table = contentBody ? contentBody.querySelector('.table') : null;
+                    if (!contentBody || !table) return;
+
+                    table.classList.remove('table-compact', 'table-ultra-compact');
+
+                    const isOverflowing = () => contentBody.scrollHeight > (contentBody.clientHeight + 1);
+
+                    if (!isOverflowing()) return;
+                    table.classList.add('table-compact');
+                    if (!isOverflowing()) return;
+                    table.classList.add('table-ultra-compact');
+                });
+            }
+
             // Set Print Date for all pages
             const now = new Date();
             const dateStr = now.toLocaleString('en-PH', {
@@ -624,6 +757,13 @@
                     });
                 });
             }
+
+            moveOverflowRowsToNextPage();
+            fitTablesToPage();
+            window.addEventListener('beforeprint', function () {
+                moveOverflowRowsToNextPage();
+                fitTablesToPage();
+            });
 
             // Convert to PDF using the same print-template layout.
             const mode = params.get('mode');
