@@ -188,6 +188,15 @@
                     <td class="text-center">
     <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 action-btns">
         @if($request->status === 'pending')
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-info"
+                data-pending-preview-id="{{ $request->id }}"
+                title="View generated certificate preview"
+            >
+                <i class="fas fa-file-alt me-1"></i>View Certificate
+            </button>
+
             {{-- Added d-inline-block to the form to prevent it from affecting height --}}
             <form action="{{ route('admin.certificate.approve', $request->id) }}" method="POST" class="d-inline-block m-0" onsubmit="return confirm('Approve this certificate request?');">
                 @csrf

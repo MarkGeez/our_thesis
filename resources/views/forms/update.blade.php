@@ -285,7 +285,7 @@
     </div>
    
     @if(!($isTerminal ?? false))
-        <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data" class="js-blotter-update-form" data-blotter-id="{{ $blotter->id }}">
             @csrf
             @method('PUT')
 

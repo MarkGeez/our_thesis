@@ -150,6 +150,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/certificate/request', [CertificateController::class, 'store'])->name('certificate.request.store');
     Route::post('/certificate/approve/{id}', [CertificateController::class, 'approve'])->name('certificate.approve');
     Route::post('/certificate/reject/{id}', [CertificateController::class, 'reject'])->name('certificate.reject');
+    Route::get('/certificate/pending-preview/{id}', [CertificateController::class, 'pendingPreview'])->name('certificate.pendingPreview');
     Route::get('/certificate/preview/{id}', [CertificateController::class, 'preview'])->name('certificate.preview');
     Route::get('/certificate/generate/{id}', [CertificateController::class, 'generate'])->name('certificate.generate');
     Route::post('/certificate/print-with-data', [CertificateController::class, 'printWithData'])->name('certificate.printWithData');

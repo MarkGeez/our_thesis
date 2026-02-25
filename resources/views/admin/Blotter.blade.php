@@ -1108,6 +1108,37 @@
                     </div>
                 </div>
 
+                <div class="modal fade" id="blotterUpdateAssuranceModal" tabindex="-1" aria-labelledby="blotterUpdateAssuranceLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold" id="blotterUpdateAssuranceLabel">
+                                    <i class="fa fa-shield-alt me-2 text-warning"></i>Confirm Status Update
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-warning mb-3">
+                                    Please review this update carefully before submission.
+                                </div>
+                                <p class="mb-2">
+                                    New status:
+                                    <strong id="assuranceStatusLabel">Selected Status</strong>
+                                </p>
+                                <p class="mb-0 text-muted" id="assuranceImpactText">
+                                    This update will be recorded in status history.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="confirmBlotterUpdateBtn">
+                                    <i class="fa fa-check me-1"></i>Yes, Submit Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -1162,6 +1193,67 @@
             document.getElementById('modalImage').src = imageUrl;
             document.getElementById('modalBlotterId').textContent = blotterId;
             modal.show();
+        }
+
+        let pendingBlotterUpdateForm = null;
+        const blotterUpdateAssuranceModalEl = document.getElementById('blotterUpdateAssuranceModal');
+        const blotterUpdateAssuranceModal = blotterUpdateAssuranceModalEl ? new bootstrap.Modal(blotterUpdateAssuranceModalEl) : null;
+        const assuranceStatusLabel = document.getElementById('assuranceStatusLabel');
+        const assuranceImpactText = document.getElementById('assuranceImpactText');
+        const confirmBlotterUpdateBtn = document.getElementById('confirmBlotterUpdateBtn');
+
+        function getStatusImpactMessage(statusValue, statusText) {
+            const label = statusText || statusValue;
+            switch (statusValue) {
+                case 'resolved':
+                    return 'Once marked as "' + label + '", this blotter becomes terminal. You can no longer update or revert this case status.';
+                case 'referredToPnp':
+                    return 'Once marked as "' + label + '", this blotter becomes terminal in barangay records. Further status updates will no longer be allowed.';
+                case 'criminalCase':
+                    return 'This marks legal escalation and will be permanently recorded in the case history.';
+                case 'coldCase':
+                    return 'This marks the case as inactive for now and records the current state in history.';
+                default:
+                    return 'This update will be recorded in status history and will change the current case status.';
+            }
+        }
+
+        document.addEventListener('submit', function (event) {
+            const form = event.target.closest('.js-blotter-update-form');
+            if (!form) return;
+
+            if (form.dataset.assuranceConfirmed === '1') {
+                form.dataset.assuranceConfirmed = '0';
+                return;
+            }
+
+            event.preventDefault();
+            const statusSelect = form.querySelector('select[name="status"]');
+            if (!statusSelect || !statusSelect.value) return;
+
+            const selectedOption = statusSelect.options[statusSelect.selectedIndex];
+            const selectedText = selectedOption ? selectedOption.text.trim() : statusSelect.value;
+
+            if (assuranceStatusLabel) assuranceStatusLabel.textContent = selectedText;
+            if (assuranceImpactText) assuranceImpactText.textContent = getStatusImpactMessage(statusSelect.value, selectedText);
+
+            pendingBlotterUpdateForm = form;
+            blotterUpdateAssuranceModal?.show();
+        });
+
+        if (confirmBlotterUpdateBtn) {
+            confirmBlotterUpdateBtn.addEventListener('click', function () {
+                if (!pendingBlotterUpdateForm) return;
+                pendingBlotterUpdateForm.dataset.assuranceConfirmed = '1';
+                blotterUpdateAssuranceModal?.hide();
+                pendingBlotterUpdateForm.requestSubmit();
+            });
+        }
+
+        if (blotterUpdateAssuranceModalEl) {
+            blotterUpdateAssuranceModalEl.addEventListener('hidden.bs.modal', function () {
+                pendingBlotterUpdateForm = null;
+            });
         }
 
         @if($errors->any() && (old('plaintiffName') || old('plaintiffLastName') || old('blotterDescription')))

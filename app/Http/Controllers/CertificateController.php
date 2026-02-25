@@ -155,6 +155,16 @@ class CertificateController extends Controller
         return $this->certificateView($req, false, true);
     }
 
+    public function pendingPreview(int $id): View
+    {
+        $req = CertificateRequest::with('user', 'resident')->findOrFail($id);
+        if ($req->status !== 'pending') {
+            abort(403, 'Only pending requests can be previewed from this action.');
+        }
+
+        return $this->certificateView($req, false, false);
+    }
+
     public function generate(int $id): View
     {
         $req = CertificateRequest::with('user', 'resident')->findOrFail($id);

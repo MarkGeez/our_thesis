@@ -41,6 +41,52 @@
         border: 1px solid #ced4da !important;
         border-left: 3px solid #0d6efd !important; 
     }
+    .input-group-text {
+        background-color: #f1f3f5;
+        border: 1.5px solid #ced4da;
+        cursor: pointer;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 1;
+        cursor: pointer;
+    }
+    .input-group > .form-control[type="date"] {
+        flex: 1 1 auto;
+        width: 1%;
+        min-width: 0;
+    }
+    .affidavit-group {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+    }
+    .affidavit-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .affidavit-check:last-child {
+        margin-bottom: 0;
+    }
+    .affidavit-check .form-check-input {
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+    }
+    .affidavit-label {
+        margin: 0;
+        line-height: 1.45;
+        word-break: break-word;
+    }
+    @media (max-width: 576px) {
+        .affidavit-group {
+            padding: 10px;
+        }
+        .affidavit-label {
+            font-size: 0.92rem;
+        }
+    }
 </style>
 
 {{-- Certificate Type Action Cards --}}
@@ -223,12 +269,23 @@
                         </div>
                         <div class="col-12" id="solo_child_container"></div>
                         <div class="col-md-6">
-                            <label class="form-label">Separated from</label>
+                            <label class="form-label">Separated from (Name of Former Partner)</label>
                             <input type="text" name="request_data[separated_from]" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Since (Date)</label>
-                            <input type="date" name="request_data[since]" class="form-control">
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="request_data[since]"
+                                    class="form-control certificate-date-input"
+                                    data-raw="{{ old('request_data.since') }}"
+                                    value="{{ old('request_data.since') }}"
+                                >
+                                <span class="input-group-text certificate-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
@@ -240,33 +297,32 @@
                             <small class="text-muted">This will help the barangay officials better understand your request.</small>
                         </div>
                         <div class="col-12 mt-3">
-                            <label class="form-label fw-bold">Affidavit Statements</label>
-                            <div class="form-check">
+                            <label class="form-label fw-bold">Affidavit Statements <span class="text-muted">(Check all that apply)</span></label>
+                            <div class="affidavit-group">
+                            <div class="form-check affidavit-check">
                                 <input class="form-check-input" type="checkbox" 
                                        name="request_data[whereabouts]" 
                                        value="1" id="soloCheck1">
-                                <label class="form-check-label" for="soloCheck1">
+                                <label class="form-check-label affidavit-label" for="soloCheck1">
                                     That I have no knowledge of the whereabouts of the father of my child/ children.
                                 </label>
                             </div>
-                            <div class="form-check mt-2">
+                            <div class="form-check affidavit-check">
                                 <input class="form-check-input" type="checkbox" 
                                        name="request_data[separated]" 
                                        value="1" id="soloCheck2">
-                                <label class="form-check-label" for="soloCheck2">
-                                    That I had separated from my partner, and at the present time, I have no husband/partner and 
-                                    <br>
-                                    as a Solo Parent, I am taking full custody and care of my child/ children mentioned in this affidavit.
+                                <label class="form-check-label affidavit-label" for="soloCheck2">
+                                    That I had separated from my partner, and at the present time, I have no husband/partner and as a Solo Parent, I am taking full custody and care of my child/ children mentioned in this affidavit.
                                 </label>
                             </div>
-                            <div class="form-check mt-2">
+                            <div class="form-check affidavit-check">
                                 <input class="form-check-input" type="checkbox" 
                                        name="request_data[attest_truth]" 
                                        value="1" id="soloCheck3">
-                                <label class="form-check-label" for="soloCheck3">
-                                    That this is being executed to attest to the truth of the foregoing facts and circumstances and
-                                    <br> for whatever legal intents and purpose this instrument may serve.
+                                <label class="form-check-label affidavit-label" for="soloCheck3">
+                                    That this is being executed to attest to the truth of the foregoing facts and circumstances and for whatever legal intents and purpose this instrument may serve.
                                 </label>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -369,10 +425,52 @@
                         </div>
                         <div class="col-md-5">
                             <label class="small fw-bold">Birth Date</label>
-                            <input type="date" name="form_data[children][${i}][dob]" class="form-control form-control-sm" max="${maxBirthDateValue}" required>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="form_data[children][${i}][dob]"
+                                    class="form-control form-control-sm certificate-date-input"
+                                    max="${maxBirthDateValue}"
+                                    required
+                                >
+                                <span class="input-group-text certificate-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>`;
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        function normalizeToYmd(raw) {
+            if (!raw) return '';
+            const d = new Date(raw);
+            if (isNaN(d)) return '';
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        function openPicker(inputEl) {
+            if (!inputEl) return;
+            if (inputEl.showPicker) inputEl.showPicker();
+            else inputEl.focus();
+        }
+
+        document.querySelectorAll('.certificate-date-input').forEach(function (input) {
+            const raw = input.getAttribute('data-raw') || input.value;
+            const formatted = normalizeToYmd(raw);
+            if (formatted) input.value = formatted;
+        });
+
+        document.addEventListener('click', function (e) {
+            const trigger = e.target.closest('.certificate-date-open');
+            if (!trigger) return;
+            const wrapper = trigger.closest('.input-group');
+            const input = wrapper ? wrapper.querySelector('.certificate-date-input') : null;
+            openPicker(input);
+        });
     });
 </script>

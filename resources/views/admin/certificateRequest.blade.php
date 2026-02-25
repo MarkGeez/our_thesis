@@ -1043,7 +1043,21 @@ document.querySelectorAll('[data-preview-id]').forEach(function(btn) {
         var id = this.getAttribute('data-preview-id');
         var url = '{{ route("admin.certificate.preview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
         document.getElementById('certificatePreviewFrame').src = url;
-        document.getElementById('certificatePrintBtn').setAttribute('data-current-id', id);
+        var printBtn = document.getElementById('certificatePrintBtn');
+        printBtn.setAttribute('data-current-id', id);
+        printBtn.style.display = '';
+        new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
+    });
+});
+
+document.querySelectorAll('[data-pending-preview-id]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-pending-preview-id');
+        var url = '{{ route("admin.certificate.pendingPreview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
+        document.getElementById('certificatePreviewFrame').src = url;
+        var printBtn = document.getElementById('certificatePrintBtn');
+        printBtn.removeAttribute('data-current-id');
+        printBtn.style.display = 'none';
         new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
     });
 });
