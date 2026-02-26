@@ -19,7 +19,7 @@ class ActiveLogController extends Controller
         $logs = ActiveLog::with('user')
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(20)
             ->appends(request()->query());
 
         return view('admin.activityLogs', compact('logs', 'user'));

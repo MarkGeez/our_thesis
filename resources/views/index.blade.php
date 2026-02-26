@@ -450,8 +450,9 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
-                    <li class="nav-item"><a class="nav-link px-3" href="#officials">Officials</a></li>
+                    
                     <li class="nav-item"><a class="nav-link px-3" href="#announcements">Announcements</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#officials">Officials</a></li>
                     <li class="nav-item"><a class="nav-link px-3" href="#contact">Contact Us</a></li>
                     <li class="nav-item ms-lg-3">
                         <a href="{{ route('login') }}" class="btn btn-outline-light rounded-pill px-4 fw-bold">LOGIN</a>
@@ -485,21 +486,7 @@
         </div>
     </section>
 
-    <!-- ============================================================
-         OFFICIALS
-    ============================================================ -->
-    <div class="section-container" id="officials">
-        <h2 class="section-title reveal">Barangay Leadership</h2>
-        <div class="section-divider reveal delay-1"></div>
-
-        @include('components.officials', [
-            'positions' => $positions,
-            'officialsByPosition' => $officialsByPosition,
-            'showControls' => false,
-        ])
-    </div>
-
-    <!-- ============================================================
+     <!-- ============================================================
          ANNOUNCEMENTS
     ============================================================ -->
     <div class="section-container" id="announcements">
@@ -531,6 +518,22 @@
         </div>
     </div>
 
+
+    <!-- ============================================================
+         OFFICIALS
+    ============================================================ -->
+    <div class="section-container" id="officials">
+        <h2 class="section-title reveal">Barangay Leadership</h2>
+        <div class="section-divider reveal delay-1"></div>
+
+        @include('components.officials', [
+            'positions' => $positions,
+            'officialsByPosition' => $officialsByPosition,
+            'showControls' => false,
+        ])
+    </div>
+
+   
     <!-- ============================================================
          CONTACT
     ============================================================ -->

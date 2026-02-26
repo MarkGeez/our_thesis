@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('contactNumber', 11);
             $table->date('birthday');
             $table->string('proofOfIdentity');
-            $table->enum('role', ['admin', 'subadmin', 'resident', 'non-resident']);
+            $table->enum('role', ['admin', 'subadmin', 'resident', 'non-resident', 'superadmin']);
             $table->enum('status', ['pending', 'approved', 'declined'])->default('pending');
             $table->timestamp('registrationDate');
             $table->rememberToken();

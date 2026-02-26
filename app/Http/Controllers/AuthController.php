@@ -48,20 +48,18 @@ class AuthController extends Controller
     $user->refresh();
 
     switch ($user->role) {
+        case 'superadmin':
+            return redirect('/superadmin/users');
         case 'admin':
-            return redirect("/admin/dashboard");
-
+            return redirect('/admin/dashboard');
         case 'subadmin':
-            return redirect("/subadmin/dashboard");
-
+            return redirect('/subadmin/dashboard');
         case 'resident':
-            return redirect("/resident/dashboard");
-
+            return redirect('/resident/dashboard');
         case 'non-resident':
-            return redirect("/non-resident/dashboard");
-
+            return redirect('/non-resident/dashboard');
         default:
-            return redirect("/");
+            return redirect('/');
     }
 }
     public function login(Request $request): RedirectResponse
@@ -83,6 +81,20 @@ class AuthController extends Controller
             return back()
                 ->withInput()
                 ->with('auth_error', 'Incorrect password. Please try again.');
+        }
+
+        // Block login for pending or declined users
+        if ($user->status === 'pending') {
+            $created = $user->created_at;
+            $daysPending = $created ? now()->diffInDays($created) : 0;
+            $msg = 'Your account is still pending for verification.';
+            if ($daysPending > 4) {
+                $msg .= ' If your account has been pending for more than 4 days, please contact the barangay.';
+            }
+            return back()->withInput()->with('auth_error', $msg);
+        }
+        if ($user->status === 'declined') {
+            return back()->withInput()->with('auth_error', 'Your account has been declined and cannot login.');
         }
 
         if (Auth::attempt($credentials)) {
