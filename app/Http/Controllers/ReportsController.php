@@ -513,6 +513,7 @@ private function buildBlotterReportQuery(array $filters)
 private function buildComplaintReportQuery(array $filters)
 {
     $query = Complaints::query()->with([
+        'complainant:id,firstName,middleName,lastName',
         'respondent:id,firstName,middleName,lastName',
     ]);
 

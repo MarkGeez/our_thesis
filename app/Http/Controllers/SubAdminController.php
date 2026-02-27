@@ -241,7 +241,10 @@ $user = auth()->user();
         $statusFilter = (string) $request->query('status_filter', 'all');
         $sort = (string) $request->query('sort', 'id_desc');
 
-        $query = Complaints::query();
+        $query = Complaints::query()->with([
+            'complainant:id,firstName,middleName,lastName,contactNumber',
+            'respondent:id,firstName,middleName,lastName,contactNumber',
+        ]);
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {

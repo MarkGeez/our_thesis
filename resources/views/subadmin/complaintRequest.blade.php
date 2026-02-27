@@ -420,10 +420,26 @@
 
                                 <tbody id="complaintTableBody" class="align-middle">
                                     @foreach ($complaints as $complaint)
+                                    @php
+                                        $complainantDisplayName = $complaint->complainant
+                                            ? ucwords(strtolower(trim(($complaint->complainant->firstName ?? '') . ' ' . ($complaint->complainant->middleName ?? '') . ' ' . ($complaint->complainant->lastName ?? ''))))
+                                            : ucwords(str_replace(',', ' ', (string) $complaint->complainantName));
+                                    @endphp
                                     <tr>
                                         <td class="text-center fw-bold">{{ $complaint->id }}</td>
                                         <td>
-                                            <span class="fw-semibold">{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</span>
+                                            @if(!empty($complaint->complainant_id))
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-link text-decoration-none p-0 fw-semibold"
+                                                    data-complainant-id="{{ $complaint->complainant_id }}"
+                                                    data-complainant-name="{{ $complainantDisplayName }}"
+                                                >
+                                                    {{ $complainantDisplayName }}
+                                                </button>
+                                            @else
+                                                <span class="fw-semibold">{{ $complainantDisplayName }}</span>
+                                            @endif
                                             <div class="text-muted small">ID: {{ $complaint->complainant_id }}</div>
                                         </td>
                                         <td>{{ $complaint->user->contactNumber ?? $complaint->complainant->contactNumber ?? 'N/A' }}</td>
@@ -468,7 +484,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <small class="text-muted">Complainant Name</small>
-                                                        <p class="fw-bold">{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</p>
+                                                        <p class="fw-bold">{{ $complainantDisplayName }}</p>
                                                     </div>
                                                     <div class="col-md-6 border-start">
                                                         <small class="text-muted">Respondent ID</small>
@@ -582,6 +598,121 @@
     </div>
 </div>
 
+<div class="modal fade" id="requesterProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user me-2"></i>Complainant Information
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="profileLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading profile...</p>
+                </div>
+                <div id="profileContent" style="display:none;">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div id="profileImageContainer" class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Full Name</small>
+                            <p class="fw-semibold mb-0" id="profileFullName" style="text-transform: capitalize;">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Email</small>
+                            <p class="fw-semibold mb-0" id="profileEmail">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Contact No.</small>
+                            <p class="fw-semibold mb-0" id="profileContact">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Birthday</small>
+                            <p class="fw-semibold mb-0" id="profileBirthday">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileAgeRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Age</small>
+                            <p class="fw-semibold mb-0" id="profileAge">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileSexRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Sex</small>
+                            <p class="fw-semibold mb-0 text-capitalize" id="profileSex">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileRoleRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Role</small>
+                            <p class="fw-semibold mb-0 text-capitalize" id="profileRole">-</p>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <div class="row mb-4" id="profileHistorySection" style="display:none;">
+                        <div class="col-12">
+                            <h6 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-history me-2"></i>Complaint History
+                            </h6>
+                        </div>
+                    </div>
+                    <div id="profileHistoryLoading" style="display:none;" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted small">Loading history...</p>
+                    </div>
+                    <div id="profileHistoryContent" style="display:none;">
+                        <div class="alert alert-info mb-3">
+                            <div class="row text-center g-2">
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Total</strong>
+                                    <span class="fs-6 fw-bold" id="profileTotalRequests">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Pending</strong>
+                                    <span class="fs-6 fw-bold text-warning" id="profilePendingCount">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">On-going</strong>
+                                    <span class="fs-6 fw-bold text-primary" id="profileOngoingCount">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Resolved</strong>
+                                    <span class="fs-6 fw-bold text-success" id="profileResolvedCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Address</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profileHistoryTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
@@ -612,6 +743,102 @@
 
             modalEl.addEventListener('shown.bs.modal', syncRemarksState);
             syncRemarksState();
+        });
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-complainant-id]');
+            if (!btn) return;
+
+            const userId = btn.getAttribute('data-complainant-id');
+            const fallbackName = btn.getAttribute('data-complainant-name') || 'N/A';
+
+            document.getElementById('profileLoading').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('profileAgeRow').style.display = 'none';
+            document.getElementById('profileSexRow').style.display = 'none';
+            document.getElementById('profileRoleRow').style.display = 'none';
+            document.getElementById('profileHistorySection').style.display = 'none';
+            document.getElementById('profileHistoryLoading').style.display = 'none';
+            document.getElementById('profileHistoryContent').style.display = 'none';
+            document.getElementById('profileImageContainer').innerHTML = '<i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>';
+
+            const modal = new bootstrap.Modal(document.getElementById('requesterProfileModal'));
+            modal.show();
+
+            const endpoint = "{{ route('subadmin.complaints.profile', ['userId' => '__ID__']) }}".replace('__ID__', userId);
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+                        return;
+                    }
+
+                    document.getElementById('profileFullName').textContent = data.fullName || fallbackName;
+                    document.getElementById('profileEmail').textContent = data.email || '-';
+                    document.getElementById('profileContact').textContent = data.contact || '-';
+                    document.getElementById('profileBirthday').textContent = data.birthday || '-';
+
+                    if (data.profileImage) {
+                        document.getElementById('profileImageContainer').innerHTML =
+                            '<img src="' + data.profileImage + '" alt="Profile" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;">';
+                    }
+
+                    if (data.age) {
+                        document.getElementById('profileAge').textContent = data.age;
+                        document.getElementById('profileAgeRow').style.display = 'block';
+                    }
+                    if (data.sex) {
+                        document.getElementById('profileSex').textContent = data.sex;
+                        document.getElementById('profileSexRow').style.display = 'block';
+                    }
+                    if (data.role) {
+                        document.getElementById('profileRole').textContent = data.role;
+                        document.getElementById('profileRoleRow').style.display = 'block';
+                    }
+
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileContent').style.display = 'block';
+                    document.getElementById('profileHistorySection').style.display = 'block';
+                    document.getElementById('profileHistoryLoading').style.display = 'block';
+
+                    const history = data.history || {};
+                    document.getElementById('profileTotalRequests').textContent = history.total || 0;
+                    document.getElementById('profilePendingCount').textContent = history.pending || 0;
+                    document.getElementById('profileOngoingCount').textContent = history.on_going || 0;
+                    document.getElementById('profileResolvedCount').textContent = history.resolved || 0;
+
+                    const tbody = document.getElementById('profileHistoryTableBody');
+                    tbody.innerHTML = '';
+                    const rows = history.requests || [];
+                    if (rows.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted small">No complaint history found</td></tr>';
+                    } else {
+                        rows.forEach(function (req) {
+                            const statusBadge = req.status === 'resolved'
+                                ? '<span class="badge bg-success">Resolved</span>'
+                                : req.status === 'on-going'
+                                    ? '<span class="badge bg-warning text-dark">On-going</span>'
+                                    : req.status === 'rejected'
+                                        ? '<span class="badge bg-danger">Rejected</span>'
+                                        : '<span class="badge bg-secondary">Pending</span>';
+
+                            const row = '<tr>' +
+                                '<td class="small">' + (req.created_at || '-') + '</td>' +
+                                '<td>' + statusBadge + '</td>' +
+                                '<td class="small">' + (req.address || '-') + '</td>' +
+                                '<td class="small">' + ((req.details || '-').length > 100 ? (req.details || '-').slice(0, 100) + '...' : (req.details || '-')) + '</td>' +
+                                '</tr>';
+                            tbody.innerHTML += row;
+                        });
+                    }
+
+                    document.getElementById('profileHistoryLoading').style.display = 'none';
+                    document.getElementById('profileHistoryContent').style.display = 'block';
+                })
+                .catch(() => {
+                    document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">Failed to load complainant profile.</div>';
+                });
         });
     });
 </script>

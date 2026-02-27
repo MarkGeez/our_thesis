@@ -176,6 +176,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/serviceRequest/{serviceRequest}/status', [ServiceRequestController::class, 'updateStatus'])->name('serviceRequest.status');
 
     Route::get('/complaintRequest', [ComplaintController::class,'showComplaints'])->name('complaintRequest');
+    Route::get('/complaint/history/{userId}', [ComplaintController::class, 'complainantHistory'])->name('complaints.history');
+    Route::get('/complaint/profile/{userId}', [ComplaintController::class, 'complainantProfile'])->name('complaints.profile');
     Route::put('/complaintRequest/{id}', [ComplaintController::class, 'updateStatus'])->name('update.complaint');
     Route::get('/adminComplaint', [AdminController::class,'adminComplaint'])->name('adminComplaint');
     Route::post('/adminComplaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');
@@ -246,6 +248,8 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
         Route::get('/announcements', [SubAdminController::class,'announcements'])->name('announcements');
        
         Route::get('/complaintRequest', [SubAdminController::class,'complaintRequest'])->name('complaintRequest');
+        Route::get('/complaint/history/{userId}', [ComplaintController::class, 'complainantHistory'])->name('complaints.history');
+        Route::get('/complaint/profile/{userId}', [ComplaintController::class, 'complainantProfile'])->name('complaints.profile');
         Route::put('/complaintRequest/{id}', [SubAdminController::class, 'updateComplaint'])->name('update.complaint');
 
 

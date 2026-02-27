@@ -700,7 +700,9 @@
                                 <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
                             @elseif($type == 'complaint')
                                 @php
-                                    $cleanComplainantName = ucwords(strtolower(trim(preg_replace('/\s+/', ' ', str_replace(',', ' ', (string) $row->complainantName)))));
+                                    $cleanComplainantName = $row->complainant
+                                        ? ucwords(strtolower(trim(($row->complainant->firstName ?? '') . ' ' . ($row->complainant->middleName ?? '') . ' ' . ($row->complainant->lastName ?? ''))))
+                                        : ucwords(strtolower(trim(preg_replace('/\s+/', ' ', str_replace(',', ' ', (string) $row->complainantName)))));
                                     $remarkLines = collect(preg_split("/\r\n|\n|\r/", (string) ($row->remarks ?? '')))
                                         ->map(fn($line) => trim($line))
                                         ->filter()
