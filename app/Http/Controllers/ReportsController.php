@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Blotter;
 use App\Models\CertificateRequest;
+use App\Models\Complaints;
 use App\Models\GeneratedReport;
 use App\Models\Street;
 use App\Models\House;
 use App\Models\Household;
 use App\Models\FamilyMember;
+use App\Models\ActiveLog;
+use App\Services\ActiveLogRecordDetails;
 use Auth;
 
 class ReportsController extends Controller
@@ -37,8 +40,27 @@ public function index()
         ->orderBy('lastName')
         ->orderBy('firstName')
         ->get(['id', 'firstName', 'middleName', 'lastName']);
+    $activityUsers = \App\Models\User::query()
+        ->whereIn('id', ActiveLog::query()->select('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
+    $activityModules = ActiveLog::query()
+        ->whereNotNull('module')
+        ->where('module', '!=', '')
+        ->select('module')
+        ->distinct()
+        ->orderBy('module')
+        ->pluck('module');
+    $activityActions = ActiveLog::query()
+        ->whereNotNull('action')
+        ->where('action', '!=', '')
+        ->select('action')
+        ->distinct()
+        ->orderBy('action')
+        ->pluck('action');
 
-    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions'));
+    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions'));
 }
 
 public function generatePopulation(Request $request)
@@ -197,6 +219,69 @@ public function generateHousehold(Request $request)
     ]);
 
     return redirect()->back()->with('success', 'Household report generated successfully.');
+}
+
+public function generateComplaint(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'complaint_status' => 'nullable|in:all,pending,on-going,resolved,rejected',
+        'complainant_name' => 'nullable|string|max:150',
+        'respondent_name' => 'nullable|string|max:150',
+        'address' => 'nullable|string|max:255',
+        'keyword' => 'nullable|string|max:255',
+        'date_from' => 'nullable|date',
+        'date_to' => 'nullable|date|after_or_equal:date_from',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $filters['complaint_status'] = $filters['complaint_status'] ?? 'all';
+    $complaints = $this->buildComplaintReportQuery($filters)->get();
+
+    if ($complaints->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No complaint records matched the selected filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'complaint',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $complaints->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Complaint report generated successfully.');
+}
+
+public function generateActivity(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'user_id' => 'nullable|exists:users,id',
+        'module' => 'nullable|string|max:150',
+        'action' => 'nullable|string|max:150',
+        'record_id' => 'nullable|integer|min:1',
+        'keyword' => 'nullable|string|max:255',
+        'date_from' => 'nullable|date',
+        'date_to' => 'nullable|date|after_or_equal:date_from',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $logs = $this->buildActivityReportQuery($filters)->get();
+
+    if ($logs->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No activity log records matched the selected filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'activity',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $logs->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Activity log report generated successfully.');
 }
 
 private function resolveHouseholdReportScope(array $filters): string
@@ -425,6 +510,97 @@ private function buildBlotterReportQuery(array $filters)
     return $query->latest();
 }
 
+private function buildComplaintReportQuery(array $filters)
+{
+    $query = Complaints::query()->with([
+        'respondent:id,firstName,middleName,lastName',
+    ]);
+
+    $status = $filters['complaint_status'] ?? 'all';
+    if ($status !== 'all') {
+        $query->where('status', $status);
+    }
+
+    if (!empty($filters['complainant_name'])) {
+        $search = trim((string) $filters['complainant_name']);
+        $query->where('complainantName', 'like', '%' . $search . '%');
+    }
+
+    if (!empty($filters['respondent_name'])) {
+        $search = trim((string) $filters['respondent_name']);
+        $query->whereHas('respondent', function ($q) use ($search) {
+            $q->where('firstName', 'like', '%' . $search . '%')
+                ->orWhere('middleName', 'like', '%' . $search . '%')
+                ->orWhere('lastName', 'like', '%' . $search . '%')
+                ->orWhereRaw("CONCAT_WS(' ', firstName, middleName, lastName) like ?", ['%' . $search . '%']);
+        });
+    }
+
+    if (!empty($filters['address'])) {
+        $query->where('address', 'like', '%' . trim((string) $filters['address']) . '%');
+    }
+
+    if (!empty($filters['keyword'])) {
+        $search = trim((string) $filters['keyword']);
+        $query->where(function ($q) use ($search) {
+            $q->where('details', 'like', '%' . $search . '%')
+                ->orWhere('remarks', 'like', '%' . $search . '%');
+        });
+    }
+
+    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
+    } elseif (!empty($filters['date_from'])) {
+        $query->whereDate('created_at', '>=', $filters['date_from']);
+    } elseif (!empty($filters['date_to'])) {
+        $query->whereDate('created_at', '<=', $filters['date_to']);
+    }
+
+    return $query->latest();
+}
+
+private function buildActivityReportQuery(array $filters)
+{
+    $query = ActiveLog::query()->with([
+        'user:id,firstName,lastName',
+    ]);
+
+    if (!empty($filters['user_id'])) {
+        $query->where('user_id', $filters['user_id']);
+    }
+
+    if (!empty($filters['module'])) {
+        $query->where('module', 'like', '%' . trim((string) $filters['module']) . '%');
+    }
+
+    if (!empty($filters['action'])) {
+        $query->where('action', 'like', '%' . trim((string) $filters['action']) . '%');
+    }
+
+    if (!empty($filters['record_id'])) {
+        $query->where('record_id', (int) $filters['record_id']);
+    }
+
+    if (!empty($filters['keyword'])) {
+        $search = trim((string) $filters['keyword']);
+        $query->where(function ($q) use ($search) {
+            $q->where('description', 'like', '%' . $search . '%')
+                ->orWhere('module', 'like', '%' . $search . '%')
+                ->orWhere('action', 'like', '%' . $search . '%');
+        });
+    }
+
+    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
+    } elseif (!empty($filters['date_from'])) {
+        $query->whereDate('created_at', '>=', $filters['date_from']);
+    } elseif (!empty($filters['date_to'])) {
+        $query->whereDate('created_at', '<=', $filters['date_to']);
+    }
+
+    return $query->latest();
+}
+
 public function view($id)
 {
     $report = GeneratedReport::findOrFail($id);
@@ -479,6 +655,16 @@ public function view($id)
         $data = $query->get();
     }
 
+    if ($report->report_type == 'complaint') {
+        $data = $this->buildComplaintReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'activity') {
+        $data = ActiveLogRecordDetails::enrich(
+            $this->buildActivityReportQuery($filters)->get()
+        );
+    }
+
     if ($report->report_type == 'household') {
         $data = $this->getHouseholdReportData($filters);
     }
@@ -500,8 +686,27 @@ public function view($id)
         ->orderBy('lastName')
         ->orderBy('firstName')
         ->get(['id', 'firstName', 'middleName', 'lastName']);
+    $activityUsers = \App\Models\User::query()
+        ->whereIn('id', ActiveLog::query()->select('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
+    $activityModules = ActiveLog::query()
+        ->whereNotNull('module')
+        ->where('module', '!=', '')
+        ->select('module')
+        ->distinct()
+        ->orderBy('module')
+        ->pluck('module');
+    $activityActions = ActiveLog::query()
+        ->whereNotNull('action')
+        ->where('action', '!=', '')
+        ->select('action')
+        ->distinct()
+        ->orderBy('action')
+        ->pluck('action');
 
-    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions'));
+    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions'));
 }
 
 public function printTemplate($id)
@@ -562,6 +767,16 @@ public function printTemplate($id)
         }
 
         $data = $query->get();
+    }
+
+    if ($report->report_type == 'complaint') {
+        $data = $this->buildComplaintReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'activity') {
+        $data = ActiveLogRecordDetails::enrich(
+            $this->buildActivityReportQuery($filters)->get()
+        );
     }
 
     if ($report->report_type == 'household') {

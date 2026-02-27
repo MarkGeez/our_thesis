@@ -142,6 +142,21 @@
                                 <th data-col="certificate_type">Certificate Type</th>
                                 <th data-col="certificate_status">Status</th>
                                 <th data-col="certificate_date">Date</th>
+                            @elseif($type == 'complaint')
+                                <th data-col="complainant">Complainant</th>
+                                <th data-col="respondent">Respondent</th>
+                                <th data-col="status">Status</th>
+                                <th data-col="address">Address</th>
+                                <th data-col="details">Details</th>
+                                <th data-col="remarks">Respondent Remarks</th>
+                                <th data-col="complaint_date">Date</th>
+                            @elseif($type == 'activity')
+                                <th data-col="activity_user">User</th>
+                                <th data-col="module">Module</th>
+                                <th data-col="action">Action</th>
+                                <th data-col="description">Description</th>
+                                <th data-col="record_id">Record ID</th>
+                                <th data-col="logged_at">Logged At</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
                                 <th data-col="head_no">Head #</th>
                                 <th data-col="house_head">House Head</th>
@@ -264,6 +279,45 @@
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                     <td data-col="certificate_status">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->status))) }}</td>
                                     <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                                @elseif($type == 'complaint')
+                                    @php
+                                        $cleanComplainantName = ucwords(strtolower(trim(preg_replace('/\s+/', ' ', str_replace(',', ' ', (string) $row->complainantName)))));
+                                        $remarkLines = collect(preg_split("/\r\n|\n|\r/", (string) ($row->remarks ?? '')))
+                                            ->map(fn($line) => trim($line))
+                                            ->filter()
+                                            ->values();
+                                    @endphp
+                                    <td data-col="complainant">{{ $cleanComplainantName ?: 'N/A' }}</td>
+                                    <td data-col="respondent">
+                                        @if($row->respondent)
+                                            {{ ucwords(strtolower(trim(($row->respondent->firstName ?? '') . ' ' . ($row->respondent->middleName ?? '') . ' ' . ($row->respondent->lastName ?? '')))) }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td data-col="status">{{ ucwords(str_replace('-', ' ', (string) $row->status)) }}</td>
+                                    <td data-col="address">{{ $row->address ?: 'N/A' }}</td>
+                                    <td data-col="details">{{ $row->details ?: 'N/A' }}</td>
+                                    <td data-col="remarks">
+                                        @if($remarkLines->isNotEmpty())
+                                            <div class="small" style="white-space: pre-line; line-height: 1.45;">{!! e($remarkLines->implode("\n")) !!}</div>
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td data-col="complaint_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                                @elseif($type == 'activity')
+                                    @php
+                                        $activityUser = $row->user
+                                            ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                            : 'N/A';
+                                    @endphp
+                                    <td data-col="activity_user">{{ $activityUser !== '' ? $activityUser : 'N/A' }}</td>
+                                    <td data-col="module">{{ $row->module ? ucwords(strtolower((string) $row->module)) : 'N/A' }}</td>
+                                    <td data-col="action">{{ $row->action ? ucwords(strtolower((string) $row->action)) : 'N/A' }}</td>
+                                    <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
+                                    <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
+                                    <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                                 @elseif($type == 'household')
                                     @php
                                         $houseHeads = $row->residents

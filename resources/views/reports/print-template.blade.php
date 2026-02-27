@@ -127,7 +127,8 @@
         }
 
         .table td[data-col="details"],
-        .table td[data-col="status_history"] {
+        .table td[data-col="status_history"],
+        .table td[data-col="remarks"] {
             line-height: 1.35;
             font-size: 10px;
         }
@@ -142,6 +143,34 @@
         .table.blotter-table td[data-col="details"] { width: 24%; }
         .table.blotter-table th[data-col="status_history"],
         .table.blotter-table td[data-col="status_history"] { width: 34%; }
+
+        .table.complaint-table th[data-col="complainant"],
+        .table.complaint-table td[data-col="complainant"] { width: 14%; }
+        .table.complaint-table th[data-col="respondent"],
+        .table.complaint-table td[data-col="respondent"] { width: 14%; }
+        .table.complaint-table th[data-col="status"],
+        .table.complaint-table td[data-col="status"] { width: 10%; }
+        .table.complaint-table th[data-col="address"],
+        .table.complaint-table td[data-col="address"] { width: 17%; }
+        .table.complaint-table th[data-col="details"],
+        .table.complaint-table td[data-col="details"] { width: 18%; }
+        .table.complaint-table th[data-col="remarks"],
+        .table.complaint-table td[data-col="remarks"] { width: 21%; }
+        .table.complaint-table th[data-col="complaint_date"],
+        .table.complaint-table td[data-col="complaint_date"] { width: 6%; }
+
+        .table.activity-table th[data-col="activity_user"],
+        .table.activity-table td[data-col="activity_user"] { width: 16%; }
+        .table.activity-table th[data-col="module"],
+        .table.activity-table td[data-col="module"] { width: 14%; }
+        .table.activity-table th[data-col="action"],
+        .table.activity-table td[data-col="action"] { width: 12%; }
+        .table.activity-table th[data-col="description"],
+        .table.activity-table td[data-col="description"] { width: 34%; }
+        .table.activity-table th[data-col="record_id"],
+        .table.activity-table td[data-col="record_id"] { width: 8%; }
+        .table.activity-table th[data-col="logged_at"],
+        .table.activity-table td[data-col="logged_at"] { width: 16%; }
 
         .table.table-compact {
             font-size: 10px;
@@ -322,6 +351,8 @@
         $rowsPerPage = match ($type) {
             'blotter' => 8,
             'certificate' => 25,
+            'complaint' => 18,
+            'activity' => 20,
             'population' => 25,
             'household' => $householdScope === 'family_members' ? 12 : 14,
             default => 18,
@@ -378,6 +409,21 @@
             $stats[] = ['label' => 'Approved',        'value' => ($statusGroups->get('approved',  collect())->count() ?: $statusGroups->get('released', collect())->count()),  'color' => 'green'];
             $stats[] = ['label' => 'Pending',         'value' => $statusGroups->get('pending',    collect())->count(), 'color' => 'amber'];
             $stats[] = ['label' => 'Rejected',        'value' => $statusGroups->get('rejected',   collect())->count(), 'color' => 'red'];
+
+        } elseif ($type === 'complaint') {
+            $statusGroups = $allData->groupBy(fn($r) => strtolower((string) ($r->status ?? 'unknown')));
+            $stats[] = ['label' => 'Total Complaints', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Pending', 'value' => $statusGroups->get('pending', collect())->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'On-going', 'value' => $statusGroups->get('on-going', collect())->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Resolved', 'value' => $statusGroups->get('resolved', collect())->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Rejected', 'value' => $statusGroups->get('rejected', collect())->count(), 'color' => 'red'];
+        } elseif ($type === 'activity') {
+            $actionGroups = $allData->groupBy(fn($r) => strtolower((string) ($r->action ?? 'unknown')));
+            $stats[] = ['label' => 'Total Logs', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Created', 'value' => $actionGroups->get('created', collect())->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Updated', 'value' => $actionGroups->get('updated', collect())->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'Deleted', 'value' => $actionGroups->get('deleted', collect())->count(), 'color' => 'red'];
+            $stats[] = ['label' => 'Modules', 'value' => $allData->pluck('module')->filter()->unique()->count(), 'color' => 'black'];
 
         } elseif ($type === 'population') {
             $params     = request()->input('cols', '');
@@ -450,7 +496,7 @@
         }
 
         // Remove zero-value stats (cleaner output)
-        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Residents', 'Total Households']));
+        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Complaints', 'Total Logs', 'Total Residents', 'Total Households']));
     @endphp
 
     <div id="pdfContent">
@@ -495,7 +541,7 @@
         @endif
 
         <div class="content-body">
-            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }}">
+            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }} {{ $type == 'complaint' ? 'complaint-table' : '' }} {{ $type == 'activity' ? 'activity-table' : '' }}">
                 <thead>
                     <tr>
                         @if($type == 'population')
@@ -520,6 +566,21 @@
                             <th data-col="certificate_type">Certificate Type</th>
                             <th data-col="certificate_status">Status</th>
                             <th data-col="certificate_date">Date</th>
+                        @elseif($type == 'complaint')
+                            <th data-col="complainant">Complainant</th>
+                            <th data-col="respondent">Respondent</th>
+                            <th data-col="status">Status</th>
+                            <th data-col="address">Address</th>
+                            <th data-col="details">Details</th>
+                            <th data-col="remarks">Respondent <br>Remarks</th>
+                            <th data-col="complaint_date">Date</th>
+                        @elseif($type == 'activity')
+                            <th data-col="activity_user">User</th>
+                            <th data-col="module">Module</th>
+                            <th data-col="action">Action</th>
+                            <th data-col="description">Description</th>
+                            <th data-col="record_id">Record ID</th>
+                            <th data-col="logged_at">Logged At</th>
                         @elseif($type == 'household' && $householdScope === 'family_members')
                             <th data-col="head_no">Head #</th>
                             <th data-col="house_head">House Head</th>
@@ -637,6 +698,45 @@
                                 <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
                                 <td data-col="certificate_status">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->status))) }}</td>
                                 <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                            @elseif($type == 'complaint')
+                                @php
+                                    $cleanComplainantName = ucwords(strtolower(trim(preg_replace('/\s+/', ' ', str_replace(',', ' ', (string) $row->complainantName)))));
+                                    $remarkLines = collect(preg_split("/\r\n|\n|\r/", (string) ($row->remarks ?? '')))
+                                        ->map(fn($line) => trim($line))
+                                        ->filter()
+                                        ->values();
+                                @endphp
+                                <td data-col="complainant">{{ $cleanComplainantName ?: 'N/A' }}</td>
+                                <td data-col="respondent">
+                                    @if($row->respondent)
+                                        {{ ucwords(strtolower(trim(($row->respondent->firstName ?? '') . ' ' . ($row->respondent->middleName ?? '') . ' ' . ($row->respondent->lastName ?? '')))) }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td data-col="status">{{ ucwords(str_replace('-', ' ', (string) $row->status)) }}</td>
+                                <td data-col="address">{{ $row->address ?: 'N/A' }}</td>
+                                <td data-col="details">{{ $row->details ?: 'N/A' }}</td>
+                                <td data-col="remarks">
+                                    @if($remarkLines->isNotEmpty())
+                                        <div style="white-space: pre-line; line-height: 1.35;">{{ $remarkLines->implode("\n") }}</div>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td data-col="complaint_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
+                            @elseif($type == 'activity')
+                                @php
+                                    $activityUser = $row->user
+                                        ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                        : 'N/A';
+                                @endphp
+                                <td data-col="activity_user">{{ $activityUser !== '' ? $activityUser : 'N/A' }}</td>
+                                <td data-col="module">{{ $row->module ? ucwords(strtolower((string) $row->module)) : 'N/A' }}</td>
+                                <td data-col="action">{{ $row->action ? ucwords(strtolower((string) $row->action)) : 'N/A' }}</td>
+                                <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
+                                <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
+                                <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                             @elseif($type == 'household')
                                 @php
                                     $houseHeads = $row->residents

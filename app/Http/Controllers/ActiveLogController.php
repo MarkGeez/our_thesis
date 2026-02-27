@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ActiveLog;
+use App\Services\ActiveLogRecordDetails;
 
 class ActiveLogController extends Controller
 {
@@ -21,6 +22,9 @@ class ActiveLogController extends Controller
             ->orderByDesc('id')
             ->paginate(20)
             ->appends(request()->query());
+        $logs->setCollection(
+            ActiveLogRecordDetails::enrich($logs->getCollection())
+        );
 
         return view('admin.activityLogs', compact('logs', 'user'));
     }

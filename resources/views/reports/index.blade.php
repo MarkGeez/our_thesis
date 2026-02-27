@@ -149,9 +149,19 @@
         background: #d1fae5;
     }
 
+    .report-type-complaint {
+        color: #9a3412;
+        background: #ffedd5;
+    }
+
     .report-type-household {
         color: #4c1d95;
         background: #ede9fe;
+    }
+
+    .report-type-activity {
+        color: #134e4a;
+        background: #ccfbf1;
     }
 
     .empty-state {
@@ -404,6 +414,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalComplaintReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-comments fa-3x mb-3" style="color:#ea580c;"></i>
+                    <h5 class="fw-bold mb-1">Complaint Report</h5>
+                    <p class="text-muted small mb-0">Complaint records by status, names, and date range</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalActivityReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-history fa-3x mb-3" style="color:#0f766e;"></i>
+                    <h5 class="fw-bold mb-1">Activity Log Report</h5>
+                    <p class="text-muted small mb-0">Audit trail records by user, module, action, and date</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="section-header mt-5">
@@ -441,6 +469,8 @@
                                     'population' => 'report-type-population',
                                     'blotter' => 'report-type-blotter',
                                     'certificate' => 'report-type-certificate',
+                                    'complaint' => 'report-type-complaint',
+                                    'activity' => 'report-type-activity',
                                     'household' => 'report-type-household',
                                     default => 'report-type-population',
                                 };
@@ -503,6 +533,200 @@
             @endif
         </div>
     @endif
+</div>
+
+<div class="modal fade" id="modalActivityReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.activity') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="activity">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-history me-2" style="color:#0f766e;"></i>Generate Activity Log Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">User <span class="text-muted">(Optional)</span></label>
+                            <select name="user_id" class="form-select">
+                                <option value="">All Users</option>
+                                @foreach(($activityUsers ?? collect()) as $activityUser)
+                                    <option value="{{ $activityUser->id }}" {{ (string) old('user_id') === (string) $activityUser->id ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower(trim(($activityUser->firstName ?? '') . ' ' . ($activityUser->lastName ?? '')))) }} (ID: {{ $activityUser->id }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Record ID <span class="text-muted">(Optional)</span></label>
+                            <input type="number" min="1" name="record_id" class="form-control" value="{{ old('record_id') }}" placeholder="e.g. 102">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Module <span class="text-muted">(Optional)</span></label>
+                            <select name="module" class="form-select">
+                                <option value="">All Modules</option>
+                                @foreach(($activityModules ?? collect()) as $module)
+                                    <option value="{{ $module }}" {{ (string) old('module') === (string) $module ? 'selected' : '' }}>
+                                        {{ $module }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Action <span class="text-muted">(Optional)</span></label>
+                            <select name="action" class="form-select">
+                                <option value="">All Actions</option>
+                                @foreach(($activityActions ?? collect()) as $action)
+                                    <option value="{{ $action }}" {{ (string) old('action') === (string) $action ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower((string) $action)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Keyword (Description/Module/Action) <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search text">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_from') }}"
+                                    data-raw="{{ old('date_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">To Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_to') }}"
+                                    data-raw="{{ old('date_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Leave filters blank to include all activity log records.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#0f766e;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalComplaintReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.complaint') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="complaint">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-comments me-2" style="color:#ea580c;"></i>Generate Complaint Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Status <span class="text-muted">(Optional)</span></label>
+                            <select name="complaint_status" class="form-select">
+                                <option value="all" {{ old('complaint_status', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                                <option value="pending" {{ old('complaint_status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="on-going" {{ old('complaint_status') === 'on-going' ? 'selected' : '' }}>On-going</option>
+                                <option value="resolved" {{ old('complaint_status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                <option value="rejected" {{ old('complaint_status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Complainant Name <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="complainant_name" class="form-control" value="{{ old('complainant_name') }}" placeholder="e.g. Juan Dela Cruz">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Respondent Name <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="respondent_name" class="form-control" value="{{ old('respondent_name') }}" placeholder="e.g. Pedro Santos">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Address <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="address" class="form-control" value="{{ old('address') }}" placeholder="Address contains...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Keyword in Details/Remarks <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search complaint details or remarks">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_from') }}"
+                                    data-raw="{{ old('date_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">To Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_to') }}"
+                                    data-raw="{{ old('date_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#ea580c;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="modal fade" id="modalPopulationReport" tabindex="-1" aria-hidden="true">
@@ -912,6 +1136,8 @@
                 population: 'modalPopulationReport',
                 blotter: 'modalBlotterReport',
                 certificate: 'modalCertificateReport',
+                complaint: 'modalComplaintReport',
+                activity: 'modalActivityReport',
                 household: 'modalHouseholdReport'
             };
             const targetModalId = modalMap['{{ old('report_form_type') }}'];
@@ -1042,6 +1268,8 @@
         autoFillReportTitle('modalPopulationReport', 'Population');
         autoFillReportTitle('modalBlotterReport', 'Blotter');
         autoFillReportTitle('modalCertificateReport', 'Certificate');
+        autoFillReportTitle('modalComplaintReport', 'Complaint');
+        autoFillReportTitle('modalActivityReport', 'Activity Logs');
         autoFillReportTitle('modalHouseholdReport', 'Household');
     });
 </script>

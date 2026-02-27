@@ -202,7 +202,7 @@
                                             <td>
                                                 <span class="badge-pill-soft badge-action">{{ ucwords(strtolower($log->action)) }}</span>
                                             </td>
-                                            <td class="description-cell">{{ $log->description }}</td>
+                                            <td class="description-cell">{{ $log->resolved_description ?? $log->description }}</td>
                                             <td>{{ $log->record_id ?? '-' }}</td>
                                             <td>{{ $log->created_at->format('M d, Y g:i A') }}</td>
                                         </tr>
