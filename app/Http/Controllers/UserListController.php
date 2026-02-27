@@ -70,8 +70,21 @@ class UserListController extends Controller
         }
 
         $userList = $userList->paginate(20)->appends($request->query());
+        $maxAdmins = 2;
+        $currentAdminCount = User::where('role', 'admin')->count();
+        $adminLimitReached = $currentAdminCount >= $maxAdmins;
 
-        return view($user->role . '.users', compact('user', 'search', 'userList', 'statusFilter', 'roleFilter', 'sort'));
+        return view($user->role . '.users', compact(
+            'user',
+            'search',
+            'userList',
+            'statusFilter',
+            'roleFilter',
+            'sort',
+            'maxAdmins',
+            'currentAdminCount',
+            'adminLimitReached'
+        ));
     }
 
 
@@ -79,8 +92,22 @@ class UserListController extends Controller
         $request->validate(['role' => 'in:admin,subadmin,resident,non-resident']);
 
         $user = User::findOrFail($id);
+        $requestedRole = $request->role;
 
-        $user->role = $request->role;
+        // Enforce maximum of 2 admins at any time.
+        if ($requestedRole === 'admin' && $user->role !== 'admin') {
+            $currentAdminCount = User::where('role', 'admin')
+                ->where('id', '!=', $user->id)
+                ->count();
+
+            if ($currentAdminCount >= 2) {
+                return redirect()->back()->withErrors([
+                    'role' => 'Only two users can have the Admin role at the same time.',
+                ]);
+            }
+        }
+
+        $user->role = $requestedRole;
         
         $user->save();
 
