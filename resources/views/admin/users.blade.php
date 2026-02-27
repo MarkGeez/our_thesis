@@ -1015,20 +1015,24 @@
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    @if($list->status === 'pending')
+                                                    @if($list->role === 'superadmin')
+                                                        <span class="text-muted small fw-semibold">No actions available</span>
+                                                    @else
+                                                        @if($list->status === 'pending')
+                                                            <button type="button" 
+                                                                    class="btn btn-sm btn-outline-success btn-action" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#statusModal{{ $list->id }}">
+                                                                <i class="fas fa-sync-alt"></i> Status
+                                                            </button>
+                                                        @endif
                                                         <button type="button" 
-                                                                class="btn btn-sm btn-outline-success btn-action" 
+                                                                class="btn btn-sm btn-outline-primary btn-action" 
                                                                 data-bs-toggle="modal" 
-                                                                data-bs-target="#statusModal{{ $list->id }}">
-                                                            <i class="fas fa-sync-alt"></i> Status
+                                                                data-bs-target="#roleModal{{ $list->id }}">
+                                                            <i class="fas fa-user-cog"></i> Role
                                                         </button>
                                                     @endif
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-outline-primary btn-action" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#roleModal{{ $list->id }}">
-                                                        <i class="fas fa-user-cog"></i> Role
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1181,130 +1185,132 @@
                                             </div>
                                         </div>
 
-                                        {{-- Status Update Modal --}}
-                                        <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-user-check me-2"></i>Update User Status
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        @if($list->role !== 'superadmin')
+                                            {{-- Status Update Modal --}}
+                                            <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-primary text-white">
+                                                            <h5 class="modal-title">
+                                                                <i class="fas fa-user-check me-2"></i>Update User Status
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                    <div class="fw-bold fs-5">
+                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="form-label fw-semibold mb-3">Select New Status</label>
+                                                                    <div class="status-radio-group">
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="approve{{ $list->id }}" value="approved" 
+                                                                                   {{ $list->status == 'approved' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
+                                                                                <i class="fas fa-check-circle"></i>
+                                                                                <span>Approve</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="pending{{ $list->id }}" value="pending" 
+                                                                                   {{ $list->status == 'pending' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
+                                                                                <i class="fas fa-clock"></i>
+                                                                                <span>Pending</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="decline{{ $list->id }}" value="declined" 
+                                                                                   {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
+                                                                                <i class="fas fa-times-circle"></i>
+                                                                                <span>Decline</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="fas fa-save me-1"></i>Update Status
+                                                                </button>
+                                                            </div>
+                                                        </form>
                                                     </div>
-                                                    <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                <div class="fw-bold fs-5">
-                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <label class="form-label fw-semibold mb-3">Select New Status</label>
-                                                                <div class="status-radio-group">
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="approve{{ $list->id }}" value="approved" 
-                                                                               {{ $list->status == 'approved' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
-                                                                            <i class="fas fa-check-circle"></i>
-                                                                            <span>Approve</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="pending{{ $list->id }}" value="pending" 
-                                                                               {{ $list->status == 'pending' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
-                                                                            <i class="fas fa-clock"></i>
-                                                                            <span>Pending</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="decline{{ $list->id }}" value="declined" 
-                                                                               {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
-                                                                            <i class="fas fa-times-circle"></i>
-                                                                            <span>Decline</span>
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-save me-1"></i>Update Status
-                                                            </button>
-                                                        </div>
-                                                    </form>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {{-- Role Update Modal --}}
-                                        <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-info text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-user-cog me-2"></i>Update User Role
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                <div class="fw-bold fs-5">
-                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                            {{-- Role Update Modal --}}
+                                            <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-info text-white">
+                                                            <h5 class="modal-title">
+                                                                <i class="fas fa-user-cog me-2"></i>Update User Role
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                    <div class="fw-bold fs-5">
+                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="form-label fw-semibold">
+                                                                        New Role 
+                                                                        <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
+                                                                    </label>
+                                                                    @if($list->role === 'non-resident' && $eligibilityDate)
+                                                                        @if($isNonResidentEligible)
+                                                                            <div class="alert alert-success py-2 px-3 mb-3">
+                                                                                <i class="fas fa-circle-check me-1"></i>
+                                                                                This user is eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }}).
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="alert alert-warning py-2 px-3 mb-3">
+                                                                                <i class="fas fa-hourglass-half me-1"></i>
+                                                                                Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }}).
+                                                                            </div>
+                                                                        @endif
+                                                                    @endif
+                                                                    <select name="role" class="form-select form-select-lg">
+                                                                        <option value="admin" {{ $list->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                                        <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
+                                                                        <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
+                                                                        <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
-                                                            <div>
-                                                                <label class="form-label fw-semibold">
-                                                                    New Role 
-                                                                    <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
-                                                                </label>
-                                                                @if($list->role === 'non-resident' && $eligibilityDate)
-                                                                    @if($isNonResidentEligible)
-                                                                        <div class="alert alert-success py-2 px-3 mb-3">
-                                                                            <i class="fas fa-circle-check me-1"></i>
-                                                                            This user is eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }}).
-                                                                        </div>
-                                                                    @else
-                                                                        <div class="alert alert-warning py-2 px-3 mb-3">
-                                                                            <i class="fas fa-hourglass-half me-1"></i>
-                                                                            Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }}).
-                                                                        </div>
-                                                                    @endif
-                                                                @endif
-                                                                <select name="role" class="form-select form-select-lg">
-                                                                    <option value="admin" {{ $list->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                                                    <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
-                                                                    <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
-                                                                    <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
-                                                                </select>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-info text-white">
+                                                                    <i class="fas fa-save me-1"></i>Update Role
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="submit" class="btn btn-info text-white">
-                                                                <i class="fas fa-save me-1"></i>Update Role
-                                                            </button>
-                                                        </div>
-                                                    </form>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>

@@ -52,8 +52,11 @@ Route::get('/', [LandingController::class, 'display']);
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::prefix('/superadmin')->name('superadmin.')->group(function(){
-        Route::get('/users', [SuperAdminController::class, 'displayUsers']);
+        Route::get('/users', [SuperAdminController::class, 'displayUsers'])->name('users');
         Route::put('/users/{id}/status', [SuperAdminController::class, 'updateRole'])->name('updateRole');
+        Route::get('/barangayOfficials', [OfficialController::class, 'displayOfficials'])->name('barangayOfficials');
+        Route::post('/barangayOfficials/assign', [OfficialController::class, 'assign'])->name('assign.official');
+        Route::delete('/barangayOfficials/{id}', [OfficialController::class, 'untagOfficial'])->name('untag.official');
 });
     
 });

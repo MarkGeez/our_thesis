@@ -32,6 +32,39 @@
             color: #64748b;
         }
 
+        .superadmin-module-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .superadmin-module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #475569;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .superadmin-module-link:hover {
+            color: #1e40af;
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .superadmin-module-link.active {
+            color: #1e40af;
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+
         .header-user-trigger {
             transition: all 0.2s ease;
         }
@@ -86,6 +119,10 @@
         }
 
         @media (max-width: 768px) {
+            .superadmin-module-nav {
+                display: none;
+            }
+
             .header-user-meta {
                 display: none;
             }
@@ -95,12 +132,24 @@
             }
         }
     </style>
+  
+        
 
     <div class="container main-nav">
         <div class="main-nav-start">
             <div style="display:inline-block; margin-right:12px;">
                 <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}"
                     alt="logo" style="width:50px; height:auto; display:block;">
+            </div>
+            <div class="superadmin-module-nav">
+                <a href="{{ route('superadmin.users') }}" class="superadmin-module-link {{ request()->routeIs('superadmin.users') ? 'active' : '' }}">
+                    <i data-feather="users" aria-hidden="true" style="width:14px;height:14px;"></i>
+                    Users
+                </a>
+                <a href="{{ route('superadmin.barangayOfficials') }}" class="superadmin-module-link {{ request()->routeIs('superadmin.barangayOfficials') ? 'active' : '' }}">
+                    <i data-feather="briefcase" aria-hidden="true" style="width:14px;height:14px;"></i>
+                    Officials
+                </a>
             </div>
         </div>
         <div class="main-nav-end">
@@ -129,15 +178,10 @@
                 <ul class="users-item-dropdown nav-user-dropdown dropdown">
                     <li class="user-info text-center">
                         <h3 class="user-name mb-2">{{ ucwords(trim(auth()->user()->firstName . ' ' . auth()->user()->lastName)) }}</h3>
-                        <p class="text-secondary user-role text-muted small">Sub-Admin</p>
+                        <p class="text-secondary user-role text-muted small">Super-Admin</p>
                     </li>
                     <hr>
-                    <li>
-                        <a href="{{ route('subadmin.profile') }}">
-                            <i data-feather="user" aria-hidden="true"></i>
-                            <span>My Profile</span>
-                        </a>
-                    </li>
+                    
 
                     <li>
                         <form method="POST" action="{{ route('logout') }}">

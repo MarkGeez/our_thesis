@@ -202,8 +202,6 @@ class ResidentController extends Controller
     {
         $positions = [
             'Barangay Chairman',
-            'Barangay Secretary',
-            'Barangay Treasurer',
             'Kagawad 1',
             'Kagawad 2',
             'Kagawad 3',
@@ -219,6 +217,8 @@ class ResidentController extends Controller
             'SK Kagawad 5',
             'SK Kagawad 6',
             'SK Kagawad 7',
+            'Barangay Secretary',
+            'Barangay Treasurer',
         ];
 
         $officialsByPosition = Official::with('resident:id,firstName,middleName,lastName,image_path')

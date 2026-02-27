@@ -5,7 +5,8 @@
     $positions = $positions ?? collect($officials ?? [])->pluck('position')->unique()->values()->all();
     $officialsByPosition = $officialsByPosition ?? collect($officials ?? [])->keyBy('position');
     $residents = $residents ?? collect();
-    $showControls = $showControls ?? (auth()->check() && auth()->user()->role === 'admin');
+    $routePrefix = $routePrefix ?? ((auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin'], true)) ? auth()->user()->role : 'admin');
+    $showControls = $showControls ?? (auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin'], true));
 @endphp
 
 <style>
@@ -267,7 +268,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                 @if($showControls)
                     <div class="official-card-actions">
                         <p class="official-action-title mb-2">Assign / Update Resident</p>
-                        <form method="POST" action="{{ route('admin.assign.official') }}" class="row g-2 official-assign-form">
+                        <form method="POST" action="{{ route($routePrefix . '.assign.official') }}" class="row g-2 official-assign-form">
                             @csrf
                             <input type="hidden" name="position" value="{{ $slot }}">
                             <input type="hidden" name="start" class="official-start-hidden" value="{{ $termStart ?? now()->toDateString() }}">
@@ -311,7 +312,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                         </form>
 
                         @if($official)
-                            <form method="POST" action="{{ route('admin.untag.official', $official->id) }}" class="mt-2" onsubmit="return confirm('Remove the resident from this position?');">
+                            <form method="POST" action="{{ route($routePrefix . '.untag.official', $official->id) }}" class="mt-2" onsubmit="return confirm('Remove the resident from this position?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-outline-danger w-100">

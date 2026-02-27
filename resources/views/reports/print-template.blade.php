@@ -112,7 +112,8 @@
         .table td {
             padding: 5px 6px;
             border: 1px solid #e2e8f0;
-            vertical-align: middle;
+            vertical-align: top;
+            text-align: left;
             word-break: break-word;
             overflow-wrap: anywhere;
             hyphens: auto;

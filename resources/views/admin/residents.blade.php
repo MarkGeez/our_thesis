@@ -762,8 +762,6 @@
                                                         <label>Select Position</label>
                                                         <select name="position" class="form-select" required>
                                                             <option value="Barangay Chairman" {{ $resident->official && $resident->official->position === 'Barangay Chairman' ? 'selected' : '' }}>Barangay Chairman</option>
-                                                            <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
-                                                            <option value="Barangay Treasurer" {{ $resident->official && $resident->official->position === 'Barangay Treasurer' ? 'selected' : '' }}>Barangay Treasurer</option>
                                                             <option value="Kagawad 1" {{ $resident->official && $resident->official->position === 'Kagawad 1' ? 'selected' : '' }}>Kagawad 1</option>
                                                             <option value="Kagawad 2" {{ $resident->official && $resident->official->position === 'Kagawad 2' ? 'selected' : '' }}>Kagawad 2</option>
                                                             <option value="Kagawad 3" {{ $resident->official && $resident->official->position === 'Kagawad 3' ? 'selected' : '' }}>Kagawad 3</option>
@@ -779,6 +777,8 @@
                                                             <option value="SK Kagawad 5" {{ $resident->official && $resident->official->position === 'SK Kagawad 5' ? 'selected' : '' }}>SK Kagawad 5</option>
                                                             <option value="SK Kagawad 6" {{ $resident->official && $resident->official->position === 'SK Kagawad 6' ? 'selected' : '' }}>SK Kagawad 6</option>
                                                             <option value="SK Kagawad 7" {{ $resident->official && $resident->official->position === 'SK Kagawad 7' ? 'selected' : '' }}>SK Kagawad 7</option>
+                                                            <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
+                                                            <option value="Barangay Treasurer" {{ $resident->official && $resident->official->position === 'Barangay Treasurer' ? 'selected' : '' }}>Barangay Treasurer</option>
                                                         </select>
 
                                                         <label>Term Description</label>

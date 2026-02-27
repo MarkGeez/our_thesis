@@ -18,8 +18,6 @@ class OfficialController extends Controller
      */
     private array $positionSlots = [
         'Barangay Chairman',
-        'Barangay Secretary',
-        'Barangay Treasurer',
         'Kagawad 1',
         'Kagawad 2',
         'Kagawad 3',
@@ -35,6 +33,8 @@ class OfficialController extends Controller
         'SK Kagawad 5',
         'SK Kagawad 6',
         'SK Kagawad 7',
+        'Barangay Secretary',
+        'Barangay Treasurer',
     ];
 
     private function positionOptions(): array
