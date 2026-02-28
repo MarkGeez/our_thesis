@@ -92,7 +92,7 @@ class ActiveLogRecordDetails
                 ->keyBy('id'),
             'announcements' => empty($announcementIds) ? collect() : Announcement::query()
                 ->whereIn('id', $announcementIds)
-                ->get(['id', 'title', 'postedAt'])
+                ->get(['id', 'title', 'created_at'])
                 ->keyBy('id'),
             'reports' => empty($reportIds) ? collect() : GeneratedReport::query()
                 ->whereIn('id', $reportIds)
@@ -229,4 +229,3 @@ class ActiveLogRecordDetails
         return "Record ID: {$recordId}";
     }
 }
-

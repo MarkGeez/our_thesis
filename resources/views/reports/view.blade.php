@@ -157,6 +157,20 @@
                                 <th data-col="description">Description</th>
                                 <th data-col="record_id">Record ID</th>
                                 <th data-col="logged_at">Logged At</th>
+                            @elseif($type == 'officials')
+                                <th data-col="position">Position</th>
+                                <th data-col="official_name">Official Name</th>
+                                <th data-col="term_start">Term Start</th>
+                                <th data-col="term_end">Term End</th>
+                                <th data-col="term_status">Term Status</th>
+                                <th data-col="notes">Notes</th>
+                            @elseif($type == 'archives')
+                                <th data-col="archive_type">Archive Type</th>
+                                <th data-col="archived_by">Archived By</th>
+                                <th data-col="record_id">Record ID</th>
+                                <th data-col="reason">Reason</th>
+                                <th data-col="details">Details</th>
+                                <th data-col="archived_at">Archived At</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
                                 <th data-col="head_no">Head #</th>
                                 <th data-col="house_head">House Head</th>
@@ -313,13 +327,60 @@
                                         $activityUser = $row->user
                                             ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
                                             : 'N/A';
-                                    @endphp
+                                @endphp
                                     <td data-col="activity_user">{{ $activityUser !== '' ? $activityUser : 'N/A' }}</td>
                                     <td data-col="module">{{ $row->module ? ucwords(strtolower((string) $row->module)) : 'N/A' }}</td>
                                     <td data-col="action">{{ $row->action ? ucwords(strtolower((string) $row->action)) : 'N/A' }}</td>
                                     <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
                                     <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
                                     <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                                @elseif($type == 'officials')
+                                    @php
+                                        $officialName = $row->resident
+                                            ? ucwords(strtolower(trim(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? ''))))
+                                            : 'N/A';
+                                        $today = now()->toDateString();
+                                        $termStatus = 'No Term Dates';
+                                        if ($row->start && $row->end) {
+                                            if ($row->start <= $today && $row->end >= $today) {
+                                                $termStatus = 'Active';
+                                            } elseif ($row->start > $today) {
+                                                $termStatus = 'Upcoming';
+                                            } elseif ($row->end < $today) {
+                                                $termStatus = 'Completed';
+                                            }
+                                        }
+                                @endphp
+                                    <td data-col="position">{{ $row->position ?: 'N/A' }}</td>
+                                    <td data-col="official_name">{{ $officialName !== '' ? $officialName : 'N/A' }}</td>
+                                    <td data-col="term_start">{{ $row->start ? \Carbon\Carbon::parse($row->start)->format('M d, Y') : 'N/A' }}</td>
+                                    <td data-col="term_end">{{ $row->end ? \Carbon\Carbon::parse($row->end)->format('M d, Y') : 'N/A' }}</td>
+                                    <td data-col="term_status">{{ $termStatus }}</td>
+                                    <td data-col="notes">{{ $row->details ?: 'N/A' }}</td>
+                                @elseif($type == 'archives')
+                                    @php
+                                        $archiver = $row->user
+                                            ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                            : 'N/A';
+                                        $archiveData = is_array($row->data) ? $row->data : [];
+                                        $archiveLines = collect($archiveData)->map(function ($value, $key) {
+                                            $label = \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $key));
+                                            $display = is_array($value) ? json_encode($value) : (string) $value;
+                                            return $label . ': ' . $display;
+                                        })->values();
+                                    @endphp
+                                    <td data-col="archive_type">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->record_type))) ?: 'N/A' }}</td>
+                                    <td data-col="archived_by">{{ $archiver !== '' ? $archiver : 'N/A' }}</td>
+                                    <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
+                                    <td data-col="reason">{{ $row->reason ?: 'N/A' }}</td>
+                                    <td data-col="details">
+                                        @if($archiveLines->isNotEmpty())
+                                            <div class="small" style="white-space: pre-line; line-height: 1.4;">{{ $archiveLines->implode("\n") }}</div>
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td data-col="archived_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                                 @elseif($type == 'household')
                                     @php
                                         $houseHeads = $row->residents

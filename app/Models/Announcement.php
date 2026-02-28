@@ -10,8 +10,8 @@ class Announcement extends Model
 {
     
 
-    protected $fillable = ['title', 'image', 'details', 
-    'eventTime', 'eventEnd', 'postedAt', 'user_id'];
+    protected $fillable = ['title', 'image', 'details',
+    'eventTime', 'eventEnd', 'user_id'];
 
     public function user(){
         return $this->belongsTo(User::class);

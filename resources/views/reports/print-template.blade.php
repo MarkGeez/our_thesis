@@ -172,6 +172,32 @@
         .table.activity-table th[data-col="logged_at"],
         .table.activity-table td[data-col="logged_at"] { width: 16%; }
 
+        .table.officials-table th[data-col="position"],
+        .table.officials-table td[data-col="position"] { width: 18%; }
+        .table.officials-table th[data-col="official_name"],
+        .table.officials-table td[data-col="official_name"] { width: 22%; }
+        .table.officials-table th[data-col="term_start"],
+        .table.officials-table td[data-col="term_start"] { width: 14%; }
+        .table.officials-table th[data-col="term_end"],
+        .table.officials-table td[data-col="term_end"] { width: 14%; }
+        .table.officials-table th[data-col="term_status"],
+        .table.officials-table td[data-col="term_status"] { width: 14%; }
+        .table.officials-table th[data-col="notes"],
+        .table.officials-table td[data-col="notes"] { width: 18%; }
+
+        .table.archives-table th[data-col="archive_type"],
+        .table.archives-table td[data-col="archive_type"] { width: 14%; }
+        .table.archives-table th[data-col="archived_by"],
+        .table.archives-table td[data-col="archived_by"] { width: 14%; }
+        .table.archives-table th[data-col="record_id"],
+        .table.archives-table td[data-col="record_id"] { width: 9%; }
+        .table.archives-table th[data-col="reason"],
+        .table.archives-table td[data-col="reason"] { width: 17%; }
+        .table.archives-table th[data-col="details"],
+        .table.archives-table td[data-col="details"] { width: 30%; }
+        .table.archives-table th[data-col="archived_at"],
+        .table.archives-table td[data-col="archived_at"] { width: 16%; }
+
         .table.table-compact {
             font-size: 10px;
         }
@@ -353,6 +379,8 @@
             'certificate' => 25,
             'complaint' => 18,
             'activity' => 20,
+            'officials' => 20,
+            'archives' => 16,
             'population' => 25,
             'household' => $householdScope === 'family_members' ? 12 : 14,
             default => 18,
@@ -424,6 +452,23 @@
             $stats[] = ['label' => 'Updated', 'value' => $actionGroups->get('updated', collect())->count(), 'color' => 'amber'];
             $stats[] = ['label' => 'Deleted', 'value' => $actionGroups->get('deleted', collect())->count(), 'color' => 'red'];
             $stats[] = ['label' => 'Modules', 'value' => $allData->pluck('module')->filter()->unique()->count(), 'color' => 'black'];
+        } elseif ($type === 'officials') {
+            $today = now()->toDateString();
+            $activeCount = $allData->filter(fn($r) => $r->start && $r->end && $r->start <= $today && $r->end >= $today)->count();
+            $upcomingCount = $allData->filter(fn($r) => $r->start && $r->start > $today)->count();
+            $completedCount = $allData->filter(fn($r) => $r->end && $r->end < $today)->count();
+            $noTermCount = $allData->filter(fn($r) => !$r->start || !$r->end)->count();
+            $stats[] = ['label' => 'Total Officials', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Active', 'value' => $activeCount, 'color' => 'green'];
+            $stats[] = ['label' => 'Upcoming', 'value' => $upcomingCount, 'color' => 'amber'];
+            $stats[] = ['label' => 'Completed', 'value' => $completedCount, 'color' => 'black'];
+            $stats[] = ['label' => 'No Term Dates', 'value' => $noTermCount, 'color' => 'red'];
+        } elseif ($type === 'archives') {
+            $stats[] = ['label' => 'Total Archives', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Record Types', 'value' => $allData->pluck('record_type')->filter()->unique()->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Archived By Users', 'value' => $allData->pluck('archived_by')->filter()->unique()->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'With Reason', 'value' => $allData->filter(fn($r) => !empty($r->reason))->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Without Reason', 'value' => $allData->filter(fn($r) => empty($r->reason))->count(), 'color' => 'red'];
 
         } elseif ($type === 'population') {
             $params     = request()->input('cols', '');
@@ -496,7 +541,7 @@
         }
 
         // Remove zero-value stats (cleaner output)
-        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Complaints', 'Total Logs', 'Total Residents', 'Total Households']));
+        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Complaints', 'Total Logs', 'Total Officials', 'Total Archives', 'Total Residents', 'Total Households']));
     @endphp
 
     <div id="pdfContent">
@@ -541,7 +586,7 @@
         @endif
 
         <div class="content-body">
-            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }} {{ $type == 'complaint' ? 'complaint-table' : '' }} {{ $type == 'activity' ? 'activity-table' : '' }}">
+            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }} {{ $type == 'complaint' ? 'complaint-table' : '' }} {{ $type == 'activity' ? 'activity-table' : '' }} {{ $type == 'officials' ? 'officials-table' : '' }} {{ $type == 'archives' ? 'archives-table' : '' }}">
                 <thead>
                     <tr>
                         @if($type == 'population')
@@ -581,6 +626,20 @@
                             <th data-col="description">Description</th>
                             <th data-col="record_id">Record ID</th>
                             <th data-col="logged_at">Logged At</th>
+                        @elseif($type == 'officials')
+                            <th data-col="position">Position</th>
+                            <th data-col="official_name">Official Name</th>
+                            <th data-col="term_start">Term Start</th>
+                            <th data-col="term_end">Term End</th>
+                            <th data-col="term_status">Term Status</th>
+                            <th data-col="notes">Notes</th>
+                        @elseif($type == 'archives')
+                            <th data-col="archive_type">Archive Type</th>
+                            <th data-col="archived_by">Archived By</th>
+                            <th data-col="record_id">Record ID</th>
+                            <th data-col="reason">Reason</th>
+                            <th data-col="details">Details</th>
+                            <th data-col="archived_at">Archived At</th>
                         @elseif($type == 'household' && $householdScope === 'family_members')
                             <th data-col="head_no">Head #</th>
                             <th data-col="house_head">House Head</th>
@@ -739,6 +798,53 @@
                                 <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
                                 <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
                                 <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                            @elseif($type == 'officials')
+                                @php
+                                    $officialName = $row->resident
+                                        ? ucwords(strtolower(trim(($row->resident->firstName ?? '') . ' ' . ($row->resident->middleName ?? '') . ' ' . ($row->resident->lastName ?? ''))))
+                                        : 'N/A';
+                                    $today = now()->toDateString();
+                                    $termStatus = 'No Term Dates';
+                                    if ($row->start && $row->end) {
+                                        if ($row->start <= $today && $row->end >= $today) {
+                                            $termStatus = 'Active';
+                                        } elseif ($row->start > $today) {
+                                            $termStatus = 'Upcoming';
+                                        } elseif ($row->end < $today) {
+                                            $termStatus = 'Completed';
+                                        }
+                                    }
+                                @endphp
+                                <td data-col="position">{{ $row->position ?: 'N/A' }}</td>
+                                <td data-col="official_name">{{ $officialName !== '' ? $officialName : 'N/A' }}</td>
+                                <td data-col="term_start">{{ $row->start ? \Carbon\Carbon::parse($row->start)->format('M d, Y') : 'N/A' }}</td>
+                                <td data-col="term_end">{{ $row->end ? \Carbon\Carbon::parse($row->end)->format('M d, Y') : 'N/A' }}</td>
+                                <td data-col="term_status">{{ $termStatus }}</td>
+                                <td data-col="notes">{{ $row->details ?: 'N/A' }}</td>
+                            @elseif($type == 'archives')
+                                @php
+                                    $archiver = $row->user
+                                        ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                        : 'N/A';
+                                    $archiveData = is_array($row->data) ? $row->data : [];
+                                    $archiveLines = collect($archiveData)->map(function ($value, $key) {
+                                        $label = \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $key));
+                                        $display = is_array($value) ? json_encode($value) : (string) $value;
+                                        return $label . ': ' . $display;
+                                    })->values();
+                                @endphp
+                                <td data-col="archive_type">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->record_type))) ?: 'N/A' }}</td>
+                                <td data-col="archived_by">{{ $archiver !== '' ? $archiver : 'N/A' }}</td>
+                                <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
+                                <td data-col="reason">{{ $row->reason ?: 'N/A' }}</td>
+                                <td data-col="details">
+                                    @if($archiveLines->isNotEmpty())
+                                        <div style="white-space: pre-line; line-height: 1.35;">{{ $archiveLines->implode("\n") }}</div>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td data-col="archived_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                             @elseif($type == 'household')
                                 @php
                                     $houseHeads = $row->residents

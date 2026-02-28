@@ -152,6 +152,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/reports/generate/certificate', [ReportsController::class, 'generateCertificate'])->name('reports.certificate');
     Route::post('/reports/generate/complaint', [ReportsController::class, 'generateComplaint'])->name('reports.complaint');
     Route::post('/reports/generate/activity', [ReportsController::class, 'generateActivity'])->name('reports.activity');
+    Route::post('/reports/generate/officials', [ReportsController::class, 'generateOfficials'])->name('reports.officials');
+    Route::post('/reports/generate/archives', [ReportsController::class, 'generateArchives'])->name('reports.archives');
     Route::post('/reports/generate/household', [ReportsController::class, 'generateHousehold'])->name('reports.household');
     Route::get('/reports/view/{id}', [ReportsController::class, 'view'])->name('reports.view');
     Route::get('/reports/print-template/{id}', [ReportsController::class, 'printTemplate'])->name('reports.print-template');

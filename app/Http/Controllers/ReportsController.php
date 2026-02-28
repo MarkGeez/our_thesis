@@ -14,6 +14,8 @@ use App\Models\House;
 use App\Models\Household;
 use App\Models\FamilyMember;
 use App\Models\ActiveLog;
+use App\Models\Official;
+use App\Models\Archive;
 use App\Services\ActiveLogRecordDetails;
 use Auth;
 
@@ -59,8 +61,27 @@ public function index()
         ->distinct()
         ->orderBy('action')
         ->pluck('action');
+    $officialPositions = Official::query()
+        ->whereNotNull('position')
+        ->where('position', '!=', '')
+        ->select('position')
+        ->distinct()
+        ->orderBy('position')
+        ->pluck('position');
+    $archiveTypes = Archive::query()
+        ->whereNotNull('record_type')
+        ->where('record_type', '!=', '')
+        ->select('record_type')
+        ->distinct()
+        ->orderBy('record_type')
+        ->pluck('record_type');
+    $archiveUsers = \App\Models\User::query()
+        ->whereIn('id', Archive::query()->select('archived_by')->whereNotNull('archived_by')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
 
-    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions'));
+    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers'));
 }
 
 public function generatePopulation(Request $request)
@@ -282,6 +303,70 @@ public function generateActivity(Request $request)
     ]);
 
     return redirect()->back()->with('success', 'Activity log report generated successfully.');
+}
+
+public function generateOfficials(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'position' => 'nullable|string|max:150',
+        'resident_name' => 'nullable|string|max:150',
+        'term_status' => 'nullable|in:all,active,upcoming,completed,no_term',
+        'term_start_from' => 'nullable|date',
+        'term_start_to' => 'nullable|date|after_or_equal:term_start_from',
+        'term_end_from' => 'nullable|date',
+        'term_end_to' => 'nullable|date|after_or_equal:term_end_from',
+        'keyword' => 'nullable|string|max:255',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $filters['term_status'] = $filters['term_status'] ?? 'all';
+    $officials = $this->buildOfficialsReportQuery($filters)->get();
+
+    if ($officials->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No barangay official records matched the selected term filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'officials',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $officials->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Barangay officials report generated successfully.');
+}
+
+public function generateArchives(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'record_type' => 'nullable|string|max:150',
+        'archived_by' => 'nullable|exists:users,id',
+        'record_id' => 'nullable|integer|min:1',
+        'reason' => 'nullable|string|max:255',
+        'keyword' => 'nullable|string|max:255',
+        'date_from' => 'nullable|date',
+        'date_to' => 'nullable|date|after_or_equal:date_from',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $archives = $this->buildArchivesReportQuery($filters)->get();
+
+    if ($archives->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No archived records matched the selected filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'archives',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $archives->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Archives report generated successfully.');
 }
 
 private function resolveHouseholdReportScope(array $filters): string
@@ -602,6 +687,114 @@ private function buildActivityReportQuery(array $filters)
     return $query->latest();
 }
 
+private function buildOfficialsReportQuery(array $filters)
+{
+    $query = Official::query()->with([
+        'resident:id,firstName,middleName,lastName',
+    ]);
+
+    if (!empty($filters['position'])) {
+        $query->where('position', $filters['position']);
+    }
+
+    if (!empty($filters['resident_name'])) {
+        $search = trim((string) $filters['resident_name']);
+        $query->whereHas('resident', function ($q) use ($search) {
+            $q->where('firstName', 'like', '%' . $search . '%')
+                ->orWhere('middleName', 'like', '%' . $search . '%')
+                ->orWhere('lastName', 'like', '%' . $search . '%')
+                ->orWhereRaw("CONCAT_WS(' ', firstName, middleName, lastName) like ?", ['%' . $search . '%']);
+        });
+    }
+
+    $today = now()->toDateString();
+    $termStatus = $filters['term_status'] ?? 'all';
+    if ($termStatus === 'active') {
+        $query->whereDate('start', '<=', $today)
+            ->whereDate('end', '>=', $today);
+    } elseif ($termStatus === 'upcoming') {
+        $query->whereDate('start', '>', $today);
+    } elseif ($termStatus === 'completed') {
+        $query->whereDate('end', '<', $today);
+    } elseif ($termStatus === 'no_term') {
+        $query->where(function ($q) {
+            $q->whereNull('start')
+                ->orWhereNull('end');
+        });
+    }
+
+    if (!empty($filters['term_start_from']) && !empty($filters['term_start_to'])) {
+        $query->whereBetween('start', [$filters['term_start_from'], $filters['term_start_to']]);
+    } elseif (!empty($filters['term_start_from'])) {
+        $query->whereDate('start', '>=', $filters['term_start_from']);
+    } elseif (!empty($filters['term_start_to'])) {
+        $query->whereDate('start', '<=', $filters['term_start_to']);
+    }
+
+    if (!empty($filters['term_end_from']) && !empty($filters['term_end_to'])) {
+        $query->whereBetween('end', [$filters['term_end_from'], $filters['term_end_to']]);
+    } elseif (!empty($filters['term_end_from'])) {
+        $query->whereDate('end', '>=', $filters['term_end_from']);
+    } elseif (!empty($filters['term_end_to'])) {
+        $query->whereDate('end', '<=', $filters['term_end_to']);
+    }
+
+    if (!empty($filters['keyword'])) {
+        $search = trim((string) $filters['keyword']);
+        $query->where(function ($q) use ($search) {
+            $q->where('details', 'like', '%' . $search . '%')
+                ->orWhere('position', 'like', '%' . $search . '%');
+        });
+    }
+
+    return $query
+        ->orderByRaw('CASE WHEN start IS NULL THEN 1 ELSE 0 END')
+        ->orderByDesc('start')
+        ->latest('id');
+}
+
+private function buildArchivesReportQuery(array $filters)
+{
+    $query = Archive::query()->with([
+        'user:id,firstName,lastName',
+    ]);
+
+    if (!empty($filters['record_type'])) {
+        $query->where('record_type', $filters['record_type']);
+    }
+
+    if (!empty($filters['archived_by'])) {
+        $query->where('archived_by', (int) $filters['archived_by']);
+    }
+
+    if (!empty($filters['record_id'])) {
+        $query->where('record_id', (int) $filters['record_id']);
+    }
+
+    if (!empty($filters['reason'])) {
+        $query->where('reason', 'like', '%' . trim((string) $filters['reason']) . '%');
+    }
+
+    if (!empty($filters['keyword'])) {
+        $search = trim((string) $filters['keyword']);
+        $query->where(function ($q) use ($search) {
+            $q->where('record_type', 'like', '%' . $search . '%')
+                ->orWhere('reason', 'like', '%' . $search . '%')
+                ->orWhere('data', 'like', '%' . $search . '%');
+        });
+    }
+
+    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
+    } elseif (!empty($filters['date_from'])) {
+        $query->whereDate('created_at', '>=', $filters['date_from']);
+    } elseif (!empty($filters['date_to'])) {
+        $query->whereDate('created_at', '<=', $filters['date_to']);
+    }
+
+    return $query->latest();
+}
+
 public function view($id)
 {
     $report = GeneratedReport::findOrFail($id);
@@ -666,6 +859,14 @@ public function view($id)
         );
     }
 
+    if ($report->report_type == 'officials') {
+        $data = $this->buildOfficialsReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'archives') {
+        $data = $this->buildArchivesReportQuery($filters)->get();
+    }
+
     if ($report->report_type == 'household') {
         $data = $this->getHouseholdReportData($filters);
     }
@@ -706,8 +907,27 @@ public function view($id)
         ->distinct()
         ->orderBy('action')
         ->pluck('action');
+    $officialPositions = Official::query()
+        ->whereNotNull('position')
+        ->where('position', '!=', '')
+        ->select('position')
+        ->distinct()
+        ->orderBy('position')
+        ->pluck('position');
+    $archiveTypes = Archive::query()
+        ->whereNotNull('record_type')
+        ->where('record_type', '!=', '')
+        ->select('record_type')
+        ->distinct()
+        ->orderBy('record_type')
+        ->pluck('record_type');
+    $archiveUsers = \App\Models\User::query()
+        ->whereIn('id', Archive::query()->select('archived_by')->whereNotNull('archived_by')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
 
-    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions'));
+    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers'));
 }
 
 public function printTemplate($id)
@@ -778,6 +998,14 @@ public function printTemplate($id)
         $data = ActiveLogRecordDetails::enrich(
             $this->buildActivityReportQuery($filters)->get()
         );
+    }
+
+    if ($report->report_type == 'officials') {
+        $data = $this->buildOfficialsReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'archives') {
+        $data = $this->buildArchivesReportQuery($filters)->get();
     }
 
     if ($report->report_type == 'household') {

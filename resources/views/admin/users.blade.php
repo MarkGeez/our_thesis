@@ -632,152 +632,6 @@
         border-top: 2px solid var(--border-color);
     }
 
-    .user-details-modal .modal-content {
-        border: none;
-        border-radius: 16px;
-        overflow: hidden;
-    }
-
-    .user-details-modal .modal-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: #fff;
-        border-bottom: none;
-    }
-
-    .user-details-modal .modal-header .modal-title {
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .user-details-modal .modal-header .btn-close {
-        filter: brightness(0) invert(1);
-        opacity: 0.85;
-    }
-
-    .user-details-modal .section-card {
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 1rem;
-    }
-
-    .user-details-modal .detail-label {
-        display: block;
-        font-size: 0.74rem;
-        letter-spacing: 0.45px;
-        color: #64748b;
-        text-transform: uppercase;
-        margin-bottom: 0.3rem;
-        font-weight: 700;
-    }
-
-    .user-details-modal .detail-value {
-        font-weight: 600;
-        color: #0f172a;
-        line-height: 1.35;
-    }
-
-    .user-details-modal .profile-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid #fff;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 0.75rem auto;
-        overflow: hidden;
-    }
-
-    .user-details-modal .profile-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .user-details-modal .proof-box {
-        background: #fff;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.75rem;
-    }
-
-    .role-block {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.45rem;
-    }
-
-    .role-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        width: fit-content;
-        padding: 0.34rem 0.7rem;
-        border-radius: 999px;
-        border: 1px solid transparent;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.25px;
-        text-transform: uppercase;
-        line-height: 1;
-    }
-
-    .role-pill.role-admin {
-        color: #1e3a8a;
-        background: #dbeafe;
-        border-color: #93c5fd;
-    }
-
-    .role-pill.role-subadmin {
-        color: #155e75;
-        background: #cffafe;
-        border-color: #67e8f9;
-    }
-
-    .role-pill.role-resident {
-        color: #065f46;
-        background: #d1fae5;
-        border-color: #6ee7b7;
-    }
-
-    .role-pill.role-non-resident {
-        color: #7c2d12;
-        background: #ffedd5;
-        border-color: #fdba74;
-    }
-
-    .eligibility-note {
-        font-size: 0.72rem;
-        line-height: 1.35;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.2rem 0.45rem;
-        border-radius: 6px;
-        border: 1px solid transparent;
-        font-weight: 500;
-        opacity: 0.9;
-        width: fit-content;
-    }
-
-    .eligibility-note.eligible {
-        color: #4b5563;
-        background: #f8fafc;
-        border-color: #e5e7eb;
-    }
-
-    .eligibility-note.pending {
-        color: #6b7280;
-        background: #f8fafc;
-        border-color: #e5e7eb;
-    }
-
     /* Alert Styling */
     .alert-info {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
@@ -939,18 +793,6 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($userList as $list)
-                                        @php
-                                            $eligibilityDate = $list->created_at ? $list->created_at->copy()->addMonths(6) : null;
-                                            $eligibilityDaysRemaining = $eligibilityDate ? max(0, (int) ceil(now()->diffInRealDays($eligibilityDate, false))) : null;
-                                            $isNonResidentEligible = $list->role === 'non-resident' && $eligibilityDate && $eligibilityDaysRemaining <= 0;
-                                            $roleStyleMap = [
-                                                'admin' => ['class' => 'role-admin', 'icon' => 'fa-user-shield'],
-                                                'subadmin' => ['class' => 'role-subadmin', 'icon' => 'fa-user-gear'],
-                                                'resident' => ['class' => 'role-resident', 'icon' => 'fa-house-user'],
-                                                'non-resident' => ['class' => 'role-non-resident', 'icon' => 'fa-user-clock'],
-                                            ];
-                                            $roleStyle = $roleStyleMap[$list->role] ?? ['class' => 'role-non-resident', 'icon' => 'fa-user'];
-                                        @endphp
                                         <tr>
                                             <td><strong>#{{ $list->id }}</strong></td>
                                             <td>
@@ -963,40 +805,10 @@
                                                      {{ ucwords(strtolower($list->middleName)) }}
                                                     {{ ucwords(strtolower($list->lastName)) }}
                                                 </button>
-                                                @if($list->status === 'pending')
-                                                    @php
-                                                        $duplicateResident = \App\Models\Resident::where('firstName', $list->firstName)
-                                                            ->where('middleName', $list->middleName)
-                                                            ->where('lastName', $list->lastName)
-                                                            ->where('birthday', $list->birthday)
-                                                            ->exists();
-                                                    @endphp
-                                                    @if($duplicateResident)
-                                                        <span class="badge bg-warning text-dark ms-2">Duplicate in residents</span>
-                                                    @endif
-                                                @endif
                                             </td>
                                             <td class="text-muted">{{ $list->email }}</td>
                                             <td>
-                                                <div class="role-block">
-                                                    <span class="role-pill {{ $roleStyle['class'] }}">
-                                                        <i class="fas {{ $roleStyle['icon'] }}"></i>
-                                                        {{ ucfirst($list->role) }}
-                                                    </span>
-                                                    @if($list->role === 'non-resident' && $eligibilityDate)
-                                                        @if($isNonResidentEligible)
-                                                            <span class="eligibility-note eligible">
-                                                                <i class="fas fa-circle-check"></i>
-                                                                Eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }})
-                                                            </span>
-                                                        @else
-                                                            <span class="eligibility-note pending">
-                                                                <i class="fas fa-hourglass-half"></i>
-                                                                Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }})
-                                                            </span>
-                                                        @endif
-                                                    @endif
-                                                </div>
+                                                <span class="badge bg-secondary">{{ ucfirst($list->role) }}</span>
                                             </td>
                                             <td>
                                                 @php
@@ -1015,30 +827,24 @@
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    @if($list->role === 'superadmin')
-                                                        <span class="text-muted small fw-semibold">No actions available</span>
-                                                    @else
-                                                        @if($list->status === 'pending')
-                                                            <button type="button" 
-                                                                    class="btn btn-sm btn-outline-success btn-action" 
-                                                                    data-bs-toggle="modal" 
-                                                                    data-bs-target="#statusModal{{ $list->id }}">
-                                                                <i class="fas fa-sync-alt"></i> Status
-                                                            </button>
-                                                        @endif
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-outline-primary btn-action" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#roleModal{{ $list->id }}">
-                                                            <i class="fas fa-user-cog"></i> Role
-                                                        </button>
-                                                    @endif
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-success btn-action" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#statusModal{{ $list->id }}">
+                                                        <i class="fas fa-sync-alt"></i> Status
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-primary btn-action" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#roleModal{{ $list->id }}">
+                                                        <i class="fas fa-user-cog"></i> Role
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
 
                                         {{-- User Details Modal --}}
-                                        <div class="modal fade user-details-modal" id="userDetailsModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal fade" id="userDetailsModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -1048,132 +854,56 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body p-4">
-                                                        <div class="row g-3">
-                                                            <div class="col-md-4">
-                                                                <div class="section-card h-100 text-center">
-                                                                    <div class="profile-avatar">
-                                                                        @if($list->profile_image)
-                                                                            <img src="{{ asset('storage/' . $list->profile_image) }}" alt="Profile image">
-                                                                        @else
-                                                                            <i class="fas fa-user" style="font-size: 54px; color: #94a3b8;"></i>
-                                                                        @endif
-                                                                    </div>
-                                                                    <div class="detail-value mb-1">
-                                                                        {{ ucwords(strtolower(trim(($list->firstName ?? '') . ' ' . ($list->middleName ?? '') . ' ' . ($list->lastName ?? '')))) }}
-                                                                    </div>
-                                                                    <small class="text-muted">User #{{ $list->id }}</small>
+                                                        <div class="row g-3 mb-3">
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold">User ID</div>
+                                                                <div class="fw-bold">#{{ $list->id }}</div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold">Status</div>
+                                                                <div class="fw-bold">{{ ucfirst($status['text']) }}</div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold">Full Name</div>
+                                                                <div class="fw-bold">
+                                                                    {{ ucwords(strtolower($list->firstName)) }}
+                                                                     {{ ucwords(strtolower($list->middleName)) }}
+                                                                    {{ ucwords(strtolower($list->lastName)) }}
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-8">
-                                                                <div class="section-card h-100">
-                                                                    <div class="row g-3">
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Email</span>
-                                                                            <div class="detail-value">{{ $list->email ?? 'N/A' }}</div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Contact Number</span>
-                                                                            <div class="detail-value">{{ $list->contactNumber ?? 'N/A' }}</div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Birthday</span>
-                                                                            <div class="detail-value">{{ $list->birthday ? \Carbon\Carbon::parse($list->birthday)->format('M d, Y') : 'N/A' }}</div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Role</span>
-                                                                            <div class="detail-value text-capitalize">{{ $list->role ?? 'N/A' }}</div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Status</span>
-                                                                            <div class="detail-value text-capitalize">{{ $list->status ?? 'pending' }}</div>
-                                                                        </div>
-                                                                        <div class="col-md-6">
-                                                                            <span class="detail-label">Registration Date</span>
-                                                                            <div class="detail-value">{{ $list->created_at ? $list->created_at->format('M d, Y h:i A') : 'N/A' }}</div>
-                                                                        </div>
-                                                                        @if($list->role === 'non-resident' && $eligibilityDate)
-                                                                            <div class="col-12">
-                                                                                <span class="detail-label">Resident Role Eligibility</span>
-                                                                                <div class="detail-value">
-                                                                                    @if($isNonResidentEligible)
-                                                                                        Eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }})
-                                                                                    @else
-                                                                                        Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }})
-                                                                                    @endif
-                                                                                </div>
-                                                                            </div>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold">Role</div>
+                                                                <div class="fw-bold">{{ ucfirst($list->role) }}</div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="text-muted small fw-semibold">Email</div>
+                                                                <div class="fw-bold">{{ $list->email }}</div>
                                                             </div>
                                                         </div>
 
-                                                        @if($list->resident)
-                                                            <div class="section-card mt-3">
-                                                                <div class="row g-3">
-                                                                    <div class="col-12">
-                                                                        <span class="detail-label">Resident Details</span>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <span class="detail-label">Age</span>
-                                                                        <div class="detail-value">{{ $list->resident->age ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <span class="detail-label">Sex</span>
-                                                                        <div class="detail-value text-capitalize">{{ $list->resident->sex ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <span class="detail-label">Parent</span>
-                                                                        <div class="detail-value text-capitalize">{{ $list->resident->parent ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-3">
-                                                                        <span class="detail-label">Enrolled</span>
-                                                                        <div class="detail-value text-capitalize">{{ $list->resident->enrolled ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Educational Attainment</span>
-                                                                        <div class="detail-value">{{ $list->resident->educationalAttainment ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Religion</span>
-                                                                        <div class="detail-value">{{ $list->resident->religion ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Resident Contact</span>
-                                                                        <div class="detail-value">{{ $list->resident->contactNo ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Resident Birthday</span>
-                                                                        <div class="detail-value">{{ $list->resident->birthday ? \Carbon\Carbon::parse($list->resident->birthday)->format('M d, Y') : 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Head of Family</span>
-                                                                        <div class="detail-value text-capitalize">{{ $list->resident->headOfFamily ?? 'N/A' }}</div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <span class="detail-label">Emergency Contact</span>
-                                                                        <div class="detail-value">
-                                                                            {{ $list->resident->emergencyContactName ?? 'N/A' }}
-                                                                            <span class="text-muted">/</span>
-                                                                            {{ $list->resident->emergencyContactNo ?? 'N/A' }}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold mb-2">Profile Image</div>
+                                                                @if($list->profile_image)
+                                                                    <img src="{{ asset('storage/' . $list->profile_image) }}"
+                                                                         alt="Profile image"
+                                                                         class="img-fluid rounded border"
+                                                                         style="max-height: 340px; width: 100%; object-fit: contain;">
+                                                                @else
+                                                                    <div class="border rounded p-3 text-muted">No profile image uploaded.</div>
+                                                                @endif
                                                             </div>
-                                                        @endif
-
-                                                        <div class="section-card mt-3">
-                                                            <span class="detail-label mb-2">Proof of Identity</span>
-                                                            @if($list->proofOfIdentity)
-                                                                <div class="proof-box">
+                                                            <div class="col-md-6">
+                                                                <div class="text-muted small fw-semibold mb-2">ID Proof</div>
+                                                                @if($list->proofOfIdentity)
                                                                     <img src="{{ asset('storage/' . $list->proofOfIdentity) }}"
                                                                          alt="ID proof"
-                                                                         class="img-fluid rounded"
-                                                                         style="max-height: 360px; width: 100%; object-fit: contain;">
-                                                                </div>
-                                                            @else
-                                                                <div class="proof-box text-muted">No ID proof uploaded.</div>
-                                                            @endif
+                                                                         class="img-fluid rounded border"
+                                                                         style="max-height: 340px; width: 100%; object-fit: contain;">
+                                                                @else
+                                                                    <div class="border rounded p-3 text-muted">No ID proof uploaded.</div>
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
@@ -1185,144 +915,117 @@
                                             </div>
                                         </div>
 
-                                        @if($list->role !== 'superadmin')
-                                            {{-- Status Update Modal --}}
-                                            <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-primary text-white">
-                                                            <h5 class="modal-title">
-                                                                <i class="fas fa-user-check me-2"></i>Update User Status
-                                                            </h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <div class="modal-body">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                    <div class="fw-bold fs-5">
-                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <label class="form-label fw-semibold mb-3">Select New Status</label>
-                                                                    <div class="status-radio-group">
-                                                                        <div class="status-radio-option">
-                                                                            <input type="radio" class="btn-check" name="status" 
-                                                                                   id="approve{{ $list->id }}" value="approved" 
-                                                                                   {{ $list->status == 'approved' ? 'checked' : '' }}>
-                                                                            <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
-                                                                                <i class="fas fa-check-circle"></i>
-                                                                                <span>Approve</span>
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="status-radio-option">
-                                                                            <input type="radio" class="btn-check" name="status" 
-                                                                                   id="pending{{ $list->id }}" value="pending" 
-                                                                                   {{ $list->status == 'pending' ? 'checked' : '' }}>
-                                                                            <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
-                                                                                <i class="fas fa-clock"></i>
-                                                                                <span>Pending</span>
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="status-radio-option">
-                                                                            <input type="radio" class="btn-check" name="status" 
-                                                                                   id="decline{{ $list->id }}" value="declined" 
-                                                                                   {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
-                                                                            <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
-                                                                                <i class="fas fa-times-circle"></i>
-                                                                                <span>Decline</span>
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                    Cancel
-                                                                </button>
-                                                                <button type="submit" class="btn btn-primary">
-                                                                    <i class="fas fa-save me-1"></i>Update Status
-                                                                </button>
-                                                            </div>
-                                                        </form>
+                                        {{-- Status Update Modal --}}
+                                        <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title">
+                                                            <i class="fas fa-user-check me-2"></i>Update User Status
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
+                                                    <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                <div class="fw-bold fs-5">
+                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label class="form-label fw-semibold mb-3">Select New Status</label>
+                                                                <div class="status-radio-group">
+                                                                    <div class="status-radio-option">
+                                                                        <input type="radio" class="btn-check" name="status" 
+                                                                               id="approve{{ $list->id }}" value="approved" 
+                                                                               {{ $list->status == 'approved' ? 'checked' : '' }}>
+                                                                        <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
+                                                                            <i class="fas fa-check-circle"></i>
+                                                                            <span>Approve</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="status-radio-option">
+                                                                        <input type="radio" class="btn-check" name="status" 
+                                                                               id="pending{{ $list->id }}" value="pending" 
+                                                                               {{ $list->status == 'pending' ? 'checked' : '' }}>
+                                                                        <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
+                                                                            <i class="fas fa-clock"></i>
+                                                                            <span>Pending</span>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="status-radio-option">
+                                                                        <input type="radio" class="btn-check" name="status" 
+                                                                               id="decline{{ $list->id }}" value="declined" 
+                                                                               {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
+                                                                        <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
+                                                                            <i class="fas fa-times-circle"></i>
+                                                                            <span>Decline</span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                Cancel
+                                                            </button>
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <i class="fas fa-save me-1"></i>Update Status
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            {{-- Role Update Modal --}}
-                                            <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-info text-white">
-                                                            <h5 class="modal-title">
-                                                                <i class="fas fa-user-cog me-2"></i>Update User Role
-                                                            </h5>
-                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <div class="modal-body">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                    <div class="fw-bold fs-5">
-                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <label class="form-label fw-semibold">
-                                                                        New Role 
-                                                                        <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
-                                                                    </label>
-                                                                    @if($list->role === 'non-resident' && $eligibilityDate)
-                                                                        @if($isNonResidentEligible)
-                                                                            <div class="alert alert-success py-2 px-3 mb-3">
-                                                                                <i class="fas fa-circle-check me-1"></i>
-                                                                                This user is eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }}).
-                                                                            </div>
-                                                                        @else
-                                                                            <div class="alert alert-warning py-2 px-3 mb-3">
-                                                                                <i class="fas fa-hourglass-half me-1"></i>
-                                                                                Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }}).
-                                                                            </div>
-                                                                        @endif
-                                                                    @endif
-                                                                    @if(($adminLimitReached ?? false) && $list->role !== 'admin')
-                                                                        <div class="alert alert-warning py-2 px-3 mb-3">
-                                                                            <i class="fas fa-triangle-exclamation me-1"></i>
-                                                                            Admin limit reached ({{ $currentAdminCount ?? 0 }}/{{ $maxAdmins ?? 2 }}). Demote an existing admin before assigning this user as Admin.
-                                                                        </div>
-                                                                    @endif
-                                                                    <select name="role" class="form-select form-select-lg">
-                                                                        <option
-                                                                            value="admin"
-                                                                            {{ $list->role === 'admin' ? 'selected' : '' }}
-                                                                            {{ (($adminLimitReached ?? false) && $list->role !== 'admin') ? 'disabled' : '' }}
-                                                                        >
-                                                                            Admin
-                                                                        </option>
-                                                                        <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
-                                                                        <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
-                                                                        <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                    Cancel
-                                                                </button>
-                                                                <button type="submit" class="btn btn-info text-white">
-                                                                    <i class="fas fa-save me-1"></i>Update Role
-                                                                </button>
-                                                            </div>
-                                                        </form>
+                                        {{-- Role Update Modal --}}
+                                        <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-info text-white">
+                                                        <h5 class="modal-title">
+                                                            <i class="fas fa-user-cog me-2"></i>Update User Role
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
+                                                    <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                <div class="fw-bold fs-5">
+                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label class="form-label fw-semibold">
+                                                                    New Role 
+                                                                    <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
+                                                                </label>
+                                                                <select name="role" class="form-select form-select-lg">
+                                                                    <option value="admin" {{ $list->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                                    <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
+                                                                    <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
+                                                                    <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                Cancel
+                                                            </button>
+                                                            <button type="submit" class="btn btn-info text-white">
+                                                                <i class="fas fa-save me-1"></i>Update Role
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        @endif
+                                        </div>
                                     @endforeach
                                 </tbody>
                             </table>

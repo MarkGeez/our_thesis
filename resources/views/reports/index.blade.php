@@ -164,6 +164,16 @@
         background: #ccfbf1;
     }
 
+    .report-type-officials {
+        color: #1d4ed8;
+        background: #dbeafe;
+    }
+
+    .report-type-archives {
+        color: #92400e;
+        background: #ffedd5;
+    }
+
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -432,6 +442,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalOfficialsReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-users-gear fa-3x mb-3" style="color:#1d4ed8;"></i>
+                    <h5 class="fw-bold mb-1">Officials Report</h5>
+                    <p class="text-muted small mb-0">Barangay officials by position and term timeline</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalArchivesReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-box-archive fa-3x mb-3" style="color:#b45309;"></i>
+                    <h5 class="fw-bold mb-1">Archives Report</h5>
+                    <p class="text-muted small mb-0">Archived records by type, reason, and date range</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="section-header mt-5">
@@ -471,6 +499,8 @@
                                     'certificate' => 'report-type-certificate',
                                     'complaint' => 'report-type-complaint',
                                     'activity' => 'report-type-activity',
+                                    'officials' => 'report-type-officials',
+                                    'archives' => 'report-type-archives',
                                     'household' => 'report-type-household',
                                     default => 'report-type-population',
                                 };
@@ -533,6 +563,233 @@
             @endif
         </div>
     @endif
+</div>
+
+<div class="modal fade" id="modalOfficialsReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.officials') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="officials">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-users-gear me-2" style="color:#1d4ed8;"></i>Generate Barangay Officials Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Position <span class="text-muted">(Optional)</span></label>
+                            <select name="position" class="form-select">
+                                <option value="">All Positions</option>
+                                @foreach(($officialPositions ?? collect()) as $position)
+                                    <option value="{{ $position }}" {{ (string) old('position') === (string) $position ? 'selected' : '' }}>
+                                        {{ $position }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Official Name <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="resident_name" class="form-control" value="{{ old('resident_name') }}" placeholder="e.g. Juan Dela Cruz">
+                        </div>{{-- 
+                        <div class="col-md-6">
+                      
+                            <label class="form-label fw-semibold">Term Status <span class="text-muted">(Optional)</span></label>
+                            <select name="term_status" class="form-select">
+                                <option value="all" {{ old('term_status', 'all') === 'all' ? 'selected' : '' }}>All Terms</option>
+                                <option value="active" {{ old('term_status') === 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="upcoming" {{ old('term_status') === 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                                <option value="completed" {{ old('term_status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="no_term" {{ old('term_status') === 'no_term' ? 'selected' : '' }}>No Term Dates</option>
+                            </select>
+                        </div>      
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Keyword in Position/Notes <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search term notes or position">
+                        </div>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <label class="form-label fw-semibold text-muted"><i class="fas fa-hourglass-half me-1"></i>Term Start Range (Optional)</label>
+                        </div> --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Start From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="term_start_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('term_start_from') }}"
+                                    data-raw="{{ old('term_start_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Start To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="term_start_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('term_start_to') }}"
+                                    data-raw="{{ old('term_start_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <label class="form-label fw-semibold text-muted"><i class="fas fa-flag-checkered me-1"></i>Term End Range (Optional)</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">End From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="term_end_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('term_end_from') }}"
+                                    data-raw="{{ old('term_end_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">End To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="term_end_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('term_end_to') }}"
+                                    data-raw="{{ old('term_end_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#1d4ed8;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalArchivesReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.archives') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="archives">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-box-archive me-2" style="color:#b45309;"></i>Generate Archives Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Archive Type <span class="text-muted">(Optional)</span></label>
+                            <select name="record_type" class="form-select">
+                                <option value="">All Types</option>
+                                @foreach(($archiveTypes ?? collect()) as $archiveType)
+                                    <option value="{{ $archiveType }}" {{ (string) old('record_type') === (string) $archiveType ? 'selected' : '' }}>
+                                        {{ ucwords(str_replace('_', ' ', strtolower((string) $archiveType))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Archived By <span class="text-muted">(Optional)</span></label>
+                            <select name="archived_by" class="form-select">
+                                <option value="">All Users</option>
+                                @foreach(($archiveUsers ?? collect()) as $archiveUser)
+                                    <option value="{{ $archiveUser->id }}" {{ (string) old('archived_by') === (string) $archiveUser->id ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower(trim(($archiveUser->firstName ?? '') . ' ' . ($archiveUser->lastName ?? '')))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Record ID <span class="text-muted">(Optional)</span></label>
+                            <input type="number" min="1" name="record_id" class="form-control" value="{{ old('record_id') }}" placeholder="e.g. 102">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Reason <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="reason" class="form-control" value="{{ old('reason') }}" placeholder="Archive reason contains...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Keyword in Type/Reason/Details <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search archive details">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_from') }}"
+                                    data-raw="{{ old('date_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">To Date <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="date_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('date_to') }}"
+                                    data-raw="{{ old('date_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Leave filters blank to include all archived records.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#b45309;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="modal fade" id="modalActivityReport" tabindex="-1" aria-hidden="true">
@@ -1138,6 +1395,8 @@
                 certificate: 'modalCertificateReport',
                 complaint: 'modalComplaintReport',
                 activity: 'modalActivityReport',
+                officials: 'modalOfficialsReport',
+                archives: 'modalArchivesReport',
                 household: 'modalHouseholdReport'
             };
             const targetModalId = modalMap['{{ old('report_form_type') }}'];
@@ -1270,6 +1529,8 @@
         autoFillReportTitle('modalCertificateReport', 'Certificate');
         autoFillReportTitle('modalComplaintReport', 'Complaint');
         autoFillReportTitle('modalActivityReport', 'Activity Logs');
+        autoFillReportTitle('modalOfficialsReport', 'Barangay Officials');
+        autoFillReportTitle('modalArchivesReport', 'Archives');
         autoFillReportTitle('modalHouseholdReport', 'Household');
     });
 </script>
