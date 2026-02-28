@@ -840,6 +840,9 @@
                         User Records Management
                     </h2>
                 </div>
+                 @if ($pendingUser)
+                    <H1>A pending user exists FOR MORE THAN 72 HRS pls check the status</H1>
+                @endif
 
                 <!-- Search Section -->
                 <div class="search-section">

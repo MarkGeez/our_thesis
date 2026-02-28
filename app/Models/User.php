@@ -109,14 +109,7 @@ class User extends Authenticatable
    
     protected static function booted()
     {
-        static::created(function ($user) {
-            ActiveLogger::log(
-                'Users',
-                'created',
-                $user->id,
-                'Created a new user'
-            );
-        });
+        
         static::updated(function ($user) {
             ActiveLogger::log(
                 'Users',

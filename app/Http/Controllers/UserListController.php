@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use app\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class UserListController extends Controller
 {
@@ -73,7 +74,13 @@ class UserListController extends Controller
         $maxAdmins = 2;
         $currentAdminCount = User::where('role', 'admin')->count();
         $adminLimitReached = $currentAdminCount >= $maxAdmins;
+        
 
+        $hours = 72;
+
+        $pendingUser = User::where('status', 'pending')->where('created_at', '>=', Carbon::now()->subHours($hours))->exists();
+
+       
         return view($user->role . '.users', compact(
             'user',
             'search',
@@ -83,7 +90,8 @@ class UserListController extends Controller
             'sort',
             'maxAdmins',
             'currentAdminCount',
-            'adminLimitReached'
+            'adminLimitReached',
+            'pendingUser'
         ));
     }
 

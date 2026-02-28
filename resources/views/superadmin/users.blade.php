@@ -836,8 +836,12 @@
                             <i class="fas fa-users"></i>
                         </div>
                         User Records Management
+                             @if ($pendingUser)
+                    <H1>A pending user exists pls check the status</H1>
+                @endif
                     </h2>
                 </div>
+           
 
                 <!-- Search Section -->
                 <div class="search-section">
