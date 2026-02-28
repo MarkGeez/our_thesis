@@ -86,10 +86,14 @@ class AuthController extends Controller
         // Block login for pending or declined users
         if ($user->status === 'pending') {
             $created = $user->created_at;
-            $daysPending = $created ? now()->diffInDays($created) : 0;
             $msg = 'Your account is still pending for verification.';
-            if ($daysPending > 4) {
-                $msg .= ' If your account has been pending for more than 4 days, please contact the barangay.';
+            if ($created) {
+                $hoursPending = (int) now()->diffInHours($created);
+                if ($hoursPending >= 72) {
+                    $msg .= ' Your registration has been pending for more than 72 hours. Please contact the barangay for assistance or follow-up.';
+                } else {
+                    $msg .= ' Please wait while the barangay reviews your registration request.';
+                }
             }
             return back()->withInput()->with('auth_error', $msg);
         }

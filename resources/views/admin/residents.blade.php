@@ -1170,7 +1170,6 @@
     <!-- Sex (Added missing field) -->
     <label for="sex">Sex</label>
     <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror">
-        <option value="">Select Sex</option>
         <option value="male" {{ old('sex') === 'male' ? 'selected' : '' }}>Male</option>
         <option value="female" {{ old('sex') === 'female' ? 'selected' : '' }}>Female</option>
     </select>

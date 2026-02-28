@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use app\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class UserListController extends Controller
 {
@@ -73,7 +74,20 @@ class UserListController extends Controller
         $maxAdmins = 2;
         $currentAdminCount = User::where('role', 'admin')->count();
         $adminLimitReached = $currentAdminCount >= $maxAdmins;
+        
 
+        $hours = 72;
+        $pendingUsersCount = User::where('status', 'pending')->count();
+        $pendingOver72HoursCount = User::where('status', 'pending')
+            ->whereNotNull('created_at')
+            ->where('created_at', '<=', Carbon::now()->subHours($hours))
+            ->count();
+        $hasPendingUsers = $pendingUsersCount > 0;
+        $hasOverduePendingUsers = $pendingOver72HoursCount > 0;
+        // Backward compatibility for existing blade checks.
+        $pendingUser = $hasPendingUsers;
+
+       
         return view($user->role . '.users', compact(
             'user',
             'search',
@@ -83,7 +97,12 @@ class UserListController extends Controller
             'sort',
             'maxAdmins',
             'currentAdminCount',
-            'adminLimitReached'
+            'adminLimitReached',
+            'pendingUser',
+            'pendingUsersCount',
+            'pendingOver72HoursCount',
+            'hasPendingUsers',
+            'hasOverduePendingUsers'
         ));
     }
 

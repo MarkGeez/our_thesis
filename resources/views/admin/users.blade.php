@@ -41,20 +41,14 @@
 
     /* Header Section */
     .page-header {
-       background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
-            color: black;
-            border-radius: 15px;
-            padding: 30px;
-            
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        color: black;
+        border-radius: 15px;
+        padding: 30px;
         margin-bottom: 0;
     }
 
@@ -71,15 +65,11 @@
     .page-header-icon {
         width: 48px;
         height: 48px;
-         background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -235,6 +225,37 @@
         color: #991b1b;
     }
 
+    .overdue-pending-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.4rem;
+        padding: 0.25rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid #fca5a5;
+        color: #b91c1c;
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: #fff5f5;
+        width: fit-content;
+    }
+
+    .pending-age-note {
+        margin-top: 0.35rem;
+        font-size: 0.72rem;
+        line-height: 1.35;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.45rem;
+        border-radius: 6px;
+        border: 1px solid #fcd34d;
+        font-weight: 600;
+        color: #92400e;
+        background: #fffbeb;
+        width: fit-content;
+    }
+
     /* Button Styling */
     .btn {
         font-weight: 600;
@@ -343,7 +364,7 @@
     }
 
     /* Pagination Styling */
-     .pagination-container {
+    .pagination-container {
         padding: 2rem;
         background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
         border-radius: 0 0 16px 16px;
@@ -632,6 +653,152 @@
         border-top: 2px solid var(--border-color);
     }
 
+    .user-details-modal .modal-content {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .user-details-modal .modal-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: #fff;
+        border-bottom: none;
+    }
+
+    .user-details-modal .modal-header .modal-title {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .user-details-modal .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.85;
+    }
+
+    .user-details-modal .section-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .user-details-modal .detail-label {
+        display: block;
+        font-size: 0.74rem;
+        letter-spacing: 0.45px;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+        font-weight: 700;
+    }
+
+    .user-details-modal .detail-value {
+        font-weight: 600;
+        color: #0f172a;
+        line-height: 1.35;
+    }
+
+    .user-details-modal .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem auto;
+        overflow: hidden;
+    }
+
+    .user-details-modal .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-details-modal .proof-box {
+        background: #fff;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem;
+    }
+
+    .role-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.45rem;
+    }
+
+    .role-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        width: fit-content;
+        padding: 0.34rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.25px;
+        text-transform: uppercase;
+        line-height: 1;
+    }
+
+    .role-pill.role-admin {
+        color: #1e3a8a;
+        background: #dbeafe;
+        border-color: #93c5fd;
+    }
+
+    .role-pill.role-subadmin {
+        color: #155e75;
+        background: #cffafe;
+        border-color: #67e8f9;
+    }
+
+    .role-pill.role-resident {
+        color: #065f46;
+        background: #d1fae5;
+        border-color: #6ee7b7;
+    }
+
+    .role-pill.role-non-resident {
+        color: #7c2d12;
+        background: #ffedd5;
+        border-color: #fdba74;
+    }
+
+    .eligibility-note {
+        font-size: 0.72rem;
+        line-height: 1.35;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.45rem;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        font-weight: 500;
+        opacity: 0.9;
+        width: fit-content;
+    }
+
+    .eligibility-note.eligible {
+        color: #4b5563;
+        background: #f8fafc;
+        border-color: #e5e7eb;
+    }
+
+    .eligibility-note.pending {
+        color: #6b7280;
+        background: #f8fafc;
+        border-color: #e5e7eb;
+    }
+
     /* Alert Styling */
     .alert-info {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
@@ -640,6 +807,65 @@
         border-radius: 12px;
         padding: 1.25rem;
         font-weight: 500;
+    }
+
+    .pending-review-banner {
+        margin: 1rem 2rem 0;
+        border-radius: 12px;
+        border: 1px solid #fde68a;
+        background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
+        padding: 0.9rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .pending-review-banner.is-overdue {
+        border-color: #fecaca;
+        background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+    }
+
+    .pending-review-banner .banner-title {
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 0.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pending-review-banner.is-overdue .banner-title {
+        color: #991b1b;
+    }
+
+    .pending-review-banner .banner-text {
+        margin: 0;
+        color: #7c2d12;
+        font-size: 0.92rem;
+    }
+
+    .pending-review-banner .banner-counts {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .pending-review-pill {
+        background: #fff;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    .pending-review-banner.is-overdue .pending-review-pill.overdue {
+        border-color: #fca5a5;
+        color: #b91c1c;
     }
 
     /* Responsive Design */
@@ -694,6 +920,28 @@
                         User Records Management
                     </h2>
                 </div>
+                @if (($hasPendingUsers ?? false) || ((int) ($pendingUsersCount ?? 0) > 0))
+                    <div class="pending-review-banner {{ ($hasOverduePendingUsers ?? false) ? 'is-overdue' : '' }}">
+                        <div>
+                            <div class="banner-title">
+                                <i class="fas fa-hourglass-half"></i>
+                                Pending User Approvals Need Review
+                            </div>
+                            <p class="banner-text">
+                                @if(($hasOverduePendingUsers ?? false))
+                                    Some pending users have been waiting for more than 72 hours. Review and update their status.
+                                @else
+                                    There are pending users awaiting approval. Review their status when ready.
+                                @endif
+                            </p>
+                        </div>
+                        <div class="banner-counts">
+                            <span class="pending-review-pill">Pending: {{ (int) ($pendingUsersCount ?? 0) }}</span>
+                            <span class="pending-review-pill overdue">Over 72h: {{ (int) ($pendingOver72HoursCount ?? 0) }}</span>
+                        </div>
+                    </div>
+                @endif
+           
 
                 <!-- Search Section -->
                 <div class="search-section">
@@ -793,6 +1041,18 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($userList as $list)
+                                        @php
+                                            $eligibilityDate = $list->created_at ? $list->created_at->copy()->addMonths(6) : null;
+                                            $eligibilityDaysRemaining = $eligibilityDate ? max(0, (int) ceil(now()->diffInRealDays($eligibilityDate, false))) : null;
+                                            $isNonResidentEligible = $list->role === 'non-resident' && $eligibilityDate && $eligibilityDaysRemaining <= 0;
+                                            $roleStyleMap = [
+                                                'admin' => ['class' => 'role-admin', 'icon' => 'fa-user-shield'],
+                                                'subadmin' => ['class' => 'role-subadmin', 'icon' => 'fa-user-gear'],
+                                                'resident' => ['class' => 'role-resident', 'icon' => 'fa-house-user'],
+                                                'non-resident' => ['class' => 'role-non-resident', 'icon' => 'fa-user-clock'],
+                                            ];
+                                            $roleStyle = $roleStyleMap[$list->role] ?? ['class' => 'role-non-resident', 'icon' => 'fa-user'];
+                                        @endphp
                                         <tr>
                                             <td><strong>#{{ $list->id }}</strong></td>
                                             <td>
@@ -805,10 +1065,40 @@
                                                      {{ ucwords(strtolower($list->middleName)) }}
                                                     {{ ucwords(strtolower($list->lastName)) }}
                                                 </button>
+                                                @if($list->status === 'pending')
+                                                    @php
+                                                        $duplicateResident = \App\Models\Resident::where('firstName', $list->firstName)
+                                                            ->where('middleName', $list->middleName)
+                                                            ->where('lastName', $list->lastName)
+                                                            ->where('birthday', $list->birthday)
+                                                            ->exists();
+                                                    @endphp
+                                                    @if($duplicateResident)
+                                                        <span class="badge bg-warning text-dark ms-2">Duplicate in residents</span>
+                                                    @endif
+                                                @endif
                                             </td>
                                             <td class="text-muted">{{ $list->email }}</td>
                                             <td>
-                                                <span class="badge bg-secondary">{{ ucfirst($list->role) }}</span>
+                                                <div class="role-block">
+                                                    <span class="role-pill {{ $roleStyle['class'] }}">
+                                                        <i class="fas {{ $roleStyle['icon'] }}"></i>
+                                                        {{ ucfirst($list->role) }}
+                                                    </span>
+                                                    @if($list->role === 'non-resident' && $eligibilityDate)
+                                                        @if($isNonResidentEligible)
+                                                            <span class="eligibility-note eligible">
+                                                                <i class="fas fa-circle-check"></i>
+                                                                Eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }})
+                                                            </span>
+                                                        @else
+                                                            <span class="eligibility-note pending">
+                                                                <i class="fas fa-hourglass-half"></i>
+                                                                Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }})
+                                                            </span>
+                                                        @endif
+                                                    @endif
+                                                </div>
                                             </td>
                                             <td>
                                                 @php
@@ -819,32 +1109,64 @@
                                                         'declined' => ['class' => 'status-declined', 'icon' => 'fa-times-circle', 'text' => 'Declined']
                                                     ];
                                                     $status = $statusConfig[$list->status] ?? $statusConfig['pending'];
+                                                    $isPendingOver72 = $list->status === 'pending'
+                                                        && $list->created_at
+                                                        && $list->created_at->lte(now()->subHours(72));
+                                                    $pendingAgeLabel = null;
+                                                    if ($list->status === 'pending' && $list->created_at) {
+                                                        $registeredAt = $list->created_at;
+                                                        $daysPending = (int) $registeredAt->diffInDays(now());
+                                                        $hoursPending = (int) $registeredAt->copy()->addDays($daysPending)->diffInHours(now());
+                                                        if ($daysPending > 0) {
+                                                            $pendingAgeLabel = 'Pending for ' . $daysPending . ' day' . ($daysPending !== 1 ? 's' : '') . ' ' . $hoursPending . ' hour' . ($hoursPending !== 1 ? 's' : '');
+                                                        } else {
+                                                            $totalHoursPending = max(0, (int) $registeredAt->diffInHours(now()));
+                                                            $pendingAgeLabel = 'Pending for ' . $totalHoursPending . ' hour' . ($totalHoursPending !== 1 ? 's' : '');
+                                                        }
+                                                    }
                                                 @endphp
                                                 <span class="status-badge {{ $status['class'] }}">
                                                     <i class="fas {{ $status['icon'] }}"></i>
                                                     {{ $status['text'] }}
                                                 </span>
+                                                @if($pendingAgeLabel)
+                                                    <span class="pending-age-note">
+                                                        <i class="fas fa-hourglass-half"></i>
+                                                        {{ $pendingAgeLabel }}
+                                                    </span>
+                                                @endif
+                                                @if($isPendingOver72)
+                                                    <div class="overdue-pending-note">
+                                                        <i class="fas fa-exclamation-triangle"></i> Over 72h
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-outline-success btn-action" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#statusModal{{ $list->id }}">
-                                                        <i class="fas fa-sync-alt"></i> Status
-                                                    </button>
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-outline-primary btn-action" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#roleModal{{ $list->id }}">
-                                                        <i class="fas fa-user-cog"></i> Role
-                                                    </button>
+                                                    @if($list->role === 'superadmin')
+                                                        <span class="text-muted small fw-semibold">No actions available</span>
+                                                    @else
+                                                        @if($list->status === 'pending')
+                                                            <button type="button" 
+                                                                    class="btn btn-sm btn-outline-success btn-action" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#statusModal{{ $list->id }}">
+                                                                <i class="fas fa-sync-alt"></i> Status
+                                                            </button>
+                                                        @endif
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-primary btn-action" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#roleModal{{ $list->id }}">
+                                                            <i class="fas fa-user-cog"></i> Role
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
 
                                         {{-- User Details Modal --}}
-                                        <div class="modal fade" id="userDetailsModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal fade user-details-modal" id="userDetailsModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -854,56 +1176,132 @@
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body p-4">
-                                                        <div class="row g-3 mb-3">
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold">User ID</div>
-                                                                <div class="fw-bold">#{{ $list->id }}</div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold">Status</div>
-                                                                <div class="fw-bold">{{ ucfirst($status['text']) }}</div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold">Full Name</div>
-                                                                <div class="fw-bold">
-                                                                    {{ ucwords(strtolower($list->firstName)) }}
-                                                                     {{ ucwords(strtolower($list->middleName)) }}
-                                                                    {{ ucwords(strtolower($list->lastName)) }}
+                                                        <div class="row g-3">
+                                                            <div class="col-md-4">
+                                                                <div class="section-card h-100 text-center">
+                                                                    <div class="profile-avatar">
+                                                                        @if($list->profile_image)
+                                                                            <img src="{{ asset('storage/' . $list->profile_image) }}" alt="Profile image">
+                                                                        @else
+                                                                            <i class="fas fa-user" style="font-size: 54px; color: #94a3b8;"></i>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div class="detail-value mb-1">
+                                                                        {{ ucwords(strtolower(trim(($list->firstName ?? '') . ' ' . ($list->middleName ?? '') . ' ' . ($list->lastName ?? '')))) }}
+                                                                    </div>
+                                                                    <small class="text-muted">User #{{ $list->id }}</small>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold">Role</div>
-                                                                <div class="fw-bold">{{ ucfirst($list->role) }}</div>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="text-muted small fw-semibold">Email</div>
-                                                                <div class="fw-bold">{{ $list->email }}</div>
+                                                            <div class="col-md-8">
+                                                                <div class="section-card h-100">
+                                                                    <div class="row g-3">
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Email</span>
+                                                                            <div class="detail-value">{{ $list->email ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Contact Number</span>
+                                                                            <div class="detail-value">{{ $list->contactNumber ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Birthday</span>
+                                                                            <div class="detail-value">{{ $list->birthday ? \Carbon\Carbon::parse($list->birthday)->format('M d, Y') : 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Role</span>
+                                                                            <div class="detail-value text-capitalize">{{ $list->role ?? 'N/A' }}</div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Status</span>
+                                                                            <div class="detail-value text-capitalize">{{ $list->status ?? 'pending' }}</div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <span class="detail-label">Registration Date</span>
+                                                                            <div class="detail-value">{{ $list->created_at ? $list->created_at->format('M d, Y h:i A') : 'N/A' }}</div>
+                                                                        </div>
+                                                                        @if($list->role === 'non-resident' && $eligibilityDate)
+                                                                            <div class="col-12">
+                                                                                <span class="detail-label">Resident Role Eligibility</span>
+                                                                                <div class="detail-value">
+                                                                                    @if($isNonResidentEligible)
+                                                                                        Eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }})
+                                                                                    @else
+                                                                                        Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }})
+                                                                                    @endif
+                                                                                </div>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <div class="row g-3">
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold mb-2">Profile Image</div>
-                                                                @if($list->profile_image)
-                                                                    <img src="{{ asset('storage/' . $list->profile_image) }}"
-                                                                         alt="Profile image"
-                                                                         class="img-fluid rounded border"
-                                                                         style="max-height: 340px; width: 100%; object-fit: contain;">
-                                                                @else
-                                                                    <div class="border rounded p-3 text-muted">No profile image uploaded.</div>
-                                                                @endif
+                                                        @if($list->resident)
+                                                            <div class="section-card mt-3">
+                                                                <div class="row g-3">
+                                                                    <div class="col-12">
+                                                                        <span class="detail-label">Resident Details</span>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <span class="detail-label">Age</span>
+                                                                        <div class="detail-value">{{ $list->resident->age ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <span class="detail-label">Sex</span>
+                                                                        <div class="detail-value text-capitalize">{{ $list->resident->sex ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <span class="detail-label">Parent</span>
+                                                                        <div class="detail-value text-capitalize">{{ $list->resident->parent ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-3">
+                                                                        <span class="detail-label">Enrolled</span>
+                                                                        <div class="detail-value text-capitalize">{{ $list->resident->enrolled ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Educational Attainment</span>
+                                                                        <div class="detail-value">{{ $list->resident->educationalAttainment ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Religion</span>
+                                                                        <div class="detail-value">{{ $list->resident->religion ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Resident Contact</span>
+                                                                        <div class="detail-value">{{ $list->resident->contactNo ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Resident Birthday</span>
+                                                                        <div class="detail-value">{{ $list->resident->birthday ? \Carbon\Carbon::parse($list->resident->birthday)->format('M d, Y') : 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Head of Family</span>
+                                                                        <div class="detail-value text-capitalize">{{ $list->resident->headOfFamily ?? 'N/A' }}</div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <span class="detail-label">Emergency Contact</span>
+                                                                        <div class="detail-value">
+                                                                            {{ $list->resident->emergencyContactName ?? 'N/A' }}
+                                                                            <span class="text-muted">/</span>
+                                                                            {{ $list->resident->emergencyContactNo ?? 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <div class="text-muted small fw-semibold mb-2">ID Proof</div>
-                                                                @if($list->proofOfIdentity)
+                                                        @endif
+
+                                                        <div class="section-card mt-3">
+                                                            <span class="detail-label mb-2">Proof of Identity</span>
+                                                            @if($list->proofOfIdentity)
+                                                                <div class="proof-box">
                                                                     <img src="{{ asset('storage/' . $list->proofOfIdentity) }}"
                                                                          alt="ID proof"
-                                                                         class="img-fluid rounded border"
-                                                                         style="max-height: 340px; width: 100%; object-fit: contain;">
-                                                                @else
-                                                                    <div class="border rounded p-3 text-muted">No ID proof uploaded.</div>
-                                                                @endif
-                                                            </div>
+                                                                         class="img-fluid rounded"
+                                                                         style="max-height: 360px; width: 100%; object-fit: contain;">
+                                                                </div>
+                                                            @else
+                                                                <div class="proof-box text-muted">No ID proof uploaded.</div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
@@ -915,117 +1313,144 @@
                                             </div>
                                         </div>
 
-                                        {{-- Status Update Modal --}}
-                                        <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-user-check me-2"></i>Update User Status
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        @if($list->role !== 'superadmin')
+                                            {{-- Status Update Modal --}}
+                                            <div class="modal fade" id="statusModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-primary text-white">
+                                                            <h5 class="modal-title">
+                                                                <i class="fas fa-user-check me-2"></i>Update User Status
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                    <div class="fw-bold fs-5">
+                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="form-label fw-semibold mb-3">Select New Status</label>
+                                                                    <div class="status-radio-group">
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="approve{{ $list->id }}" value="approved" 
+                                                                                   {{ $list->status == 'approved' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
+                                                                                <i class="fas fa-check-circle"></i>
+                                                                                <span>Approve</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="pending{{ $list->id }}" value="pending" 
+                                                                                   {{ $list->status == 'pending' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
+                                                                                <i class="fas fa-clock"></i>
+                                                                                <span>Pending</span>
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="status-radio-option">
+                                                                            <input type="radio" class="btn-check" name="status" 
+                                                                                   id="decline{{ $list->id }}" value="declined" 
+                                                                                   {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
+                                                                            <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
+                                                                                <i class="fas fa-times-circle"></i>
+                                                                                <span>Decline</span>
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="fas fa-save me-1"></i>Update Status
+                                                                </button>
+                                                            </div>
+                                                        </form>
                                                     </div>
-                                                    <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                <div class="fw-bold fs-5">
-                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <label class="form-label fw-semibold mb-3">Select New Status</label>
-                                                                <div class="status-radio-group">
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="approve{{ $list->id }}" value="approved" 
-                                                                               {{ $list->status == 'approved' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-success" for="approve{{ $list->id }}">
-                                                                            <i class="fas fa-check-circle"></i>
-                                                                            <span>Approve</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="pending{{ $list->id }}" value="pending" 
-                                                                               {{ $list->status == 'pending' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-warning" for="pending{{ $list->id }}">
-                                                                            <i class="fas fa-clock"></i>
-                                                                            <span>Pending</span>
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="status-radio-option">
-                                                                        <input type="radio" class="btn-check" name="status" 
-                                                                               id="decline{{ $list->id }}" value="declined" 
-                                                                               {{ $list->status == 'declined' || $list->status == 'rejected' ? 'checked' : '' }}>
-                                                                        <label class="status-radio-label btn-outline-danger" for="decline{{ $list->id }}">
-                                                                            <i class="fas fa-times-circle"></i>
-                                                                            <span>Decline</span>
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <i class="fas fa-save me-1"></i>Update Status
-                                                            </button>
-                                                        </div>
-                                                    </form>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {{-- Role Update Modal --}}
-                                        <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-info text-white">
-                                                        <h5 class="modal-title">
-                                                            <i class="fas fa-user-cog me-2"></i>Update User Role
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-semibold text-muted small">USER</label>
-                                                                <div class="fw-bold fs-5">
-                                                                    {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                            {{-- Role Update Modal --}}
+                                            <div class="modal fade" id="roleModal{{ $list->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-info text-white">
+                                                            <h5 class="modal-title">
+                                                                <i class="fas fa-user-cog me-2"></i>Update User Role
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-semibold text-muted small">USER</label>
+                                                                    <div class="fw-bold fs-5">
+                                                                        {{ ucwords(strtolower($list->firstName)) }} {{ ucwords(strtolower($list->lastName)) }}
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="form-label fw-semibold">
+                                                                        New Role 
+                                                                        <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
+                                                                    </label>
+                                                                    @if($list->role === 'non-resident' && $eligibilityDate)
+                                                                        @if($isNonResidentEligible)
+                                                                            <div class="alert alert-success py-2 px-3 mb-3">
+                                                                                <i class="fas fa-circle-check me-1"></i>
+                                                                                This user is eligible for Official Resident now ({{ $eligibilityDate->format('M d, Y') }}).
+                                                                            </div>
+                                                                        @else
+                                                                            <div class="alert alert-warning py-2 px-3 mb-3">
+                                                                                <i class="fas fa-hourglass-half me-1"></i>
+                                                                                Eligible for Official Resident in {{ $eligibilityDaysRemaining }} days ({{ $eligibilityDate->format('M d, Y') }}).
+                                                                            </div>
+                                                                        @endif
+                                                                    @endif
+                                                                    @if(($adminLimitReached ?? false) && $list->role !== 'admin')
+                                                                        <div class="alert alert-warning py-2 px-3 mb-3">
+                                                                            <i class="fas fa-triangle-exclamation me-1"></i>
+                                                                            Admin limit reached ({{ $currentAdminCount ?? 0 }}/{{ $maxAdmins ?? 2 }}). Demote an existing admin before assigning this user as Admin.
+                                                                        </div>
+                                                                    @endif
+                                                                    <select name="role" class="form-select form-select-lg">
+                                                                        <option
+                                                                            value="admin"
+                                                                            {{ $list->role === 'admin' ? 'selected' : '' }}
+                                                                            {{ (($adminLimitReached ?? false) && $list->role !== 'admin') ? 'disabled' : '' }}
+                                                                        >
+                                                                            Admin
+                                                                        </option>
+                                                                        <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
+                                                                        <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
+                                                                        <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
-                                                            <div>
-                                                                <label class="form-label fw-semibold">
-                                                                    New Role 
-                                                                    <span class="badge bg-secondary ms-2">Current: {{ ucfirst($list->role) }}</span>
-                                                                </label>
-                                                                <select name="role" class="form-select form-select-lg">
-                                                                    <option value="admin" {{ $list->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                                                    <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
-                                                                    <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
-                                                                    <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
-                                                                </select>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+                                                                <button type="submit" class="btn btn-info text-white">
+                                                                    <i class="fas fa-save me-1"></i>Update Role
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="submit" class="btn btn-info text-white">
-                                                                <i class="fas fa-save me-1"></i>Update Role
-                                                            </button>
-                                                        </div>
-                                                    </form>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -1033,145 +1458,143 @@
                     </div>
 
                     <!-- Enhanced Pagination -->
-@if($userList->count() > 0)
-<div class="pagination-container">
-    <div class="pagination-wrapper">
-        <!-- Pagination Info -->
-        <div class="pagination-info">
-            <div class="pagination-info-text">
-                <i class="fas fa-list-ol"></i>
-                Showing 
-                <span class="pagination-info-numbers">{{ $userList->firstItem() ?? 0 }}</span>
-                to 
-                <span class="pagination-info-numbers">{{ $userList->lastItem() ?? 0 }}</span>
-                of 
-                <span class="pagination-info-numbers">{{ $userList->total() }}</span>
-                entries
-            </div>
+                    @if($userList->count() > 0)
+                    <div class="pagination-container">
+                        <div class="pagination-wrapper">
+                            <!-- Pagination Info -->
+                            <div class="pagination-info">
+                                <div class="pagination-info-text">
+                                    <i class="fas fa-list-ol"></i>
+                                    Showing 
+                                    <span class="pagination-info-numbers">{{ $userList->firstItem() ?? 0 }}</span>
+                                    to 
+                                    <span class="pagination-info-numbers">{{ $userList->lastItem() ?? 0 }}</span>
+                                    of 
+                                    <span class="pagination-info-numbers">{{ $userList->total() }}</span>
+                                    entries
+                                </div>
+                            </div>
+
+                            <!-- Main Pagination -->
+                            <nav aria-label="User list pagination">
+                                <ul class="pagination">
+                                {{-- First Page Link --}}
+                                @if ($userList->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">First</span>
+                                        </span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->url(1) }}" rel="first">
+                                            <i class="fas fa-angle-double-left"></i>
+                                            <span class="d-none d-sm-inline ms-1">First</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                {{-- Previous Page Link --}}
+                                @if ($userList->onFirstPage())
+                                    <li class="page-item disabled">
+                                        <span class="page-link">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->previousPageUrl() }}" rel="prev">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @php
+                                    $currentPage = $userList->currentPage();
+                                    $lastPage = $userList->lastPage();
+                                    $start = max(1, $currentPage - 2);
+                                    $end = min($lastPage, $currentPage + 2);
+                                @endphp
+
+                                {{-- Show first page if not in range --}}
+                                @if ($start > 1)
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->url(1) }}">1</a>
+                                    </li>
+                                    @if ($start > 2)
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    @endif
+                                @endif
+
+                                {{-- Page Numbers --}}
+                                @for ($i = $start; $i <= $end; $i++)
+                                    @if ($i == $currentPage)
+                                        <li class="page-item active" aria-current="page">
+                                            <span class="page-link">{{ $i }}</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $userList->url($i) }}">{{ $i }}</a>
+                                        </li>
+                                    @endif
+                                @endfor
+
+                                {{-- Show last page if not in range --}}
+                                @if ($end < $lastPage)
+                                    @if ($end < $lastPage - 1)
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    @endif
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->url($lastPage) }}">{{ $lastPage }}</a>
+                                    </li>
+                                @endif
+
+                                {{-- Next Page Link --}}
+                                @if ($userList->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->nextPageUrl() }}" rel="next">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </span>
+                                    </li>
+                                @endif
+
+                                {{-- Last Page Link --}}
+                                @if ($userList->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $userList->url($userList->lastPage()) }}" rel="last">
+                                            <span class="d-none d-sm-inline me-1">Last</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled">
+                                        <span class="page-link">
+                                            <span class="d-none d-sm-inline me-1">Last</span>
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </span>
+                                    </li>
+                                @endif
+                                </ul>
+                            </nav>
+
+                            <!-- Additional Controls -->
+                        </div>
+                    </div>
+                    @endif
+                @endif
         </div>
-
-        <!-- Main Pagination -->
-        <nav aria-label="User list pagination">
-            <ul class="pagination">
-                {{-- First Page Link --}}
-                @if ($userList->onFirstPage())
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-angle-double-left"></i>
-                            <span class="d-none d-sm-inline ms-1">First</span>
-                        </span>
-                    </li>
-                @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->url(1) }}" rel="first">
-                            <i class="fas fa-angle-double-left"></i>
-                            <span class="d-none d-sm-inline ms-1">First</span>
-                        </a>
-                    </li>
-                @endif
-
-                {{-- Previous Page Link --}}
-                @if ($userList->onFirstPage())
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    </li>
-                @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->previousPageUrl() }}" rel="prev">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
-                @endif
-
-                {{-- Pagination Elements --}}
-                @php
-                    $currentPage = $userList->currentPage();
-                    $lastPage = $userList->lastPage();
-                    $start = max(1, $currentPage - 2);
-                    $end = min($lastPage, $currentPage + 2);
-                @endphp
-
-                {{-- Show first page if not in range --}}
-                @if ($start > 1)
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->url(1) }}">1</a>
-                    </li>
-                    @if ($start > 2)
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                    @endif
-                @endif
-
-                {{-- Page Numbers --}}
-                @for ($i = $start; $i <= $end; $i++)
-                    @if ($i == $currentPage)
-                        <li class="page-item active" aria-current="page">
-                            <span class="page-link">{{ $i }}</span>
-                        </li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $userList->url($i) }}">{{ $i }}</a>
-                        </li>
-                    @endif
-                @endfor
-
-                {{-- Show last page if not in range --}}
-                @if ($end < $lastPage)
-                    @if ($end < $lastPage - 1)
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                    @endif
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->url($lastPage) }}">{{ $lastPage }}</a>
-                    </li>
-                @endif
-
-                {{-- Next Page Link --}}
-                @if ($userList->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->nextPageUrl() }}" rel="next">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                @else
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    </li>
-                @endif
-
-                {{-- Last Page Link --}}
-                @if ($userList->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $userList->url($userList->lastPage()) }}" rel="last">
-                            <span class="d-none d-sm-inline me-1">Last</span>
-                            <i class="fas fa-angle-double-right"></i>
-                        </a>
-                    </li>
-                @else
-                    <li class="page-item disabled">
-                        <span class="page-link">
-                            <span class="d-none d-sm-inline me-1">Last</span>
-                            <i class="fas fa-angle-double-right"></i>
-                        </span>
-                    </li>
-                @endif
-            </ul>
-        </nav>
-
-        <!-- Additional Controls -->
-       
-    </div>
-</div>
-@endif
-                @endif
-            </div>
-        </main>
     </div>
 </div>
 

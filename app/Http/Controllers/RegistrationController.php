@@ -23,37 +23,53 @@ class RegistrationController extends Controller
             'middleName'      => 'required|string|max:50',
             'lastName'        => 'required|string|max:50',
             'email'           => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|max:255', // Remove 'confirmed'    
+            'password'        => 'required|string|min:8|max:255',
             'contactNumber'   => 'required|string|digits:11',
             'birthday'        => 'required|date|before:today',
             'proofOfIdentity' => 'required|image|mimes:jpg,png,jpeg|max:4096'
         ]);
+
+        $firstName = strtolower(trim($request->firstName));
+        $middleName = strtolower(trim($request->middleName));
+        $lastName = strtolower(trim($request->lastName));
+
+        // Check for duplicate name with approved status
+        $existingUser = User::whereRaw('LOWER(firstName) = ?', [$firstName])
+            ->whereRaw('LOWER(middleName) = ?', [$middleName])
+            ->whereRaw('LOWER(lastName) = ?', [$lastName])
+            ->where('status', 'approved')
+            ->first();
+        if ($existingUser) {
+            return back()
+                ->withInput()
+                ->with('auth_error', 'A user with the same name is already registered and approved.');
+        }
+
+        // Email uniqueness is already validated by unique rule above, but double check for safety
+        if (\App\Models\User::where('email', $request->email)->exists()) {
+            return back()
+                ->withInput()
+                ->with('auth_error', 'This email is already registered.');
+        }
 
         $imageData = null;
         if($request->hasFile('proofOfIdentity')){
             $imageData = $request->file('proofOfIdentity')->store('photos', 'public');
         }
 
-        $firstName = strtolower(trim($request->firstName));
-        $middleName = strtolower(trim($request->middleName));
-        $lastName = strtolower(trim($request->lastName));
-
-
         // Check if user exists in residents table
         $resident = Resident::where('firstName', $request->firstName)
-            ->where('middleName', $request-> middleName)
+            ->where('middleName', $request->middleName)
             ->where('lastName', $request->lastName)
             ->first();
 
         $role = "non-resident";
         $status = "pending";
-
         if($resident){
             $role = "resident";
             $status = "pending";
-
         }
-        
+
         $user = User::create([
             'email'            => $request->email,
             'password'         => Hash::make($request->password),
@@ -62,7 +78,7 @@ class RegistrationController extends Controller
             'lastName'         => $lastName,
             'contactNumber'    => $request->contactNumber,
             'birthday'         => $request->birthday,
-            'proofOfIdentity'  => $imageData,  
+            'proofOfIdentity'  => $imageData,
             'role'             => $role,
             'registrationDate' => now(),
             'status'           => $status
@@ -74,10 +90,7 @@ class RegistrationController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('login')
-            ->with('auth_success', $role === 'resident'
-                ? 'Registration successful. Your account is tagged for resident access. You will be directed to the Resident dashboard after login.'
-                : 'Registration successful. Your account is tagged for non-resident access. You will be directed to the Non-Resident dashboard after login.');
+
+        return redirect()->route('login')->with('auth_success', 'Registration successful. Pls wait for 3 working days as officials will review your registration request');
     }
 }
