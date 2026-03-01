@@ -169,7 +169,7 @@ class UserListController extends Controller
         // If password change is attempted, validate only the new password + confirmation
         if ($request->filled('password')) {
             $rules['password'] = 'required|min:8|confirmed';
-        }w
+        }
 
         // Validate the request
         $validated = $request->validate($rules);
