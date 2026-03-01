@@ -101,7 +101,7 @@ class UserListController extends Controller
 
         $user = User::findOrFail($id);
         $requestedRole = $request->role;
-
+        
         // Enforce maximum of 2 admins at any time.
         if ($requestedRole === 'admin' && $user->role !== 'admin') {
             $currentAdminCount = User::where('role', 'admin')
@@ -179,6 +179,11 @@ class UserListController extends Controller
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
         
+        // Update linked resident contact number
+if ($user->resident) {
+    $user->resident->contactNumber = $validated['contactNumber'];
+    $user->resident->save();
+}
         // Update password if provided
         if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
