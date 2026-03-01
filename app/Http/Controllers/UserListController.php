@@ -181,7 +181,7 @@ class UserListController extends Controller
         
         // Update linked resident contact number
 if ($user->resident) {
-    $user->resident->contactNumber = $validated['contactNumber'];
+    $user->resident->contactNo = $validated['contactNumber'];
     $user->resident->save();
 }
         // Update password if provided
