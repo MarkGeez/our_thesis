@@ -160,7 +160,7 @@ class UserListController extends Controller
 
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'contactNumber' => 'required|string|max:20',
+            'contactNumber' => 'required|string|max:11|',
             'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
@@ -169,7 +169,7 @@ class UserListController extends Controller
         // If password change is attempted, validate only the new password + confirmation
         if ($request->filled('password')) {
             $rules['password'] = 'required|min:8|confirmed';
-        }
+        }w
 
         // Validate the request
         $validated = $request->validate($rules);
