@@ -1142,7 +1142,7 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     @if($list->role === 'superadmin')
-                                                        <span class="text-muted small fw-semibold">No actions available</span>
+                                                        <span class="text-muted small fw-semibold"></span>
                                                     @else
                                                         @if($list->status === 'pending')
                                                             <button type="button" 

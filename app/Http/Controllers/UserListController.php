@@ -110,8 +110,16 @@ class UserListController extends Controller
     public function updateRole(Request $request, $id){
         $request->validate(['role' => 'in:admin,subadmin,resident,non-resident']);
 
+        $actor = auth()->user();
         $user = User::findOrFail($id);
         $requestedRole = $request->role;
+
+        // Admins cannot change their own role from the users module.
+        if ($actor && $actor->role === 'admin' && (int) $actor->id === (int) $user->id) {
+            return redirect()->back()->withErrors([
+                'role' => 'You cannot modify your own role.',
+            ]);
+        }
         
         // Enforce maximum of 2 admins at any time.
         if ($requestedRole === 'admin' && $user->role !== 'admin') {

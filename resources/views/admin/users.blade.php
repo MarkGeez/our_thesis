@@ -1045,6 +1045,7 @@
                                             $eligibilityDate = $list->created_at ? $list->created_at->copy()->addMonths(6) : null;
                                             $eligibilityDaysRemaining = $eligibilityDate ? max(0, (int) ceil(now()->diffInRealDays($eligibilityDate, false))) : null;
                                             $isNonResidentEligible = $list->role === 'non-resident' && $eligibilityDate && $eligibilityDaysRemaining <= 0;
+                                            $isOwnAccount = (int) $user->id === (int) $list->id;
                                             $roleStyleMap = [
                                                 'admin' => ['class' => 'role-admin', 'icon' => 'fa-user-shield'],
                                                 'subadmin' => ['class' => 'role-subadmin', 'icon' => 'fa-user-gear'],
@@ -1144,7 +1145,7 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     @if($list->role === 'superadmin')
-                                                        <span class="text-muted small fw-semibold">No actions available</span>
+                                                        <span class="text-muted small fw-semibold"></span>
                                                     @else
                                                         @if($list->status === 'pending')
                                                             <button type="button" 
@@ -1154,12 +1155,16 @@
                                                                 <i class="fas fa-sync-alt"></i> Status
                                                             </button>
                                                         @endif
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-outline-primary btn-action" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#roleModal{{ $list->id }}">
-                                                            <i class="fas fa-user-cog"></i> Role
-                                                        </button>
+                                                        @if($isOwnAccount && $user->role === 'admin')
+                                                            <span class="text-muted small fw-semibold">Current account</span>
+                                                        @else
+                                                            <button type="button" 
+                                                                    class="btn btn-sm btn-outline-primary btn-action" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#roleModal{{ $list->id }}">
+                                                                <i class="fas fa-user-cog"></i> Role
+                                                            </button>
+                                                        @endif
                                                     @endif
                                                 </div>
                                             </td>
