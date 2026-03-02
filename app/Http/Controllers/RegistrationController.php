@@ -91,6 +91,6 @@ class RegistrationController extends Controller
         }
 
 
-        return redirect()->route('login')->with('auth_success', 'Registration successful. Pls wait for 3 working days as officials will review your registration request');
+        return redirect()->route('login')->with('auth_success', 'Registration successful. Please wait up to 3 working days while officials review your registration request.');
     }
 }

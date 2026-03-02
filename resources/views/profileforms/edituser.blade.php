@@ -86,7 +86,7 @@ $user = auth()->user();
                         class="form-control form-control-lg"
                         value="{{ old('birthday', $user->birthday) }}"
                         max="{{ now()->subDay()->format('Y-m-d') }}"
-                        required
+                        readonly
                     >
                     <span class="input-group-text" id="user_openDate">
                         <i class="fa fa-calendar"></i>

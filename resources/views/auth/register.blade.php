@@ -320,6 +320,19 @@
                     @enderror
                 </div>
 
+                <div class="input-with-icon mb-3" id="confirmPasswordContainer" style="display: none;">
+                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                    placeholder="Confirm your password">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <div id="passwordMismatchError" class="bg-danger p-1 my-1 rounded text-light small mt-1" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i> Passwords do not match
+                    </div>
+                    @error('password_confirmation')
+                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="input-with-icon mb-3">
                     <label for="contactNumber" class="form-label">Contact Number</label>
                     <input type="text" name="contactNumber" id="contactNumber" class="form-control"
@@ -428,6 +441,36 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Show/hide confirm password field and validate password match
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
+        const confirmPasswordInput = document.getElementById('password_confirmation');
+        const passwordMismatchError = document.getElementById('passwordMismatchError');
+
+        passwordInput.addEventListener('input', function() {
+            // Show confirm password container if password has content
+            if (this.value.length > 0) {
+                confirmPasswordContainer.style.display = 'block';
+            } else {
+                confirmPasswordContainer.style.display = 'none';
+                passwordMismatchError.style.display = 'none';
+                confirmPasswordInput.value = '';
+            }
+            validatePasswordMatch();
+        });
+
+        confirmPasswordInput.addEventListener('input', function() {
+            validatePasswordMatch();
+        });
+
+        function validatePasswordMatch() {
+            if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
+                passwordMismatchError.style.display = 'block';
+            } else {
+                passwordMismatchError.style.display = 'none';
+            }
+        }
+
         // Enable/disable submit button based on checkbox
         document.getElementById('terms_accepted').addEventListener('change', function() {
             document.getElementById('submitBtn').disabled = !this.checked;
@@ -435,9 +478,3 @@
     </script>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('terms_accepted').addEventListener('change', function() {
-            document.getElementById('submitBtn').disabled = !this.checked;
-        });
-    </script>

@@ -217,6 +217,14 @@ class OfficialController extends Controller
     public function untagOfficial(Request $request, $id)
     {
         $official = Official::findOrFail($id);
+        $user = auth()->user();
+
+        if($official->position === "chairman" && $user->role === "admin"){
+            return back()->withErrors([
+                "errors" => "Cant untag chairman, contact the super admin to remove."
+            ]);
+        }
+        
         $this->recordHistoryFromOfficial($official, 'removed');
         $official->delete();
 

@@ -212,11 +212,11 @@
                 @enderror
             </div>
             
-            <div class=" d-flex align-items-center justify-content-between w-100 text-white">
+            <div class=" d-flex align-items-center justify-content-between w-100 text-white">{{--  
             <div class="d-flex align-items-center gap-2">
                 <input type="checkbox" name="RememberMe" id="RememberMe">
                 <label for="RememberMe" class="m-0">Remember Me</label>
-            </div>
+            </div>--}}
 
             <a href="{{ route('password.request') }}" class="text-white fw-bold">Forgot Password?</a>
         </div>

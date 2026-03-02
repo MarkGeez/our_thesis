@@ -38,6 +38,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
+                @if ($errors->has('error'))
+    <div class="alert alert-danger">
+        {{ $errors->first('error') }}
+    </div>
+@endif
 
                 @if ($errors->any())
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -70,6 +75,7 @@
                     'officialsByPosition' => $officialsByPosition,
                     'residents' => $residents,
                 ])
+
 
                 <div class="modal fade" id="officialHistoryModal" tabindex="-1" aria-labelledby="officialHistoryModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
