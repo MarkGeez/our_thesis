@@ -198,6 +198,28 @@
         .table.archives-table th[data-col="archived_at"],
         .table.archives-table td[data-col="archived_at"] { width: 16%; }
 
+        .table.announcements-table th[data-col="title"],
+        .table.announcements-table td[data-col="title"] { width: 16%; }
+        .table.announcements-table th[data-col="publisher"],
+        .table.announcements-table td[data-col="publisher"] { width: 14%; }
+        .table.announcements-table th[data-col="event_start"],
+        .table.announcements-table td[data-col="event_start"] { width: 10%; }
+        .table.announcements-table th[data-col="event_end"],
+        .table.announcements-table td[data-col="event_end"] { width: 10%; }
+        .table.announcements-table th[data-col="details"],
+        .table.announcements-table td[data-col="details"] { width: 38%; }
+        .table.announcements-table th[data-col="published_at"],
+        .table.announcements-table td[data-col="published_at"] { width: 12%; }
+
+        .table.feedback-table th[data-col="feedback_user"],
+        .table.feedback-table td[data-col="feedback_user"] { width: 18%; }
+        .table.feedback-table th[data-col="message"],
+        .table.feedback-table td[data-col="message"] { width: 56%; }
+        .table.feedback-table th[data-col="message_length"],
+        .table.feedback-table td[data-col="message_length"] { width: 10%; }
+        .table.feedback-table th[data-col="submitted_at"],
+        .table.feedback-table td[data-col="submitted_at"] { width: 16%; }
+
         .table.table-compact {
             font-size: 10px;
         }
@@ -381,6 +403,8 @@
             'activity' => 20,
             'officials' => 20,
             'archives' => 16,
+            'announcements' => 18,
+            'feedback' => 18,
             'population' => 25,
             'household' => $householdScope === 'family_members' ? 12 : 14,
             default => 18,
@@ -469,6 +493,17 @@
             $stats[] = ['label' => 'Archived By Users', 'value' => $allData->pluck('archived_by')->filter()->unique()->count(), 'color' => 'amber'];
             $stats[] = ['label' => 'With Reason', 'value' => $allData->filter(fn($r) => !empty($r->reason))->count(), 'color' => 'green'];
             $stats[] = ['label' => 'Without Reason', 'value' => $allData->filter(fn($r) => empty($r->reason))->count(), 'color' => 'red'];
+        } elseif ($type === 'announcements') {
+            $stats[] = ['label' => 'Total Announcements', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'With Image', 'value' => $allData->filter(fn($r) => !empty($r->image))->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Without Image', 'value' => $allData->filter(fn($r) => empty($r->image))->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'With Event Dates', 'value' => $allData->filter(fn($r) => !empty($r->eventTime) || !empty($r->eventEnd))->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Published By Users', 'value' => $allData->pluck('user_id')->filter()->unique()->count(), 'color' => 'black'];
+        } elseif ($type === 'feedback') {
+            $stats[] = ['label' => 'Total Feedback', 'value' => $allData->count(), 'color' => 'black'];
+            $stats[] = ['label' => 'Unique Senders', 'value' => $allData->pluck('user_id')->filter()->unique()->count(), 'color' => 'green'];
+            $stats[] = ['label' => 'Avg Length', 'value' => (int) round($allData->avg(fn($r) => mb_strlen((string) ($r->message ?? ''))) ?? 0), 'color' => 'black'];
+            $stats[] = ['label' => 'Long Messages (200+)', 'value' => $allData->filter(fn($r) => mb_strlen((string) ($r->message ?? '')) >= 200)->count(), 'color' => 'amber'];
 
         } elseif ($type === 'population') {
             $params     = request()->input('cols', '');
@@ -541,7 +576,7 @@
         }
 
         // Remove zero-value stats (cleaner output)
-        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Complaints', 'Total Logs', 'Total Officials', 'Total Archives', 'Total Residents', 'Total Households']));
+        $stats = array_filter($stats, fn($s) => $s['value'] > 0 || in_array($s['label'], ['Total Cases', 'Total Requests', 'Total Complaints', 'Total Logs', 'Total Officials', 'Total Archives', 'Total Announcements', 'Total Feedback', 'Total Residents', 'Total Households']));
     @endphp
 
     <div id="pdfContent">
@@ -586,7 +621,7 @@
         @endif
 
         <div class="content-body">
-            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }} {{ $type == 'complaint' ? 'complaint-table' : '' }} {{ $type == 'activity' ? 'activity-table' : '' }} {{ $type == 'officials' ? 'officials-table' : '' }} {{ $type == 'archives' ? 'archives-table' : '' }}">
+            <table class="table {{ $type == 'blotter' ? 'blotter-table' : '' }} {{ $type == 'complaint' ? 'complaint-table' : '' }} {{ $type == 'activity' ? 'activity-table' : '' }} {{ $type == 'officials' ? 'officials-table' : '' }} {{ $type == 'archives' ? 'archives-table' : '' }} {{ $type == 'announcements' ? 'announcements-table' : '' }} {{ $type == 'feedback' ? 'feedback-table' : '' }}">
                 <thead>
                     <tr>
                         @if($type == 'population')
@@ -640,6 +675,18 @@
                             <th data-col="reason">Reason</th>
                             <th data-col="details">Details</th>
                             <th data-col="archived_at">Archived At</th>
+                        @elseif($type == 'announcements')
+                            <th data-col="title">Title</th>
+                            <th data-col="publisher">Published By</th>
+                            <th data-col="event_start">Event Start</th>
+                            <th data-col="event_end">Event End</th>
+                            <th data-col="details">Details</th>
+                            <th data-col="published_at">Published At</th>
+                        @elseif($type == 'feedback')
+                            <th data-col="feedback_user">Submitted By</th>
+                            <th data-col="message">Feedback Message</th>
+                            <th data-col="message_length">Message Length</th>
+                            <th data-col="submitted_at">Submitted At</th>
                         @elseif($type == 'household' && $householdScope === 'family_members')
                             <th data-col="head_no">Head #</th>
                             <th data-col="house_head">House Head</th>
@@ -845,6 +892,29 @@
                                     @endif
                                 </td>
                                 <td data-col="archived_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                            @elseif($type == 'announcements')
+                                @php
+                                    $publisher = $row->user
+                                        ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                        : 'N/A';
+                                @endphp
+                                <td data-col="title">{{ $row->title ?: 'N/A' }}</td>
+                                <td data-col="publisher">{{ $publisher !== '' ? $publisher : 'N/A' }}</td>
+                                <td data-col="event_start">{{ $row->eventTime ? \Carbon\Carbon::parse($row->eventTime)->format('M d, Y') : 'N/A' }}</td>
+                                <td data-col="event_end">{{ $row->eventEnd ? \Carbon\Carbon::parse($row->eventEnd)->format('M d, Y') : 'N/A' }}</td>
+                                <td data-col="details">{{ \Illuminate\Support\Str::limit((string) ($row->details ?? ''), 170, '...') ?: 'N/A' }}</td>
+                                <td data-col="published_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                            @elseif($type == 'feedback')
+                                @php
+                                    $feedbackUser = $row->user
+                                        ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                        : 'N/A';
+                                    $feedbackMessage = (string) ($row->message ?? '');
+                                @endphp
+                                <td data-col="feedback_user">{{ $feedbackUser !== '' ? $feedbackUser : 'N/A' }}</td>
+                                <td data-col="message">{{ $feedbackMessage !== '' ? $feedbackMessage : 'N/A' }}</td>
+                                <td data-col="message_length">{{ mb_strlen($feedbackMessage) }}</td>
+                                <td data-col="submitted_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                             @elseif($type == 'household')
                                 @php
                                     $houseHeads = $row->residents

@@ -174,6 +174,16 @@
         background: #ffedd5;
     }
 
+    .report-type-announcements {
+        color: #0c4a6e;
+        background: #e0f2fe;
+    }
+
+    .report-type-feedback {
+        color: #365314;
+        background: #ecfccb;
+    }
+
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -460,6 +470,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalAnnouncementsReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-bullhorn fa-3x mb-3" style="color:#0369a1;"></i>
+                    <h5 class="fw-bold mb-1">Announcements Report</h5>
+                    <p class="text-muted small mb-0">Published announcements by author, event date, and content</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalFeedbackReport">
+                <div class="card-body py-4">
+                    <i class="fas fa-message fa-3x mb-3" style="color:#4d7c0f;"></i>
+                    <h5 class="fw-bold mb-1">Feedback Report</h5>
+                    <p class="text-muted small mb-0">Feedback submissions by resident and date</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="section-header mt-5">
@@ -501,6 +529,8 @@
                                     'activity' => 'report-type-activity',
                                     'officials' => 'report-type-officials',
                                     'archives' => 'report-type-archives',
+                                    'announcements' => 'report-type-announcements',
+                                    'feedback' => 'report-type-feedback',
                                     'household' => 'report-type-household',
                                     default => 'report-type-population',
                                 };
@@ -786,6 +816,239 @@
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn px-4 text-white" style="background:#b45309;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAnnouncementsReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.announcements') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="announcements">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-bullhorn me-2" style="color:#0369a1;"></i>Generate Announcements Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Published By <span class="text-muted">(Optional)</span></label>
+                            <select name="user_id" class="form-select">
+                                <option value="">All Users</option>
+                                @foreach(($announcementUsers ?? collect()) as $announcementUser)
+                                    <option value="{{ $announcementUser->id }}" {{ (string) old('user_id') === (string) $announcementUser->id ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower(trim(($announcementUser->firstName ?? '') . ' ' . ($announcementUser->lastName ?? '')))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Title Contains <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="title" class="form-control" value="{{ old('title') }}" placeholder="e.g. Cleanup Drive">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Details Keyword <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="details_keyword" class="form-control" value="{{ old('details_keyword') }}" placeholder="Search announcement details">
+                        </div>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <label class="form-label fw-semibold text-muted"><i class="fas fa-calendar-days me-1"></i>Event Start Range (Optional)</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Start From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="event_start_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('event_start_from') }}"
+                                    data-raw="{{ old('event_start_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Start To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="event_start_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('event_start_to') }}"
+                                    data-raw="{{ old('event_start_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <label class="form-label fw-semibold text-muted"><i class="fas fa-calendar-check me-1"></i>Event End Range (Optional)</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">End From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="event_end_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('event_end_from') }}"
+                                    data-raw="{{ old('event_end_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">End To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="event_end_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('event_end_to') }}"
+                                    data-raw="{{ old('event_end_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12 border-top pt-3 mt-2">
+                            <label class="form-label fw-semibold text-muted"><i class="fas fa-clock me-1"></i>Published Date Range (Optional)</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Published From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="published_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('published_from') }}"
+                                    data-raw="{{ old('published_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Published To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="published_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('published_to') }}"
+                                    data-raw="{{ old('published_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Leave filters blank to include all announcement records.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#0369a1;">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFeedbackReport" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="{{ route('admin.reports.feedback') }}" method="POST">
+            @csrf
+            <input type="hidden" name="report_form_type" value="feedback">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-message me-2" style="color:#4d7c0f;"></i>Generate Feedback Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3 py-2">
+                        <span class="optional-hint">
+                            Fields marked as <strong>(Optional)</strong> can be left blank.
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+                            <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Submitted By <span class="text-muted">(Optional)</span></label>
+                            <select name="user_id" class="form-select">
+                                <option value="">All Users</option>
+                                @foreach(($feedbackUsers ?? collect()) as $feedbackUser)
+                                    <option value="{{ $feedbackUser->id }}" {{ (string) old('user_id') === (string) $feedbackUser->id ? 'selected' : '' }}>
+                                        {{ ucwords(strtolower(trim(($feedbackUser->firstName ?? '') . ' ' . ($feedbackUser->lastName ?? '')))) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Message Keyword <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="message_keyword" class="form-control" value="{{ old('message_keyword') }}" placeholder="Search text in feedback message">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Submitted From <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="submitted_from"
+                                    class="form-control report-date-input"
+                                    value="{{ old('submitted_from') }}"
+                                    data-raw="{{ old('submitted_from') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Submitted To <span class="text-muted">(Optional)</span></label>
+                            <div class="input-group w-100">
+                                <input
+                                    type="date"
+                                    name="submitted_to"
+                                    class="form-control report-date-input"
+                                    value="{{ old('submitted_to') }}"
+                                    data-raw="{{ old('submitted_to') }}"
+                                >
+                                <span class="input-group-text report-date-open">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Leave filters blank to include all feedback records.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn px-4 text-white" style="background:#4d7c0f;">Generate Report</button>
                 </div>
             </div>
         </form>
@@ -1397,6 +1660,8 @@
                 activity: 'modalActivityReport',
                 officials: 'modalOfficialsReport',
                 archives: 'modalArchivesReport',
+                announcements: 'modalAnnouncementsReport',
+                feedback: 'modalFeedbackReport',
                 household: 'modalHouseholdReport'
             };
             const targetModalId = modalMap['{{ old('report_form_type') }}'];
@@ -1531,6 +1796,8 @@
         autoFillReportTitle('modalActivityReport', 'Activity Logs');
         autoFillReportTitle('modalOfficialsReport', 'Barangay Officials');
         autoFillReportTitle('modalArchivesReport', 'Archives');
+        autoFillReportTitle('modalAnnouncementsReport', 'Announcements');
+        autoFillReportTitle('modalFeedbackReport', 'Feedback');
         autoFillReportTitle('modalHouseholdReport', 'Household');
     });
 </script>

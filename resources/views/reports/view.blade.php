@@ -171,6 +171,18 @@
                                 <th data-col="reason">Reason</th>
                                 <th data-col="details">Details</th>
                                 <th data-col="archived_at">Archived At</th>
+                            @elseif($type == 'announcements')
+                                <th data-col="title">Title</th>
+                                <th data-col="publisher">Published By</th>
+                                <th data-col="event_start">Event Start</th>
+                                <th data-col="event_end">Event End</th>
+                                <th data-col="details">Details</th>
+                                <th data-col="published_at">Published At</th>
+                            @elseif($type == 'feedback')
+                                <th data-col="feedback_user">Submitted By</th>
+                                <th data-col="message">Feedback Message</th>
+                                <th data-col="message_length">Message Length</th>
+                                <th data-col="submitted_at">Submitted At</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
                                 <th data-col="head_no">Head #</th>
                                 <th data-col="house_head">House Head</th>
@@ -381,6 +393,29 @@
                                         @endif
                                     </td>
                                     <td data-col="archived_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                                @elseif($type == 'announcements')
+                                    @php
+                                        $publisher = $row->user
+                                            ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                            : 'N/A';
+                                    @endphp
+                                    <td data-col="title">{{ $row->title ?: 'N/A' }}</td>
+                                    <td data-col="publisher">{{ $publisher !== '' ? $publisher : 'N/A' }}</td>
+                                    <td data-col="event_start">{{ $row->eventTime ? \Carbon\Carbon::parse($row->eventTime)->format('M d, Y') : 'N/A' }}</td>
+                                    <td data-col="event_end">{{ $row->eventEnd ? \Carbon\Carbon::parse($row->eventEnd)->format('M d, Y') : 'N/A' }}</td>
+                                    <td data-col="details">{{ \Illuminate\Support\Str::limit((string) ($row->details ?? ''), 180, '...') ?: 'N/A' }}</td>
+                                    <td data-col="published_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
+                                @elseif($type == 'feedback')
+                                    @php
+                                        $feedbackUser = $row->user
+                                            ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
+                                            : 'N/A';
+                                        $feedbackMessage = (string) ($row->message ?? '');
+                                    @endphp
+                                    <td data-col="feedback_user">{{ $feedbackUser !== '' ? $feedbackUser : 'N/A' }}</td>
+                                    <td data-col="message">{{ $feedbackMessage !== '' ? $feedbackMessage : 'N/A' }}</td>
+                                    <td data-col="message_length">{{ mb_strlen($feedbackMessage) }}</td>
+                                    <td data-col="submitted_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                                 @elseif($type == 'household')
                                     @php
                                         $houseHeads = $row->residents

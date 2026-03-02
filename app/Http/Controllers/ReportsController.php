@@ -16,6 +16,8 @@ use App\Models\FamilyMember;
 use App\Models\ActiveLog;
 use App\Models\Official;
 use App\Models\Archive;
+use App\Models\Announcement;
+use App\Models\Feedbacks;
 use App\Services\ActiveLogRecordDetails;
 use Auth;
 
@@ -80,8 +82,18 @@ public function index()
         ->orderBy('lastName')
         ->orderBy('firstName')
         ->get(['id', 'firstName', 'lastName']);
+    $announcementUsers = \App\Models\User::query()
+        ->whereIn('id', Announcement::query()->select('user_id')->whereNotNull('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
+    $feedbackUsers = \App\Models\User::query()
+        ->whereIn('id', Feedbacks::query()->select('user_id')->whereNotNull('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
 
-    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers'));
+    return view('admin.reports', compact('reports', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers', 'announcementUsers', 'feedbackUsers'));
 }
 
 public function generatePopulation(Request $request)
@@ -367,6 +379,69 @@ public function generateArchives(Request $request)
     ]);
 
     return redirect()->back()->with('success', 'Archives report generated successfully.');
+}
+
+public function generateAnnouncements(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'user_id' => 'nullable|exists:users,id',
+        'title' => 'nullable|string|max:100',
+        'details_keyword' => 'nullable|string|max:255',
+        'has_image' => 'nullable|in:all,yes,no',
+        'event_start_from' => 'nullable|date',
+        'event_start_to' => 'nullable|date|after_or_equal:event_start_from',
+        'event_end_from' => 'nullable|date',
+        'event_end_to' => 'nullable|date|after_or_equal:event_end_from',
+        'published_from' => 'nullable|date',
+        'published_to' => 'nullable|date|after_or_equal:published_from',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $filters['has_image'] = $filters['has_image'] ?? 'all';
+    $announcements = $this->buildAnnouncementsReportQuery($filters)->get();
+
+    if ($announcements->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No announcement records matched the selected filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'announcements',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $announcements->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Announcements report generated successfully.');
+}
+
+public function generateFeedback(Request $request)
+{
+    $request->validate([
+        'report_name' => 'required|string|max:255',
+        'user_id' => 'nullable|exists:users,id',
+        'message_keyword' => 'nullable|string|max:255',
+        'submitted_from' => 'nullable|date',
+        'submitted_to' => 'nullable|date|after_or_equal:submitted_from',
+    ]);
+
+    $filters = $request->except(['_token', 'report_form_type']);
+    $feedback = $this->buildFeedbackReportQuery($filters)->get();
+
+    if ($feedback->isEmpty()) {
+        return redirect()->back()->withInput()->with('error', 'Report generation failed. No feedback records matched the selected filters.');
+    }
+
+    GeneratedReport::create([
+        'report_name' => $request->report_name,
+        'report_type' => 'feedback',
+        'filters_used' => json_encode($filters),
+        'generated_by' => Auth::id(),
+        'total_records' => $feedback->count(),
+    ]);
+
+    return redirect()->back()->with('success', 'Feedback report generated successfully.');
 }
 
 private function resolveHouseholdReportScope(array $filters): string
@@ -795,6 +870,85 @@ private function buildArchivesReportQuery(array $filters)
     return $query->latest();
 }
 
+private function buildAnnouncementsReportQuery(array $filters)
+{
+    $query = Announcement::query()->with([
+        'user:id,firstName,lastName',
+    ]);
+
+    if (!empty($filters['user_id'])) {
+        $query->where('user_id', (int) $filters['user_id']);
+    }
+
+    if (!empty($filters['title'])) {
+        $query->where('title', 'like', '%' . trim((string) $filters['title']) . '%');
+    }
+
+    if (!empty($filters['details_keyword'])) {
+        $query->where('details', 'like', '%' . trim((string) $filters['details_keyword']) . '%');
+    }
+
+    $hasImage = $filters['has_image'] ?? 'all';
+    if ($hasImage === 'yes') {
+        $query->whereNotNull('image')->where('image', '!=', '');
+    } elseif ($hasImage === 'no') {
+        $query->where(function ($q) {
+            $q->whereNull('image')->orWhere('image', '');
+        });
+    }
+
+    if (!empty($filters['event_start_from']) && !empty($filters['event_start_to'])) {
+        $query->whereBetween('eventTime', [$filters['event_start_from'], $filters['event_start_to']]);
+    } elseif (!empty($filters['event_start_from'])) {
+        $query->whereDate('eventTime', '>=', $filters['event_start_from']);
+    } elseif (!empty($filters['event_start_to'])) {
+        $query->whereDate('eventTime', '<=', $filters['event_start_to']);
+    }
+
+    if (!empty($filters['event_end_from']) && !empty($filters['event_end_to'])) {
+        $query->whereBetween('eventEnd', [$filters['event_end_from'], $filters['event_end_to']]);
+    } elseif (!empty($filters['event_end_from'])) {
+        $query->whereDate('eventEnd', '>=', $filters['event_end_from']);
+    } elseif (!empty($filters['event_end_to'])) {
+        $query->whereDate('eventEnd', '<=', $filters['event_end_to']);
+    }
+
+    if (!empty($filters['published_from']) && !empty($filters['published_to'])) {
+        $query->whereBetween('created_at', [$filters['published_from'], $filters['published_to']]);
+    } elseif (!empty($filters['published_from'])) {
+        $query->whereDate('created_at', '>=', $filters['published_from']);
+    } elseif (!empty($filters['published_to'])) {
+        $query->whereDate('created_at', '<=', $filters['published_to']);
+    }
+
+    return $query->latest();
+}
+
+private function buildFeedbackReportQuery(array $filters)
+{
+    $query = Feedbacks::query()->with([
+        'user:id,firstName,lastName',
+    ]);
+
+    if (!empty($filters['user_id'])) {
+        $query->where('user_id', (int) $filters['user_id']);
+    }
+
+    if (!empty($filters['message_keyword'])) {
+        $query->where('message', 'like', '%' . trim((string) $filters['message_keyword']) . '%');
+    }
+
+    if (!empty($filters['submitted_from']) && !empty($filters['submitted_to'])) {
+        $query->whereBetween('created_at', [$filters['submitted_from'], $filters['submitted_to']]);
+    } elseif (!empty($filters['submitted_from'])) {
+        $query->whereDate('created_at', '>=', $filters['submitted_from']);
+    } elseif (!empty($filters['submitted_to'])) {
+        $query->whereDate('created_at', '<=', $filters['submitted_to']);
+    }
+
+    return $query->latest();
+}
+
 public function view($id)
 {
     $report = GeneratedReport::findOrFail($id);
@@ -867,6 +1021,14 @@ public function view($id)
         $data = $this->buildArchivesReportQuery($filters)->get();
     }
 
+    if ($report->report_type == 'announcements') {
+        $data = $this->buildAnnouncementsReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'feedback') {
+        $data = $this->buildFeedbackReportQuery($filters)->get();
+    }
+
     if ($report->report_type == 'household') {
         $data = $this->getHouseholdReportData($filters);
     }
@@ -926,8 +1088,18 @@ public function view($id)
         ->orderBy('lastName')
         ->orderBy('firstName')
         ->get(['id', 'firstName', 'lastName']);
+    $announcementUsers = \App\Models\User::query()
+        ->whereIn('id', Announcement::query()->select('user_id')->whereNotNull('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
+    $feedbackUsers = \App\Models\User::query()
+        ->whereIn('id', Feedbacks::query()->select('user_id')->whereNotNull('user_id')->distinct())
+        ->orderBy('lastName')
+        ->orderBy('firstName')
+        ->get(['id', 'firstName', 'lastName']);
 
-    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers'));
+    return view('admin.reports', compact('reports', 'report', 'data', 'streets', 'streetOptions', 'houseOptions', 'houseHeadOptions', 'activityUsers', 'activityModules', 'activityActions', 'officialPositions', 'archiveTypes', 'archiveUsers', 'announcementUsers', 'feedbackUsers'));
 }
 
 public function printTemplate($id)
@@ -1006,6 +1178,14 @@ public function printTemplate($id)
 
     if ($report->report_type == 'archives') {
         $data = $this->buildArchivesReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'announcements') {
+        $data = $this->buildAnnouncementsReportQuery($filters)->get();
+    }
+
+    if ($report->report_type == 'feedback') {
+        $data = $this->buildFeedbackReportQuery($filters)->get();
     }
 
     if ($report->report_type == 'household') {
