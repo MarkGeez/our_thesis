@@ -177,6 +177,32 @@ class OfficialController extends Controller
 
     public function assign(Request $request)
     {
+        $user = auth()->user();
+        $userResidentId = optional($user?->resident)->id;
+
+        if ($user && $user->role === 'admin' && $userResidentId) {
+            $selfOfficial = Official::where('resident_id', $userResidentId)->first();
+
+            if ($selfOfficial) {
+                $requestedPosition = (string) $request->input('position', '');
+                $requestedResidentId = (int) $request->input('resident_id');
+
+                $isReplacingSelfFromOwnSlot =
+                    $requestedPosition === (string) $selfOfficial->position &&
+                    $requestedResidentId !== (int) $userResidentId;
+
+                $isMovingSelfToAnotherSlot =
+                    $requestedResidentId === (int) $userResidentId &&
+                    $requestedPosition !== (string) $selfOfficial->position;
+
+                if ($isReplacingSelfFromOwnSlot || $isMovingSelfToAnotherSlot) {
+                    return back()->withErrors([
+                        'position' => 'You cannot modify your own official position from the Officials module.',
+                    ]);
+                }
+            }
+        }
+
         $term = $request->validate([
             'term_start' => ['required', 'date_format:Y-m-d'],
             'term_end' => ['required', 'date_format:Y-m-d', 'after_or_equal:term_start'],
@@ -218,6 +244,13 @@ class OfficialController extends Controller
     {
         $official = Official::findOrFail($id);
         $user = auth()->user();
+        $userResidentId = optional($user?->resident)->id;
+
+        if ($user && $user->role === 'admin' && $userResidentId && (int) $official->resident_id === (int) $userResidentId) {
+            return back()->withErrors([
+                'errors' => 'You cannot remove your own official position from the Officials module.',
+            ]);
+        }
 
         if($official->position === "chairman" && $user->role === "admin"){
             return back()->withErrors([

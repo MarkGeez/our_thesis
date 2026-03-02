@@ -92,7 +92,37 @@ object-fit: cover;
     height: 240px;
   }
 }
-    </style>
+
+/* ── Improved Success Alert ── */
+#successAlert {
+    position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+    display: flex; align-items: center; gap: 14px;
+    background: #fff; border-left: 5px solid #22c55e;
+    border-radius: 12px; padding: 16px 20px 22px 18px;
+    min-width: 300px; max-width: 420px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(34,197,94,0.15);
+    animation: slideInRight 0.4s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+    overflow: hidden;
+}
+#successAlert.fade-out { animation: slideOutRight 0.4s cubic-bezier(0.55,0,1,0.45) forwards; }
+.success-icon  { font-size: 1.8rem; color: #22c55e; flex-shrink: 0; }
+.success-body  { flex: 1; }
+.success-title { font-size: 0.78rem; font-weight: 700; color: #22c55e; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 2px; }
+.success-message { font-size: 0.92rem; color: #374151; margin: 0; line-height: 1.4; }
+.success-close { background: none; border: none; color: #9ca3af; font-size: 1rem; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: color 0.2s; flex-shrink: 0; align-self: flex-start; }
+.success-close:hover { color: #374151; }
+.success-progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, #22c55e, #86efac);
+    border-radius: 0 0 0 12px; width: 100%;
+    animation: shrink 8s linear forwards;
+}
+@keyframes slideInRight  { from{opacity:0;transform:translateX(110%)} to{opacity:1;transform:translateX(0)} }
+@keyframes slideOutRight { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(110%)} }
+@keyframes shrink        { from{width:100%} to{width:0%} }
+@media (max-width: 576px) {
+    #successAlert { bottom: 16px; right: 12px; left: 12px; min-width: unset; max-width: unset; }
+}
 
 
 
@@ -126,19 +156,15 @@ object-fit: cover;
 </div>
 
   @if(session("success"))
-<div id="successAlert" class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm"
-     style="max-width: 325px; box-shadow: 0 4px 12px rgb(5, 94, 12);">
-    <h6>{{ session("success") }}</h6>
+<div id="successAlert">
+    <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+    <div class="success-body">
+        <p class="success-title">Success!</p>
+        <p class="success-message">{{ session("success") }}</p>
+    </div>
+    <button class="success-close" onclick="dismissAlert()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="success-progress-bar"></div>
 </div>
-
-<script>
-    setTimeout(function() {
-        const alertBox = document.getElementById("successAlert");
-        if (alertBox) {
-            alertBox.style.display = "none";
-        }
-    }, 10000);
-</script>
 @endif
 
 
@@ -244,6 +270,13 @@ object-fit: cover;
 @include('subadmin.create-announcement')
 
 <script>
+// ── Success Alert dismiss ──
+function dismissAlert() {
+    const el = document.getElementById('successAlert');
+    if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 400); }
+}
+setTimeout(dismissAlert, 8000);
+
 document.addEventListener("DOMContentLoaded", function() {
     flatpickr(".datetime-picker", {
         enableTime: true,

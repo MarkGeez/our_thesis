@@ -190,9 +190,10 @@ class UserListController extends Controller
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
         
-        // Update linked resident contact number
+        // Update linked resident contact number and birthday
 if ($user->resident) {
     $user->resident->contactNo = $validated['contactNumber'];
+    $user->resident->birthday = $validated['birthday'];
     $user->resident->save();
 }
         // Update password if provided

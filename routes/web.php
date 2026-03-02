@@ -240,6 +240,7 @@ Route::middleware(['auth', 'role:subadmin'])->group(function(){
             return view('profileforms.addMemberPage');
         })->name('family.add');
         Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
+        Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
         Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
         Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');

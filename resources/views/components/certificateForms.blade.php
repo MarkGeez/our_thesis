@@ -147,7 +147,7 @@
                         <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
                     </div>
 
-                    <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
+                    <p class="small text-muted my-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         @php
                         $bonafidePurposes = [
@@ -210,7 +210,7 @@
                         <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
                     </div>
 
-                    <p class="small text-muted mb-3">Select the purpose(s) for this certification:</p>
+                    <p class="small text-muted my-3">Select the purpose(s) for this certification:</p>
                     <div class="purpose-group">
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" name="request_data[medical]" value="1" id="i_medical">
@@ -348,7 +348,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="my-3">
                         <label class="form-label fw-bold">Name to Appear on Certificate <span class="text-danger">*</span></label>
                         <input
                             type="text"
@@ -361,17 +361,17 @@
                         <small class="text-muted">This name will be used in the generated senior certificate.</small>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="my-3">
                         <label class="form-label fw-bold">Current Address <span class="text-danger">*</span></label>
                         <input type="text" name="address" class="form-control" required placeholder="Enter complete postal address">
                     </div>
 
-                    <div class="mb-3">
+                    <div class="my-3">
                         <label class="form-label">Former Address</label>
                         <input type="text" name="form_data[former_address]" class="form-control" placeholder="Where did you live before?">
                     </div>
 
-                    <div class="mb-3">
+                    <div class="my-3">
                         <label class="form-label fw-bold">Explain Your Purpose <span class="text-danger">*</span></label>
                         <textarea class="form-control" name="purpose" rows="4" required placeholder="Please explain why you need this certificate and how you will use it..."></textarea>
                         <small class="text-muted">This will help the barangay officials better understand your request.</small>

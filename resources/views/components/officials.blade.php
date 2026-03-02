@@ -7,6 +7,8 @@
     $residents = $residents ?? collect();
     $routePrefix = $routePrefix ?? ((auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin'], true)) ? auth()->user()->role : 'admin');
     $showControls = $showControls ?? (auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin'], true));
+    $currentUser = auth()->user();
+    $currentUserResidentId = optional($currentUser?->resident)->id;
 @endphp
 
 <style>
@@ -220,6 +222,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{
         @php
             $official = $officialsByPosition[$slot] ?? null;
             $resident = $official?->resident;
+            $isAdminOwnOfficialSlot =
+                $showControls
+                && $currentUser
+                && $currentUser->role === 'admin'
+                && $official
+                && $currentUserResidentId
+                && (int) $official->resident_id === (int) $currentUserResidentId;
             $avatar = $resident && $resident->image_path
                 ? asset('storage/' . $resident->image_path)
                 : asset('images/default_profile.jpg');
@@ -283,9 +292,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{
             class="form-control resident-search-input"
             placeholder="Type name then Enter or Search"
             autocomplete="off"
-            value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}">
+            value="{{ $resident ? ucwords(strtolower($resident->lastName)).', '.ucwords(strtolower($resident->firstName)) : '' }}"
+            {{ $isAdminOwnOfficialSlot ? 'readonly' : '' }}>
         
-        <button type="button" class="btn btn-outline-primary resident-search-btn">
+        <button type="button" class="btn btn-outline-primary resident-search-btn" {{ $isAdminOwnOfficialSlot ? 'disabled' : '' }}>
             <i class="fa fa-search"></i>
         </button>
     </div>
@@ -297,6 +307,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
     <div class="resident-dropdown d-none"></div>
     <small class="search-help">Click search to see matching residents.</small>
+    @if($isAdminOwnOfficialSlot)
+        <small class="text-muted d-block mt-1">You cannot modify your own official position in this module.</small>
+    @endif
 </div>
 
                             <div class="col-12">
@@ -311,7 +324,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                             </div>
                         </form>
 
-                        @if($official)
+                        @if($official && !$isAdminOwnOfficialSlot)
                             <form method="POST" action="{{ route($routePrefix . '.untag.official', $official->id) }}" class="mt-2" onsubmit="return confirm('Remove the resident from this position?');">
                                 @csrf
                                 @method('DELETE')
@@ -319,6 +332,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                                     <i class="fa fa-times me-1"></i> Clear Assignment
                                 </button>
                             </form>
+                        @elseif($official && $isAdminOwnOfficialSlot)
+                            <button type="button" class="btn btn-outline-danger w-100 mt-2" disabled>
+                                <i class="fa fa-times me-1"></i> Clear Assignment
+                            </button>
                         @endif
                     </div>
                 @endif

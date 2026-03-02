@@ -523,6 +523,11 @@ document.addEventListener('DOMContentLoaded', function () {
   addData();
 });
 
-document.querySelector('.mobile-toggle').addEventListener('click', () => {
-    document.querySelector('.sidebar').classList.toggle('hidden');
-});
+const mobileToggle = document.querySelector('.mobile-toggle');
+const sidebar = document.querySelector('.sidebar');
+
+if (mobileToggle && sidebar) {
+  mobileToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+  });
+}

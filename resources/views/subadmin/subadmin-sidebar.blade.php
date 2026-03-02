@@ -443,14 +443,14 @@
     @endphp
 
     <li>
-    <a class="show-cat-btn {{ $servicesActive ? 'show' : '' }}" href="javascript:void(0)">
+    <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="javascript:void(0)">
          E-Barangay Services
         <span class="category__btn transparent-btn" title="Open list">
             <span class="sr-only">Open list</span>
             <span class="icon arrow-down" aria-hidden="true"></span>
         </span>
     </a>
-    <ul class="cat-sub-menu" style="{{ $servicesActive ? 'display:block;' : 'display:none;' }}">
+    <ul class="cat-sub-menu {{ $servicesActive ? 'visible' : '' }}">
         <li>
             <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
                 <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
@@ -508,40 +508,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (luminance > 0.35) sidebar.classList.add('sidebar--light');
     })();
 
-    // 1. SELECT ALL TOGGLE BUTTONS
-    const menuToggles = document.querySelectorAll('.show-cat-btn');
-
-    menuToggles.forEach(toggle => {
-        toggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            const submenu = this.nextElementSibling;
-            
-            // Toggle the 'show' class for arrow rotation
-            this.classList.toggle('show');
-
-            // Toggle the submenu visibility
-            if (submenu.style.display === 'block') {
-                submenu.style.display = 'none';
-            } else {
-                submenu.style.display = 'block';
-            }
-        });
-    });
-
-    // 2. AUTO-OPEN ACTIVE SUBMENU ON LOAD
+    // Auto-open active submenu on load
     const activeItem = document.querySelector('.sidebar .active');
     if (activeItem) {
         const submenu = activeItem.closest('.cat-sub-menu');
         if (submenu) {
-            submenu.style.display = 'block';
+            submenu.classList.add('visible');
             const toggle = submenu.previousElementSibling;
             if (toggle && toggle.classList.contains('show-cat-btn')) {
-                toggle.classList.add('show'); 
-                // Note: We don't add 'active' here so the parent stays dark
+                toggle.classList.add('active');
             }
         }
 
-        // 3. SCROLL ACTIVE INTO VIEW
+        // Scroll active item into view
         const sidebarBody = document.querySelector('.sidebar-body');
         if (sidebarBody) {
             setTimeout(function() {

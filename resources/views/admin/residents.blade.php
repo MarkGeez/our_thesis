@@ -596,10 +596,10 @@
                                                     </button>
                                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#updateResident{{ $resident->id }}">
                                                         <i class="fa fa-edit"></i><span>Edit</span>
-                                                    </button>
+                                                    </button>{{--  
                                                     <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addOfficial{{ $resident->id }}">
                                                         <i class="fa fa-user-tie"></i><span>{{ $resident->official ? 'Edit Official' : 'Set Official' }}</span>
-                                                    </button>
+                                                    </button>--}}
                                                     <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
@@ -762,6 +762,8 @@
                                                         <label>Select Position</label>
                                                         <select name="position" class="form-select" required>
                                                             <option value="Barangay Chairman" {{ $resident->official && $resident->official->position === 'Barangay Chairman' ? 'selected' : '' }}>Barangay Chairman</option>
+                                                            <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
+                                                            <option value="Barangay Treasurer" {{ $resident->official && $resident->official->position === 'Barangay Treasurer' ? 'selected' : '' }}>Barangay Treasurer</option>
                                                             <option value="Kagawad 1" {{ $resident->official && $resident->official->position === 'Kagawad 1' ? 'selected' : '' }}>Kagawad 1</option>
                                                             <option value="Kagawad 2" {{ $resident->official && $resident->official->position === 'Kagawad 2' ? 'selected' : '' }}>Kagawad 2</option>
                                                             <option value="Kagawad 3" {{ $resident->official && $resident->official->position === 'Kagawad 3' ? 'selected' : '' }}>Kagawad 3</option>
@@ -777,8 +779,6 @@
                                                             <option value="SK Kagawad 5" {{ $resident->official && $resident->official->position === 'SK Kagawad 5' ? 'selected' : '' }}>SK Kagawad 5</option>
                                                             <option value="SK Kagawad 6" {{ $resident->official && $resident->official->position === 'SK Kagawad 6' ? 'selected' : '' }}>SK Kagawad 6</option>
                                                             <option value="SK Kagawad 7" {{ $resident->official && $resident->official->position === 'SK Kagawad 7' ? 'selected' : '' }}>SK Kagawad 7</option>
-                                                            <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
-                                                            <option value="Barangay Treasurer" {{ $resident->official && $resident->official->position === 'Barangay Treasurer' ? 'selected' : '' }}>Barangay Treasurer</option>
                                                         </select>
 
                                                         <label>Term Description</label>
@@ -870,7 +870,6 @@
                                                                         data-age-target="ageEdit{{ $resident->id }}"
                                                                         data-raw="{{ old('birthday', $resident->birthday) }}"
                                                                         value="{{ old('birthday', $resident->birthday) }}"
-                                                                        max="{{ now()->subDay()->format('Y-m-d') }}"
                                                                         required
                                                                     >
                                                                     <span class="input-group-text resident-date-open">
@@ -1122,7 +1121,6 @@
             data-age-target="ageCreate"
             data-raw="{{ old('birthday') }}"
             value="{{ old('birthday') }}"
-            max="{{ now()->subDay()->format('Y-m-d') }}"
             required
         >
         <span class="input-group-text resident-date-open">
@@ -1170,6 +1168,7 @@
     <!-- Sex (Added missing field) -->
     <label for="sex">Sex</label>
     <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror">
+        <option value="">Select Sex</option>
         <option value="male" {{ old('sex') === 'male' ? 'selected' : '' }}>Male</option>
         <option value="female" {{ old('sex') === 'female' ? 'selected' : '' }}>Female</option>
     </select>
@@ -1213,7 +1212,7 @@
     <!-- Emergency Contact Name -->
     <label for="emergencyContactName">Emergency Contact Name</label>
     <input type="text" id="emergencyContactName" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" 
-           value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here (optional)">
+           value="{{ old('emergencyContactName') }}" placeholder="Enter Full Name here">
     @error('emergencyContactName')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1221,7 +1220,7 @@
     <!-- Emergency Contact No -->
     <label for="emergencyContactNo">Emergency Contact No.</label>
     <input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
-           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx (optional)">
+           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx ">
     @error('emergencyContactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

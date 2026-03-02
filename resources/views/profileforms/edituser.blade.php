@@ -23,7 +23,13 @@
     input[type="date"]::-webkit-calendar-picker-indicator { 
         opacity: 1; 
         cursor: pointer; 
-    } 
+    }
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 5px;
+    }
 </style>
 
 @php
@@ -86,12 +92,12 @@ $user = auth()->user();
                         class="form-control form-control-lg"
                         value="{{ old('birthday', $user->birthday) }}"
                         max="{{ now()->subDay()->format('Y-m-d') }}"
-                        readonly
                     >
                     <span class="input-group-text" id="user_openDate">
                         <i class="fa fa-calendar"></i>
                     </span>
                 </div>
+                <div id="birthday_error" class="invalid-feedback"></div>
             </div>
         </div>
 
@@ -149,17 +155,38 @@ $user = auth()->user();
     document.addEventListener('DOMContentLoaded', function () {
         const birthdayInput = document.getElementById('user_birthday');
         const openDateBtn = document.getElementById('user_openDate');
-        // Using the same date formatting logic from editresident
+        const errorDisplay = document.getElementById('birthday_error');
         const rawDate = "{{ old('birthday', $user->birthday) }}";
 
         if (rawDate && birthdayInput) {
             const d = new Date(rawDate);
             if (!isNaN(d)) {
-                // Formatting to YYYY-MM-DD for the HTML5 date input
                 const formattedDate = d.getFullYear() + '-' + 
                                      String(d.getMonth() + 1).padStart(2, '0') + '-' + 
                                      String(d.getDate()).padStart(2, '0');
                 birthdayInput.value = formattedDate;
+            }
+        }
+
+        // Validate date on change
+        if (birthdayInput) {
+            birthdayInput.addEventListener('change', function () {
+                validateBirthday();
+            });
+        }
+
+        function validateBirthday() {
+            const selectedDate = new Date(birthdayInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (birthdayInput.value && selectedDate > today) {
+                errorDisplay.textContent = 'Birthday cannot be set to a future date.';
+                birthdayInput.classList.add('is-invalid');
+                birthdayInput.value = '';
+            } else {
+                errorDisplay.textContent = '';
+                birthdayInput.classList.remove('is-invalid');
             }
         }
 

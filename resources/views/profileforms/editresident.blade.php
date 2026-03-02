@@ -100,16 +100,16 @@
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Contact Number</label>
+                <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
                 <input type="text" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" required>
+                       value="{{ old('contactNo', $resident->contactNo) }}" readonly>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Birthday</label>
+                <label class="form-label">Birthday <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
                 <div class="input-group">
                     <input type="date" name="birthday" id="resident_birthday"
-                           class="form-control form-control-lg" required
+                           class="form-control form-control-lg" readonly
                            max="{{ now()->subDay()->format('Y-m-d') }}"
                            value="{{ old('birthday', $resident->birthday) }}">
                     <span class="input-group-text" id="resident_openDate">
