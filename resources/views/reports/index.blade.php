@@ -1008,8 +1008,8 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Message Keyword <span class="text-muted">(Optional)</span></label>
-                            <input type="text" name="message_keyword" class="form-control" value="{{ old('message_keyword') }}" placeholder="Search text in feedback message">
+                            {{--  <label class="form-label fw-semibold">Message Keyword <span class="text-muted">(Optional)</span></label>
+                            <input type="text" name="message_keyword" class="form-control" value="{{ old('message_keyword') }}" placeholder="Search text in feedback message">--}}
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Submitted From <span class="text-muted">(Optional)</span></label>
