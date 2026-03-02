@@ -382,7 +382,7 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-primary fw-bold" id="submitBtn" disabled>Submit</button>
+                <button type="submit" class="btn btn-primary fw-bold" id="submitBtn" disabled>Register</button>
             </form>
 
             <p class="text-light mt-3" id="textforlogin" style="text-align: center">Already have an account? <a href="{{ route('login') }}" class="text-light fw-bold">Login</a></p>

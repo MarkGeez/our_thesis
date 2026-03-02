@@ -1329,7 +1329,7 @@
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST" class="js-confirm-status-form" data-user-name="{{ trim(ucwords(strtolower(($list->firstName ?? '') . ' ' . ($list->lastName ?? '')))) }}">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
@@ -1395,7 +1395,7 @@
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
+                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST" class="js-confirm-role-form" data-user-name="{{ trim(ucwords(strtolower(($list->firstName ?? '') . ' ' . ($list->lastName ?? '')))) }}">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
@@ -1607,3 +1607,40 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusLabelMap = {
+            approved: 'Approved',
+            pending: 'Pending',
+            declined: 'Declined'
+        };
+
+        document.querySelectorAll('.js-confirm-status-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                const selected = form.querySelector('input[name="status"]:checked');
+                const selectedStatus = selected ? selected.value : '';
+                const statusLabel = statusLabelMap[selectedStatus] || selectedStatus || 'selected status';
+                const userName = form.getAttribute('data-user-name') || 'this user';
+                const message = `You are about to update the status of ${userName} to "${statusLabel}".\n\nDo you want to continue?`;
+
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        document.querySelectorAll('.js-confirm-role-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                const roleSelect = form.querySelector('select[name="role"]');
+                const selectedRole = roleSelect ? roleSelect.value : '';
+                const roleLabel = selectedRole ? selectedRole.replace('-', ' ').replace(/\b\w/g, function (char) { return char.toUpperCase(); }) : 'selected role';
+                const userName = form.getAttribute('data-user-name') || 'this user';
+                const message = `You are about to change the role of ${userName} to "${roleLabel}".\n\nDo you want to continue?`;
+
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+</script>
