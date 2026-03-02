@@ -90,6 +90,12 @@ $user = auth()->user();
             // Store new image
             $path = $request->file('profile_image')->store('profile_images', 'public');
             $user->profile_image = $path;
+
+            // Keep resident photo in sync with user profile image.
+            if ($user->resident) {
+                $user->resident->image_path = $path;
+                $user->resident->save();
+            }
         }
 
         if ($request->hasFile('proofOfIdentity')) {

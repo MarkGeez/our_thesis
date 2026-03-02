@@ -1,6 +1,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+<link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -763,8 +764,7 @@
     </div>
 </div>
 
-{{-- All modals remain the same as before --}}
-{{-- I'll include them for completeness but they're unchanged --}}
+
 
 {{-- Reject Modal --}}
 <div class="modal fade" id="rejectModal" tabindex="-1">
@@ -1043,21 +1043,7 @@ document.querySelectorAll('[data-preview-id]').forEach(function(btn) {
         var id = this.getAttribute('data-preview-id');
         var url = '{{ route("admin.certificate.preview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
         document.getElementById('certificatePreviewFrame').src = url;
-        var printBtn = document.getElementById('certificatePrintBtn');
-        printBtn.setAttribute('data-current-id', id);
-        printBtn.style.display = '';
-        new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
-    });
-});
-
-document.querySelectorAll('[data-pending-preview-id]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var id = this.getAttribute('data-pending-preview-id');
-        var url = '{{ route("admin.certificate.pendingPreview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
-        document.getElementById('certificatePreviewFrame').src = url;
-        var printBtn = document.getElementById('certificatePrintBtn');
-        printBtn.removeAttribute('data-current-id');
-        printBtn.style.display = 'none';
+        document.getElementById('certificatePrintBtn').setAttribute('data-current-id', id);
         new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
     });
 });

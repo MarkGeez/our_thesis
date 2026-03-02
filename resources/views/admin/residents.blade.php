@@ -961,7 +961,7 @@
                                                             <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
                                                             <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
                                                         </select>
-                                                        <div class="row mt-3"> <div class="col-md-4 text-center"> <label class="d-block mb-2">Current Photo</label> <img id="previewImage{{ $resident->id }}" src="{{ asset('storage/' . $resident->image_path) }}" class="img-fluid rounded shadow-sm mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Resident Photo" > </div>
+                                                        {{--  <div class="row mt-3"> <div class="col-md-4 text-center"> <label class="d-block mb-2">Current Photo</label> <img id="previewImage{{ $resident->id }}" src="{{ asset('storage/' . $resident->image_path) }}" class="img-fluid rounded shadow-sm mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Resident Photo" > </div>
 <div class="col-md-8">
     <label for="image_path{{ $resident->id }}">Update Photo</label>
     <input
@@ -977,7 +977,7 @@
     </small>
 </div>
 
-</div>
+</div>--}}
 
                                                         <hr class="mt-4">
 
@@ -1201,13 +1201,14 @@
 
     <hr class="mt-4">
 
-    <!-- Image -->
+   {{--  <!-- Image -->
     <label for="image_path">Profile Image</label>
     <input type="file" name="image_path" id="image_path" class="form-control @error('image_path') is-invalid @enderror" 
            accept="image/png, image/jpg, image/jpeg">
     @error('image_path')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
+    --}}
 
     <!-- Emergency Contact Name -->
     <label for="emergencyContactName">Emergency Contact Name</label>
