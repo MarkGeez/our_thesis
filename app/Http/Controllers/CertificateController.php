@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CertificateStatusUpdateMail;
 use App\Models\CertificateRequest;
 use App\Models\Official;
 use App\Models\Resident;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class CertificateController extends Controller
@@ -117,7 +119,7 @@ class CertificateController extends Controller
 
     public function approve(int $id)
     {
-        $req = CertificateRequest::findOrFail($id);
+        $req = CertificateRequest::with('user')->findOrFail($id);
         if ($req->status !== 'pending') {
             return back()->with('error', 'Request is no longer pending.');
         }
@@ -127,6 +129,11 @@ class CertificateController extends Controller
             'approved_by' => Auth::id(),
             'decline_reason' => null,
         ]);
+
+        if (!empty($req->user?->email)) {
+            Mail::send(new CertificateStatusUpdateMail($req));
+        }
+
         return back()->with('success', 'Certificate request approved. Requester may pick up at admin\'s house.');
     }
 
@@ -135,7 +142,7 @@ class CertificateController extends Controller
         $validated = $request->validate([
             'decline_reason' => 'nullable|string|max:500',
         ]);
-        $req = CertificateRequest::findOrFail($id);
+        $req = CertificateRequest::with('user')->findOrFail($id);
         if ($req->status !== 'pending') {
             return back()->with('error', 'Request is no longer pending.');
         }
@@ -145,6 +152,11 @@ class CertificateController extends Controller
             'approved_at' => now(),
             'approved_by' => Auth::id(),
         ]);
+
+        if (!empty($req->user?->email)) {
+            Mail::send(new CertificateStatusUpdateMail($req));
+        }
+
         return back()->with('success', 'Certificate request declined.');
     }
 

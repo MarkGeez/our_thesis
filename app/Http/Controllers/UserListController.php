@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserAccountStatusUpdateMail;
 use Illuminate\Http\Request;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
@@ -146,6 +148,9 @@ class UserListController extends Controller
         $user = User::findOrFail($id);
         $request->validate(['status'=> "required"]);
         $newStatus = $request->status;
+        $oldStatus = $user->status;
+
+        $shouldNotifyCurrentUser = $oldStatus === 'pending' && in_array($newStatus, ['approved', 'declined', 'rejected'], true);
 
         if ($newStatus === 'approved') {
             // Bind user to resident if exists
@@ -155,21 +160,44 @@ class UserListController extends Controller
                 ->where('birthday', $user->birthday)
                 ->first();
             if ($resident) {
-                $user->resident()->associate($resident);
-                $user->save();
+                // User -> resident is a hasOne relation; assign the FK on resident.
+                $resident->user_id = $user->id;
+                $resident->save();
             }
             // Decline all other users with same name and birthday
-            \App\Models\User::where('id', '!=', $user->id)
+            $duplicatePendingUsers = User::where('id', '!=', $user->id)
                 ->where('firstName', $user->firstName)
                 ->where('middleName', $user->middleName)
                 ->where('lastName', $user->lastName)
                 ->where('birthday', $user->birthday)
                 ->where('status', 'pending')
+                ->get();
+
+            User::whereIn('id', $duplicatePendingUsers->pluck('id'))
                 ->update(['status' => 'declined']);
+
+            foreach ($duplicatePendingUsers as $duplicatePendingUser) {
+                $duplicatePendingUser->status = 'declined';
+                $this->sendAccountStatusEmail($duplicatePendingUser);
+            }
         }
         $user->status = $newStatus;
         $user->save();
+
+        if ($shouldNotifyCurrentUser) {
+            $this->sendAccountStatusEmail($user);
+        }
+
         return redirect()->back()->with('success', 'user status updated');
+    }
+
+    private function sendAccountStatusEmail(User $user): void
+    {
+        if (empty($user->email)) {
+            return;
+        }
+
+        Mail::send(new UserAccountStatusUpdateMail($user));
     }
 
     public function updateProfile(Request $request, $id)

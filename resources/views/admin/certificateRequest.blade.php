@@ -1048,6 +1048,16 @@ document.querySelectorAll('[data-preview-id]').forEach(function(btn) {
     });
 });
 
+document.querySelectorAll('[data-pending-preview-id]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-pending-preview-id');
+        var url = '{{ route("admin.certificate.pendingPreview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
+        document.getElementById('certificatePreviewFrame').src = url;
+        document.getElementById('certificatePrintBtn').setAttribute('data-current-id', id);
+        new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
+    });
+});
+
 document.getElementById('certificatePrintBtn').addEventListener('click', function() {
     var frame = document.getElementById('certificatePreviewFrame');
     try {
