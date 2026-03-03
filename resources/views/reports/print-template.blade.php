@@ -638,6 +638,7 @@
                         @elseif($type == 'blotter')
                             <th data-col="plaintiff">Plaintiff</th>
                             <th data-col="defendant">Defendant</th>
+                            <th data-col="blotter_type">Blotter Type</th>
                             <th data-col="status">Status</th>
                             <th data-col="details">Details</th>
                             <th data-col="status_history">Status History</th>
@@ -773,11 +774,17 @@
                                         'referredToPnp' => 'Referred To PNP',
                                         'resolved' => 'Resolved',
                                     ];
+                                    $blotterTypeMap = [
+                                        'regular' => 'Regular',
+                                        'vawc' => 'VAWC',
+                                    ];
                                     $blotterStatus = $row->current_status ?? $row->status;
+                                    $blotterType = strtolower((string) ($row->blotter_type ?? 'regular'));
                                     $historyUpdates = collect($row->updates ?? []);
                                 @endphp
                                 <td data-col="plaintiff">{{ trim(ucwords(strtolower(($row->plaintiffName ?? '') . ' ' . ($row->plaintiffMiddleName ?? '') . ' ' . ($row->plaintiffLastName ?? '')))) }}</td>
                                 <td data-col="defendant">{{ ucwords(strtolower($row->defendantName)) }} {{ ucwords(strtolower($row->defendantLastName)) }}</td>
+                                <td data-col="blotter_type">{{ $blotterTypeMap[$blotterType] ?? ucfirst($blotterType) }}</td>
                                 <td data-col="status">{{ $blotterStatusMap[$blotterStatus] ?? ucfirst((string) $blotterStatus) }}</td>
                                 <td data-col="details">{{ $row->blotterDescription ?? 'N/A' }}</td>
                                 <td data-col="status_history">

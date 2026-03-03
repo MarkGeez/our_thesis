@@ -208,6 +208,43 @@
             box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
         }
 
+        /* Match certificate request management tab styling */
+        .nav-tabs {
+            border: none;
+            background: #fff;
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            gap: 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            background-color: #f1f5f9;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .tab-content {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
         table th,
         table td {
             vertical-align: middle;
@@ -658,7 +695,14 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#blotterModal">
                                     <i class="fa fa-plus"></i>
-                                    <span>Submit Blotter</span>
+                                    <span>Submit Regular Blotter</span>
+                                </button>
+                                <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#vawcBlotterModal">
+                                    <i class="fa fa-user-shield"></i>
+                                    <span>Submit VAWC Blotter</span>
                                 </button>
                             </div>
                         </div>
@@ -697,8 +741,31 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         @endif
+
+                        <ul class="nav nav-tabs mb-3" id="blotterTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ ($activeTab ?? 'all') === 'all' ? 'active' : '' }}"
+                                   href="{{ route('admin.blotter.index', array_merge(request()->except('page', 'tab'), ['tab' => 'all'])) }}">
+                                    <i class="fas fa-list me-2"></i>All Blotters
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ ($activeTab ?? 'all') === 'regular' ? 'active' : '' }}"
+                                   href="{{ route('admin.blotter.index', array_merge(request()->except('page', 'tab'), ['tab' => 'regular'])) }}">
+                                    <i class="fas fa-file-lines me-2"></i>Regular
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ ($activeTab ?? 'all') === 'vawc' ? 'active' : '' }}"
+                                   href="{{ route('admin.blotter.index', array_merge(request()->except('page', 'tab'), ['tab' => 'vawc'])) }}">
+                                    <i class="fas fa-user-shield me-2"></i>VAWC
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
+                    <div class="tab-content" id="blotterTabContent">
+                        <div class="tab-pane fade show active" id="blotter-list-pane" role="tabpanel">
                     @if($blotters->isEmpty())
                         <div class="content-wrap pt-0">
                             <div class="alert alert-info mb-4">
@@ -712,6 +779,7 @@
                                     Records: <span class="count-number">{{ $blotters->total() }}</span>
                                 </div>
                                 <form method="GET" action="{{ route('admin.blotter.index') }}" class="table-filter-bar">
+                                    <input type="hidden" name="tab" value="{{ $activeTab ?? 'all' }}">
                                     <div class="flex-grow-1" style="min-width: 250px;">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text bg-white border-end-0 text-muted">
@@ -719,22 +787,22 @@
                                             </span>
                                             <input type="text" name="search"
                                                 class="form-control border-start-0 ps-0"
-                                                placeholder="Search complainant, respondent, or status..."
+                                                placeholder="Search complainant, defendant, or status..."
                                                 value="{{ request('search') }}">
                                             <button type="submit" class="btn btn-primary px-3">Apply</button>
                                         </div>
                                     </div>
 
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="filter-group">
-                                            <span class="filter-label d-none d-md-inline">Status:</span>
-                                            <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
-                                                <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
-                                                <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="ongoing" {{ request('status_filter') === 'ongoing' ? 'selected' : '' }}>On-going</option>
-                                                <option value="closed" {{ request('status_filter') === 'closed' ? 'selected' : '' }}>Closed</option>
-                                            </select>
-                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="filter-group">
+                                                <span class="filter-label d-none d-md-inline">Status:</span>
+                                                <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
+                                                    <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                    <option value="ongoing" {{ request('status_filter') === 'ongoing' ? 'selected' : '' }}>On-going</option>
+                                                    <option value="closed" {{ request('status_filter') === 'closed' ? 'selected' : '' }}>Closed</option>
+                                                </select>
+                                            </div>
 
                                         <div class="filter-group">
                                             <span class="filter-label d-none d-md-inline">Sort:</span>
@@ -743,13 +811,13 @@
                                                 <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
                                                 <option value="complainant_asc" {{ request('sort') === 'complainant_asc' ? 'selected' : '' }}>Complainant: A-Z</option>
                                                 <option value="complainant_desc" {{ request('sort') === 'complainant_desc' ? 'selected' : '' }}>Complainant: Z-A</option>
-                                                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: A-Z</option>
-                                                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Z-A</option>
+                                                <option value="status_asc" {{ request('sort') === 'status_asc' ? 'selected' : '' }}>Status: First to Resolved</option>
+                                                <option value="status_desc" {{ request('sort') === 'status_desc' ? 'selected' : '' }}>Status: Resolved to First</option>
                                             </select>
                                         </div>
 
                                         <div class="vr mx-1 d-none d-md-block"></div>
-                                        <a href="{{ route('admin.blotter.index') }}"
+                                        <a href="{{ route('admin.blotter.index', ['tab' => ($activeTab ?? 'all')]) }}"
                                            class="btn btn-link btn-sm text-secondary text-decoration-none px-2"
                                            title="Reset Filters">
                                             <i class="fa fa-undo me-1"></i>Reset
@@ -763,8 +831,9 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 120px;">Blotter No</th>
+                                            <th style="width: 140px;">Type</th>
                                             <th>Complainant (Nagrereklamo)</th>
-                                            <th>Respondent (Nirereklamo)</th>
+                                            <th>Defendant (Nirereklamo)</th>
                                             <th style="width: 150px;">Status</th>
                                             <th class="text-center" style="width: 150px;">Action</th>
                                         </tr>
@@ -774,6 +843,8 @@
                                             @php
                                                 $statusKey = $blotter->current_status ?? '';
                                                 $displayStatus = $statusLabels[$statusKey] ?? ucfirst(str_replace('_', ' ', $statusKey));
+                                                $typeKey = $blotter->blotter_type ?? 'regular';
+                                                $displayType = $typeLabels[$typeKey] ?? ucfirst((string) $typeKey);
                                                 $terminalStatuses = ['referredToPnp', 'resolved'];
                                                 $isTerminal = in_array($statusKey, $terminalStatuses, true);
                                                 $uiClass = match ($statusKey) {
@@ -786,6 +857,7 @@
 
                                             <tr>
                                                 <td class="case-number">#{{ $blotter->id }}</td>
+                                                <td>{{ $displayType }}</td>
                                                 <td>{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
                                                 <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
                                                 <td>
@@ -835,6 +907,18 @@
                                                         </div>
                                                         <div class="modal-body p-4">
                                                             <section>
+                                                                <h6>Case Classification</h6>
+                                                                <div class="info-box">
+                                                                    <div class="row gy-2">
+                                                                        <div class="col-sm-6">
+                                                                            <div class="info-label">Blotter Type</div>
+                                                                            <div class="info-value">{{ $displayType }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </section>
+
+                                                            <section>
                                                                 <h6>Complainant Information</h6>
                                                                 <div class="info-box">
                                                                     <div class="row gy-3">
@@ -859,7 +943,7 @@
                                                             </section>
 
                                                             <section>
-                                                                <h6>Respondent Information</h6>
+                                                                <h6>Defendant Information</h6>
                                                                 <div class="info-box">
                                                                     <div class="row gy-3">
                                                                         <div class="col-sm-6">
@@ -1051,6 +1135,8 @@
                             </div>
                         @endif
                     @endif
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal fade" id="blotterModal" tabindex="-1" aria-labelledby="blotterModalLabel" aria-hidden="true">
@@ -1058,13 +1144,36 @@
                         <div class="modal-content">
                             <div class="modal-header border-0 pb-0">
                                 <div>
-                                    <h5 class="modal-title fw-bold" id="blotterModalLabel">Submit Blotter</h5>
+                                    <h5 class="modal-title fw-bold" id="blotterModalLabel">Submit Regular Blotter</h5>
                                     <small class="text-muted">Provide the incident details and parties involved.</small>
                                 </div>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body pt-3">
-                                @include('forms.blotter')
+                                @include('forms.blotter', [
+                                    'defaultBlotterType' => 'regular',
+                                    'showBlotterTypeSelector' => false,
+                                ])
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="vawcBlotterModal" tabindex="-1" aria-labelledby="vawcBlotterModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0">
+                                <div>
+                                    <h5 class="modal-title fw-bold" id="vawcBlotterModalLabel">Submit VAWC Blotter</h5>
+                                    <small class="text-muted">Provide the incident details and parties involved.</small>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-3">
+                                @include('forms.blotter', [
+                                    'defaultBlotterType' => 'vawc',
+                                    'showBlotterTypeSelector' => false,
+                                ])
                             </div>
                         </div>
                     </div>
@@ -1257,7 +1366,9 @@
         }
 
         @if($errors->any() && (old('plaintiffName') || old('plaintiffLastName') || old('blotterDescription')))
-            const submitBlotterModalEl = document.getElementById('blotterModal');
+            const selectedBlotterType = "{{ old('blotter_type', 'regular') }}";
+            const targetModalId = selectedBlotterType === 'vawc' ? 'vawcBlotterModal' : 'blotterModal';
+            const submitBlotterModalEl = document.getElementById(targetModalId);
             if (submitBlotterModalEl) {
                 const submitBlotterModal = new bootstrap.Modal(submitBlotterModalEl);
                 submitBlotterModal.show();

@@ -10,6 +10,11 @@ use Illuminate\Validation\Rule;
 
 class BlotterController extends Controller
 {
+    private const BLOTTER_TYPES = [
+        'regular',
+        'vawc',
+    ];
+
     private const STATUS_SEQUENCE = [
         'first',
         'second',
@@ -25,6 +30,14 @@ class BlotterController extends Controller
         'referredToPnp',
         'resolved',
     ];
+
+    private static function getBlotterTypeLabels(): array
+    {
+        return [
+            'regular' => 'Regular Blotter',
+            'vawc' => 'VAWC Blotter',
+        ];
+    }
 
     /**
      * Map status codes to human-readable labels
@@ -57,7 +70,12 @@ class BlotterController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
         $statusFilter = (string) $request->query('status_filter', 'all');
+        $activeTab = (string) $request->query('tab', 'all');
         $sort = (string) $request->query('sort', 'id_desc');
+
+        if (!in_array($activeTab, ['all', ...self::BLOTTER_TYPES], true)) {
+            $activeTab = 'all';
+        }
 
         $query = Blotter::with(['updates.updater']);
 
@@ -80,6 +98,10 @@ class BlotterController extends Controller
             $query->whereIn('current_status', ['coldCase', 'criminalCase', 'referredToPnp', 'resolved']);
         }
 
+        if ($activeTab !== 'all') {
+            $query->where('blotter_type', $activeTab);
+        }
+
         switch ($sort) {
             case 'id_asc':
                 $query->orderBy('id', 'asc');
@@ -91,10 +113,34 @@ class BlotterController extends Controller
                 $query->orderBy('plaintiffName', 'desc')->orderBy('plaintiffLastName', 'desc');
                 break;
             case 'status_asc':
-                $query->orderBy('current_status', 'asc')->orderBy('id', 'desc');
+                $query->orderByRaw("
+                    CASE current_status
+                        WHEN 'first' THEN 1
+                        WHEN 'second' THEN 2
+                        WHEN 'third' THEN 3
+                        WHEN 'brgyHearing' THEN 4
+                        WHEN 'coldCase' THEN 5
+                        WHEN 'criminalCase' THEN 6
+                        WHEN 'referredToPnp' THEN 7
+                        WHEN 'resolved' THEN 8
+                        ELSE 99
+                    END ASC
+                ")->orderBy('id', 'desc');
                 break;
             case 'status_desc':
-                $query->orderBy('current_status', 'desc')->orderBy('id', 'desc');
+                $query->orderByRaw("
+                    CASE current_status
+                        WHEN 'first' THEN 1
+                        WHEN 'second' THEN 2
+                        WHEN 'third' THEN 3
+                        WHEN 'brgyHearing' THEN 4
+                        WHEN 'coldCase' THEN 5
+                        WHEN 'criminalCase' THEN 6
+                        WHEN 'referredToPnp' THEN 7
+                        WHEN 'resolved' THEN 8
+                        ELSE 99
+                    END DESC
+                ")->orderBy('id', 'desc');
                 break;
             default:
                 $query->orderBy('id', 'desc');
@@ -103,7 +149,9 @@ class BlotterController extends Controller
 
         $blotters = $query->paginate(10)->appends($request->query());
         $statusLabels = self::getStatusLabels();
-        return view('admin.Blotter', compact('blotters', 'search', 'statusFilter', 'sort', 'statusLabels'));
+        $typeLabels = self::getBlotterTypeLabels();
+
+        return view('admin.Blotter', compact('blotters', 'search', 'statusFilter', 'activeTab', 'sort', 'statusLabels', 'typeLabels'));
     }
 
     // SHOW CREATE FORM
@@ -119,6 +167,7 @@ $request->validate([
 'plaintiffName' => 'required|string',
 'plaintiffLastName' => 'required|string',
 'blotterDescription' => 'required|string',
+'blotter_type' => ['nullable', Rule::in(self::BLOTTER_TYPES)],
 'proof' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
 ]);
 
@@ -148,6 +197,7 @@ $blotter = Blotter::create([
 
     'proof' => $proofPath,
     'blotterDescription' => $request->blotterDescription,
+    'blotter_type' => $request->input('blotter_type', 'regular'),
     'schedule' => $request->schedule,
 
     'encodedBy' => Auth::id(),

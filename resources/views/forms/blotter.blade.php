@@ -76,6 +76,11 @@
     }
 </style>
 
+@php
+    $defaultBlotterType = $defaultBlotterType ?? old('blotter_type', 'regular');
+    $showBlotterTypeSelector = $showBlotterTypeSelector ?? true;
+@endphp
+
 <form method="POST" action="{{ route('admin.blotter.store') }}" enctype="multipart/form-data" class="blotter-form p-2">
     @csrf
 
@@ -165,6 +170,17 @@
                         <span class="input-group-text schedule-trigger"><i class="fa fa-calendar"></i></span>
                     </div>
                 </div>--}}
+                <div class="mb-3">
+                    @if($showBlotterTypeSelector)
+                        <label class="form-label">Blotter Category</label>
+                        <select name="blotter_type" class="form-select">
+                            <option value="regular" {{ old('blotter_type', $defaultBlotterType) === 'regular' ? 'selected' : '' }}>Regular Blotter</option>
+                            <option value="vawc" {{ old('blotter_type', $defaultBlotterType) === 'vawc' ? 'selected' : '' }}>VAWC Blotter</option>
+                        </select>
+                    @else
+                        <input type="hidden" name="blotter_type" value="{{ old('blotter_type', $defaultBlotterType) }}">
+                    @endif
+                </div>
                 <label class="form-label">Attach Evidence/Proof (Optional)</label>
                 <input type="file" name="proof" accept="image/jpg, image/jpeg, image/png" class="form-control">
                 <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>

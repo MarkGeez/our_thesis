@@ -1421,6 +1421,14 @@
                             </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Blotter Type <span class="text-muted">(Optional)</span></label>
+                            <select name="blotter_type" class="form-select">
+                                <option value="all" {{ old('blotter_type', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                <option value="regular" {{ old('blotter_type') === 'regular' ? 'selected' : '' }}>Regular</option>
+                                <option value="vawc" {{ old('blotter_type') === 'vawc' ? 'selected' : '' }}>VAWC</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Complainant Name <span class="text-muted">(Optional)</span></label>
                             <input
                                 type="text"

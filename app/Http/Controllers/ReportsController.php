@@ -135,6 +135,7 @@ public function generateBlotter(Request $request)
     $request->validate([
         'report_name' => 'required',
         'blotter_status' => 'nullable|in:all,pending,ongoing,closed,first,second,third,brgyHearing,coldCase,criminalCase,referredToPnp,resolved',
+        'blotter_type' => 'nullable|in:all,regular,vawc',
         'complainant_name' => 'nullable|string|max:150',
         'date_from' => 'nullable|date',
         'date_to' => 'nullable|date|after_or_equal:date_from',
@@ -142,6 +143,7 @@ public function generateBlotter(Request $request)
 
     $filters = $request->except(['_token', 'report_form_type']);
     $filters['blotter_status'] = $filters['blotter_status'] ?? 'all';
+    $filters['blotter_type'] = $filters['blotter_type'] ?? 'all';
     $blotters = $this->buildBlotterReportQuery($filters)->get();
 
     if ($blotters->isEmpty()) {
@@ -636,6 +638,7 @@ private function buildBlotterReportQuery(array $filters)
         },
     ]);
     $status = $filters['blotter_status'] ?? 'all';
+    $type = $filters['blotter_type'] ?? 'all';
 
     if (!empty($filters['complainant_name'])) {
         $search = trim((string) $filters['complainant_name']);
@@ -657,6 +660,10 @@ private function buildBlotterReportQuery(array $filters)
         } else {
             $query->where('current_status', $status);
         }
+    }
+
+    if ($type !== 'all') {
+        $query->where('blotter_type', $type);
     }
 
     if (!empty($filters['date_from']) && !empty($filters['date_to'])) {

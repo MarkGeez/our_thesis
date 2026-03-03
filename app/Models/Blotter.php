@@ -29,6 +29,7 @@ class Blotter extends Model
     'witnessContactNumber',
     'proof',
     'blotterDescription',
+    'blotter_type',
     'schedule',
     'encodedBy',
     'action',
