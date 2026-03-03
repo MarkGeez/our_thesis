@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encode Resident</title>
 
-    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -1158,7 +1159,7 @@
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
     <input type="text" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
-           value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" required>
+           value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1167,7 +1168,7 @@
 
     <!-- Sex (Added missing field) -->
     <label for="sex">Sex</label>
-    <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror">
+    <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror" required>
         <option value="">Select Sex</option>
         <option value="male" {{ old('sex') === 'male' ? 'selected' : '' }}>Male</option>
         <option value="female" {{ old('sex') === 'female' ? 'selected' : '' }}>Female</option>
@@ -1178,7 +1179,7 @@
 
     <!-- Parent Status (Added missing field) -->
     <label for="parent">Parent Status</label>
-    <select id="parent" name="parent" class="form-select @error('parent') is-invalid @enderror">
+    <select id="parent" name="parent" class="form-select @error('parent') is-invalid @enderror " required>
         <option value="">Select Parent Status</option>
         <option value="yes" {{ old('parent') === 'yes' ? 'selected' : '' }}>Yes</option>
         <option value="no" {{ old('parent') === 'no' ? 'selected' : '' }}>No</option>
@@ -1190,7 +1191,7 @@
 
     <!-- Enrolled (Added missing field) -->
     <label for="enrolled">Enrolled in School</label>
-    <select id="enrolled" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror">
+    <select id="enrolled" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror" required>
         <option value="">Select Enrollment Status</option>
         <option value="yes" {{ old('enrolled') === 'yes' ? 'selected' : '' }}>Yes</option>
         <option value="no" {{ old('enrolled') === 'no' ? 'selected' : '' }}>No</option>

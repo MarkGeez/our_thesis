@@ -12,7 +12,6 @@ use App\Models\Household;
 use App\Models\HouseholdResident;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User;
 
 
 class ResidentListController extends Controller
@@ -85,8 +84,8 @@ public function searchResidents(Request $request)
             'firstName' => 'required|string|max:70',
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
-            'contactNo' => 'required|string|max:11',
-            'birthday' => 'required|date|before:today',
+            'contactNo' => 'nullable|string|max:11',
+            'birthday' => 'required|date',
             'emergencyContactNo' => 'nullable|string|max:11',
             'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
@@ -100,21 +99,7 @@ public function searchResidents(Request $request)
             'house_id' => 'required|exists:houses,id',
         ]);
 
-        // Check for duplicate resident (same firstName, middleName, lastName, and birthday)
-        $firstNameLower = strtolower(trim($validated['firstName']));
-        $middleNameLower = strtolower(trim($validated['middleName']));
-        $lastNameLower = strtolower(trim($validated['lastName']));
-        $birthday = $validated['birthday'];
 
-        $duplicateResident = Resident::where('firstName', $firstNameLower)
-            ->where('middleName', $middleNameLower)
-            ->where('lastName', $lastNameLower)
-            ->where('birthday', $birthday)
-            ->first();
-
-        if ($duplicateResident) {
-            return redirect()->back()->with('error', 'A resident with the same first name, middle name, last name, and birthday already exists. Please verify the information before encoding.');
-        }
 
         // Handle image upload
         if($request->hasFile('image_path')){
@@ -123,31 +108,21 @@ public function searchResidents(Request $request)
         }
 
         // Format names
-        $validated['firstName'] = $firstNameLower;
-        $validated['middleName'] = $middleNameLower;
-        $validated['lastName'] = $lastNameLower;
-        $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
-            ? trim($validated['emergencyContactName'])
+        $validated['firstName'] = strtolower(trim($validated['firstName']));
+        $validated['middleName'] = strtolower(trim($validated['middleName']));
+        $validated['lastName'] = strtolower(trim($validated['lastName']));
+        $validated['contactNo'] = filled($validated['contactNo'] ?? null)
+            ? trim((string) $validated['contactNo'])
             : 'N/A';
         $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
-            ? trim($validated['emergencyContactNo'])
+            ? trim((string) $validated['emergencyContactNo'])
+            : 'N/A';
+        $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
+            ? trim((string) $validated['emergencyContactName'])
             : 'N/A';
         
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
-
-        // If this resident already has a registered user account, auto-link it.
-        $matchedUser = User::whereRaw('LOWER(firstName) = ?', [$validated['firstName']])
-            ->whereRaw('LOWER(middleName) = ?', [$validated['middleName']])
-            ->whereRaw('LOWER(lastName) = ?', [$validated['lastName']])
-            ->whereDate('birthday', $validated['birthday'])
-            ->whereIn('role', ['resident', 'non-resident'])
-            ->whereDoesntHave('resident')
-            ->first();
-
-        if ($matchedUser) {
-            $validated['user_id'] = $matchedUser->id;
-        }
 
         // Create resident
         $resident = Resident::create($validated);
@@ -156,11 +131,6 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
     'household_id' => $household->id,
     'resident_id'  => $resident->id,
     'is_household_head'   => $validated['headOfFamily'] === 'yes' ? true : false,]);
-
-        // Auto-promote linked users to resident role once encoded by admin.
-        if ($matchedUser && $matchedUser->role !== 'resident') {
-            $matchedUser->update(['role' => 'resident']);
-        }
     
         return redirect()->back()->with('success', 'Resident encoded successfully!');
     
@@ -181,7 +151,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'middleName' => 'required|string|max:70',
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
-            'birthday' => 'required|date|before:today',
+            'birthday' => 'required|date',
             'emergencyContactNo' => 'required|string|max:11',
             'emergencyContactName' => 'required|string|max:255',
             'age' => 'required|integer|min:0|max:255',
@@ -254,7 +224,7 @@ $householdResident->update([
     // Validate the request
     $validated = $request->validate([
         'contactNo' => 'required|string|max:11',
-        'birthday' => 'required|date|before:today',
+        'birthday' => 'required|date',
         'emergencyContactNo' => 'required|string|max:11',
         'emergencyContactName' => 'required|string|max:255',
         'age' => 'required|integer|min:0|max:255',
