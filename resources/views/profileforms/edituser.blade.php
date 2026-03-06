@@ -30,6 +30,9 @@
         font-size: 13px;
         margin-top: 5px;
     }
+    .password-section.d-none {
+        display: none !important;
+    }
 </style>
 
 @php
@@ -102,47 +105,46 @@ $user = auth()->user();
         </div>
 
         <hr>
-        <div class="row mb-3">
-    
-        {{-- <div class="col-md-4">
-             <label for="current_password" class="form-label">Current Password</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="current_password" name="current_password" >
-                <span class="input-group-text" onclick="togglePassword('current_password')" style="cursor: pointer;">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </div> 
-        </div>--}}
-        <div class="col-md-4">
-            <label for="password" class="form-label">Update Your Password</label>
-            <div class="input-group">
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    class="form-control"
-                >
-                <span class="input-group-text" onclick="togglePassword('password')" style="cursor: pointer;">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="text-muted mb-0">Password</h6>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="togglePasswordSection">
+                Change Password
+            </button>
         </div>
 
-        <div class="col-md-4">
-            <label for="password_confirmation" class="form-label">Confirm New Password</label>
-            <div class="input-group">
-                <input
-                    type="password"
-                    name="password_confirmation"
-                    id="password_confirmation"
-                    class="form-control"
-                >
-                <span class="input-group-text" onclick="togglePassword('password_confirmation')" style="cursor: pointer;">
-                    <i class="fas fa-eye"></i>
-                </span>
+        <div id="passwordSection" class="password-section d-none">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="password" class="form-label">New Password</label>
+                    <div class="input-group">
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control"
+                        >
+                        <span class="input-group-text" onclick="togglePassword('password')" style="cursor: pointer;">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                    <div class="input-group">
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            class="form-control"
+                        >
+                        <span class="input-group-text" onclick="togglePassword('password_confirmation')" style="cursor: pointer;">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     <div class="card-footer text-end">
@@ -156,7 +158,12 @@ $user = auth()->user();
         const birthdayInput = document.getElementById('user_birthday');
         const openDateBtn = document.getElementById('user_openDate');
         const errorDisplay = document.getElementById('birthday_error');
+        const passwordSection = document.getElementById('passwordSection');
+        const togglePasswordSectionBtn = document.getElementById('togglePasswordSection');
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmationInput = document.getElementById('password_confirmation');
         const rawDate = "{{ old('birthday', $user->birthday) }}";
+        const hasPasswordErrors = @json($errors->has('password') || $errors->has('password_confirmation'));
 
         if (rawDate && birthdayInput) {
             const d = new Date(rawDate);
@@ -196,6 +203,30 @@ $user = auth()->user();
                     birthdayInput.showPicker();
                 } else {
                     birthdayInput.focus();
+                }
+            });
+        }
+
+        if (togglePasswordSectionBtn && passwordSection) {
+            if (hasPasswordErrors) {
+                passwordSection.classList.remove('d-none');
+                togglePasswordSectionBtn.textContent = 'Cancel Password Change';
+            }
+
+            togglePasswordSectionBtn.addEventListener('click', function () {
+                const isHidden = passwordSection.classList.contains('d-none');
+                passwordSection.classList.toggle('d-none');
+                togglePasswordSectionBtn.textContent = isHidden ? 'Cancel Password Change' : 'Change Password';
+
+                if (!isHidden) {
+                    if (passwordInput) {
+                        passwordInput.value = '';
+                        passwordInput.type = 'password';
+                    }
+                    if (passwordConfirmationInput) {
+                        passwordConfirmationInput.value = '';
+                        passwordConfirmationInput.type = 'password';
+                    }
                 }
             });
         }
