@@ -195,8 +195,8 @@
                                     System
                                 @endif
                             </td>
-                            <td style="text-transform: uppercase; font-weight: 600;">{{ $log->action }}</td>
-                            <td>{{ $log->module ?? $log->model ?? '-' }}</td>
+                            <td style="text-transform: uppercase; font-weight: 600;">{{ $log->action ? \Illuminate\Support\Str::headline((string) $log->action) : 'N/A' }}</td>
+                            <td>{{ ($log->module ?? $log->model) ? \Illuminate\Support\Str::headline((string) ($log->module ?? $log->model)) : '-' }}</td>
                             <td>{{ Str::limit($log->description ?? '', 70) }}</td>
                             <td>ID: {{ $log->record_id ?? '-' }}</td>
                         </tr>

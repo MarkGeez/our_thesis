@@ -105,7 +105,7 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
 
 Route::prefix('admin/blotter')
     ->name('admin.blotter.')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin', 'log.module.visit'])
     ->group(function () {
 
         // List blotters
@@ -126,7 +126,7 @@ Route::prefix('admin/blotter')
     });
 
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class,'profile'])->name('profile');
     Route::get('/profile/add-family', function () {
@@ -234,7 +234,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 });
 
-Route::middleware(['auth', 'role:subadmin'])->group(function(){
+Route::middleware(['auth', 'role:subadmin', 'log.module.visit'])->group(function(){
     Route::prefix('subadmin')->name("subadmin.")->group(function(){
         Route::get('/dashboard', [SubAdminController::class,'dashboard'])->name('dashboard');
         Route::get('/profile', [SubAdminController::class,'profile'])->name('profile');
@@ -308,3 +308,5 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
         
     });
 });
+
+

@@ -847,8 +847,8 @@
                                         : 'N/A';
                                 @endphp
                                 <td data-col="activity_user">{{ $activityUser !== '' ? $activityUser : 'N/A' }}</td>
-                                <td data-col="module">{{ $row->module ? ucwords(strtolower((string) $row->module)) : 'N/A' }}</td>
-                                <td data-col="action">{{ $row->action ? ucwords(strtolower((string) $row->action)) : 'N/A' }}</td>
+                                <td data-col="module">{{ $row->module ? \Illuminate\Support\Str::headline((string) $row->module) : 'N/A' }}</td>
+                                <td data-col="action">{{ $row->action ? \Illuminate\Support\Str::headline((string) $row->action) : 'N/A' }}</td>
                                 <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
                                 <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
                                 <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
