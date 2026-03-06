@@ -955,7 +955,7 @@
         <input type="hidden" name="new_head_id" class="new-head-id-input">
         <div class="resident-dropdown new-head-dropdown d-none"></div>
         <div class="form-text">
-            Search only residents from the same household who are not currently a head of family.
+            Search only residents from the same household who are not currently a head of family. <span class="text-danger">Make sure to search residents from the same household before entering for a new head.</span>
         </div>
     </div>
 </div>
