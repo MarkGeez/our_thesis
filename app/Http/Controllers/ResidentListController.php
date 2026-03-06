@@ -29,7 +29,7 @@ public function showResidents(Request $request)
     $searchTerm = $request->input('search');
     $sexFilter = $request->input('sex_filter', 'all');
     $sort = $request->input('sort', 'id_desc');
-
+    
     $residentCount = Resident::count();
     $maleCount = Resident::where('sex', 'male')->count();
     $femaleCount = Resident::where('sex', 'female')->count();
@@ -48,6 +48,7 @@ public function showResidents(Request $request)
             return $query->where('sex', $sexFilter);
         });
 
+
     switch ($sort) {
         case 'id_asc':
             $residents->orderBy('id', 'asc');
@@ -65,10 +66,15 @@ public function showResidents(Request $request)
     }
 
     $residents = $residents->paginate(20)->appends($request->query());
-
+    $allResidents =  Resident::select(
+        'id',
+        'firstName',
+        'middleName',
+        'lastName'
+    )->get();
     return view($user->role . '.residents', compact(
     'user', 'residents', 'searchTerm', 'streets', 'houses',
-    'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'sexFilter', 'sort'
+    'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'sexFilter', 'sort', 'allResidents'
 ));
 }
 
@@ -142,6 +148,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         if(!$user || $user->role === "resident" || $user->role === "non-resident"){
             abort(403);
         }
+        
 
         $resident = Resident::findOrFail($id);
 
@@ -219,9 +226,8 @@ $householdResident->update([
         return redirect()->back()->with('success', 'Resident archived successfully!');
     }
 
-    public function updateOwnInfo(Request $request, $id)
+   public function updateOwnInfo(Request $request, $id)
 {
-    // Validate the request
     $validated = $request->validate([
         'contactNo' => 'required|string|max:11',
         'birthday' => 'required|date',
@@ -233,27 +239,47 @@ $householdResident->update([
         'enrolled' => 'required|in:yes,no',
         'educationalAttainment' => 'nullable|string|max:255',
         'headOfFamily' => 'nullable|in:yes,no',
-        'religion' => 'nullable|string|max:255'
+        'religion' => 'nullable|string|max:255',
+        'new_head_id' => 'nullable|exists:residents,id'
     ]);
 
-    // Find the resident record
     $resident = Resident::findOrFail($id);
-    
-    // Check if the resident belongs to the logged-in user (skip for admin/subadmin)
+
     $user = auth()->user();
+
     if (!in_array($user->role, ['admin', 'subadmin']) && $resident->user_id !== $user->id) {
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
 
-    // Keep existing head-of-family value if not provided in the update form.
-    if (!array_key_exists('headOfFamily', $validated)) {
-        $validated['headOfFamily'] = $resident->headOfFamily;
+    /*
+    |--------------------------------------------------------------------------
+    | Handle Head of Family Replacement
+    |--------------------------------------------------------------------------
+    */
+
+    if ($resident->headOfFamily === 'yes' && $validated['headOfFamily'] === 'no') {
+
+        if (!$request->new_head_id) {
+            return back()->withErrors(['error' => 'Please select a new Head of Family.']);
+        }
+
+        $newHead = Resident::find($request->new_head_id);
+        $newHead->update([
+            'headOfFamily' => 'yes'
+        ]);
     }
 
-    // Update the resident
+    /*
+    |--------------------------------------------------------------------------
+    | Update Resident
+    |--------------------------------------------------------------------------
+    */
+
     $resident->update($validated);
 
-    return redirect()->route($user->role . '.profile')->with('success', 'Resident information updated successfully.');
+    return redirect()
+        ->route($user->role . '.profile')
+        ->with('success', 'Resident information updated successfully.');
 }
 
 }

@@ -26,6 +26,34 @@
             --text-secondary: #64748b;
         }
 
+        .resident-dropdown {
+        position: absolute;
+        z-index: 1050; /* Ensure it stays above modal elements */
+        background: white;
+        border: 1px solid #dee2e6;
+        width: 100%;
+        max-height: 250px;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 4px;
+    }
+    .resident-option {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f1f1;
+        font-size: 14px;
+    }
+    .resident-option:hover {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+    #newHeadContainer {
+        border-left: 3px solid #0d6efd; /* Visual cue that this field is required now */
+        padding-left: 15px;
+        background-color: #f0f7ff;
+        padding-bottom: 10px;
+        border-radius: 5px;
+    }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--light-bg);
@@ -900,12 +928,149 @@
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Head of Family</label>
-                                                                <select name="headOfFamily" class="form-select" required>
-                                                                    <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
-                                                                    <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
-                                                                </select>
-                                                            </div>
+    <label>Head of Family</label>
+    <select name="headOfFamily" id="headOfFamilySelect_{{ $resident->id }}" class="form-select head-of-family-trigger" data-resident-id="{{ $resident->id }}" required>
+        <option value="yes" {{ $resident->headOfFamily === 'yes' ? 'selected' : '' }}>Yes</option>
+        <option value="no" {{ $resident->headOfFamily === 'no' ? 'selected' : '' }}>No</option>
+    </select>
+</div>
+
+<div class="col-md-12 mt-3" id="newHeadContainer_{{ $resident->id }}" style="display:none;">
+    <label class="form-label">Select New Head of Family</label>
+
+    <div class="mb-3 position-relative search-box-container">
+        <div class="input-group">
+            <input type="text" 
+                   class="form-control new-head-search-input" 
+                   placeholder="Type name and click Search" 
+                   autocomplete="off">
+            <button type="button" class="btn btn-outline-primary new-head-search-btn">
+                Search
+            </button>
+        </div>
+
+        <input type="hidden" name="new_head_id" class="new-head-id-input">
+        <div class="resident-dropdown new-head-dropdown d-none"></div>
+    </div>
+</div>
+
+<script>
+
+document.addEventListener("change", function(e) {
+    // Check if the element changed has our trigger class
+    if (e.target && e.target.classList.contains('head-of-family-trigger')) {
+        const select = e.target;
+        const residentId = select.getAttribute('data-resident-id');
+        const container = document.getElementById(`newHeadContainer_${residentId}`);
+        
+        // Use the actual DB value for this specific resident
+        // We can pass this via a data attribute as well
+        const originalStatus = select.querySelector('option[selected]')?.value || "no";
+
+        if (originalStatus === "yes" && select.value === "no") {
+            container.style.display = "block";
+        } else {
+            container.style.display = "none";
+            // Clear inputs inside this specific container
+            container.querySelector('.new-head-search-input').value = '';
+            container.querySelector('.new-head-id-input').value = '';
+        }
+    }
+});
+
+// Update the Search Logic to find elements RELATIVE to the button clicked
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('new-head-search-btn')) {
+        const btn = e.target;
+        const parentModal = btn.closest('.modal-body'); // Scope to current modal
+        const searchInput = parentModal.querySelector('.new-head-search-input');
+        const dropdown = parentModal.querySelector('.new-head-dropdown');
+        const hiddenInput = parentModal.querySelector('.new-head-id-input');
+        
+        const residents = @json($allResidents);
+        const query = searchInput.value.toLowerCase().trim();
+        
+        // ... (Insert your existing filtering logic here) ...
+        // Just ensure you use 'dropdown.appendChild' so it adds to the current modal's list
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const residents = @json($allResidents);
+
+    // 1. Show/Hide Logic for each modal
+    document.querySelectorAll('.head-of-family-trigger').forEach(select => {
+        select.addEventListener('change', function() {
+            const resId = this.dataset.residentId;
+            const originalValue = this.dataset.originalValue; // Pass this via data-original-value
+            const container = document.getElementById(`newHeadContainer_${resId}`);
+            
+            if (originalValue === 'yes' && this.value === 'no') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
+    });
+
+    // 2. Search Logic (Scoped to the clicked button's container)
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('new-head-search-btn')) {
+            const container = e.target.closest('.search-box-container');
+            const searchInput = container.querySelector('.new-head-search-input');
+            const dropdown = container.querySelector('.new-head-dropdown');
+            const hiddenInput = container.querySelector('.new-head-id-input');
+
+            const query = searchInput.value.toLowerCase().trim();
+            dropdown.innerHTML = '';
+
+            if (!query) {
+                dropdown.classList.add('d-none');
+                return;
+            }
+
+            const matches = residents.filter(person => {
+                const fullName = `${person.lastName} ${person.firstName} ${person.middleName ?? ''}`.toLowerCase();
+                return fullName.includes(query) || person.id.toString() === query;
+            }).slice(0, 8);
+
+            if (matches.length === 0) {
+                dropdown.innerHTML = '<div class="p-2 text-muted">No residents found</div>';
+                dropdown.classList.remove('d-none');
+                return;
+            }
+
+            matches.forEach(person => {
+                const option = document.createElement('div');
+                option.className = 'resident-option p-2 border-bottom';
+                option.style.cursor = 'pointer';
+                option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
+
+                option.addEventListener('click', function () {
+                    searchInput.value = this.textContent;
+                    hiddenInput.value = person.id;
+                    dropdown.classList.add('d-none');
+                });
+
+                dropdown.appendChild(option);
+            });
+
+            dropdown.classList.remove('d-none');
+        }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-box-container')) {
+            document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
+        }
+    });
+});
+</script>
+
+
                                                             <div class="col-md-6">
                                                                 <label>Parent Status</label>
                                                                 <select name="parent" class="form-select" required>

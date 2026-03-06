@@ -41,14 +41,20 @@
 
     /* Header Section */
     .page-header {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        color: black;
-        border-radius: 15px;
-        padding: 30px;
+       background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+            color: black;
+            border-radius: 15px;
+            padding: 30px;
+            
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         margin-bottom: 0;
     }
 
@@ -65,11 +71,15 @@
     .page-header-icon {
         width: 48px;
         height: 48px;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+         background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -225,37 +235,6 @@
         color: #991b1b;
     }
 
-    .overdue-pending-note {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        margin-top: 0.4rem;
-        padding: 0.25rem 0.55rem;
-        border-radius: 999px;
-        border: 1px solid #fca5a5;
-        color: #b91c1c;
-        font-size: 0.72rem;
-        font-weight: 700;
-        background: #fff5f5;
-        width: fit-content;
-    }
-
-    .pending-age-note {
-        margin-top: 0.35rem;
-        font-size: 0.72rem;
-        line-height: 1.35;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.2rem 0.45rem;
-        border-radius: 6px;
-        border: 1px solid #fcd34d;
-        font-weight: 600;
-        color: #92400e;
-        background: #fffbeb;
-        width: fit-content;
-    }
-
     /* Button Styling */
     .btn {
         font-weight: 600;
@@ -364,7 +343,7 @@
     }
 
     /* Pagination Styling */
-    .pagination-container {
+     .pagination-container {
         padding: 2rem;
         background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
         border-radius: 0 0 16px 16px;
@@ -809,65 +788,6 @@
         font-weight: 500;
     }
 
-    .pending-review-banner {
-        margin: 1rem 2rem 0;
-        border-radius: 12px;
-        border: 1px solid #fde68a;
-        background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
-        padding: 0.9rem 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .pending-review-banner.is-overdue {
-        border-color: #fecaca;
-        background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
-    }
-
-    .pending-review-banner .banner-title {
-        font-weight: 700;
-        color: #92400e;
-        margin-bottom: 0.2rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .pending-review-banner.is-overdue .banner-title {
-        color: #991b1b;
-    }
-
-    .pending-review-banner .banner-text {
-        margin: 0;
-        color: #7c2d12;
-        font-size: 0.92rem;
-    }
-
-    .pending-review-banner .banner-counts {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    .pending-review-pill {
-        background: #fff;
-        border: 1px solid #fed7aa;
-        color: #9a3412;
-        font-weight: 700;
-        font-size: 0.78rem;
-        padding: 0.35rem 0.6rem;
-        border-radius: 999px;
-        white-space: nowrap;
-    }
-
-    .pending-review-banner.is-overdue .pending-review-pill.overdue {
-        border-color: #fca5a5;
-        color: #b91c1c;
-    }
-
     /* Responsive Design */
     @media (max-width: 768px) {
         .main-container {
@@ -915,30 +835,9 @@
                         <div class="page-header-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        User Records Management
+                        
                     </h2>
                 </div>
-                @if (($hasPendingUsers ?? false) || ((int) ($pendingUsersCount ?? 0) > 0))
-                    <div class="pending-review-banner {{ ($hasOverduePendingUsers ?? false) ? 'is-overdue' : '' }}">
-                        <div>
-                            <div class="banner-title">
-                                <i class="fas fa-hourglass-half"></i>
-                                Pending User Approvals Need Review
-                            </div>
-                            <p class="banner-text">
-                                @if(($hasOverduePendingUsers ?? false))
-                                    Some pending users have been waiting for more than 72 hours. Review and update their status.
-                                @else
-                                    There are pending users awaiting approval. Review their status when ready.
-                                @endif
-                            </p>
-                        </div>
-                        <div class="banner-counts">
-                            <span class="pending-review-pill">Pending: {{ (int) ($pendingUsersCount ?? 0) }}</span>
-                            <span class="pending-review-pill overdue">Over 72h: {{ (int) ($pendingOver72HoursCount ?? 0) }}</span>
-                        </div>
-                    </div>
-                @endif
            
 
                 <!-- Search Section -->
@@ -1107,42 +1006,16 @@
                                                         'declined' => ['class' => 'status-declined', 'icon' => 'fa-times-circle', 'text' => 'Declined']
                                                     ];
                                                     $status = $statusConfig[$list->status] ?? $statusConfig['pending'];
-                                                    $isPendingOver72 = $list->status === 'pending'
-                                                        && $list->created_at
-                                                        && $list->created_at->lte(now()->subHours(72));
-                                                    $pendingAgeLabel = null;
-                                                    if ($list->status === 'pending' && $list->created_at) {
-                                                        $registeredAt = $list->created_at;
-                                                        $daysPending = (int) $registeredAt->diffInDays(now());
-                                                        $hoursPending = (int) $registeredAt->copy()->addDays($daysPending)->diffInHours(now());
-                                                        if ($daysPending > 0) {
-                                                            $pendingAgeLabel = 'Pending for ' . $daysPending . ' day' . ($daysPending !== 1 ? 's' : '') . ' ' . $hoursPending . ' hour' . ($hoursPending !== 1 ? 's' : '');
-                                                        } else {
-                                                            $totalHoursPending = max(0, (int) $registeredAt->diffInHours(now()));
-                                                            $pendingAgeLabel = 'Pending for ' . $totalHoursPending . ' hour' . ($totalHoursPending !== 1 ? 's' : '');
-                                                        }
-                                                    }
                                                 @endphp
                                                 <span class="status-badge {{ $status['class'] }}">
                                                     <i class="fas {{ $status['icon'] }}"></i>
                                                     {{ $status['text'] }}
                                                 </span>
-                                                @if($pendingAgeLabel)
-                                                    <span class="pending-age-note">
-                                                        <i class="fas fa-hourglass-half"></i>
-                                                        {{ $pendingAgeLabel }}
-                                                    </span>
-                                                @endif
-                                                @if($isPendingOver72)
-                                                    <div class="overdue-pending-note">
-                                                        <i class="fas fa-exclamation-triangle"></i> Over 72h
-                                                    </div>
-                                                @endif
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
                                                     @if($list->role === 'superadmin')
-                                                        <span class="text-muted small fw-semibold"></span>
+                                                        <span class="text-muted small fw-semibold">No actions available</span>
                                                     @else
                                                         @if($list->status === 'pending')
                                                             <button type="button" 
@@ -1322,7 +1195,7 @@
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST" class="js-confirm-status-form" data-user-name="{{ trim(ucwords(strtolower(($list->firstName ?? '') . ' ' . ($list->lastName ?? '')))) }}">
+                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
@@ -1388,7 +1261,7 @@
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST" class="js-confirm-role-form" data-user-name="{{ trim(ucwords(strtolower(($list->firstName ?? '') . ' ' . ($list->lastName ?? '')))) }}">
+                                                        <form action="{{ route($user->role . '.update.role', $list->id) }}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
@@ -1456,141 +1329,142 @@
                     </div>
 
                     <!-- Enhanced Pagination -->
-                    @if($userList->count() > 0)
-                    <div class="pagination-container">
-                        <div class="pagination-wrapper">
-                            <!-- Pagination Info -->
-                            <div class="pagination-info">
-                                <div class="pagination-info-text">
-                                    <i class="fas fa-list-ol"></i>
-                                    Showing 
-                                    <span class="pagination-info-numbers">{{ $userList->firstItem() ?? 0 }}</span>
-                                    to 
-                                    <span class="pagination-info-numbers">{{ $userList->lastItem() ?? 0 }}</span>
-                                    of 
-                                    <span class="pagination-info-numbers">{{ $userList->total() }}</span>
-                                    entries
-                                </div>
-                            </div>
+@if($userList->count() > 0)
+<div class="pagination-container">
+    <div class="pagination-wrapper">
+        <!-- Pagination Info -->
+        <div class="pagination-info">
+            <div class="pagination-info-text">
+                <i class="fas fa-list-ol"></i>
+                Showing 
+                <span class="pagination-info-numbers">{{ $userList->firstItem() ?? 0 }}</span>
+                to 
+                <span class="pagination-info-numbers">{{ $userList->lastItem() ?? 0 }}</span>
+                of 
+                <span class="pagination-info-numbers">{{ $userList->total() }}</span>
+                entries
+            </div>
+        </div>
 
-                            <!-- Main Pagination -->
-                            <nav aria-label="User list pagination">
-                                <ul class="pagination">
-                                {{-- First Page Link --}}
-                                @if ($userList->onFirstPage())
-                                    <li class="page-item disabled">
-                                        <span class="page-link">
-                                            <i class="fas fa-angle-double-left"></i>
-                                            <span class="d-none d-sm-inline ms-1">First</span>
-                                        </span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->url(1) }}" rel="first">
-                                            <i class="fas fa-angle-double-left"></i>
-                                            <span class="d-none d-sm-inline ms-1">First</span>
-                                        </a>
-                                    </li>
-                                @endif
+        <!-- Main Pagination -->
+        <nav aria-label="User list pagination">
+            <ul class="pagination">
+                {{-- First Page Link --}}
+                @if ($userList->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="fas fa-angle-double-left"></i>
+                            <span class="d-none d-sm-inline ms-1">First</span>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->url(1) }}" rel="first">
+                            <i class="fas fa-angle-double-left"></i>
+                            <span class="d-none d-sm-inline ms-1">First</span>
+                        </a>
+                    </li>
+                @endif
 
-                                {{-- Previous Page Link --}}
-                                @if ($userList->onFirstPage())
-                                    <li class="page-item disabled">
-                                        <span class="page-link">
-                                            <i class="fas fa-chevron-left"></i>
-                                        </span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->previousPageUrl() }}" rel="prev">
-                                            <i class="fas fa-chevron-left"></i>
-                                        </a>
-                                    </li>
-                                @endif
+                {{-- Previous Page Link --}}
+                @if ($userList->onFirstPage())
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="fas fa-chevron-left"></i>
+                        </span>
+                    </li>
+                @else
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->previousPageUrl() }}" rel="prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                @endif
 
-                                {{-- Pagination Elements --}}
-                                @php
-                                    $currentPage = $userList->currentPage();
-                                    $lastPage = $userList->lastPage();
-                                    $start = max(1, $currentPage - 2);
-                                    $end = min($lastPage, $currentPage + 2);
-                                @endphp
+                {{-- Pagination Elements --}}
+                @php
+                    $currentPage = $userList->currentPage();
+                    $lastPage = $userList->lastPage();
+                    $start = max(1, $currentPage - 2);
+                    $end = min($lastPage, $currentPage + 2);
+                @endphp
 
-                                {{-- Show first page if not in range --}}
-                                @if ($start > 1)
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->url(1) }}">1</a>
-                                    </li>
-                                    @if ($start > 2)
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    @endif
-                                @endif
-
-                                {{-- Page Numbers --}}
-                                @for ($i = $start; $i <= $end; $i++)
-                                    @if ($i == $currentPage)
-                                        <li class="page-item active" aria-current="page">
-                                            <span class="page-link">{{ $i }}</span>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $userList->url($i) }}">{{ $i }}</a>
-                                        </li>
-                                    @endif
-                                @endfor
-
-                                {{-- Show last page if not in range --}}
-                                @if ($end < $lastPage)
-                                    @if ($end < $lastPage - 1)
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    @endif
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->url($lastPage) }}">{{ $lastPage }}</a>
-                                    </li>
-                                @endif
-
-                                {{-- Next Page Link --}}
-                                @if ($userList->hasMorePages())
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->nextPageUrl() }}" rel="next">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
-                                @else
-                                    <li class="page-item disabled">
-                                        <span class="page-link">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </span>
-                                    </li>
-                                @endif
-
-                                {{-- Last Page Link --}}
-                                @if ($userList->hasMorePages())
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $userList->url($userList->lastPage()) }}" rel="last">
-                                            <span class="d-none d-sm-inline me-1">Last</span>
-                                            <i class="fas fa-angle-double-right"></i>
-                                        </a>
-                                    </li>
-                                @else
-                                    <li class="page-item disabled">
-                                        <span class="page-link">
-                                            <span class="d-none d-sm-inline me-1">Last</span>
-                                            <i class="fas fa-angle-double-right"></i>
-                                        </span>
-                                    </li>
-                                @endif
-                                </ul>
-                            </nav>
-
-                            <!-- Additional Controls -->
-                        </div>
-                    </div>
+                {{-- Show first page if not in range --}}
+                @if ($start > 1)
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->url(1) }}">1</a>
+                    </li>
+                    @if ($start > 2)
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
                     @endif
+                @endif
+
+                {{-- Page Numbers --}}
+                @for ($i = $start; $i <= $end; $i++)
+                    @if ($i == $currentPage)
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ $i }}</span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $userList->url($i) }}">{{ $i }}</a>
+                        </li>
+                    @endif
+                @endfor
+
+                {{-- Show last page if not in range --}}
+                @if ($end < $lastPage)
+                    @if ($end < $lastPage - 1)
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    @endif
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->url($lastPage) }}">{{ $lastPage }}</a>
+                    </li>
+                @endif
+
+                {{-- Next Page Link --}}
+                @if ($userList->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->nextPageUrl() }}" rel="next">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                @endif
+
+                {{-- Last Page Link --}}
+                @if ($userList->hasMorePages())
+                    <li class="page-item">
+                        <a class="page-link" href="{{ $userList->url($userList->lastPage()) }}" rel="last">
+                            <span class="d-none d-sm-inline me-1">Last</span>
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                @else
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <span class="d-none d-sm-inline me-1">Last</span>
+                            <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    </li>
+                @endif
+            </ul>
+        </nav>
+
+        <!-- Additional Controls -->
+       
+    </div>
+</div>
+@endif
                 @endif
         </div>
     </div>
@@ -1600,40 +1474,3 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const statusLabelMap = {
-            approved: 'Approved',
-            pending: 'Pending',
-            declined: 'Declined'
-        };
-
-        document.querySelectorAll('.js-confirm-status-form').forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                const selected = form.querySelector('input[name="status"]:checked');
-                const selectedStatus = selected ? selected.value : '';
-                const statusLabel = statusLabelMap[selectedStatus] || selectedStatus || 'selected status';
-                const userName = form.getAttribute('data-user-name') || 'this user';
-                const message = `You are about to update the status of ${userName} to "${statusLabel}".\n\nDo you want to continue?`;
-
-                if (!window.confirm(message)) {
-                    event.preventDefault();
-                }
-            });
-        });
-
-        document.querySelectorAll('.js-confirm-role-form').forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                const roleSelect = form.querySelector('select[name="role"]');
-                const selectedRole = roleSelect ? roleSelect.value : '';
-                const roleLabel = selectedRole ? selectedRole.replace('-', ' ').replace(/\b\w/g, function (char) { return char.toUpperCase(); }) : 'selected role';
-                const userName = form.getAttribute('data-user-name') || 'this user';
-                const message = `You are about to change the role of ${userName} to "${roleLabel}".\n\nDo you want to continue?`;
-
-                if (!window.confirm(message)) {
-                    event.preventDefault();
-                }
-            });
-        });
-    });
-</script>
