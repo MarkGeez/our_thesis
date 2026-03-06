@@ -69,6 +69,12 @@
             margin-bottom: 15px;
         }
 
+        .announcement-details {
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0;
+        }
+
         .welcome-card {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
@@ -265,7 +271,7 @@
                                       
                                     <h3 class="fw-bold mb-2">{{ strtoupper($announcement->title) }}</h3>
                                     <div class="announcement-text">
-                                        <p class="mt-1">{{ $announcement->details }}</p>
+                                        <div class="announcement-details">{{ $announcement->details }}</div>
 
                                         @if($announcement->eventTime || $announcement->eventEnd)
                                             <p class="mt-2 mb-2"><strong>Event Start:</strong> {{ date('M d, Y g:i A', strtotime($announcement->eventTime)) }}</p>
@@ -293,4 +299,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

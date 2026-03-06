@@ -414,6 +414,11 @@
             border-radius: 99px;
             margin: 0 auto 50px;
         }
+
+        .announcement-details {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -508,7 +513,7 @@
                             <small class="opacity-50">{{ $announcement->created_at->format('M d, Y') }}</small>
                         </div>
                         <h3 class="h4 mb-3" style="font-family: 'Oswald'; color: white;">{{ strtoupper($announcement->title) }}</h3>
-                        <p class="opacity-75 small">{{ Str::limit($announcement->details, 150) }}</p>
+                        <div class="announcement-details opacity-75 small">{{ $announcement->details }}</div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
+   <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}">
@@ -325,9 +325,11 @@
                 </div>
 
                 @if (session('success'))
-                <div class="container m-3 bg-white text-success fw-bold p-3 rounded-3 shadow-sm" style="max-width: 325px;">
-                    <h6>{{ session('success') }}</h6>
-                </div>
+                    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mx-4 mt-3 mb-4" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <div>{{ session('success') }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 @endif
 
                 @php $activeTab = $activeTab ?? 'all'; @endphp
@@ -419,10 +421,26 @@
 
                                 <tbody id="complaintTableBody" class="align-middle">
                                     @foreach ($complaints as $complaint)
+                                    @php
+                                        $complainantDisplayName = $complaint->complainant
+                                            ? ucwords(strtolower(trim(($complaint->complainant->firstName ?? '') . ' ' . ($complaint->complainant->middleName ?? '') . ' ' . ($complaint->complainant->lastName ?? ''))))
+                                            : ucwords(str_replace(',', ' ', (string) $complaint->complainantName));
+                                    @endphp
                                     <tr>
                                         <td class="text-center fw-bold">{{ $complaint->id }}</td>
                                         <td>
-                                            <span class="fw-semibold">{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</span>
+                                            @if(!empty($complaint->complainant_id))
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-link text-decoration-none p-0 fw-semibold"
+                                                    data-complainant-id="{{ $complaint->complainant_id }}"
+                                                    data-complainant-name="{{ $complainantDisplayName }}"
+                                                >
+                                                    {{ $complainantDisplayName }}
+                                                </button>
+                                            @else
+                                                <span class="fw-semibold">{{ $complainantDisplayName }}</span>
+                                            @endif
                                             <div class="text-muted small">ID: {{ $complaint->complainant_id }}</div>
                                         </td>
                                         <td>{{ $complaint->user->contactNumber ?? $complaint->complainant->contactNumber ?? 'N/A' }}</td>
@@ -467,7 +485,7 @@
                                                 <div class="row mb-4">
                                                     <div class="col-md-6">
                                                         <small class="text-muted">Complainant Name</small>
-                                                        <p class="fw-bold">{{ ucwords(str_replace(',', '', $complaint->complainantName)) }}</p>
+                                                        <p class="fw-bold">{{ $complainantDisplayName }}</p>
                                                     </div>
                                                     <div class="col-md-6 border-start">
                                                         <small class="text-muted">Respondent ID</small>
@@ -524,20 +542,20 @@
                                                 @csrf @method('PUT')
                                                 <div class="modal-body p-4">
                                                     <label class="fw-bold mb-3 d-block">Select New Status</label>
-                                                    <div class="btn-group w-100 mb-4" role="group" >
-                                                        <input type="radio" class="btn-check" name="status" id="res{{ $complaint->id }}" value="resolved" {{ $complaint->status == 'resolved' ? 'checked' : '' }}>
+                                                    <div class="btn-group w-100 mb-4" role="group">
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="res{{ $complaint->id }}" value="resolved" required>
                                                         <label class="btn btn-outline-success" for="res{{ $complaint->id }}">Resolved</label>
 
-                                                        <input type="radio" class="btn-check" name="status" id="on{{ $complaint->id }}" value="on-going" {{ $complaint->status == 'on-going' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="on{{ $complaint->id }}" value="on-going" required>
                                                         <label class="btn btn-outline-warning" for="on{{ $complaint->id }}">On-going</label>
 
-                                                        <input type="radio" class="btn-check" name="status" id="rej{{ $complaint->id }}" value="rejected" {{ $complaint->status == 'rejected' ? 'checked' : '' }}>
+                                                        <input type="radio" class="btn-check complaint-status-radio" name="status" id="rej{{ $complaint->id }}" value="rejected" required>
                                                         <label class="btn btn-outline-danger" for="rej{{ $complaint->id }}">Rejected</label>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label class="fw-bold mb-2">Internal Remarks</label>
-                                                        <textarea name="remarks" class="form-control" rows="4" placeholder="Enter resolution details..."></textarea>
+                                                        <textarea name="remarks" class="form-control complaint-remarks-input" rows="4" placeholder="Select a status first, then enter resolution details..." disabled></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
@@ -581,7 +599,247 @@
     </div>
 </div>
 
+<div class="modal fade" id="requesterProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user me-2"></i>Complainant Information
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="profileLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading profile...</p>
+                </div>
+                <div id="profileContent" style="display:none;">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center mb-3">
+                                <div id="profileImageContainer" class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Full Name</small>
+                            <p class="fw-semibold mb-0" id="profileFullName" style="text-transform: capitalize;">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Email</small>
+                            <p class="fw-semibold mb-0" id="profileEmail">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Contact No.</small>
+                            <p class="fw-semibold mb-0" id="profileContact">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Birthday</small>
+                            <p class="fw-semibold mb-0" id="profileBirthday">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileAgeRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Age</small>
+                            <p class="fw-semibold mb-0" id="profileAge">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileSexRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Sex</small>
+                            <p class="fw-semibold mb-0 text-capitalize" id="profileSex">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileRoleRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Role</small>
+                            <p class="fw-semibold mb-0 text-capitalize" id="profileRole">-</p>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <div class="row mb-4" id="profileHistorySection" style="display:none;">
+                        <div class="col-12">
+                            <h6 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-history me-2"></i>Complaint History
+                            </h6>
+                        </div>
+                    </div>
+                    <div id="profileHistoryLoading" style="display:none;" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted small">Loading history...</p>
+                    </div>
+                    <div id="profileHistoryContent" style="display:none;">
+                        <div class="alert alert-info mb-3">
+                            <div class="row text-center g-2">
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Total</strong>
+                                    <span class="fs-6 fw-bold" id="profileTotalRequests">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Pending</strong>
+                                    <span class="fs-6 fw-bold text-warning" id="profilePendingCount">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">On-going</strong>
+                                    <span class="fs-6 fw-bold text-primary" id="profileOngoingCount">0</span>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <strong class="d-block small">Resolved</strong>
+                                    <span class="fs-6 fw-bold text-success" id="profileResolvedCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Address</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profileHistoryTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const actionModals = document.querySelectorAll('[id^="complaintActionModal"]');
+
+        actionModals.forEach(function (modalEl) {
+            const statusRadios = modalEl.querySelectorAll('.complaint-status-radio');
+            const remarksInput = modalEl.querySelector('.complaint-remarks-input');
+
+            if (!remarksInput || statusRadios.length === 0) return;
+
+            const syncRemarksState = function () {
+                const hasSelectedStatus = Array.from(statusRadios).some(radio => radio.checked);
+                remarksInput.disabled = !hasSelectedStatus;
+                if (hasSelectedStatus) {
+                    remarksInput.placeholder = 'Enter resolution details...';
+                } else {
+                    remarksInput.placeholder = 'Select a status first, then enter resolution details...';
+                }
+            };
+
+            statusRadios.forEach(function (radio) {
+                radio.addEventListener('change', syncRemarksState);
+            });
+
+            modalEl.addEventListener('shown.bs.modal', syncRemarksState);
+            syncRemarksState();
+        });
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-complainant-id]');
+            if (!btn) return;
+
+            const userId = btn.getAttribute('data-complainant-id');
+            const fallbackName = btn.getAttribute('data-complainant-name') || 'N/A';
+
+            document.getElementById('profileLoading').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('profileAgeRow').style.display = 'none';
+            document.getElementById('profileSexRow').style.display = 'none';
+            document.getElementById('profileRoleRow').style.display = 'none';
+            document.getElementById('profileHistorySection').style.display = 'none';
+            document.getElementById('profileHistoryLoading').style.display = 'none';
+            document.getElementById('profileHistoryContent').style.display = 'none';
+            document.getElementById('profileImageContainer').innerHTML = '<i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>';
+
+            const modal = new bootstrap.Modal(document.getElementById('requesterProfileModal'));
+            modal.show();
+
+            const endpoint = "{{ route('admin.complaints.profile', ['userId' => '__ID__']) }}".replace('__ID__', userId);
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+                        return;
+                    }
+
+                    document.getElementById('profileFullName').textContent = data.fullName || fallbackName;
+                    document.getElementById('profileEmail').textContent = data.email || '-';
+                    document.getElementById('profileContact').textContent = data.contact || '-';
+                    document.getElementById('profileBirthday').textContent = data.birthday || '-';
+
+                    if (data.profileImage) {
+                        document.getElementById('profileImageContainer').innerHTML =
+                            '<img src="' + data.profileImage + '" alt="Profile" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;">';
+                    }
+
+                    if (data.age) {
+                        document.getElementById('profileAge').textContent = data.age;
+                        document.getElementById('profileAgeRow').style.display = 'block';
+                    }
+                    if (data.sex) {
+                        document.getElementById('profileSex').textContent = data.sex;
+                        document.getElementById('profileSexRow').style.display = 'block';
+                    }
+                    if (data.role) {
+                        document.getElementById('profileRole').textContent = data.role;
+                        document.getElementById('profileRoleRow').style.display = 'block';
+                    }
+
+                    document.getElementById('profileLoading').style.display = 'none';
+                    document.getElementById('profileContent').style.display = 'block';
+                    document.getElementById('profileHistorySection').style.display = 'block';
+                    document.getElementById('profileHistoryLoading').style.display = 'block';
+
+                    const history = data.history || {};
+                    document.getElementById('profileTotalRequests').textContent = history.total || 0;
+                    document.getElementById('profilePendingCount').textContent = history.pending || 0;
+                    document.getElementById('profileOngoingCount').textContent = history.on_going || 0;
+                    document.getElementById('profileResolvedCount').textContent = history.resolved || 0;
+
+                    const tbody = document.getElementById('profileHistoryTableBody');
+                    tbody.innerHTML = '';
+                    const rows = history.requests || [];
+                    if (rows.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted small">No complaint history found</td></tr>';
+                    } else {
+                        rows.forEach(function (req) {
+                            const statusBadge = req.status === 'resolved'
+                                ? '<span class="badge bg-success">Resolved</span>'
+                                : req.status === 'on-going'
+                                    ? '<span class="badge bg-warning text-dark">On-going</span>'
+                                    : req.status === 'rejected'
+                                        ? '<span class="badge bg-danger">Rejected</span>'
+                                        : '<span class="badge bg-secondary">Pending</span>';
+
+                            const row = '<tr>' +
+                                '<td class="small">' + (req.created_at || '-') + '</td>' +
+                                '<td>' + statusBadge + '</td>' +
+                                '<td class="small">' + (req.address || '-') + '</td>' +
+                                '<td class="small">' + ((req.details || '-').length > 100 ? (req.details || '-').slice(0, 100) + '...' : (req.details || '-')) + '</td>' +
+                                '</tr>';
+                            tbody.innerHTML += row;
+                        });
+                    }
+
+                    document.getElementById('profileHistoryLoading').style.display = 'none';
+                    document.getElementById('profileHistoryContent').style.display = 'block';
+                })
+                .catch(() => {
+                    document.getElementById('profileLoading').innerHTML = '<div class="alert alert-danger">Failed to load complainant profile.</div>';
+                });
+        });
+    });
+</script>

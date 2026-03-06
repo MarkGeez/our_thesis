@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\UserAccountStatusUpdateMail;
 use Illuminate\Http\Request;
+use App\Models\Resident;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -12,6 +13,27 @@ use Carbon\Carbon;
 
 class UserListController extends Controller
 {
+    private function syncResidentLink(User $user, string $role): void
+    {
+        if (!in_array($role, ['admin', 'subadmin', 'resident'], true)) {
+            return;
+        }
+
+        $resident = Resident::where('user_id', $user->id)->first();
+
+        if (!$resident) {
+            $resident = Resident::whereRaw('LOWER(firstName) = ?', [strtolower((string) $user->firstName)])
+                ->whereRaw('LOWER(middleName) = ?', [strtolower((string) $user->middleName)])
+                ->whereRaw('LOWER(lastName) = ?', [strtolower((string) $user->lastName)])
+                ->whereDate('birthday', $user->birthday)
+                ->first();
+        }
+
+        if ($resident && (int) $resident->user_id !== (int) $user->id) {
+            $resident->update(['user_id' => $user->id]);
+        }
+    }
+
     public function showUsers(Request $request){
 
         $user= auth()->user();
@@ -137,8 +159,8 @@ class UserListController extends Controller
         }
 
         $user->role = $requestedRole;
-        
         $user->save();
+        $this->syncResidentLink($user, $requestedRole);
 
         return redirect()->back()->with('success', 'user role updated');
     }

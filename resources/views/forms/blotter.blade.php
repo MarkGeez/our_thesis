@@ -190,7 +190,7 @@
         <div class="col-12">
             <label class="form-label">Incident Narrative <span class="text-danger">*</span></label>
             <textarea name="blotterDescription" class="form-control" rows="4" 
-                placeholder="Briefly describe the incident..."></textarea>
+                placeholder="Briefly describe the incident..." required></textarea>
         </div>
     </div>
 

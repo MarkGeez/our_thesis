@@ -118,10 +118,9 @@ class ComplaintController extends Controller
                 $remarkerName = $user->name ?? $user->email ?? 'Unknown';
             }
             $remarkerName = Str::title($remarkerName);
-            $statusLabel = Str::title(str_replace('-', ' ', (string) $request->status));
 
             $timestamp = now()->format('M d, Y g:i A');
-            $entry = $timestamp . ' - ' . $remarkerName . ': [Status: ' . $statusLabel . '] ' . $newRemarks;
+            $entry = $timestamp . ' - ' . $remarkerName . ': ' . $newRemarks;
             $existingRemarks = trim((string) $complaint->remarks);
             $complaint->remarks = $existingRemarks === ''
                 ? $entry
@@ -130,7 +129,7 @@ class ComplaintController extends Controller
 
         $complaint->save();
 
-    return redirect()->back()->with('success', 'Complaint status updated successfully!');
+    return redirect()->back()->with('success', 'Complaint updated successfully.');
     }
 
     public function complainantHistory(int $userId): JsonResponse

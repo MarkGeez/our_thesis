@@ -38,16 +38,28 @@ class SubAdminController extends Controller
 
     public function profile(): View
     {
-$user = auth()->user();
-    
-    // Try to find resident by matching firstName, lastName
-    $resident = Resident::with('households.house.street')
-                    ->where('user_id', $user->id)
-                    ->first();
+        $user = auth()->user();
 
-    $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
-    $residents = Resident::select('id','firstName','middleName','lastName')->get();
-    return view('subadmin.profile', compact('user', 'resident', 'members', 'residents'));
+        $resident = Resident::with('households.house.street')
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$resident) {
+            $resident = Resident::with('households.house.street')
+                ->where('firstName', $user->firstName)
+                ->where('lastName', $user->lastName)
+                ->whereDate('birthday', $user->birthday)
+                ->first();
+
+            if ($resident && !$resident->user_id) {
+                $resident->update(['user_id' => $user->id]);
+            }
+        }
+
+        $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+        $residents = Resident::select('id','firstName','middleName','lastName')->get();
+
+        return view('subadmin.profile', compact('user', 'resident', 'members', 'residents'));
     }
 
     public function updateProfile(Request $request, $id)

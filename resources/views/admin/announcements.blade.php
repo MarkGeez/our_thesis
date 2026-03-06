@@ -72,6 +72,12 @@
       margin-bottom: 15px;
     }
 
+    .announcement-details {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+
     .header-section {
       padding: 20px 30px;
       background: none;
@@ -271,7 +277,7 @@
               
             <h3 class="fw-bold mb-2">{{ strtoupper($announcements->title )}}</h3>
             <div class="announcement-text">
-              <p class="mt-1">{{ $announcements->details }}</p>
+              <div class="announcement-details">{{ $announcements->details }}</div>
               @if($announcements->eventTime || $announcements->eventEnd)
                 <p class="mt-2 mb-2"><strong>Event Start:</strong> {{ date('M d, Y g:i A', strtotime($announcements->eventTime)) }}</p>
                 <p><strong>Event End:</strong> {{ date('M d, Y g:i A', strtotime($announcements->eventEnd)) }}</p>
@@ -360,5 +366,4 @@ document.addEventListener("DOMContentLoaded", function() {
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 

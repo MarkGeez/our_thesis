@@ -858,8 +858,8 @@
                                             <tr>
                                                 <td class="case-number">#{{ $blotter->id }}</td>
                                                 <td>{{ $displayType }}</td>
-                                                <td>{{ $blotter->plaintiffName }} {{ $blotter->plaintiffLastName }}</td>
-                                                <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
+                                                <td>{{ ucwords($blotter->plaintiffName) }} {{ ucwords($blotter->plaintiffLastName) }}</td>
+                                                <td>{{ ucwords($blotter->defendantName) }} {{ ucwords($blotter->defendantLastName) }}</td>
                                                 <td>
                                                     <div class="status-badge {{ $uiClass }}">
                                                         <span class="status-dot"></span>
@@ -924,7 +924,7 @@
                                                                     <div class="row gy-3">
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Full Name</div>
-                                                                            <div class="info-value">{{ $blotter->plaintiffName }} {{ $blotter->plaintiffMiddleName }} {{ $blotter->plaintiffLastName }}</div>
+                                                                            <div class="info-value">{{ ucwords($blotter->plaintiffName) }} {{ ucwords($blotter->plaintiffMiddleName) }} {{ ucwords($blotter->plaintiffLastName) }}</div>
                                                                         </div>
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Age</div>
@@ -948,7 +948,7 @@
                                                                     <div class="row gy-3">
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Full Name</div>
-                                                                            <div class="info-value">{{ $blotter->defendantName }} {{ $blotter->defendantMiddleName }} {{ $blotter->defendantLastName }}</div>
+                                                                            <div class="info-value">{{ ucwords($blotter->defendantName) }} {{ ucwords($blotter->defendantMiddleName) }} {{ ucwords($blotter->defendantLastName) }}</div>
                                                                         </div>{{-- 
                                                                         <div class="col-sm-6">
                                                                             <div class="info-label">Age</div>
@@ -1000,7 +1000,7 @@
 
                                                             @if($blotter->proof)
                                                                 <section>
-                                                                    <h6>Evidence / Proof Submitted</h6>
+                                                                    <h6>Initial Evidence</h6>
                                                                     <div class="info-box">
                                                                         <div class="row gy-2">
                                                                             <div class="col-12">

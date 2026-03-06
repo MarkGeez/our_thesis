@@ -83,6 +83,12 @@ object-fit: cover;
   line-height: 1.5px;
 }
 
+.announcement-details {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
 
 @media (max-width: 768px) {
   .announcements-grid {
@@ -183,7 +189,7 @@ object-fit: cover;
        
          <h3 class=" fw-bold mb-2">{{ strtoupper($announcements->title )}}</h3>
     <div class="announcement-text" >
-         <p class="mt-1 " style="line-height: 1.25em;">{{ $announcements->details }}</p>
+         <div class="announcement-details" style="line-height: 1.25em;">{{ $announcements->details }}</div>
 
          @if($announcements->eventTime || $announcements->eventEnd)
           <p class="mt-2 mb-2"><strong>Event Start:</strong>  {{ date('M d, Y g:i A', strtotime($announcements->eventTime)) }}</p>
@@ -294,5 +300,4 @@ document.addEventListener("DOMContentLoaded", function() {
 <script src="{{ asset('template/js/script.js') }}"></script>
 <!--    -- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 
