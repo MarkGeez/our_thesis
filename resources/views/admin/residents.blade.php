@@ -26,6 +26,34 @@
             --text-secondary: #64748b;
         }
 
+        .resident-dropdown {
+        position: absolute;
+        z-index: 1050; /* Ensure it stays above modal elements */
+        background: white;
+        border: 1px solid #dee2e6;
+        width: 100%;
+        max-height: 250px;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 4px;
+    }
+    .resident-option {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f1f1;
+        font-size: 14px;
+    }
+    .resident-option:hover {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+    #newHeadContainer {
+        border-left: 3px solid #0d6efd; /* Visual cue that this field is required now */
+        padding-left: 15px;
+        background-color: #f0f7ff;
+        padding-bottom: 10px;
+        border-radius: 5px;
+    }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--light-bg);
@@ -837,6 +865,7 @@
     $household = $resident->households->first();
     $houseId   = $household?->house_id;
     $streetId  = $household?->house?->street_id;
+    $householdId = $household?->id;
 @endphp
 
 <label>Street</label>
@@ -900,12 +929,195 @@
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Head of Family</label>
-                                                                <select name="headOfFamily" class="form-select" required>
-                                                                    <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
-                                                                    <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
-                                                                </select>
-                                                            </div>
+    <label>Head of Family</label>
+    <select name="headOfFamily" id="headOfFamilySelect_{{ $resident->id }}" class="form-select head-of-family-trigger" data-resident-id="{{ $resident->id }}" data-original-value="{{ $resident->headOfFamily }}" required>
+        <option value="yes" {{ $resident->headOfFamily === 'yes' ? 'selected' : '' }}>Yes</option>
+        <option value="no" {{ $resident->headOfFamily === 'no' ? 'selected' : '' }}>No</option>
+    </select>
+</div>
+
+<div class="col-md-12 mt-3" id="newHeadContainer_{{ $resident->id }}" style="display:none;">
+    <label class="form-label">Select New Head of Family</label>
+
+    <div class="mb-3 position-relative search-box-container"
+         data-resident-id="{{ $resident->id }}"
+         data-household-id="{{ $householdId }}">
+        <div class="input-group">
+            <input type="text" 
+                   class="form-control new-head-search-input" 
+                   placeholder="Enter resident name then press Enter or click Search" 
+                   autocomplete="off">
+            <button type="button" class="btn btn-outline-primary new-head-search-btn">
+                Search
+            </button>
+        </div>
+
+        <input type="hidden" name="new_head_id" class="new-head-id-input">
+        <div class="resident-dropdown new-head-dropdown d-none"></div>
+        <div class="form-text">
+            Search only residents from the same household who are not currently a head of family.
+        </div>
+    </div>
+</div>
+
+@once
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const headCandidateResidents = @json($headCandidateResidents ?? []);
+
+    function formatName(value) {
+        return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : '';
+    }
+
+    function closeNewHeadDropdown(container) {
+        const dropdown = container.querySelector('.new-head-dropdown');
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+    }
+
+    function clearNewHeadSelection(container) {
+        container.querySelector('.new-head-search-input').value = '';
+        container.querySelector('.new-head-id-input').value = '';
+        closeNewHeadDropdown(container);
+    }
+
+    function updateNewHeadVisibility(select) {
+        const resId = select.dataset.residentId;
+        const originalValue = select.dataset.originalValue;
+        const container = document.getElementById(`newHeadContainer_${resId}`);
+
+        if (!container) {
+            return;
+        }
+
+        if (originalValue === 'yes' && select.value === 'no') {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+            clearNewHeadSelection(container);
+        }
+    }
+
+    function runNewHeadSearch(container) {
+        const searchInput = container.querySelector('.new-head-search-input');
+        const dropdown = container.querySelector('.new-head-dropdown');
+        const hiddenInput = container.querySelector('.new-head-id-input');
+        const currentResidentId = Number(container.dataset.residentId);
+        const householdId = Number(container.dataset.householdId);
+        const query = (searchInput.value || '').toLowerCase().trim();
+
+        dropdown.innerHTML = '';
+        hiddenInput.value = '';
+
+        if (!query || !householdId) {
+            closeNewHeadDropdown(container);
+            return;
+        }
+
+        const matches = headCandidateResidents.filter(function (person) {
+            const residentId = Number(person.id);
+            const householdIds = Array.isArray(person.householdIds)
+                ? person.householdIds.map(Number)
+                : [];
+
+            if (residentId === currentResidentId) return false;
+            if (String(person.headOfFamily).toLowerCase() === 'yes') return false;
+            if (!householdIds.includes(householdId)) return false;
+
+            const fullName = (
+                `${person.lastName} ${person.firstName} ${person.middleName ?? ''}`
+            ).toLowerCase();
+
+            return fullName.includes(query) || residentId.toString().includes(query);
+        }).slice(0, 8);
+
+        if (matches.length === 0) {
+            dropdown.innerHTML = '<div class="p-2 text-muted">No eligible non-head residents found</div>';
+            dropdown.classList.remove('d-none');
+            return;
+        }
+
+        matches.forEach(function (person) {
+            const option = document.createElement('div');
+            const last = formatName(person.lastName);
+            const first = formatName(person.firstName);
+            const middle = formatName(person.middleName);
+
+            option.className = 'resident-option';
+            option.textContent = `${last}, ${first}${middle ? ' ' + middle : ''} (ID: ${person.id})`;
+
+            option.addEventListener('click', function () {
+                searchInput.value = option.textContent;
+                hiddenInput.value = person.id;
+                closeNewHeadDropdown(container);
+            });
+
+            dropdown.appendChild(option);
+        });
+
+        dropdown.classList.remove('d-none');
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('new-head-search-btn')) {
+            const container = e.target.closest('.search-box-container');
+            if (!container) {
+                return;
+            }
+
+            runNewHeadSearch(container);
+        }
+
+        if (!e.target.closest('.search-box-container')) {
+            document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
+        }
+    });
+
+    document.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
+        updateNewHeadVisibility(select);
+
+        select.addEventListener('change', function () {
+            updateNewHeadVisibility(select);
+        });
+    });
+
+    document.querySelectorAll('.search-box-container').forEach(function (container) {
+        const searchInput = container.querySelector('.new-head-search-input');
+        const hiddenInput = container.querySelector('.new-head-id-input');
+        const form = container.closest('form');
+
+        searchInput.addEventListener('input', function () {
+            hiddenInput.value = '';
+            closeNewHeadDropdown(container);
+        }
+
+        );
+
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                runNewHeadSearch(container);
+            }
+        });
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const wrapper = container.closest('[id^="newHeadContainer_"]');
+                const isVisible = wrapper && wrapper.style.display !== 'none';
+
+                if (isVisible && !hiddenInput.value) {
+                    e.preventDefault();
+                    alert('Please select a new Head of Family from the dropdown.');
+                    searchInput.focus();
+                }
+            });
+        }
+    });
+});
+</script>
+@endonce
+
+
                                                             <div class="col-md-6">
                                                                 <label>Parent Status</label>
                                                                 <select name="parent" class="form-select" required>
@@ -953,33 +1165,6 @@
                                                             @endforeach
                                                         </select>
 
-                                                        <label for="age{{ $resident->id }}">Age</label>
-                                                        <input type="number" id="age{{ $resident->id }}" name="age" class="form-control @error('age') is-invalid @enderror" value="{{ old('age', $resident->age) }}" placeholder="0" min="0" max="255" required readonly>
-
-                                                        <label for="sex{{ $resident->id }}">Sex</label>
-                                                        <select id="sex{{ $resident->id }}" name="sex" class="form-select @error('sex') is-invalid @enderror" required>
-                                                            <option value="">Select Sex</option>
-                                                            <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
-                                                            <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
-                                                        </select>
-                                                        {{--  <div class="row mt-3"> <div class="col-md-4 text-center"> <label class="d-block mb-2">Current Photo</label> <img id="previewImage{{ $resident->id }}" src="{{ asset('storage/' . $resident->image_path) }}" class="img-fluid rounded shadow-sm mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Resident Photo" > </div>
-<div class="col-md-8">
-    <label for="image_path{{ $resident->id }}">Update Photo</label>
-    <input
-        type="file"
-        id="image_path{{ $resident->id }}"
-        name="image_path"
-        class="form-control"
-        accept="image/png, image/jpg, image/jpeg"
-        onchange="previewResidentImage(event, '{{ $resident->id }}')"
-    >
-    <small class="text-muted d-block mt-1">
-        JPG or PNG. Max 2MB.
-    </small>
-</div>
-
-</div>--}}
-
                                                         <hr class="mt-4">
 
                                                         <label for="emergencyContactName{{ $resident->id }}">Emergency Contact Name</label>
@@ -987,66 +1172,6 @@
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
                                                         <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09123456789" required>
-
-                                                        <hr class="mt-4">
-
-                                                        <label for="parent{{ $resident->id }}">Parent Status</label>
-                                                        <select id="parent{{ $resident->id }}" name="parent" class="form-select @error('parent') is-invalid @enderror" required>
-                                                            <option value="">Select Option</option>
-                                                            <option value="yes" {{ old('parent', $resident->parent) === 'yes' ? 'selected' : '' }}>Yes</option>
-                                                            <option value="no" {{ old('parent', $resident->parent) === 'no' ? 'selected' : '' }}>No</option>
-                                                            <option value="single" {{ old('parent', $resident->parent) === 'single' ? 'selected' : '' }}>Single Parent</option>
-                                                        </select>
-
-                                                        <label for="enrolled{{ $resident->id }}">Currently Enrolled</label>
-                                                        <select id="enrolled{{ $resident->id }}" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror" required>
-                                                            <option value="">Select Option</option>
-                                                            <option value="yes" {{ old('enrolled', $resident->enrolled) === 'yes' ? 'selected' : '' }}>Yes</option>
-                                                            <option value="no" {{ old('enrolled', $resident->enrolled) === 'no' ? 'selected' : '' }}>No</option>
-                                                        </select>
-
-                                                        <label for="educationalAttainment{{ $resident->id }}">Educational Attainment</label>
-                                                        @php
-                                                            $selectedEducation = old('educationalAttainment', $resident->educationalAttainment ?? 'Unknown');
-                                                            if (!in_array($selectedEducation, $educationOptions, true)) {
-                                                                $selectedEducation = 'Unknown';
-                                                            }
-                                                        @endphp
-                                                        <select id="educationalAttainment{{ $resident->id }}" name="educationalAttainment" class="form-select @error('educationalAttainment') is-invalid @enderror">
-                                                            @foreach ($educationOptions as $option)
-                                                                <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                            @endforeach
-                                                        </select>
-
-                                                        <label for="religion{{ $resident->id }}">Religion</label>
-                                                        @php
-                                                            $selectedReligion = old('religion', $resident->religion ?? 'Unknown');
-                                                            if (!in_array($selectedReligion, $religionOptions, true)) {
-                                                                $selectedReligion = 'Unknown';
-                                                            }
-                                                        @endphp
-                                                        <select id="religion{{ $resident->id }}" name="religion" class="form-select @error('religion') is-invalid @enderror">
-                                                            @foreach ($religionOptions as $option)
-                                                                <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                            @endforeach
-                                                        </select>
-
-                                                        <label for="headOfFamily{{ $resident->id }}">Head of Family</label>
-                                                        <select id="headOfFamily{{ $resident->id }}" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
-                                                            <option value="">Select Option</option>
-                                                            <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
-                                                            <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
-                                                        </select>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label>Emergency Contact Name</label>
-                                                                <input type="text" name="emergencyContactName" class="form-control" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" required>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label>Emergency Contact No.</label>
-                                                                <input type="text" name="emergencyContactNo" class="form-control" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" required>
-                                                            </div>
-                                                        </div>
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>

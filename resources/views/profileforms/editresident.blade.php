@@ -24,7 +24,6 @@
         margin-bottom: 6px;
     }
 </style>
-
 <form action="{{ route(auth()->user()->role . '.update.ownInfo', $resident->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -101,8 +100,8 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
-                <input type="text" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" readonly>
+                <input type="number" name="contactNo" class="form-control form-control-lg"
+                       value="{{ old('contactNo', $resident->contactNo) }}" >
             </div>
 
             <div class="col-md-6">
@@ -111,7 +110,7 @@
                     <input type="date" name="birthday" id="resident_birthday"
                            class="form-control form-control-lg" readonly
                            max="{{ now()->subDay()->format('Y-m-d') }}"
-                           value="{{ old('birthday', $resident->birthday) }}">
+                           value="{{ old('birthday', $resident->birthday) }}" readonly>
                     <span class="input-group-text" id="resident_openDate">
                         <i class="fa fa-calendar"></i>
                     </span>
@@ -123,7 +122,7 @@
             <div class="col-md-3">
                 <label class="form-label">Age</label>
                 <input type="number" name="age" class="form-control form-control-lg"
-                       value="{{ old('age', $resident->age) }}" required>
+                       value="{{ old('age', $resident->age) }}" required readonly>
             </div>
 
             <div class="col-md-3">
@@ -161,13 +160,13 @@
             <div class="col-md-6">
                 <label class="form-label">Emergency Contact Name</label>
                 <input type="text" name="emergencyContactName" class="form-control form-control-lg"
-                       value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" required>
+                       value="{{ old('emergencyContactName', $resident->emergencyContactName) }}">
             </div>
 
             <div class="col-md-6">
                 <label class="form-label">Emergency Contact No.</label>
-                <input type="text" name="emergencyContactNo" class="form-control form-control-lg"
-                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" required>
+                <input type="number" name="emergencyContactNo" class="form-control form-control-lg"
+                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" >
             </div>
         </div>
 
