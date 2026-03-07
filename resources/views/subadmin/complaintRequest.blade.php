@@ -466,9 +466,15 @@
                                                 <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#complaintViewModal{{ $complaint->id }}">
                                                     <i class="fa-solid fa-eye"></i> View Full Details
                                                 </button>
-                                                <button class="btn btn-sm btn-primary px-3" data-bs-toggle="modal" data-bs-target="#complaintActionModal{{ $complaint->id }}">
-                                                    Manage
-                                                </button>
+                                                @if($complaint->status !== 'resolved')
+                                                    <button class="btn btn-sm btn-primary px-3" data-bs-toggle="modal" data-bs-target="#complaintActionModal{{ $complaint->id }}">
+                                                        Manage
+                                                    </button>
+                                                @else
+                                                    <span class="btn btn-sm btn-outline-secondary disabled px-3" aria-disabled="true">
+                                                        Locked
+                                                    </span>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -843,4 +849,3 @@
         });
     });
 </script>
-

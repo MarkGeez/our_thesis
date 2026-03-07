@@ -102,6 +102,10 @@ class ComplaintController extends Controller
         $complaint = Complaints::findOrFail($id);
         $respondent = Auth::user()->id;
 
+        if ($complaint->status === 'resolved') {
+            return redirect()->back()->with('error', 'Resolved complaints can no longer be updated.');
+        }
+
         $request->validate([
             "status"=> "required|in:resolved,on-going,rejected",
             "remarks"=> "nullable|string|max:1000",

@@ -321,6 +321,11 @@ class SubAdminController extends Controller
         ]);
 
         $complaint = Complaints::findOrFail($id);
+
+        if ($complaint->status === 'resolved') {
+            return back()->with('error', 'Resolved complaints can no longer be updated.');
+        }
+
         $complaint->status = $request->input('status');
 
         $newRemarks = trim((string) $request->input('remarks'));

@@ -19,10 +19,27 @@ use App\Models\Archive;
 use App\Models\Announcement;
 use App\Models\Feedbacks;
 use App\Services\ActiveLogRecordDetails;
+use Carbon\Carbon;
 use Auth;
 
 class ReportsController extends Controller
 {
+private function applyInclusiveDateRange($query, string $column, ?string $from, ?string $to)
+{
+    if (!empty($from) && !empty($to)) {
+        $query->whereBetween($column, [
+            Carbon::parse($from)->startOfDay(),
+            Carbon::parse($to)->endOfDay(),
+        ]);
+    } elseif (!empty($from)) {
+        $query->whereDate($column, '>=', $from);
+    } elseif (!empty($to)) {
+        $query->whereDate($column, '<=', $to);
+    }
+
+    return $query;
+}
+
 public function index()
 {
     // show admin wrapper and report list
@@ -196,16 +213,12 @@ public function generateCertificate(Request $request)
         $query->where('certificate_type', $type);
     }
 
-    if (!empty($request->date_from) && !empty($request->date_to)) {
-        $query->whereBetween('created_at', [
-            $request->date_from,
-            $request->date_to
-        ]);
-    } elseif (!empty($request->date_from)) {
-        $query->whereDate('created_at', '>=', $request->date_from);
-    } elseif (!empty($request->date_to)) {
-        $query->whereDate('created_at', '<=', $request->date_to);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $request->date_from,
+        $request->date_to
+    );
 
     $certificates = $query->get();
     $filters = $request->except(['_token', 'report_form_type']);
@@ -666,13 +679,12 @@ private function buildBlotterReportQuery(array $filters)
         $query->where('blotter_type', $type);
     }
 
-    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
-    } elseif (!empty($filters['date_from'])) {
-        $query->whereDate('created_at', '>=', $filters['date_from']);
-    } elseif (!empty($filters['date_to'])) {
-        $query->whereDate('created_at', '<=', $filters['date_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['date_from'] ?? null,
+        $filters['date_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -716,13 +728,12 @@ private function buildComplaintReportQuery(array $filters)
         });
     }
 
-    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
-    } elseif (!empty($filters['date_from'])) {
-        $query->whereDate('created_at', '>=', $filters['date_from']);
-    } elseif (!empty($filters['date_to'])) {
-        $query->whereDate('created_at', '<=', $filters['date_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['date_from'] ?? null,
+        $filters['date_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -758,13 +769,12 @@ private function buildActivityReportQuery(array $filters)
         });
     }
 
-    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
-    } elseif (!empty($filters['date_from'])) {
-        $query->whereDate('created_at', '>=', $filters['date_from']);
-    } elseif (!empty($filters['date_to'])) {
-        $query->whereDate('created_at', '<=', $filters['date_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['date_from'] ?? null,
+        $filters['date_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -866,13 +876,12 @@ private function buildArchivesReportQuery(array $filters)
         });
     }
 
-    if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-        $query->whereBetween('created_at', [$filters['date_from'], $filters['date_to']]);
-    } elseif (!empty($filters['date_from'])) {
-        $query->whereDate('created_at', '>=', $filters['date_from']);
-    } elseif (!empty($filters['date_to'])) {
-        $query->whereDate('created_at', '<=', $filters['date_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['date_from'] ?? null,
+        $filters['date_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -904,29 +913,26 @@ private function buildAnnouncementsReportQuery(array $filters)
         });
     }
 
-    if (!empty($filters['event_start_from']) && !empty($filters['event_start_to'])) {
-        $query->whereBetween('eventTime', [$filters['event_start_from'], $filters['event_start_to']]);
-    } elseif (!empty($filters['event_start_from'])) {
-        $query->whereDate('eventTime', '>=', $filters['event_start_from']);
-    } elseif (!empty($filters['event_start_to'])) {
-        $query->whereDate('eventTime', '<=', $filters['event_start_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'eventTime',
+        $filters['event_start_from'] ?? null,
+        $filters['event_start_to'] ?? null
+    );
 
-    if (!empty($filters['event_end_from']) && !empty($filters['event_end_to'])) {
-        $query->whereBetween('eventEnd', [$filters['event_end_from'], $filters['event_end_to']]);
-    } elseif (!empty($filters['event_end_from'])) {
-        $query->whereDate('eventEnd', '>=', $filters['event_end_from']);
-    } elseif (!empty($filters['event_end_to'])) {
-        $query->whereDate('eventEnd', '<=', $filters['event_end_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'eventEnd',
+        $filters['event_end_from'] ?? null,
+        $filters['event_end_to'] ?? null
+    );
 
-    if (!empty($filters['published_from']) && !empty($filters['published_to'])) {
-        $query->whereBetween('created_at', [$filters['published_from'], $filters['published_to']]);
-    } elseif (!empty($filters['published_from'])) {
-        $query->whereDate('created_at', '>=', $filters['published_from']);
-    } elseif (!empty($filters['published_to'])) {
-        $query->whereDate('created_at', '<=', $filters['published_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['published_from'] ?? null,
+        $filters['published_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -945,13 +951,12 @@ private function buildFeedbackReportQuery(array $filters)
         $query->where('message', 'like', '%' . trim((string) $filters['message_keyword']) . '%');
     }
 
-    if (!empty($filters['submitted_from']) && !empty($filters['submitted_to'])) {
-        $query->whereBetween('created_at', [$filters['submitted_from'], $filters['submitted_to']]);
-    } elseif (!empty($filters['submitted_from'])) {
-        $query->whereDate('created_at', '>=', $filters['submitted_from']);
-    } elseif (!empty($filters['submitted_to'])) {
-        $query->whereDate('created_at', '<=', $filters['submitted_to']);
-    }
+    $this->applyInclusiveDateRange(
+        $query,
+        'created_at',
+        $filters['submitted_from'] ?? null,
+        $filters['submitted_to'] ?? null
+    );
 
     return $query->latest();
 }
@@ -996,16 +1001,12 @@ public function view($id)
         }
 
         // Apply date range filter
-        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-            $query->whereBetween('created_at', [
-                $filters['date_from'],
-                $filters['date_to']
-            ]);
-        } elseif (!empty($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
-        } elseif (!empty($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
-        }
+        $this->applyInclusiveDateRange(
+            $query,
+            'created_at',
+            $filters['date_from'] ?? null,
+            $filters['date_to'] ?? null
+        );
 
         $data = $query->get();
     }
@@ -1155,16 +1156,12 @@ public function printTemplate($id)
         }
 
         // Apply date range filter
-        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
-            $query->whereBetween('created_at', [
-                $filters['date_from'],
-                $filters['date_to']
-            ]);
-        } elseif (!empty($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
-        } elseif (!empty($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
-        }
+        $this->applyInclusiveDateRange(
+            $query,
+            'created_at',
+            $filters['date_from'] ?? null,
+            $filters['date_to'] ?? null
+        );
 
         $data = $query->get();
     }

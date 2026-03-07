@@ -457,7 +457,7 @@
             </a>
         </li>
         <li>
-            <a class="{{ Request::routeIs('subadmin.complaint*') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
+            <a class="{{ Request::routeIs('subadmin.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
                 <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
             </a>
         </li>

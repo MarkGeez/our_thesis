@@ -241,6 +241,43 @@
         font-weight: 500;
     }
 
+    .report-filter-toggle {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+        color: #1e293b;
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+    }
+
+    .report-filter-toggle:hover,
+    .report-filter-toggle:focus {
+        border-color: #93c5fd;
+        color: #0f172a;
+        background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.08);
+    }
+
+    .report-filter-chevron {
+        transition: transform 0.2s ease;
+    }
+
+    .report-filter-toggle:not(.collapsed) .report-filter-chevron {
+        transform: rotate(180deg);
+    }
+
+    .report-filter-panel {
+        margin-top: 0.85rem;
+        padding: 1rem;
+        border: 1px solid #dbeafe;
+        border-radius: 14px;
+        background: #f8fbff;
+    }
+
     .pagination-container {
         padding: 18px 22px 22px 22px;
         background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
@@ -773,11 +810,11 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Reason <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="reason" class="form-control" value="{{ old('reason') }}" placeholder="Archive reason contains...">
-                        </div>
+                        </div>{{--  
                         <div class="col-12">
                             <label class="form-label fw-semibold">Keyword in Type/Reason/Details <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search archive details">
-                        </div>
+                        </div>--}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
@@ -1087,10 +1124,10 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        {{--  <div class="col-md-6">
                             <label class="form-label fw-semibold">Record ID <span class="text-muted">(Optional)</span></label>
                             <input type="number" min="1" name="record_id" class="form-control" value="{{ old('record_id') }}" placeholder="e.g. 102">
-                        </div>
+                        </div>--}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Module <span class="text-muted">(Optional)</span></label>
                             <select name="module" class="form-select">
@@ -1113,10 +1150,10 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12">
+                        {{--  <div class="col-12">
                             <label class="form-label fw-semibold">Keyword (Description/Module/Action) <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search text">
-                        </div>
+                        </div>--}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
@@ -1203,11 +1240,11 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Address <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="address" class="form-control" value="{{ old('address') }}" placeholder="Address contains...">
-                        </div>
+                        </div>{{--  
                         <div class="col-12">
                             <label class="form-label fw-semibold">Keyword in Details/Remarks <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search complaint details or remarks">
-                        </div>
+                        </div>--}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">From Date <span class="text-muted">(Optional)</span></label>
                             <div class="input-group w-100">
@@ -1711,6 +1748,154 @@
                 openPicker(input);
             });
         });
+
+        function buildDateRangeToggle(config) {
+            const modal = document.getElementById(config.modalId);
+            if (!modal) return;
+
+            const row = modal.querySelector('.modal-body .row.g-3');
+            if (!row) return;
+
+            const startInput = row.querySelector(`input[name="${config.startField}"]`);
+            const endInput = row.querySelector(`input[name="${config.endField}"]`);
+            if (!startInput || !endInput) return;
+
+            let startBlock = startInput.closest('[class*="col-"]');
+            const endBlock = endInput.closest('[class*="col-"]');
+            if (!startBlock || !endBlock) return;
+
+            if (config.includePreviousHeader) {
+                const previousBlock = startBlock.previousElementSibling;
+                if (previousBlock && previousBlock.matches('[class*="col-"]')) {
+                    startBlock = previousBlock;
+                }
+            }
+
+            const toggleCol = document.createElement('div');
+            toggleCol.className = 'col-12';
+
+            const collapseId = `${config.modalId}DateFilters`;
+            const toggleButton = document.createElement('button');
+            toggleButton.type = 'button';
+            toggleButton.className = 'btn report-filter-toggle collapsed';
+            toggleButton.setAttribute('data-bs-toggle', 'collapse');
+            toggleButton.setAttribute('data-bs-target', `#${collapseId}`);
+            toggleButton.setAttribute('aria-expanded', 'false');
+            toggleButton.setAttribute('aria-controls', collapseId);
+            toggleButton.innerHTML = `<span><i class="fas fa-calendar-range me-2 text-primary"></i>${config.label}</span><i class="fas fa-chevron-down report-filter-chevron"></i>`;
+
+            const collapseCol = document.createElement('div');
+            collapseCol.className = 'col-12';
+
+            const collapseEl = document.createElement('div');
+            collapseEl.className = 'collapse report-filter-collapse';
+            collapseEl.id = collapseId;
+
+            const panel = document.createElement('div');
+            panel.className = 'report-filter-panel';
+
+            const innerRow = document.createElement('div');
+            innerRow.className = 'row g-3';
+
+            panel.appendChild(innerRow);
+            collapseEl.appendChild(panel);
+            toggleCol.appendChild(toggleButton);
+            collapseCol.appendChild(collapseEl);
+
+            row.insertBefore(toggleCol, startBlock);
+            row.insertBefore(collapseCol, startBlock);
+
+            let current = startBlock;
+            while (current) {
+                const next = current.nextElementSibling;
+                innerRow.appendChild(current);
+                if (current === endBlock) {
+                    break;
+                }
+                current = next;
+            }
+
+            if (config.includeNextInfo) {
+                const nextBlock = collapseCol.nextElementSibling;
+                if (nextBlock && nextBlock.matches('[class*="col-"]') && nextBlock.querySelector('small.text-muted') && !nextBlock.querySelector('input, select, textarea')) {
+                    innerRow.appendChild(nextBlock);
+                }
+            }
+
+            const hasValue = Array.from(collapseEl.querySelectorAll('.report-date-input')).some(function (input) {
+                return Boolean((input.value || input.getAttribute('data-raw') || '').trim());
+            });
+
+            if (hasValue && typeof bootstrap !== 'undefined') {
+                bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false }).show();
+            }
+        }
+
+        [
+            {
+                modalId: 'modalOfficialsReport',
+                startField: 'term_start_from',
+                endField: 'term_end_to',
+                label: 'Term Date Range Filters'
+            },
+            {
+                modalId: 'modalArchivesReport',
+                startField: 'date_from',
+                endField: 'date_to',
+                label: 'Date Range Filters',
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalAnnouncementsReport',
+                startField: 'event_start_from',
+                endField: 'published_to',
+                label: 'Date Range Filters',
+                includePreviousHeader: true,
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalFeedbackReport',
+                startField: 'submitted_from',
+                endField: 'submitted_to',
+                label: 'Date Range Filters',
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalActivityReport',
+                startField: 'date_from',
+                endField: 'date_to',
+                label: 'Date Range Filters',
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalComplaintReport',
+                startField: 'date_from',
+                endField: 'date_to',
+                label: 'Date Range Filters'
+            },
+            {
+                modalId: 'modalPopulationReport',
+                startField: 'birthday_from',
+                endField: 'birthday_to',
+                label: 'Birthday Range Filters',
+                includePreviousHeader: true,
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalBlotterReport',
+                startField: 'date_from',
+                endField: 'date_to',
+                label: 'Date Range Filters',
+                includeNextInfo: true
+            },
+            {
+                modalId: 'modalCertificateReport',
+                startField: 'date_from',
+                endField: 'date_to',
+                label: 'Date Range Filters',
+                includeNextInfo: true
+            }
+        ].forEach(buildDateRangeToggle);
 
         const streetSelect = document.getElementById('householdStreetFilter');
         const houseSelect = document.getElementById('householdHouseFilter');
