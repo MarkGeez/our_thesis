@@ -1018,49 +1018,40 @@ document.addEventListener('DOMContentLoaded', function () {
     // 2. Search Logic (Scoped to the clicked button's container)
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('new-head-search-btn')) {
-            const container = e.target.closest('.search-box-container');
+            // Find the container SPECIFIC to this modal
+            const container = e.target.closest('.position-relative');
             const searchInput = container.querySelector('.new-head-search-input');
             const dropdown = container.querySelector('.new-head-dropdown');
-            const hiddenInput = container.querySelector('.new-head-id-input');
-
+            
             const query = searchInput.value.toLowerCase().trim();
             dropdown.innerHTML = '';
 
-            if (!query) {
-                dropdown.classList.add('d-none');
-                return;
-            }
+            if (!query) return dropdown.classList.add('d-none');
 
             const matches = residents.filter(person => {
                 const fullName = `${person.lastName} ${person.firstName} ${person.middleName ?? ''}`.toLowerCase();
                 return fullName.includes(query) || person.id.toString() === query;
             }).slice(0, 8);
 
-            if (matches.length === 0) {
-                dropdown.innerHTML = '<div class="p-2 text-muted">No residents found</div>';
-                dropdown.classList.remove('d-none');
-                return;
-            }
+            if (matches.length > 0) {
+                matches.forEach(person => {
+                    const option = document.createElement('div');
+                    option.className = 'resident-option p-2 border-bottom';
+                    option.style.cursor = 'pointer';
+                    option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
 
-            matches.forEach(person => {
-                const option = document.createElement('div');
-                option.className = 'resident-option p-2 border-bottom';
-                option.style.cursor = 'pointer';
-                option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
-
-                option.addEventListener('click', function () {
-                    searchInput.value = this.textContent;
-                    hiddenInput.value = person.id;
-                    dropdown.classList.add('d-none');
+                    option.addEventListener('click', function () {
+                        // Crucial: Update the hidden input in THIS modal only
+                        searchInput.value = this.textContent;
+                        container.querySelector('.new-head-id-input').value = person.id;
+                        dropdown.classList.add('d-none');
+                    });
+                    dropdown.appendChild(option);
                 });
-
-                dropdown.appendChild(option);
-            });
-
-            dropdown.classList.remove('d-none');
+                dropdown.classList.remove('d-none');
+            }
         }
     });
-
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-box-container')) {
@@ -1263,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Middle Name -->
     <label>Middle Name</label>
     <input type="text" name="middleName" class="form-control @error('middleName') is-invalid @enderror" 
-           placeholder="Enter Middle Name" value="{{ old('middleName') }}" required>
+           placeholder="Enter Middle Name" value="{{ old('middleName') }}" >
     @error('middleName')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

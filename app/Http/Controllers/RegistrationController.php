@@ -20,7 +20,7 @@ class RegistrationController extends Controller
     {
         $request->validate([
             'firstName'       => 'required|string|max:70',
-            'middleName'      => 'required|string|max:50',
+            'middleName'      => 'nullable|string|max:50',
             'lastName'        => 'required|string|max:50',
             'email'           => 'required|string|email|max:255|unique:users,email',
             'password'        => 'required|string|min:8|max:255',
