@@ -56,7 +56,26 @@ class SubAdminController extends Controller
             }
         }
 
-        $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
+        $householdIds = collect();
+        $isHouseholdHead = false;
+
+        if ($resident) {
+            $householdIds = $resident->households->pluck('id');
+            $isHouseholdHead = $resident->households->contains(function ($household) {
+                return (bool) ($household->pivot->is_household_head ?? false);
+            });
+        }
+
+        $members = FamilyMember::with('resident')
+            ->where(function ($query) use ($user, $householdIds, $isHouseholdHead) {
+                $query->where('encoded_by', $user->id);
+
+                if ($isHouseholdHead && $householdIds->isNotEmpty()) {
+                    $query->orWhereIn('household_id', $householdIds);
+                }
+            })
+            ->get();
+
         $residents = Resident::select('id','firstName','middleName','lastName')->get();
 
         return view('subadmin.profile', compact('user', 'resident', 'members', 'residents'));

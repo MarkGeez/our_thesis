@@ -280,11 +280,9 @@ class HouseholdController extends Controller
         if (!$newHeadResident) {
             return redirect()->back()->with('error', 'Selected resident not found.');
         }
-
         if (!$newHeadResident->user_id) {
             return redirect()->back()->with('error', 'The selected resident must have an account before becoming the household head.');
         }
-
         HouseholdResident::firstOrCreate(
             [
                 'household_id' => $member->household_id,
@@ -313,10 +311,6 @@ class HouseholdController extends Controller
             ->update(['is_household_head' => true]);
 
         $newHeadResident->update(['headOfFamily' => 'yes']);
-
-        FamilyMember::where('household_id', $member->household_id)
-            ->where('encoded_by', $user->id)
-            ->update(['encoded_by' => $newHeadResident->user_id]);
 
         FamilyMember::where('household_id', $member->household_id)
             ->where('resident_id', $newHeadResident->id)
