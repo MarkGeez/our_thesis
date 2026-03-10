@@ -79,7 +79,7 @@
                                                     <i class="fa-solid fa-user-minus me-1"></i> Untag Member
                                                 </button>
                                             </form>
-                                           
+                                            @if($currentHeadHouseholdIds->contains($member->household_id))
                                                 <form action="{{ route(auth()->user()->role . '.update.head', $member->id) }}" method="POST" class="m-0">
                                                     @csrf
                                                     @method('PUT')
