@@ -77,6 +77,8 @@ Route::middleware(['auth', 'role:resident'])->group(function(){
         })->name('family.add');
         Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
    Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
+    Route::put('profile/update-head/{id}', [HouseholdController::class, 'updateHead'])->name('update.head');
+
     Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
 
 
@@ -141,6 +143,7 @@ Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->
     Route::get('/households/streets/{id}', [HouseholdController::class, 'showStreets'])->name('households.streets');
     Route::get('/households/houses/{id}', [HouseholdController::class, 'showHeads'])->name('households.heads');
     Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
+    Route::put('profile/update-head/{id}', [HouseholdController::class, 'updateHead'])->name('update.head');
     Route::put('profile/update-family/{id}', [HouseholdController::class, 'editMember'])->name('edit.family');
     Route::get('/profile/search', [HouseholdController::class, 'search']);
 
@@ -243,6 +246,7 @@ Route::middleware(['auth', 'role:subadmin', 'log.module.visit'])->group(function
         })->name('family.add');
         Route::post('/profile/add-family', [HouseholdController::class, 'storeFamilyMember'])->name('family.store');
         Route::delete('profile/delete-family/{id}', [HouseholdController::class, 'untagMember'])->name('untag.member');
+        Route::put('profile/update-head/{id}', [HouseholdController::class, 'updateHead'])->name('update.head');
         Route::put('/profile/{id}', [ResidentListController::class, 'updateOwnInfo'])->name('update.ownInfo');
         Route::put('/profile/update/{id}', [UserListController::class, 'updateProfile'])->name('update.profile');
         Route::get('/blotterRequest', [SubAdminController::class,'blotterRequest'])->name('blotterRequest');
