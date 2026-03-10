@@ -812,7 +812,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="certificatePrintBtn" class="btn btn-primary">
+                <button type="button" id="certificatePrintBtn" class="btn btn-primary d-none">
                     <i class="fas fa-print me-2"></i>Print Certificate
                 </button>
             </div>
@@ -1044,6 +1044,7 @@ document.querySelectorAll('[data-preview-id]').forEach(function(btn) {
         var url = '{{ route("admin.certificate.preview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
         document.getElementById('certificatePreviewFrame').src = url;
         document.getElementById('certificatePrintBtn').setAttribute('data-current-id', id);
+        document.getElementById('certificatePrintBtn').classList.remove('d-none');
         new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
     });
 });
@@ -1054,6 +1055,7 @@ document.querySelectorAll('[data-pending-preview-id]').forEach(function(btn) {
         var url = '{{ route("admin.certificate.pendingPreview", ["id" => 0]) }}'.replace(/\/0$/, '/' + id);
         document.getElementById('certificatePreviewFrame').src = url;
         document.getElementById('certificatePrintBtn').setAttribute('data-current-id', id);
+        document.getElementById('certificatePrintBtn').classList.add('d-none');
         new bootstrap.Modal(document.getElementById('certificatePreviewModal')).show();
     });
 });

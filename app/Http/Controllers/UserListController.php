@@ -22,10 +22,7 @@ class UserListController extends Controller
         $resident = Resident::where('user_id', $user->id)->first();
 
         if (!$resident) {
-            $resident = Resident::whereRaw('LOWER(firstName) = ?', [strtolower((string) $user->firstName)])
-                ->whereRaw('LOWER(middleName) = ?', [strtolower((string) $user->middleName)])
-                ->whereRaw('LOWER(lastName) = ?', [strtolower((string) $user->lastName)])
-                ->whereDate('birthday', $user->birthday)
+            $resident = Resident::matchingUser($user)
                 ->first();
         }
 
@@ -176,10 +173,7 @@ class UserListController extends Controller
 
         if ($newStatus === 'approved') {
             // Bind user to resident if exists
-            $resident = \App\Models\Resident::where('firstName', $user->firstName)
-                ->where('middleName', $user->middleName)
-                ->where('lastName', $user->lastName)
-                ->where('birthday', $user->birthday)
+            $resident = \App\Models\Resident::matchingUser($user)
                 ->first();
             if ($resident) {
                 // User -> resident is a hasOne relation; assign the FK on resident.

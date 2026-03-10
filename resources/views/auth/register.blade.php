@@ -75,6 +75,36 @@
             position: relative;
         }
 
+        /* Inner wrapper keeps icon anchored to input, not the whole field group */
+        .input-field-wrap {
+            position: relative;
+        }
+
+        /* Auth-alert error style matching login.blade */
+        .auth-alert {
+            border-radius: 8px;
+            padding: 0.45rem 0.65rem;
+            margin-top: 0.35rem;
+            font-size: 0.72rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .auth-alert i {
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .auth-alert-error {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.55);
+        }
+
         .form-control {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             font-size: 0.8rem;
@@ -109,10 +139,10 @@
             padding: 0.4rem 2.5rem 0.4rem 0.5rem; 
         }
 
-        .input-with-icon .input-icon {
+        .input-field-wrap .input-icon {
             position: absolute;
             right: 10px;
-            top: 72.5%;
+            top: 50%;
             transform: translateY(-50%);
             color: #fff !important;
             pointer-events: none;
@@ -230,13 +260,7 @@
             border-bottom-color: #fff;
         }
 
-        .terms-error-box {
-            font-size: 0.7rem;
-            color: #ff9999;
-            margin-top: 8px;
-            display: block;
-            font-weight: bold;
-        }
+        
         .proof-instruction {
     background: rgba(255, 255, 255, 0.1);
     border-left: 3px solid #6fb1ff;
@@ -260,7 +284,6 @@
 }
     </style>
 </head>
-
 <body class="d-flex justify-content-center align-items-start vh-100" style="padding-top: 40px;">
     <div class="d-flex flex-column align-items-center">
         <div class="card shadow">
@@ -272,74 +295,88 @@
                 <!-- Your existing form fields (unchanged) -->
                 <div class="input-with-icon mb-3">
                     <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" name="firstName" id="firstName" class="form-control"
-                    placeholder="Enter your first name" value="{{ old('firstName') }}" required>
-                    <i class="fa-solid fa-user input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="text" name="firstName" id="firstName" class="form-control"
+                        placeholder="Enter your first name" value="{{ old('firstName') }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
                     @error('firstName')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message}}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3">
                     <label for="middleName" class="form-label">Middle Name</label>
-                    <input type="text" name="middleName" id="middleName" class="form-control"
-                    placeholder="Enter your middle name" value="{{ old('middleName') }}" required> 
-                    <i class="fa-solid fa-user input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="text" name="middleName" id="middleName" class="form-control"
+                        placeholder="Enter your middle name" value="{{ old('middleName') }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
                     @error('middleName')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3">
                     <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" name="lastName" id="lastName" class="form-control"
-                    placeholder="Enter your last name" value="{{ old('lastName') }}" required>
-                    <i class="fa-solid fa-user input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="text" name="lastName" id="lastName" class="form-control"
+                        placeholder="Enter your last name" value="{{ old('lastName') }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
                     @error('lastName')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="text" name="email" id="email" class="form-control"
-                    placeholder="Enter your email" value="{{ old('email') }}" required>
-                    <i class="fa-solid fa-envelope input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="text" name="email" id="email" class="form-control"
+                        placeholder="Enter your email" value="{{ old('email') }}" required>
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
                     @error('email')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" name="password" id="password" class="form-control"
-                    placeholder="Enter your password" required>
-                    <i class="fa-solid fa-lock input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="password" name="password" id="password" class="form-control"
+                        placeholder="Enter your password" required>
+                        <i class="fa-solid fa-lock input-icon"></i>
+                    </div>
                     @error('password')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3" id="confirmPasswordContainer" style="display: none;">
                     <label for="password_confirmation" class="form-label">Confirm Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                    placeholder="Confirm your password">
-                    <i class="fa-solid fa-lock input-icon"></i>
-                    <div id="passwordMismatchError" class="bg-danger p-1 my-1 rounded text-light small mt-1" style="display: none;">
-                        <i class="fas fa-exclamation-circle"></i> Passwords do not match
+                    <div class="input-field-wrap">
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                        placeholder="Confirm your password">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                    </div>
+                    <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display: none;">
+                        <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
                     </div>
                     @error('password_confirmation')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
                 <div class="input-with-icon mb-3">
                     <label for="contactNumber" class="form-label">Contact Number</label>
-                    <input type="text" name="contactNumber" id="contactNumber" class="form-control"
-                    placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
-                    <i class="fa-solid fa-phone input-icon"></i>
+                    <div class="input-field-wrap">
+                        <input type="text" name="contactNumber" id="contactNumber" class="form-control"
+                        placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
+                        <i class="fa-solid fa-phone input-icon"></i>
+                    </div>
                     @error('contactNumber')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
@@ -348,7 +385,7 @@
                     <input type="date" name="birthday" id="birthday" class="form-control"
                     value="{{ old('birthday') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
                     @error('birthday')
-                    <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
@@ -366,7 +403,7 @@
                         id="proofOfIdentity" class="form-control">
                         
                     @error('proofOfIdentity')
-                        <div class="bg-danger p-1 my-1 rounded text-light small mt-1">{{ $message }}</div>
+                        <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 
@@ -378,7 +415,7 @@
                         </label>
                     </div>
                     @error('terms_accepted')
-                        <span class="terms-error-box"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span>
+                        <div class="auth-alert auth-alert-error mt-2"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
                 </div>
 

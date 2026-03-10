@@ -447,7 +447,7 @@
                         <li>
                            <a class="{{ Request::routeIs('admin.adminCertificate*') ? 'active' : '' }}"
                                href="{{ route('admin.adminCertificate') }}">
-                                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
+                                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Certificates
                             </a>
                         </li>
                         <li>
@@ -504,7 +504,7 @@
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Document Requests</p>
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Certificate Requests</p>
                     </a>
                 </li>
 

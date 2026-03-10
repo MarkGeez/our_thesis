@@ -26,10 +26,7 @@ class AuthController extends Controller
         $resident = Resident::where('user_id', $user->id)->first();
 
         if (!$resident) {
-            $resident = Resident::whereRaw('LOWER(firstName) = ?', [strtolower((string) $user->firstName)])
-                ->whereRaw('LOWER(middleName) = ?', [strtolower((string) $user->middleName)])
-                ->whereRaw('LOWER(lastName) = ?', [strtolower((string) $user->lastName)])
-                ->whereDate('birthday', $user->birthday)
+            $resident = Resident::matchingUser($user)
                 ->first();
         }
 

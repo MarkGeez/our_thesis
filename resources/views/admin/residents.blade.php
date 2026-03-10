@@ -662,7 +662,9 @@
                                                             <div class="row">
                                                                 <div class="col-md-4 text-center mb-3 mb-md-0">
                                                                     <div class="img-container mb-2">
-                                                                        <img src="{{ asset('storage/' . $resident->image_path) }}" 
+                                                                        <img src="{{ $resident->user && $resident->user->profile_image
+                                                                            ? asset('storage/' . $resident->user->profile_image)
+                                                                            : asset('images/default_profile.jpg') }}" 
                                                                             alt="Profile Picture" 
                                                                             class="img-thumbnail rounded shadow-sm"
                                                                             style="width: 100%; max-width: 200px; height: 200px; object-fit: cover;">
@@ -855,7 +857,7 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <label>Middle Name</label>
-                                                                <input type="text" name="middleName" class="form-control" value="{{ old('middleName', $resident->middleName) }}" required>
+                                                                <input type="text" name="middleName" class="form-control" value="{{ old('middleName', $resident->middleName) }}" >
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <label>Last Name</label>
@@ -1235,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 {{ $residents->appends(request()->query())->links('pagination::bootstrap-5') }}
                             </div>
                         </div>
+                    @endif
                     @endif
                 </div>
             </div>

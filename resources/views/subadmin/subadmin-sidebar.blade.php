@@ -453,7 +453,7 @@
     <ul class="cat-sub-menu {{ $servicesActive ? 'visible' : '' }}">
         <li>
             <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
-                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
+                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Certificates
             </a>
         </li>
         <li>

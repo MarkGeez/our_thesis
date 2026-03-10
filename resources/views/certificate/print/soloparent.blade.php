@@ -325,7 +325,7 @@
     </div>
 </div>
 
-@if($editable)
+@if($editable && $req->status === 'approved')
 <div class="no-print" style="position:fixed;bottom:20px;right:20px;">
   <button type="submit" form="certEditForm" style="padding:10px 18px;background:#0a3a8a;color:white;border:none;border-radius:4px;font-size:14px;cursor:pointer">Print with current data</button>
 </div>

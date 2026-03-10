@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-    use App\Services\ActiveLogger;
+use App\Services\ActiveLogger;
+use App\Models\User;
 
 class Resident extends Model
 {
@@ -75,5 +77,42 @@ class Resident extends Model
         return $this->belongsToMany(Household::class, 'household_resident')
             ->withPivot('is_household_head')
             ->withTimestamps();
+    }
+
+    public function scopeMatchingIdentity(
+        Builder $query,
+        ?string $firstName,
+        ?string $middleName,
+        ?string $lastName,
+        $birthday = null
+    ): Builder {
+        $query
+            ->whereRaw('LOWER(firstName) = ?', [self::normalizeNamePart($firstName)])
+            ->whereRaw(
+                "LOWER(COALESCE(NULLIF(TRIM(middleName), ''), '')) = ?",
+                [self::normalizeNamePart($middleName)]
+            )
+            ->whereRaw('LOWER(lastName) = ?', [self::normalizeNamePart($lastName)]);
+
+        if ($birthday) {
+            $query->whereDate('birthday', $birthday);
+        }
+
+        return $query;
+    }
+
+    public function scopeMatchingUser(Builder $query, User $user): Builder
+    {
+        return $query->matchingIdentity(
+            $user->firstName,
+            $user->middleName,
+            $user->lastName,
+            $user->birthday
+        );
+    }
+
+    public static function normalizeNamePart(?string $value): string
+    {
+        return strtolower(trim((string) $value));
     }
 }

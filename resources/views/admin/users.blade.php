@@ -1468,6 +1468,7 @@
                             </table>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Enhanced Pagination -->
                     @if($userList->count() > 0)

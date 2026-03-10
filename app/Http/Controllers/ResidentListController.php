@@ -99,7 +99,7 @@ public function showResidents(Request $request)
     $femaleCount = Resident::where('sex', 'female')->count();
     $seniorCount = Resident::where('age', '>=', 60)->count();
     
-    $residents = Resident::with(['user:id,firstName,lastname', 'official', 'households.house.street'])
+    $residents = Resident::with(['user:id,firstName,lastname,profile_image', 'official', 'households.house.street'])
         ->when($searchTerm, function($query, $searchTerm) {
             return $query->where(function($q) use ($searchTerm) {
                 $q->where('firstName', 'like', "%{$searchTerm}%")

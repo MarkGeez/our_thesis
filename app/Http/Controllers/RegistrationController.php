@@ -29,13 +29,16 @@ class RegistrationController extends Controller
             'proofOfIdentity' => 'required|image|mimes:jpg,png,jpeg|max:4096'
         ]);
 
-        $firstName = strtolower(trim($request->firstName));
-        $middleName = strtolower(trim($request->middleName));
-        $lastName = strtolower(trim($request->lastName));
+        $firstName = Resident::normalizeNamePart($request->firstName);
+        $middleName = Resident::normalizeNamePart($request->middleName);
+        $lastName = Resident::normalizeNamePart($request->lastName);
 
         // Check for duplicate name with approved status
         $existingUser = User::whereRaw('LOWER(firstName) = ?', [$firstName])
-            ->whereRaw('LOWER(middleName) = ?', [$middleName])
+            ->whereRaw(
+                "LOWER(COALESCE(NULLIF(TRIM(middleName), ''), '')) = ?",
+                [$middleName]
+            )
             ->whereRaw('LOWER(lastName) = ?', [$lastName])
             ->where('status', 'approved')
             ->first();
@@ -58,9 +61,12 @@ class RegistrationController extends Controller
         }
 
         // Check if user exists in residents table
-        $resident = Resident::where('firstName', $request->firstName)
-            ->where('middleName', $request->middleName)
-            ->where('lastName', $request->lastName)
+        $resident = Resident::matchingIdentity(
+            $request->firstName,
+            $request->middleName,
+            $request->lastName,
+            $request->birthday
+        )
             ->first();
 
         $role = "non-resident";
