@@ -1444,9 +1444,10 @@
                             <label class="form-label fw-semibold">Status <span class="text-muted">(Optional)</span></label>
                             <select name="blotter_status" class="form-select">
                                 <option value="all" {{ old('blotter_status', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (First-Third Summon)</option>
+                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (Barangay Blotter-Third Summon)</option>
                                 <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Hearing)</option>
                                 <option value="closed" {{ old('blotter_status') === 'closed' ? 'selected' : '' }}>Closed</option>
+                                <option value="barangayBlotter" {{ old('blotter_status') === 'barangayBlotter' ? 'selected' : '' }}>Barangay Blotter</option>
                                 <option value="first" {{ old('blotter_status') === 'first' ? 'selected' : '' }}>First Summon</option>
                                 <option value="second" {{ old('blotter_status') === 'second' ? 'selected' : '' }}>Second Summon</option>
                                 <option value="third" {{ old('blotter_status') === 'third' ? 'selected' : '' }}>Third Summon</option>

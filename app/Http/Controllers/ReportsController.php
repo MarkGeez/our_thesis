@@ -151,7 +151,7 @@ public function generateBlotter(Request $request)
 {
     $request->validate([
         'report_name' => 'required',
-        'blotter_status' => 'nullable|in:all,pending,ongoing,closed,first,second,third,brgyHearing,coldCase,criminalCase,referredToPnp,resolved',
+        'blotter_status' => 'nullable|in:all,pending,ongoing,closed,barangayBlotter,first,second,third,brgyHearing,coldCase,criminalCase,referredToPnp,resolved',
         'blotter_type' => 'nullable|in:all,regular,vawc',
         'complainant_name' => 'nullable|string|max:150',
         'date_from' => 'nullable|date',
@@ -665,7 +665,7 @@ private function buildBlotterReportQuery(array $filters)
 
     if ($status !== 'all') {
         if ($status === 'pending') {
-            $query->whereIn('current_status', ['first', 'second', 'third']);
+            $query->whereIn('current_status', ['barangayBlotter', 'first', 'second', 'third']);
         } elseif ($status === 'ongoing') {
             $query->where('current_status', 'brgyHearing');
         } elseif ($status === 'closed') {

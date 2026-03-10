@@ -53,10 +53,7 @@
         'senior' => 'Senior Citizen',
     ];
 @endphp
-@if($filteredRequests->isEmpty())
-    <div class="alert alert-info">No certificate requests in this category.</div>
-@else
-    <form method="GET" action="{{ route('admin.certificateRequest') }}" class="table-filter-bar">
+<form method="GET" action="{{ route('admin.certificateRequest') }}" class="table-filter-bar">
     <input type="hidden" name="tab" value="{{ $tab }}">
 
     <div class="flex-grow-1" style="min-width: 250px;">
@@ -122,6 +119,9 @@
     </div>
 </form>
 
+@if($filteredRequests->isEmpty())
+    <div class="alert alert-info">No certificate requests found for the current filters. Adjust the filters above or use Reset to return to all records.</div>
+@else
     <div class="results-info">
         <div class="results-count ms-3">
             Records: <span class="count-number">{{ $filteredRequests instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator ? $filteredRequests->total() : $filteredRequests->count() }}</span>

@@ -766,13 +766,6 @@
 
                     <div class="tab-content" id="blotterTabContent">
                         <div class="tab-pane fade show active" id="blotter-list-pane" role="tabpanel">
-                    @if($blotters->isEmpty())
-                        <div class="content-wrap pt-0">
-                            <div class="alert alert-info mb-4">
-                                No blotter records found.
-                            </div>
-                        </div>
-                    @else
                         <div class="table-container pt-0">
                             <div class="results-info">
                                 <div class="results-count">
@@ -826,6 +819,13 @@
                                 </form>
                             </div>
 
+                            @if($blotters->isEmpty())
+                                <div class="content-wrap pt-0 px-0">
+                                    <div class="alert alert-info mb-0">
+                                        No blotter records found for the current filters. Adjust the filters above or use Reset to return to all records.
+                                    </div>
+                                </div>
+                            @else
                             <div class="table-responsive table-wrapper">
                                 <table id="blotterTable" class="table table-hover align-middle">
                                     <thead>
@@ -833,7 +833,7 @@
                                             <th style="width: 120px;">Blotter No</th>
                                             <th style="width: 140px;">Type</th>
                                             <th>Complainant (Nagrereklamo)</th>
-                                            <th>Defendant (Nirereklamo)</th>
+                                            <th>Respondent (Nirereklamo)</th>
                                             <th style="width: 150px;">Status</th>
                                             <th class="text-center" style="width: 150px;">Action</th>
                                         </tr>
@@ -848,6 +848,7 @@
                                                 $terminalStatuses = ['referredToPnp', 'resolved'];
                                                 $isTerminal = in_array($statusKey, $terminalStatuses, true);
                                                 $uiClass = match ($statusKey) {
+                                                    'barangayBlotter' => 'status-default',
                                                     'first', 'second', 'third' => 'status-pending',
                                                     'brgyHearing' => 'status-ongoing',
                                                     'coldCase', 'criminalCase', 'referredToPnp', 'resolved' => 'status-closed',
@@ -943,7 +944,7 @@
                                                             </section>
 
                                                             <section>
-                                                                <h6>Defendant Information</h6>
+                                                                <h6>Respondent Information</h6>
                                                                 <div class="info-box">
                                                                     <div class="row gy-3">
                                                                         <div class="col-sm-6">
@@ -1114,6 +1115,7 @@
                                     </tbody>
                                 </table>
                             </div>
+                            @endif
                         </div>
 
                         @if($blotters->hasPages())
@@ -1134,7 +1136,6 @@
                                 </div>
                             </div>
                         @endif
-                    @endif
                         </div>
                     </div>
                 </div>

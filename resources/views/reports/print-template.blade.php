@@ -451,7 +451,7 @@
         if ($type === 'blotter') {
             $statusGroups = $allData->groupBy(fn($r) => strtolower($r->current_status ?? $r->status ?? 'unknown'));
             $stats[] = ['label' => 'Total Cases',     'value' => $allData->count(),                            'color' => 'black'];
-            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->only(['first', 'second', 'third'])->flatten(1)->count(), 'color' => 'amber'];
+            $stats[] = ['label' => 'Pending',         'value' => $statusGroups->only(['barangayblotter', 'first', 'second', 'third'])->flatten(1)->count(), 'color' => 'amber'];
             $stats[] = ['label' => 'Ongoing',         'value' => $statusGroups->only(['brgyhearing'])->flatten(1)->count(), 'color' => 'green'];
             $stats[] = ['label' => 'Closed',          'value' => $statusGroups->only(['coldcase', 'criminalcase', 'referredtopnp', 'resolved'])->flatten(1)->count(), 'color' => 'slate'];
 
@@ -765,6 +765,7 @@
                             @elseif($type == 'blotter')
                                 @php
                                     $blotterStatusMap = [
+                                        'barangayBlotter' => 'Barangay Blotter',
                                         'first' => 'First Summon',
                                         'second' => 'Second Summon',
                                         'third' => 'Third Summon',

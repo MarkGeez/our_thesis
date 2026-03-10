@@ -264,6 +264,7 @@
                                 @elseif($type == 'blotter')
                                     @php
                                         $blotterStatusMap = [
+                                            'barangayBlotter' => 'Barangay Blotter',
                                             'first' => 'First Summon',
                                             'second' => 'Second Summon',
                                             'third' => 'Third Summon',

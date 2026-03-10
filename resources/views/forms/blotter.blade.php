@@ -181,7 +181,7 @@
                         <input type="hidden" name="blotter_type" value="{{ old('blotter_type', $defaultBlotterType) }}">
                     @endif
                 </div>
-                <label class="form-label">Attach Evidence/Proof (Optional)</label>
+                <label class="form-label">Attach Blotter Image</label>
                 <input type="file" name="proof" accept="image/jpg, image/jpeg, image/png" class="form-control">
                 <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
             </div>

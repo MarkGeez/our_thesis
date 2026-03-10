@@ -569,40 +569,41 @@
                     </form>
                 </div>
 
-                @if($residents->isEmpty())
-                    <div class="table-container">
-                        <div class="alert alert-info">No residents found.</div>
-                    </div>
-                @else
-                    <div class="table-container">
-                        <div class="results-info">
-                            <div class="results-count">
-                                Records: <span class="count-number">{{ $residents->total() }}</span>
-                            </div>
-                            <form method="GET" action="{{ route($user->role . '.residents') }}" class="table-filter-bar">
-                                <input type="hidden" name="search" value="{{ request('search') }}">
-                                <div class="filter-group">
-                                    <span class="filter-label">Sex</span>
-                                    <select name="sex_filter" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="all" {{ request('sex_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                                        <option value="male" {{ request('sex_filter') === 'male' ? 'selected' : '' }}>Male</option>
-                                        <option value="female" {{ request('sex_filter') === 'female' ? 'selected' : '' }}>Female</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <span class="filter-label">Sort</span>
-                                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
-                                        <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
-                                        <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
-                                        <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name: Z-A</option>
-                                    </select>
-                                </div>
-                                <a href="{{ route($user->role . '.residents', array_filter(['search' => request('search')])) }}" class="btn btn-link btn-sm text-secondary text-decoration-none">
-                                    <i class="fa fa-undo me-1"></i>Reset
-                                </a>
-                            </form>
+                <div class="table-container">
+                    <div class="results-info">
+                        <div class="results-count">
+                            Records: <span class="count-number">{{ $residents->total() }}</span>
                         </div>
+                        <form method="GET" action="{{ route($user->role . '.residents') }}" class="table-filter-bar">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                            <div class="filter-group">
+                                <span class="filter-label">Sex</span>
+                                <select name="sex_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ request('sex_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                    <option value="male" {{ request('sex_filter') === 'male' ? 'selected' : '' }}>Male</option>
+                                    <option value="female" {{ request('sex_filter') === 'female' ? 'selected' : '' }}>Female</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <span class="filter-label">Sort</span>
+                                <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
+                                    <option value="id_asc" {{ request('sort') === 'id_asc' ? 'selected' : '' }}>ID: Oldest</option>
+                                    <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name: A-Z</option>
+                                    <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name: Z-A</option>
+                                </select>
+                            </div>
+                            <a href="{{ route($user->role . '.residents', array_filter(['search' => request('search')])) }}" class="btn btn-link btn-sm text-secondary text-decoration-none">
+                                <i class="fa fa-undo me-1"></i>Reset
+                            </a>
+                        </form>
+                    </div>
+
+                    @if($residents->isEmpty())
+                        <div class="px-4 pb-4">
+                            <div class="alert alert-info mb-0">No residents found for the current filters. Adjust the filters above or use Reset to return to all records.</div>
+                        </div>
+                    @else
 
                         <div class="table-responsive table-wrapper">
                             <table class="table table-bordered table-hover bg-white">
@@ -1060,14 +1061,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('new-head-search-btn')) {
+<<<<<<< HEAD
             const container = e.target.closest('.search-box-container');
             if (!container) {
                 return;
             }
+=======
+            // Find the container SPECIFIC to this modal
+            const container = e.target.closest('.position-relative');
+            const searchInput = container.querySelector('.new-head-search-input');
+            const dropdown = container.querySelector('.new-head-dropdown');
+            
+            const query = searchInput.value.toLowerCase().trim();
+            dropdown.innerHTML = '';
+
+            if (!query) return dropdown.classList.add('d-none');
+>>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
 
             runNewHeadSearch(container);
         }
 
+<<<<<<< HEAD
         if (!e.target.closest('.search-box-container')) {
             document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
         }
@@ -1111,6 +1125,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     searchInput.focus();
                 }
             });
+=======
+            if (matches.length > 0) {
+                matches.forEach(person => {
+                    const option = document.createElement('div');
+                    option.className = 'resident-option p-2 border-bottom';
+                    option.style.cursor = 'pointer';
+                    option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
+
+                    option.addEventListener('click', function () {
+                        // Crucial: Update the hidden input in THIS modal only
+                        searchInput.value = this.textContent;
+                        container.querySelector('.new-head-id-input').value = person.id;
+                        dropdown.classList.add('d-none');
+                    });
+                    dropdown.appendChild(option);
+                });
+                dropdown.classList.remove('d-none');
+            }
+        }
+    });
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-box-container')) {
+            document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
+>>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
         }
     });
 });
@@ -1197,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         </div>
                     @endif
-                @endif
+                </div>
             </div>
 
             {{-- Modal: Create New Resident --}}
@@ -1223,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Middle Name -->
     <label>Middle Name</label>
     <input type="text" name="middleName" class="form-control @error('middleName') is-invalid @enderror" 
-           placeholder="Enter Middle Name" value="{{ old('middleName') }}" required>
+           placeholder="Enter Middle Name" value="{{ old('middleName') }}" >
     @error('middleName')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

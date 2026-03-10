@@ -26,6 +26,7 @@
                                     <div class="info-label">Current Status</div>
                                     @php
                                         $statusLabels = [
+                                            'barangayBlotter' => 'Barangay Blotter',
                                             'first' => 'First Summon',
                                             'second' => 'Second Summon',
                                             'third' => 'Third Summon',
@@ -38,6 +39,7 @@
                                         $currentStatus = $blotter->current_status ?? $blotter->status;
                                         $displayStatus = $statusLabels[$currentStatus] ?? ucfirst(strtolower($currentStatus));
                                         $badgeClass = match($currentStatus) {
+                                            'barangayBlotter' => 'secondary',
                                             'first', 'second' => 'primary',
                                             'third' => 'info',
                                             'brgyHearing' => 'warning text-dark',

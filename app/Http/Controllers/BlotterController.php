@@ -16,6 +16,7 @@ class BlotterController extends Controller
     ];
 
     private const STATUS_SEQUENCE = [
+        'barangayBlotter',
         'first',
         'second',
         'third',
@@ -45,6 +46,7 @@ class BlotterController extends Controller
     private static function getStatusLabels()
     {
         return [
+            'barangayBlotter' => 'Barangay Blotter',
             'first' => 'First Summon',
             'second' => 'Second Summon',
             'third' => 'Third Summon',
@@ -65,6 +67,47 @@ class BlotterController extends Controller
         return $labels[$status] ?? ucfirst(str_replace('_', ' ', $status));
     }
 
+    private static function normalizeSearchTerm(string $value): string
+    {
+        return strtolower(trim(preg_replace('/\s+/', ' ', str_replace('#', '', $value))));
+    }
+
+    private static function resolveMatchingStatuses(string $search): array
+    {
+        $normalizedSearch = self::normalizeSearchTerm($search);
+
+        return collect(self::getStatusLabels())
+            ->filter(function (string $label, string $code) use ($normalizedSearch) {
+                $normalizedLabel = self::normalizeSearchTerm($label);
+                $normalizedCode = self::normalizeSearchTerm($code);
+
+                return str_contains($normalizedLabel, $normalizedSearch)
+                    || str_contains($normalizedSearch, $normalizedLabel)
+                    || str_contains($normalizedCode, $normalizedSearch);
+            })
+            ->keys()
+            ->values()
+            ->all();
+    }
+
+    private static function resolveMatchingBlotterTypes(string $search): array
+    {
+        $normalizedSearch = self::normalizeSearchTerm($search);
+
+        return collect(self::getBlotterTypeLabels())
+            ->filter(function (string $label, string $code) use ($normalizedSearch) {
+                $normalizedLabel = self::normalizeSearchTerm($label);
+                $normalizedCode = self::normalizeSearchTerm($code);
+
+                return str_contains($normalizedLabel, $normalizedSearch)
+                    || str_contains($normalizedSearch, $normalizedLabel)
+                    || str_contains($normalizedCode, $normalizedSearch);
+            })
+            ->keys()
+            ->values()
+            ->all();
+    }
+
     // LIST ALL BLOTTERS (ADMIN)
     public function index(Request $request)
     {
@@ -80,18 +123,45 @@ class BlotterController extends Controller
         $query = Blotter::with(['updates.updater']);
 
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
+            $matchingStatuses = self::resolveMatchingStatuses($search);
+            $matchingTypes = self::resolveMatchingBlotterTypes($search);
+            $searchId = preg_replace('/\D+/', '', $search);
+            $normalizedSearch = self::normalizeSearchTerm($search);
+            $searchLike = '%' . $normalizedSearch . '%';
+
+            $query->where(function ($q) use ($search, $matchingStatuses, $matchingTypes, $searchId, $searchLike) {
                 $q->where('id', 'like', '%' . $search . '%')
-                    ->orWhere('plaintiffName', 'like', '%' . $search . '%')
-                    ->orWhere('plaintiffLastName', 'like', '%' . $search . '%')
-                    ->orWhere('defendantName', 'like', '%' . $search . '%')
-                    ->orWhere('defendantLastName', 'like', '%' . $search . '%')
-                    ->orWhere('current_status', 'like', '%' . $search . '%');
+                    ->orWhereRaw('LOWER(plaintiffName) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(COALESCE(plaintiffMiddleName, "")) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(plaintiffLastName) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(defendantName) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(COALESCE(defendantMiddleName, "")) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(defendantLastName) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(blotterDescription) LIKE ?', [$searchLike])
+                    ->orWhereRaw("LOWER(CONCAT_WS(' ', plaintiffName, plaintiffMiddleName, plaintiffLastName)) LIKE ?", [$searchLike])
+                    ->orWhereRaw("LOWER(CONCAT_WS(' ', plaintiffName, plaintiffLastName)) LIKE ?", [$searchLike])
+                    ->orWhereRaw("LOWER(CONCAT_WS(' ', defendantName, defendantMiddleName, defendantLastName)) LIKE ?", [$searchLike])
+                    ->orWhereRaw("LOWER(CONCAT_WS(' ', defendantName, defendantLastName)) LIKE ?", [$searchLike])
+                    ->orWhereRaw('LOWER(current_status) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(blotter_type) LIKE ?', [$searchLike]);
+
+                if ($searchId !== '') {
+                    $q->orWhere('id', (int) $searchId)
+                        ->orWhereRaw("CAST(id AS CHAR) LIKE ?", ['%' . $searchId . '%']);
+                }
+
+                if ($matchingStatuses !== []) {
+                    $q->orWhereIn('current_status', $matchingStatuses);
+                }
+
+                if ($matchingTypes !== []) {
+                    $q->orWhereIn('blotter_type', $matchingTypes);
+                }
             });
         }
 
         if ($statusFilter === 'pending') {
-            $query->whereIn('current_status', ['first', 'second', 'third']);
+            $query->whereIn('current_status', ['barangayBlotter', 'first', 'second', 'third']);
         } elseif ($statusFilter === 'ongoing') {
             $query->where('current_status', 'brgyHearing');
         } elseif ($statusFilter === 'closed') {
@@ -115,14 +185,15 @@ class BlotterController extends Controller
             case 'status_asc':
                 $query->orderByRaw("
                     CASE current_status
-                        WHEN 'first' THEN 1
-                        WHEN 'second' THEN 2
-                        WHEN 'third' THEN 3
-                        WHEN 'brgyHearing' THEN 4
-                        WHEN 'coldCase' THEN 5
-                        WHEN 'criminalCase' THEN 6
-                        WHEN 'referredToPnp' THEN 7
-                        WHEN 'resolved' THEN 8
+                        WHEN 'barangayBlotter' THEN 1
+                        WHEN 'first' THEN 2
+                        WHEN 'second' THEN 3
+                        WHEN 'third' THEN 4
+                        WHEN 'brgyHearing' THEN 5
+                        WHEN 'coldCase' THEN 6
+                        WHEN 'criminalCase' THEN 7
+                        WHEN 'referredToPnp' THEN 8
+                        WHEN 'resolved' THEN 9
                         ELSE 99
                     END ASC
                 ")->orderBy('id', 'desc');
@@ -130,14 +201,15 @@ class BlotterController extends Controller
             case 'status_desc':
                 $query->orderByRaw("
                     CASE current_status
-                        WHEN 'first' THEN 1
-                        WHEN 'second' THEN 2
-                        WHEN 'third' THEN 3
-                        WHEN 'brgyHearing' THEN 4
-                        WHEN 'coldCase' THEN 5
-                        WHEN 'criminalCase' THEN 6
-                        WHEN 'referredToPnp' THEN 7
-                        WHEN 'resolved' THEN 8
+                        WHEN 'barangayBlotter' THEN 1
+                        WHEN 'first' THEN 2
+                        WHEN 'second' THEN 3
+                        WHEN 'third' THEN 4
+                        WHEN 'brgyHearing' THEN 5
+                        WHEN 'coldCase' THEN 6
+                        WHEN 'criminalCase' THEN 7
+                        WHEN 'referredToPnp' THEN 8
+                        WHEN 'resolved' THEN 9
                         ELSE 99
                     END DESC
                 ")->orderBy('id', 'desc');
@@ -201,12 +273,12 @@ $blotter = Blotter::create([
     'schedule' => $request->schedule,
 
     'encodedBy' => Auth::id(),
-    'current_status' => 'first',
+    'current_status' => 'barangayBlotter',
 ]);
 
 UpdateBlotter::create([
     'blotter_id' => $blotter->id,
-    'status' => 'first',
+    'status' => 'barangayBlotter',
     'remarks' => $request->blotterDescription,
     'updated_by' => Auth::id(),
     'photo_path' => $proofPath,

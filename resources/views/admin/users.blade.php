@@ -979,7 +979,6 @@
                     </form>
                 </div>
 
-                @if($userList->count() > 0)
                     <!-- Table Container -->
                     <div class="table-container">
                         <div class="results-info">
@@ -1026,6 +1025,14 @@
                                 </a>
                             </form>
                         </div>
+
+                        @if($userList->count() === 0)
+                            <div class="px-4 pb-4">
+                                <div class="alert alert-info mb-0">
+                                    No users found for the current filters. Adjust the filters above or use Reset to return to all records.
+                                </div>
+                            </div>
+                        @else
 
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
@@ -1598,7 +1605,7 @@
                         </div>
                     </div>
                     @endif
-                @endif
+                </div>
         </div>
     </div>
 </div>

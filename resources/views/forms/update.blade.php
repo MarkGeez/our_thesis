@@ -225,6 +225,7 @@
                             @php
                                 $normalized = strtolower($hist->status ?? '');
                                 $badgeClass = match(true) {
+                                    str_contains($normalized, 'barangayblotter') => 'scheduled',
                                     str_contains($normalized, 'first')     => 'pending',
                                     str_contains($normalized, 'second')    => 'pending',
                                     str_contains($normalized, 'third')     => 'pending',

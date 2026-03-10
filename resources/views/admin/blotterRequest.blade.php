@@ -172,6 +172,7 @@
                                             @php
                                                 // Map status codes to display labels
                                                 $statusLabels = [
+                                                    'barangayBlotter' => 'Barangay Blotter',
                                                     'first' => 'First Summon',
                                                     'second' => 'Second Summon',
                                                     'third' => 'Third Summon',
@@ -184,6 +185,7 @@
                                                 $statusKey = $blotter->current_status ?? $blotter->status;
                                                 $displayStatus = $statusLabels[$statusKey] ?? ucfirst(strtolower($statusKey));
                                                 $statusClasses = [
+                                                    'barangayBlotter' => 'secondary',
                                                     'first' => 'primary',
                                                     'second' => 'primary',
                                                     'third' => 'info',

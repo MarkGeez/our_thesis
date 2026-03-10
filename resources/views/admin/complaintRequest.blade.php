@@ -362,7 +362,6 @@
                         </li>
                     </ul>
 
-                    @if($complaints->count() > 0)
                     <div class="complaints-table-wrapper">
                         <form method="GET" action="{{ route('admin.complaintRequest') }}" class="table-filter-bar">
                             <input type="hidden" name="tab" value="{{ $activeTab }}">
@@ -406,6 +405,7 @@
                                 </a>
                             </div>
                         </form>
+                        @if($complaints->count() > 0)
                         <div class="table-responsive">
                             <table id="complaintTable" class="table table-bordered table-hover mb-0 shadow-sm bg-white">
                                 <thead class="table-primary">
@@ -596,10 +596,10 @@
                     @endif
                     @else
                     <div class="bg-light m-3 p-5 text-center rounded border">
-                        <p class="text-muted mb-0">No complaints records found in this tab.</p>
+                        <p class="text-muted mb-0">No complaints records found for the current filters. Adjust the filters above or use Reset to return to all records.</p>
                     </div>
                     @endif
-                </div>
+                    </div>
             </div>
         </main>
     </div>

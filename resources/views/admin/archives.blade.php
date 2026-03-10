@@ -183,7 +183,6 @@
         </div>
 
         <div class="records-container">
-            @if($archive->count() > 0)
                 <form method="GET" action="{{ route('admin.archives') }}" class="table-filter-bar">
                     <input type="text" name="search" class="form-control" placeholder="Search records..." value="{{ request('search') }}">
                     <select name="sort" class="form-select">
@@ -197,6 +196,7 @@
                     <button type="submit" class="btn btn-primary">Apply</button>
                     <a href="{{ route('admin.archives') }}" class="btn btn-outline-secondary">Reset</a>
                 </form>
+            @if($archive->count() > 0)
                 <div class="table-responsive">
                     <table id="archivesTable" class="table table-bordered table-hover">
                         <thead>
@@ -255,7 +255,7 @@
                 @endif
             @else
                 <div class="p-5 text-center">
-                    <p class="text-muted mb-0">No archived records found.</p>
+                    <p class="text-muted mb-0">No archived records found for the current filters. Adjust the filters above or use Reset to return to all records.</p>
                 </div>
             @endif
         </div>

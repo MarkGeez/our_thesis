@@ -167,7 +167,7 @@ public function searchResidents(Request $request)
      
         $validated = $request->validate([
             'firstName' => 'required|string|max:70',
-            'middleName' => 'required|string|max:70',
+            'middleName' => 'nullable|string|max:70',
             'lastName' => 'required|string|max:70',
             'contactNo' => 'nullable|string|max:11',
             'birthday' => 'required|date',
@@ -234,7 +234,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         $validated = $request->validate([
             'house_id' => 'required|exists:houses,id',
             'firstName' => 'required|string|max:70',
-            'middleName' => 'required|string|max:70',
+            'middleName' => 'nullable|string|max:70',
             'lastName' => 'required|string|max:70',
             'contactNo' => 'required|string|max:11',
             'birthday' => 'required|date',
