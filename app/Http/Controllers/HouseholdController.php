@@ -9,6 +9,7 @@ use App\Models\HouseholdResident;
 use App\Models\Household;
 use App\Models\Resident;
 use App\Models\FamilyMember;
+use Illuminate\Support\Facades\DB;
 
 class HouseholdController extends Controller
 {
@@ -213,6 +214,8 @@ class HouseholdController extends Controller
                 'relationship' => $validated['relationship']
             ]);
 
+            // Do NOT create household_resident row for family members. Only add to family_members table.
+
             \Log::info('Family member created: ' . $familyMember->id);
 
             return redirect()->route($user->role . '.profile')->with('success', 'Family member added successfully!');
@@ -283,49 +286,45 @@ class HouseholdController extends Controller
         if (!$newHeadResident->user_id) {
             return redirect()->back()->with('error', 'The selected resident must have an account before becoming the household head.');
         }
-        HouseholdResident::firstOrCreate(
-            [
-                'household_id' => $member->household_id,
-                'resident_id' => $newHeadResident->id,
-            ],
-            [
-                'is_household_head' => false,
-            ]
-        );
 
-        $householdResidentIds = HouseholdResident::where('household_id', $member->household_id)
-            ->pluck('resident_id');
+        DB::transaction(function () use ($member, $currentResident, $newHeadResident) {
+            // Set previous head to false
+            HouseholdResident::where('household_id', $member->household_id)
+                ->where('resident_id', $currentResident->id)
+                ->update(['is_household_head' => false]);
 
-        HouseholdResident::where('household_id', $member->household_id)
-            ->update(['is_household_head' => false]);
+            // Set new head to true (create if missing)
+            HouseholdResident::updateOrCreate(
+                [
+                    'household_id' => $member->household_id,
+                    'resident_id' => $newHeadResident->id,
+                ],
+                [
+                    'is_household_head' => true,
+                ]
+            );
 
-        if ($householdResidentIds->isNotEmpty()) {
-            Resident::whereIn('id', $householdResidentIds)->update(['headOfFamily' => 'no']);
-        }
+            // Update residents table
+            $currentResident->update(['headOfFamily' => 'no']);
+            $newHeadResident->update(['headOfFamily' => 'yes']);
 
-        $currentHeadMembership->update(['is_household_head' => false]);
-        $currentResident->update(['headOfFamily' => 'no']);
+            // Remove head tag from new head in family_members
+            FamilyMember::where('household_id', $member->household_id)
+                ->where('resident_id', $newHeadResident->id)
+                ->delete();
 
-        HouseholdResident::where('household_id', $member->household_id)
-            ->where('resident_id', $newHeadResident->id)
-            ->update(['is_household_head' => true]);
-
-        $newHeadResident->update(['headOfFamily' => 'yes']);
-
-        FamilyMember::where('household_id', $member->household_id)
-            ->where('resident_id', $newHeadResident->id)
-            ->delete();
-
-        FamilyMember::updateOrCreate(
-            [
-                'household_id' => $member->household_id,
-                'resident_id' => $currentResident->id,
-            ],
-            [
-                'encoded_by' => $newHeadResident->user_id,
-                'relationship' => 'Member',
-            ]
-        );
+            // Add previous head as member
+            FamilyMember::updateOrCreate(
+                [
+                    'household_id' => $member->household_id,
+                    'resident_id' => $currentResident->id,
+                ],
+                [
+                    'encoded_by' => $newHeadResident->user_id,
+                    'relationship' => 'Member',
+                ]
+            );
+        });
 
         return redirect()->back()->with('success', 'Household head updated successfully.');
     }
