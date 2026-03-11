@@ -1063,27 +1063,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('new-head-search-btn')) {
-<<<<<<< HEAD
             const container = e.target.closest('.search-box-container');
             if (!container) {
                 return;
             }
-=======
-            // Find the container SPECIFIC to this modal
-            const container = e.target.closest('.position-relative');
-            const searchInput = container.querySelector('.new-head-search-input');
-            const dropdown = container.querySelector('.new-head-dropdown');
-            
-            const query = searchInput.value.toLowerCase().trim();
-            dropdown.innerHTML = '';
-
-            if (!query) return dropdown.classList.add('d-none');
->>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
 
             runNewHeadSearch(container);
         }
 
-<<<<<<< HEAD
         if (!e.target.closest('.search-box-container')) {
             document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
         }
@@ -1127,31 +1114,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     searchInput.focus();
                 }
             });
-=======
-            if (matches.length > 0) {
-                matches.forEach(person => {
-                    const option = document.createElement('div');
-                    option.className = 'resident-option p-2 border-bottom';
-                    option.style.cursor = 'pointer';
-                    option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
-
-                    option.addEventListener('click', function () {
-                        // Crucial: Update the hidden input in THIS modal only
-                        searchInput.value = this.textContent;
-                        container.querySelector('.new-head-id-input').value = person.id;
-                        dropdown.classList.add('d-none');
-                    });
-                    dropdown.appendChild(option);
-                });
-                dropdown.classList.remove('d-none');
-            }
-        }
-    });
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.search-box-container')) {
-            document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
->>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
         }
     });
 });

@@ -23,6 +23,23 @@ use Illuminate\View\View;
 
 class SubAdminController extends Controller
 {
+    private function getHeadCandidateResidents()
+    {
+        return Resident::with('households:id')
+            ->select('id', 'firstName', 'middleName', 'lastName', 'headOfFamily')
+            ->get()
+            ->map(function (Resident $resident) {
+                return [
+                    'id' => $resident->id,
+                    'firstName' => $resident->firstName,
+                    'middleName' => $resident->middleName,
+                    'lastName' => $resident->lastName,
+                    'headOfFamily' => $resident->headOfFamily,
+                    'householdIds' => $resident->households->pluck('id')->values(),
+                ];
+            });
+    }
+
     public function dashboard(): View
     {
         $announcement = Announcement::with('user:id,firstName,lastName')->latest()->get();
@@ -58,8 +75,9 @@ class SubAdminController extends Controller
 
         $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
         $residents = Resident::select('id','firstName','middleName','lastName')->get();
+        $headCandidateResidents = $this->getHeadCandidateResidents();
 
-        return view('subadmin.profile', compact('user', 'resident', 'members', 'residents'));
+        return view('subadmin.profile', compact('user', 'resident', 'members', 'residents', 'headCandidateResidents'));
     }
 
     public function updateProfile(Request $request, $id)

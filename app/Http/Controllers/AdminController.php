@@ -23,6 +23,23 @@ use App\Models\CertificateRequest;
 
 class AdminController extends Controller
 {
+    private function getHeadCandidateResidents()
+    {
+        return Resident::with('households:id')
+            ->select('id', 'firstName', 'middleName', 'lastName', 'headOfFamily')
+            ->get()
+            ->map(function (Resident $resident) {
+                return [
+                    'id' => $resident->id,
+                    'firstName' => $resident->firstName,
+                    'middleName' => $resident->middleName,
+                    'lastName' => $resident->lastName,
+                    'headOfFamily' => $resident->headOfFamily,
+                    'householdIds' => $resident->households->pluck('id')->values(),
+                ];
+            });
+    }
+
     public function dashboard(): View
     {
     
@@ -56,7 +73,8 @@ class AdminController extends Controller
     
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
     $residents = Resident::select('id','firstName','middleName','lastName')->get();
-    return view('admin.profile', compact('user', 'resident', 'members', 'residents'));
+    $headCandidateResidents = $this->getHeadCandidateResidents();
+    return view('admin.profile', compact('user', 'resident', 'members', 'residents', 'headCandidateResidents'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();
