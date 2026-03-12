@@ -384,32 +384,74 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
     $validated = $this->normalizeResidentPayload($validated);
     $requestedHeadStatus = $validated['headOfFamily'] ?? $resident->headOfFamily;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Handle Head of Family Replacement
-    |--------------------------------------------------------------------------
-    */
-
-    if ($resident->headOfFamily === 'yes' && $requestedHeadStatus === 'no') {
-
-        if (!$request->new_head_id) {
-            return back()->withErrors(['error' => 'Please select a new Head of Family.']);
-        }
-
-        $newHead = Resident::find($request->new_head_id);
-        $newHead->update([
-            'headOfFamily' => 'yes'
+    if ($resident->headOfFamily === 'no' && $requestedHeadStatus !== 'no') {
+        throw ValidationException::withMessages([
+            'headOfFamily' => 'Only the current household head can update head of family status from the profile.',
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Resident
-    |--------------------------------------------------------------------------
-    */
+    DB::transaction(function () use ($resident, $validated, $requestedHeadStatus) {
+        $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
 
-    $resident->update($validated);
-    $this->syncLinkedUserFromResident($resident->fresh('user'), $validated);
+        if ($resident->headOfFamily === 'yes' && $requestedHeadStatus === 'no') {
+            $newHeadId = $validated['new_head_id'] ?? null;
+
+            if (!$newHeadId) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'Please select a new Head of Family.',
+                ]);
+            }
+
+            if ((int) $newHeadId === (int) $resident->id) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'The replacement head of family must be a different resident.',
+                ]);
+            }
+
+            if (!$householdResident) {
+                throw ValidationException::withMessages([
+                    'headOfFamily' => 'No household record was found for this resident.',
+                ]);
+            }
+
+            $newHeadMembership = HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', $newHeadId)
+                ->first();
+
+            if (!$newHeadMembership) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'The selected new Head of Family must belong to the same household.',
+                ]);
+            }
+
+            Resident::whereKey($newHeadId)->update(['headOfFamily' => 'yes']);
+            $newHeadMembership->update(['is_household_head' => true]);
+        }
+
+        if ($requestedHeadStatus === 'yes' && $householdResident) {
+            $otherResidentIds = HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', '!=', $resident->id)
+                ->pluck('resident_id');
+
+            if ($otherResidentIds->isNotEmpty()) {
+                Resident::whereIn('id', $otherResidentIds)->update(['headOfFamily' => 'no']);
+            }
+
+            HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', '!=', $resident->id)
+                ->update(['is_household_head' => false]);
+        }
+
+        $resident->update(Arr::except($validated, ['new_head_id']));
+
+        if ($householdResident) {
+            $householdResident->update([
+                'is_household_head' => $requestedHeadStatus === 'yes',
+            ]);
+        }
+
+        $this->syncLinkedUserFromResident($resident->fresh('user'), $validated);
+    });
 
     return redirect()
         ->route($user->role . '.profile')

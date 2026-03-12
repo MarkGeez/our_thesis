@@ -224,30 +224,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-people-group"></i></span>
-                                <div>
-                                    <div class="stats-title">Tagged Members</div>
-                                    <div class="stats-number">{{ $stats['total_members'] ?? 0 }}</div>
-                                    <div class="stats-caption">Avg {{ $stats['average_members_per_family'] ?? 0 }} per active family</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-house"></i></span>
-                                <div>
-                                    <div class="stats-title">Household Coverage</div>
-                                    <div class="stats-number">{{ $stats['households_with_members'] ?? 0 }}/{{ $stats['total_households'] ?? 0 }}</div>
-                                    <div class="stats-caption">{{ $stats['household_coverage_rate'] ?? 0 }}% have members</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row g-4">
