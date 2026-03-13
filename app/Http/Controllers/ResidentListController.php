@@ -458,4 +458,5 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         ->with('success', 'Resident information updated successfully.');
 }
 
+
 }

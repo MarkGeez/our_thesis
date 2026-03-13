@@ -1,3 +1,15 @@
+@php
+    $currentHeadHouseholdIds = collect();
+
+    if (isset($resident) && $resident) {
+        $currentHeadHouseholdIds = $resident->households
+            ->filter(function ($household) {
+                return (bool) data_get($household, 'pivot.is_household_head');
+            })
+            ->pluck('id');
+    }
+@endphp
+
 {{--@if($members && $members->count() > 0)  --}}
     <div class="row mt-4">
         <div class="col-12">
@@ -67,6 +79,15 @@
                                                     <i class="fa-solid fa-user-minus me-1"></i> Untag Member
                                                 </button>
                                             </form>
+                                           
+                                                <form action="{{ route(auth()->user()->role . '.update.head', $member->id) }}" method="POST" class="m-0">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary d-flex align-items-center" style="padding: 0.25rem 0.75rem;">
+                                                        <i class="fa-solid fa-user-check me-1"></i> Assign as new household head
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

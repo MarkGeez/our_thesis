@@ -92,9 +92,12 @@ class UserListController extends Controller
         }
 
         $userList = $userList->paginate(20)->appends($request->query());
-        $maxAdmins = 2;
+        $maxAdmins = 7;
         $currentAdminCount = User::where('role', 'admin')->count();
         $adminLimitReached = $currentAdminCount >= $maxAdmins;
+        $maxSubadmins = 7;
+        $currentSubadminCount = User::where('role', 'subadmin')->count();
+        $subadminLimitReached = $currentSubadminCount >= $maxSubadmins;
         
 
         $hours = 72;
@@ -119,6 +122,9 @@ class UserListController extends Controller
             'maxAdmins',
             'currentAdminCount',
             'adminLimitReached',
+            'maxSubadmins',
+            'currentSubadminCount',
+            'subadminLimitReached',
             'pendingUser',
             'pendingUsersCount',
             'pendingOver72HoursCount',
@@ -142,15 +148,20 @@ class UserListController extends Controller
             ]);
         }
         
-        // Enforce maximum of 2 admins at any time.
-        if ($requestedRole === 'admin' && $user->role !== 'admin') {
-            $currentAdminCount = User::where('role', 'admin')
+        $roleLimits = [
+            'admin' => ['max' => 7, 'label' => 'Admin'],
+            'subadmin' => ['max' => 7, 'label' => 'Sub-admin'],
+        ];
+
+        // Enforce role caps during role updates.
+        if (isset($roleLimits[$requestedRole]) && $user->role !== $requestedRole) {
+            $currentRoleCount = User::where('role', $requestedRole)
                 ->where('id', '!=', $user->id)
                 ->count();
 
-            if ($currentAdminCount >= 2) {
+            if ($currentRoleCount >= $roleLimits[$requestedRole]['max']) {
                 return redirect()->back()->withErrors([
-                    'role' => 'Only two users can have the Admin role at the same time.',
+                    'role' => 'Only ' . $roleLimits[$requestedRole]['max'] . ' users can have the ' . $roleLimits[$requestedRole]['label'] . ' role at the same time.',
                 ]);
             }
         }
