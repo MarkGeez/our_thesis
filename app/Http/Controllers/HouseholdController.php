@@ -201,10 +201,26 @@ class HouseholdController extends Controller
             // New table stores only household_id, resident_id, encoded_by.
             $validated = $request->validate([
                 'resident_id' => 'required|exists:residents,id',
-                'relationship' => 'required|alpha'
+                'relationship' => 'required|string|max:50'
             ]);
 
-            $selectedId = $validated['resident_id'];
+            $selectedId = (int) $validated['resident_id'];
+
+            if ((int) $resident->id === $selectedId) {
+                return back()->withErrors([
+                    'resident_id' => 'You cannot add yourself as a family member.',
+                ]);
+            }
+
+            $alreadyTagged = FamilyMember::where('household_id', $household->id)
+                ->where('resident_id', $selectedId)
+                ->exists();
+
+            if ($alreadyTagged) {
+                return back()->withErrors([
+                    'resident_id' => 'That resident is already added as a family member.',
+                ]);
+            }
 
             $familyMember = FamilyMember::create([
                 'household_id' => $household->id,
