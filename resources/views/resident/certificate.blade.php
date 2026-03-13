@@ -390,7 +390,7 @@
                                                     @case('picked_up')
                                                         <span class="badge bg-secondary">
                                                             <i class="fas fa-box"></i>
-                                                            Picked Up
+                                                            Received
                                                         </span>
                                                         @break
                                                     @case('declined')
@@ -433,7 +433,7 @@
                                                 @elseif($req->status === 'picked_up')
                                                     <span class="remarks-success">
                                                         <i class="fas fa-check-double"></i>
-                                                        Successfully picked up
+                                                        Successfully received
                                                     </span>
                                                 @elseif($req->status === 'declined' && $req->decline_reason)
                                                     <div class="remarks-muted">
@@ -458,4 +458,3 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-

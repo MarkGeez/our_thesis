@@ -362,7 +362,7 @@ public function generateOfficials(Request $request)
         'total_records' => $officials->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Barangay officials report generated successfully.');
+    return redirect()->back()->with('success', 'Officials list reports generated successfully.');
 }
 
 public function generateArchives(Request $request)
