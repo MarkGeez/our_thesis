@@ -79,7 +79,7 @@
                     <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All Status</option>
                     <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Approved</option>
-                    <option value="picked_up" {{ request('status_filter') === 'picked_up' ? 'selected' : '' }}>Picked Up</option>
+                    <option value="picked_up" {{ request('status_filter') === 'picked_up' ? 'selected' : '' }}>Received</option>
                     <option value="declined" {{ request('status_filter') === 'declined' ? 'selected' : '' }}>Declined</option>
                 </select>
             </div>
@@ -170,7 +170,7 @@
                         @switch($request->status)
                             @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
                             @case('approved') <span class="badge bg-success">Approved</span> @break
-                            @case('picked_up') <span class="badge bg-secondary">Picked up</span> @break
+                            @case('picked_up') <span class="badge bg-secondary">Received</span> @break
                             @case('declined') <span class="badge bg-danger">Declined</span> @break
                             @default <span class="badge bg-secondary">{{ $request->status }}</span>
                         @endswitch

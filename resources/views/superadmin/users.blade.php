@@ -1292,7 +1292,13 @@
                                                                     @if(($adminLimitReached ?? false) && $list->role !== 'admin')
                                                                         <div class="alert alert-warning py-2 px-3 mb-3">
                                                                             <i class="fas fa-triangle-exclamation me-1"></i>
-                                                                            Admin limit reached ({{ $currentAdminCount ?? 0 }}/{{ $maxAdmins ?? 2 }}). Demote an existing admin before assigning this user as Admin.
+                                                                            Admin limit reached ({{ $currentAdminCount ?? 0 }}/{{ $maxAdmins ?? 7 }}). Demote an existing admin before assigning this user as Admin.
+                                                                        </div>
+                                                                    @endif
+                                                                    @if(($subadminLimitReached ?? false) && $list->role !== 'subadmin')
+                                                                        <div class="alert alert-warning py-2 px-3 mb-3">
+                                                                            <i class="fas fa-triangle-exclamation me-1"></i>
+                                                                            Sub-admin limit reached ({{ $currentSubadminCount ?? 0 }}/{{ $maxSubadmins ?? 7 }}). Demote an existing sub-admin before assigning this user as Sub-admin.
                                                                         </div>
                                                                     @endif
                                                                     <select name="role" class="form-select form-select-lg">
@@ -1303,7 +1309,13 @@
                                                                         >
                                                                             Admin
                                                                         </option>
-                                                                        <option value="subadmin" {{ $list->role === 'subadmin' ? 'selected' : '' }}>Sub-admin</option>
+                                                                        <option
+                                                                            value="subadmin"
+                                                                            {{ $list->role === 'subadmin' ? 'selected' : '' }}
+                                                                            {{ (($subadminLimitReached ?? false) && $list->role !== 'subadmin') ? 'disabled' : '' }}
+                                                                        >
+                                                                            Sub-admin
+                                                                        </option>
                                                                         <option value="resident" {{ $list->role === 'resident' ? 'selected' : '' }}>Resident</option>
                                                                         <option value="non-resident" {{ $list->role === 'non-resident' ? 'selected' : '' }}>Non-resident</option>
                                                                     </select>

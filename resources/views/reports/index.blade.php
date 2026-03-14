@@ -493,7 +493,7 @@
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalOfficialsReport">
                 <div class="card-body py-4">
                     <i class="fas fa-users-gear fa-3x mb-3" style="color:#1d4ed8;"></i>
-                    <h5 class="fw-bold mb-1">Officials Report</h5>
+                    <h5 class="fw-bold mb-1">Officials List Reports</h5>
                     <p class="text-muted small mb-0">Barangay officials by position and term timeline</p>
                 </div>
             </div>
@@ -639,7 +639,7 @@
             <input type="hidden" name="report_form_type" value="officials">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-users-gear me-2" style="color:#1d4ed8;"></i>Generate Barangay Officials Report</h5>
+                    <h5 class="modal-title"><i class="fas fa-users-gear me-2" style="color:#1d4ed8;"></i>Generate Officials List Reports</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -802,7 +802,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div>{{--
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Record ID <span class="text-muted">(Optional)</span></label>
                             <input type="number" min="1" name="record_id" class="form-control" value="{{ old('record_id') }}" placeholder="e.g. 102">
@@ -810,7 +810,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Reason <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="reason" class="form-control" value="{{ old('reason') }}" placeholder="Archive reason contains...">
-                        </div>{{--  
+                        </div>  
                         <div class="col-12">
                             <label class="form-label fw-semibold">Keyword in Type/Reason/Details <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="keyword" class="form-control" value="{{ old('keyword') }}" placeholder="Search archive details">
@@ -1112,7 +1112,7 @@
                         <div class="col-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
                             <input type="text" name="report_name" class="form-control" value="{{ old('report_name') }}" required>
-                        </div>
+                        </div>{{--  
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">User <span class="text-muted">(Optional)</span></label>
                             <select name="user_id" class="form-select">
@@ -1123,7 +1123,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div>--}}
                         {{--  <div class="col-md-6">
                             <label class="form-label fw-semibold">Record ID <span class="text-muted">(Optional)</span></label>
                             <input type="number" min="1" name="record_id" class="form-control" value="{{ old('record_id') }}" placeholder="e.g. 102">
@@ -1233,10 +1233,10 @@
                             <label class="form-label fw-semibold">Complainant Name <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="complainant_name" class="form-control" value="{{ old('complainant_name') }}" placeholder="e.g. Juan Dela Cruz">
                         </div>
-                        <div class="col-md-6">
+                        {{--  <div class="col-md-6">
                             <label class="form-label fw-semibold">Respondent Name <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="respondent_name" class="form-control" value="{{ old('respondent_name') }}" placeholder="e.g. Pedro Santos">
-                        </div>
+                        </div>--}}
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Address <span class="text-muted">(Optional)</span></label>
                             <input type="text" name="address" class="form-control" value="{{ old('address') }}" placeholder="Address contains...">
@@ -1988,7 +1988,7 @@
         autoFillReportTitle('modalCertificateReport', 'Certificate');
         autoFillReportTitle('modalComplaintReport', 'Complaint');
         autoFillReportTitle('modalActivityReport', 'Activity Logs');
-        autoFillReportTitle('modalOfficialsReport', 'Barangay Officials');
+        autoFillReportTitle('modalOfficialsReport', 'Officials List Reports');
         autoFillReportTitle('modalArchivesReport', 'Archives');
         autoFillReportTitle('modalAnnouncementsReport', 'Announcements');
         autoFillReportTitle('modalFeedbackReport', 'Feedback');

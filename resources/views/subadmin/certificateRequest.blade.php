@@ -80,7 +80,7 @@
                                         @switch($req->status)
                                             @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
                                             @case('approved') <span class="badge bg-success">Approved</span> @break
-                                            @case('picked_up') <span class="badge bg-secondary">Picked up</span> @break
+                                            @case('picked_up') <span class="badge bg-secondary">Received</span> @break
                                             @case('declined') <span class="badge bg-danger">Declined</span> @break
                                             @default <span class="badge bg-secondary">{{ $req->status }}</span>
                                         @endswitch

@@ -182,7 +182,7 @@
                             @elseif($type == 'feedback')
                                 <th data-col="feedback_user">Submitted By</th>
                                 <th data-col="message">Feedback Message</th>
-                                <th data-col="message_length">Message Length</th>
+                                <th data-col="message_length">Message  <br> Length</th>
                                 <th data-col="submitted_at">Submitted At</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
                                 <th data-col="head_no">Head #</th>
