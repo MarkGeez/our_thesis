@@ -371,8 +371,8 @@
                 <div class="input-with-icon mb-3">
                     <label for="contactNumber" class="form-label">Contact Number</label>
                     <div class="input-field-wrap">
-                        <input type="text" name="contactNumber" id="contactNumber" class="form-control"
-                        placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
+                        <input type="tel" name="contactNumber" id="contactNumber" class="form-control"
+                        placeholder="09170000000" value="{{ old('contactNumber') }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
                         <i class="fa-solid fa-phone input-icon"></i>
                     </div>
                     @error('contactNumber')

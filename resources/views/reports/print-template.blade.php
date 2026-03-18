@@ -985,7 +985,7 @@
     </div>
     <div class="footer-contact-row">
         <i class="fas fa-phone-alt"></i>
-        <span>{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</span>
+                            <span>{{ \App\Models\Setting::get('contact_number', '09170000000') }}</span>
     </div>
 </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Models\Blotter;
 use App\Models\UpdateBlotter;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class BlotterController extends Controller
 {
+    use ValidatesContactNumbers;
+
     private const BLOTTER_TYPES = [
         'regular',
         'vawc',
@@ -411,10 +414,17 @@ class BlotterController extends Controller
         $request->validate([
             'plaintiffName' => 'required|string',
             'plaintiffLastName' => 'required|string',
+            'plaintiffContactNumber' => $this->nullableContactNumberRules(),
+            'defendantContactNumber' => $this->nullableContactNumberRules(),
+            'witnessContactNumber' => $this->nullableContactNumberRules(),
             'blotterDescription' => 'required|string',
             'blotter_type' => ['nullable', Rule::in(self::BLOTTER_TYPES)],
             'proof' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
-        ]);
+        ], $this->contactNumberMessages([
+            'plaintiffContactNumber',
+            'defendantContactNumber',
+            'witnessContactNumber',
+        ]));
 
         $proofPath = null;
 

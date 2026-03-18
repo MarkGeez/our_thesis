@@ -57,7 +57,7 @@ class Setting extends Model
             'name', 'system_name' => $setting->barangay_name ?? 'brgy249',
             'theme', 'sidebar_theme' => $setting->theme ?? '#0061f7',
             'contact_address' => $setting->contact_address ?? 'Barangay 249 Zone 23, Tondo, Manila',
-            'contact_number' => $setting->contact_number ?? '0999-123-4567',
+            'contact_number' => $setting->contact_number ?? '09170000000',
             'contact_email' => $setting->contact_email ?? 'brgy249@email.com',
             default => $default,
         };

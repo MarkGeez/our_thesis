@@ -100,8 +100,8 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
-                <input type="number" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" >
+                <input type="tel" name="contactNo" class="form-control form-control-lg"
+                       value="{{ old('contactNo', $resident->contactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
             </div>
 
             <div class="col-md-6">
@@ -165,8 +165,8 @@
 
             <div class="col-md-6">
                 <label class="form-label">Emergency Contact No.</label>
-                <input type="number" name="emergencyContactNo" class="form-control form-control-lg"
-                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" >
+                <input type="tel" name="emergencyContactNo" class="form-control form-control-lg"
+                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
             </div>
         </div>
 

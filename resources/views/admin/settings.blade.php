@@ -173,7 +173,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Contact Number</label>
-                                            <input type="text" name="contact_number" class="form-control" value="{{ $settings->contact_number ?? '' }}">
+                                            <input type="tel" name="contact_number" class="form-control" value="{{ $settings->contact_number ?? '' }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Email</label>

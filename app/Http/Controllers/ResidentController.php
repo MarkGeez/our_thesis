@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Models\Resident;
 use App\Models\Announcement;
 use App\Models\Household;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ResidentController extends Controller
 {
+    use ValidatesContactNumbers;
     
      public function dashboard()
     {
@@ -36,7 +38,7 @@ class ResidentController extends Controller
                         ->where('user_id', $user->id)
                         ->first();
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
-    $residents = Resident::select('id','firstName','middleName','lastName')->get();
+    $residents = Resident::select('id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo')->get();
     return view('resident.profile', compact('user', 'resident', 'members', 'residents'));
     }
 
@@ -50,7 +52,7 @@ class ResidentController extends Controller
 
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'contactNumber' => 'required|string|max:20',
+            'contactNumber' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
@@ -61,7 +63,7 @@ class ResidentController extends Controller
             $rules['password'] = 'required|min:8|confirmed';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, $this->contactNumberMessages(['contactNumber']));
 
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
@@ -108,7 +110,7 @@ class ResidentController extends Controller
         
         $validated = $request->validate([
             'house_id' => 'required|exists:houses,id',
-            'contactNo' => 'required|string|max:20',
+            'contactNo' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'age' => 'required|integer',
             'sex' => 'required|in:male,female',
@@ -118,8 +120,8 @@ class ResidentController extends Controller
             'educationalAttainment' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:255',
             'emergencyContactName' => 'required|string|max:255',
-            'emergencyContactNo' => 'required|string|max:20',
-        ]);
+            'emergencyContactNo' => $this->requiredContactNumberRules(),
+        ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
         
         // Update household assignment
         $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);

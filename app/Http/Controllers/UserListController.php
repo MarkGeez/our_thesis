@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Mail\UserAccountStatusUpdateMail;
 use Illuminate\Http\Request;
 use App\Models\Resident;
@@ -13,6 +14,8 @@ use Carbon\Carbon;
 
 class UserListController extends Controller
 {
+    use ValidatesContactNumbers;
+
     private function syncResidentLink(User $user, string $role): void
     {
         if (!in_array($role, ['admin', 'subadmin', 'resident'], true)) {
@@ -234,7 +237,7 @@ class UserListController extends Controller
 
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'contactNumber' => 'required|string|max:11|',
+            'contactNumber' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
@@ -246,7 +249,7 @@ class UserListController extends Controller
         }
 
         // Validate the request
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, $this->contactNumberMessages(['contactNumber']));
         
         // Update basic info
         $user->email = $validated['email'];

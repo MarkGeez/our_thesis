@@ -60,7 +60,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label for="contactNumber_{{ $member->id }}" class="form-label">Contact Number</label>
-                            <input type="tel" class="form-control" id="contactNumber_{{ $member->id }}" name="contactNumber" placeholder="09XXXXXXXXX" value="{{ old('contactNumber', $member->contactNumber) }}">
+                            <input type="tel" class="form-control" id="contactNumber_{{ $member->id }}" name="contactNumber" placeholder="09170000000" value="{{ old('contactNumber', $member->contactNumber) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
                         </div>
                     </div>
 

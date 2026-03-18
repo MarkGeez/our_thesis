@@ -556,7 +556,7 @@
                     </div>
                     <div class="d-flex gap-3 mb-4">
                         <i class="fa-solid fa-phone-volume text-success fs-4"></i>
-                        <p class="mb-0">{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</p>
+                                <p class="mb-0">{{ \App\Models\Setting::get('contact_number', '09170000000') }}</p>
                     </div>
                     <div class="d-flex gap-3">
                         <i class="fa-solid fa-envelope-open-text text-warning fs-4"></i>

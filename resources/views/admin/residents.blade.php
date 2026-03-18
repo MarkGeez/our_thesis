@@ -926,7 +926,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
-                                                                <input type="text" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" required>
+                                                                <input type="tel" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
                                                             </div>
                                                         </div>
 
@@ -1159,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name" required>
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
-                                                        <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09123456789" required>
+                                                        <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1272,8 +1272,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
-    <input type="text" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
-           value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
+    <input type="tel" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
+           value="{{ old('contactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" >
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1335,8 +1335,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Emergency Contact No -->
     <label for="emergencyContactNo">Emergency Contact No.</label>
-    <input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
-           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx ">
+    <input type="tel" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
+           value="{{ old('emergencyContactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
     @error('emergencyContactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

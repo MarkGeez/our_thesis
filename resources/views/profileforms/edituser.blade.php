@@ -80,7 +80,7 @@ $user = auth()->user();
 
             <div class="col-md-6">
                 <label class="form-label">Contact Number</label>
-                <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
+                <input type="tel" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000" required>
             </div>
         </div>
 

@@ -51,9 +51,12 @@
             </div>
             <div class="col-md-4">
                 <label class="info-label">Contact Number</label>
-                <input type="text" 
+                <input type="tel" 
                        name="plaintiffContactNumber" 
-                       placeholder="09xxxxxxxxx"
+                       placeholder="09170000000"
+                       inputmode="numeric"
+                       pattern="^09\d{9}$"
+                       maxlength="11"
                        class="form-control @error('plaintiffContactNumber') is-invalid @enderror" 
                        value="{{ old('plaintiffContactNumber') }}">
                 @error('plaintiffContactNumber')

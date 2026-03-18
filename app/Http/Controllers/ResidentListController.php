@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Archive;
@@ -19,6 +20,8 @@ use Carbon\Carbon;
 
 class ResidentListController extends Controller
 {
+    use ValidatesContactNumbers;
+
 private function normalizeResidentPayload(array $validated): array
 {
     if (array_key_exists('firstName', $validated)) {
@@ -169,9 +172,9 @@ public function searchResidents(Request $request)
             'firstName' => 'required|string|max:70',
             'middleName' => 'nullable|string|max:70',
             'lastName' => 'required|string|max:70',
-            'contactNo' => 'nullable|string|max:11',
+            'contactNo' => $this->nullableContactNumberRules(),
             'birthday' => 'required|date',
-            'emergencyContactNo' => 'nullable|string|max:11',
+            'emergencyContactNo' => $this->nullableContactNumberRules(),
             'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
             'sex' => 'nullable|in:male,female',
@@ -182,7 +185,7 @@ public function searchResidents(Request $request)
             'headOfFamily' => 'required|in:yes,no',
             'image_path' => 'nullable|mimes:jpg,jpeg,png|max:4096', // Changed to match form
             'house_id' => 'required|exists:houses,id',
-        ]);
+        ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
 
 
 
@@ -236,9 +239,9 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'firstName' => 'required|string|max:70',
             'middleName' => 'nullable|string|max:70',
             'lastName' => 'required|string|max:70',
-            'contactNo' => 'required|string|max:11',
+            'contactNo' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date',
-            'emergencyContactNo' => 'required|string|max:11',
+            'emergencyContactNo' => $this->requiredContactNumberRules(),
             'emergencyContactName' => 'required|string|max:255',
             'age' => 'required|integer|min:0|max:255',
             'sex' => 'required|in:male,female',
@@ -249,7 +252,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'headOfFamily' => 'required|in:yes,no',
             'new_head_id' => 'nullable|exists:residents,id',
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
-        ]);
+        ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
 
         $validated = $this->normalizeResidentPayload($validated);
 
@@ -359,9 +362,9 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
    public function updateOwnInfo(Request $request, $id)
 {
     $validated = $request->validate([
-        'contactNo' => 'required|string|max:11',
+        'contactNo' => $this->requiredContactNumberRules(),
         'birthday' => 'required|date',
-        'emergencyContactNo' => 'nullable|string|max:11',
+        'emergencyContactNo' => $this->nullableContactNumberRules(),
         'emergencyContactName' => 'nullable|string|max:255',
         'age' => 'required|integer|min:0|max:255',
         'sex' => 'required|in:male,female',
@@ -371,7 +374,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         'headOfFamily' => 'nullable|in:yes,no',
         'religion' => 'nullable|string|max:255',
         'new_head_id' => 'nullable|exists:residents,id'
-    ]);
+    ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
 
     $resident = Resident::findOrFail($id);
 

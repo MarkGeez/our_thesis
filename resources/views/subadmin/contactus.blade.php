@@ -211,7 +211,7 @@
                 </span>
                 <div>
                   <p class="contact-label">Contact Number</p>
-                  <p class="contact-value">{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</p>
+                    <p class="contact-value">{{ \App\Models\Setting::get('contact_number', '09170000000') }}</p>
                 </div>
               </article>
 

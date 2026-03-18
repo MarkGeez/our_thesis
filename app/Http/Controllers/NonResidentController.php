@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Controllers\NonResident;
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,8 @@ use App\Models\Official;
 
 class NonResidentController extends Controller
 {
+    use ValidatesContactNumbers;
+
     public function dashboard()
     {
         $nonResident = auth()->user();
@@ -37,7 +40,7 @@ class NonResidentController extends Controller
 
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'contactNumber' => 'required|string|max:20',
+            'contactNumber' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
@@ -48,7 +51,7 @@ class NonResidentController extends Controller
             $rules['password'] = 'required|min:8|confirmed';
         }
         
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, $this->contactNumberMessages(['contactNumber']));
         
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
@@ -96,7 +99,7 @@ class NonResidentController extends Controller
         $validated = $request->validate([
             'houseNo' => 'required|string|max:255',
             'street' => 'required|string|max:255',
-            'contactNo' => 'required|string|max:20',
+            'contactNo' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'age' => 'required|integer',
             'sex' => 'required|in:male,female',
@@ -106,8 +109,8 @@ class NonResidentController extends Controller
             'educationalAttainment' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:255',
             'emergencyContactName' => 'required|string|max:255',
-            'emergencyContactNo' => 'required|string|max:20',
-        ]);
+            'emergencyContactNo' => $this->requiredContactNumberRules(),
+        ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
         
         $resident->update($validated);
         

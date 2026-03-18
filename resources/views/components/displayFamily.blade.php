@@ -138,7 +138,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="contactNo" class="form-label">Contact No.</label>
-                                <input type="text" class="form-control" id="contactNo" name="contactNo">
+                                <input type="tel" class="form-control" id="contactNo" name="contactNo" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="birthday" class="form-label">Birthday</label>
