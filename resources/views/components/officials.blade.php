@@ -49,6 +49,10 @@
     flex-direction: column;
   }
 
+  .official-card.is-clickable {
+    cursor: pointer;
+  }
+
   .official-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
@@ -122,6 +126,67 @@
 
   .official-card-public .official-card-header {
     border-bottom-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .official-card-public .official-card-body {
+    min-height: 110px;
+  }
+
+  .official-public-hint {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .official-modal-avatar-wrap {
+    width: 108px;
+    height: 108px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(135deg, #0d6efd, #7cc0ff);
+  }
+
+  .official-modal-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e2e8f0;
+  }
+
+  .official-modal-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.6px;
+    color: #0f172a;
+  }
+
+  .official-modal-position {
+    color: #475569;
+    font-weight: 600;
+  }
+
+  .official-modal-meta-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+
+  .official-modal-meta-value {
+    color: #0f172a;
+    margin-bottom: 0;
+  }
+
+  .official-privacy-note {
+    font-size: 0.82rem;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
   }
 
   .official-action-title {
@@ -232,10 +297,32 @@ input[type="date"]::-webkit-calendar-picker-indicator{
             $avatar = $resident && $resident->image_path
                 ? asset('storage/' . $resident->image_path)
                 : asset('images/default_profile.jpg');
+            $publicOfficialName = $resident
+                ? trim(collect([$resident->firstName, $resident->middleName, $resident->lastName])->filter()->implode(' '))
+                : '';
+            $publicOfficialTerm = null;
+            if ($official && $official->start && $official->end) {
+                $publicOfficialTerm = date('M d, Y', strtotime($official->start)) . ' - ' . date('M d, Y', strtotime($official->end));
+            } elseif ($official) {
+                $publicOfficialTerm = 'Term dates not set yet.';
+            }
         @endphp
 
         <div class="col-12 col-md-6 col-xl-4">
-            <div class="official-card {{ $showControls ? '' : 'official-card-public' }}">
+            <div
+                class="official-card {{ $showControls ? '' : 'official-card-public' }} {{ !$showControls && $official && $resident ? 'is-clickable' : '' }}"
+                @if(!$showControls && $official && $resident)
+                    role="button"
+                    tabindex="0"
+                    data-bs-toggle="modal"
+                    data-bs-target="#officialDetailsModal"
+                    data-official-name="{{ e($publicOfficialName) }}"
+                    data-official-position="{{ e($slot) }}"
+                    data-official-image="{{ e($avatar) }}"
+                    data-official-term="{{ e($publicOfficialTerm ?? 'Not available') }}"
+                    data-official-notes="{{ e($official->details ?: 'No public notes provided.') }}"
+                @endif
+            >
                 <div class="official-card-header">
                     <span class="official-slot">{{ $slot }}</span>
                     @if($showControls)
@@ -270,6 +357,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
                         @if($official && $official->details)
                             <p class="official-meta mb-0">Notes: {{ $official->details }}</p>
+                        @endif
+
+                        @if(!$showControls && $official && $resident)
+                            <p class="official-public-hint mb-0">Click to view public profile</p>
                         @endif
                     </div>
                 </div>
@@ -343,6 +434,83 @@ input[type="date"]::-webkit-calendar-picker-indicator{
         </div>
     @endforeach
 </div>
+
+@if(!$showControls)
+    <div class="modal fade" id="officialDetailsModal" tabindex="-1" aria-labelledby="officialDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="officialDetailsModalLabel">Official Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    <div class="text-center mb-4">
+                        <div class="official-modal-avatar-wrap">
+                            <img src="{{ asset('images/default_profile.jpg') }}" alt="Official Photo" class="official-modal-avatar" id="officialModalImage">
+                        </div>
+                        <div class="official-modal-name" id="officialModalName">Official Name</div>
+                        <div class="official-modal-position" id="officialModalPosition">Position</div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <div class="official-modal-meta-label">Term of Service</div>
+                            <p class="official-modal-meta-value" id="officialModalTerm">Not available</p>
+                        </div>
+                        <div class="col-12">
+                            <div class="official-modal-meta-label">Public Notes</div>
+                            <p class="official-modal-meta-value" id="officialModalNotes">No public notes provided.</p>
+                        </div>
+                    </div>
+
+                    <div class="official-privacy-note">
+                        This profile only shows public-facing official details and excludes sensitive resident information such as contact details, birth date, age, address, household data, and account records.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const officialDetailsModal = document.getElementById('officialDetailsModal');
+
+    if (!officialDetailsModal) {
+        return;
+    }
+
+    const modalName = document.getElementById('officialModalName');
+    const modalPosition = document.getElementById('officialModalPosition');
+    const modalImage = document.getElementById('officialModalImage');
+    const modalTerm = document.getElementById('officialModalTerm');
+    const modalNotes = document.getElementById('officialModalNotes');
+    const defaultImage = @json(asset('images/default_profile.jpg'));
+
+    function populateOfficialModal(card) {
+        modalName.textContent = card.getAttribute('data-official-name') || 'Official Name';
+        modalPosition.textContent = card.getAttribute('data-official-position') || 'Position';
+        modalImage.src = card.getAttribute('data-official-image') || defaultImage;
+        modalTerm.textContent = card.getAttribute('data-official-term') || 'Not available';
+        modalNotes.textContent = card.getAttribute('data-official-notes') || 'No public notes provided.';
+        modalImage.alt = (modalName.textContent || 'Official') + ' Photo';
+    }
+
+    document.querySelectorAll('.official-card.is-clickable').forEach(function (card) {
+        card.addEventListener('click', function () {
+            populateOfficialModal(card);
+        });
+
+        card.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                populateOfficialModal(card);
+                bootstrap.Modal.getOrCreateInstance(officialDetailsModal).show();
+            }
+        });
+    });
+});
+    </script>
+@endif
 
 @if($showControls)
     <script>
