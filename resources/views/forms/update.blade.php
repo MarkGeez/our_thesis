@@ -210,6 +210,10 @@
                         <span class="badge bg-info text-dark badge-status">{{ $statusLabels[$blotter->current_status] ?? ucfirst(str_replace('_', ' ', $blotter->current_status)) }}</span>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label">Blotter Type</label>
+                        <div class="fw-semibold">{{ \App\Http\Controllers\BlotterController::getBlotterTypeLabel($blotter->blotter_type ?? 'regular') }}</div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label">Blotter #</label>
                         <div class="fw-semibold">#{{ $blotter->id }}</div>
                     </div>
@@ -223,19 +227,7 @@
                     <div class="history-list timeline">
                         @foreach ($history as $hist)
                             @php
-                                $normalized = strtolower($hist->status ?? '');
-                                $badgeClass = match(true) {
-                                    str_contains($normalized, 'barangayblotter') => 'scheduled',
-                                    str_contains($normalized, 'first')     => 'pending',
-                                    str_contains($normalized, 'second')    => 'pending',
-                                    str_contains($normalized, 'third')     => 'pending',
-                                    str_contains($normalized, 'brgy')      => 'ongoing',
-                                    str_contains($normalized, 'cold')      => 'closed',
-                                    str_contains($normalized, 'criminal')  => 'closed',
-                                    str_contains($normalized, 'referred')  => 'closed',
-                                    str_contains($normalized, 'resolved')  => 'resolved',
-                                    default                                => 'pending',
-                                };
+                                $badgeClass = \App\Http\Controllers\BlotterController::getTimelineBadgeClass($hist->status);
                             @endphp
                             <div class="timeline-item">
                                 <span class="timeline-dot" style="background:#0d6efd;"></span>
@@ -285,7 +277,7 @@
         </div>
     </div>
    
-    @if(!($isTerminal ?? false))
+    @if($canUpdate ?? false)
         <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data" class="js-blotter-update-form" data-blotter-id="{{ $blotter->id }}">
             @csrf
             @method('PUT')
@@ -298,19 +290,22 @@
                         <label for="status_{{ $blotter->id }}" class="form-label">New Status <span class="text-danger">*</span></label>
                         @php
                             $selectedStatus = old('status', $blotter->current_status);
+                            $selectableStatuses = collect($availableStatuses ?? []);
                         @endphp
                         <select name="status" id="status_{{ $blotter->id }}" class="form-select" required>
                             <option value="">-- Select Status --</option>
-                            @foreach($availableStatuses as $status)
+                            @foreach(($allStatuses ?? $availableStatuses) as $status)
                                 @php
                                     $isSelected = $selectedStatus === $status;
                                     $displayLabel = $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status));
+                                    $isSelectable = $selectableStatuses->contains($status);
                                 @endphp
-                                <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }}>
+                                <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isSelectable ? '' : 'disabled' }}>
                                     {{ $displayLabel }}
                                 </option>
                             @endforeach
                         </select>
+                        <small class="form-text text-muted">Hearing statuses must follow sequence. Other statuses can still be selected anytime.</small>
                         @error('status')
                             <div class="error-text mt-1">{{ $message }}</div>
                         @enderror
@@ -352,7 +347,7 @@
         </form>
     @else
         <div class="alert alert-info mb-0">
-            This blotter is already in a terminal status (`{{ $statusLabels[$blotter->current_status] ?? $blotter->current_status }}`) and cannot be updated further.
+            {{ $updateBlockedReason ?? 'This blotter can no longer be updated.' }}
         </div>
     @endif
 </div>

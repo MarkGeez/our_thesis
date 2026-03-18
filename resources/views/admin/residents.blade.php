@@ -1063,12 +1063,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('new-head-search-btn')) {
-<<<<<<< HEAD
-            const container = e.target.closest('.search-box-container');
-            if (!container) {
-                return;
-            }
-=======
             // Find the container SPECIFIC to this modal
             const container = e.target.closest('.position-relative');
             const searchInput = container.querySelector('.new-head-search-input');
@@ -1078,56 +1072,10 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdown.innerHTML = '';
 
             if (!query) return dropdown.classList.add('d-none');
->>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
 
             runNewHeadSearch(container);
         }
 
-<<<<<<< HEAD
-        if (!e.target.closest('.search-box-container')) {
-            document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
-        }
-    });
-
-    document.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
-        updateNewHeadVisibility(select);
-
-        select.addEventListener('change', function () {
-            updateNewHeadVisibility(select);
-        });
-    });
-
-    document.querySelectorAll('.search-box-container').forEach(function (container) {
-        const searchInput = container.querySelector('.new-head-search-input');
-        const hiddenInput = container.querySelector('.new-head-id-input');
-        const form = container.closest('form');
-
-        searchInput.addEventListener('input', function () {
-            hiddenInput.value = '';
-            closeNewHeadDropdown(container);
-        }
-
-        );
-
-        searchInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                runNewHeadSearch(container);
-            }
-        });
-
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                const wrapper = container.closest('[id^="newHeadContainer_"]');
-                const isVisible = wrapper && wrapper.style.display !== 'none';
-
-                if (isVisible && !hiddenInput.value) {
-                    e.preventDefault();
-                    alert('Please select a new Head of Family from the dropdown.');
-                    searchInput.focus();
-                }
-            });
-=======
             if (matches.length > 0) {
                 matches.forEach(person => {
                     const option = document.createElement('div');
@@ -1151,7 +1099,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-box-container')) {
             document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
->>>>>>> 3039941198bbc2b20ae83716433b13b2bf7d5545
         }
     });
 });

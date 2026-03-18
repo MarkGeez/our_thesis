@@ -1,20 +1,37 @@
 <style>
-.resident-dropdown{
-    position:absolute;
-    z-index:1050;
-    width:100%;
-    background:white;
-    border:1px solid #ddd;
-    max-height:200px;
-    overflow-y:auto;
-    border-radius:4px;
+.resident-dropdown {
+    position: absolute;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 2000;
+    max-height: 240px;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-.resident-option{
-    padding:8px 10px;
-    cursor:pointer;
-    border-bottom:1px solid #eee;
+
+.resident-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
 }
-.resident-option:hover{ background:#f0f0f0; }
+
+.resident-option:hover {
+    background: #f1f5f9;
+}
+
+.search-help {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.resident-dropdown-message {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
 </style>
 
 <div class="modal fade" id="addHouseholdMemberModal" tabindex="-1" aria-hidden="true">
@@ -29,26 +46,26 @@
                 <form id="addHouseholdMemberForm" method="POST" action="{{ route($user->role. '.family.store') }}">
                     @csrf
 
-                    <div class="mb-3 position-relative">
+                    <div class="mb-3">
                         <label class="form-label">Search Resident</label>
 
-                        <div class="input-group">
-                            <input type="text"
-                                   class="form-control resident-search-input"
-                                   placeholder="Enter resident name then press Enter or click Search"
-                                   autocomplete="off" required>
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control resident-search-input"
+                                       placeholder="Type name then Enter or Search"
+                                       autocomplete="off" required>
 
-                            <button type="button" class="btn btn-outline-primary resident-search-btn">
-                                Search
-                            </button>
+                                <button type="button" class="btn btn-outline-primary resident-search-btn">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+
+                            <input type="hidden" name="resident_id" class="resident-id-input">
+                            <div class="resident-dropdown d-none"></div>
                         </div>
 
-                        <input type="hidden" name="resident_id" class="resident-id-input">
-                        <div class="resident-dropdown d-none"></div>
-
-                        <div class="form-text">
-                            Press Enter or click Search to show results.
-                        </div>
+                        <small class="search-help d-block mt-1" style="font-size: 0.8rem; color: #94a3b8;">Click search to see matching residents.</small>
                     </div>
 
                     <div class="mb-3">
@@ -83,56 +100,88 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+function initializeAddMemberModal() {
     const residents = @json($residents);
-
-    // Make sure IDs are numbers to match person.id type
+    const currentResidentId = Number(@json(optional($resident)->id));
     const existingMemberIds = new Set(
         (@json($members->pluck('resident_id')->toArray() ?? [])).map(Number)
     );
 
+    const modalEl = document.getElementById('addHouseholdMemberModal');
+    if (!modalEl || modalEl.dataset.searchInitialized === 'true') {
+        return;
+    }
+
+    modalEl.dataset.searchInitialized = 'true';
+
     const form = document.getElementById('addHouseholdMemberForm');
-    const searchInput = document.querySelector('.resident-search-input');
-    const searchBtn = document.querySelector('.resident-search-btn');
-    const hiddenInput = document.querySelector('.resident-id-input');
-    const dropdown = document.querySelector('.resident-dropdown');
+    const searchInput = modalEl.querySelector('.resident-search-input');
+    const searchBtn = modalEl.querySelector('.resident-search-btn');
+    const hiddenInput = modalEl.querySelector('.resident-id-input');
+    const dropdown = modalEl.querySelector('.resident-dropdown');
+
+    if (!form || !searchInput || !searchBtn || !hiddenInput || !dropdown) {
+        return;
+    }
 
     function closeDropdown() {
         dropdown.classList.add('d-none');
         dropdown.innerHTML = '';
     }
 
+    function showDropdownMessage(message) {
+        dropdown.innerHTML = '<div class="resident-dropdown-message">' + message + '</div>';
+        dropdown.classList.remove('d-none');
+    }
+
     function formatName(str) {
         return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
     }
 
+    function normalize(value) {
+        return (value || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function buildSearchTerms(person) {
+        const first = normalize(person.firstName);
+        const middle = normalize(person.middleName);
+        const last = normalize(person.lastName);
+
+        return [
+            [first, middle, last].filter(Boolean).join(' '),
+            [first, last].filter(Boolean).join(' '),
+            [last, first, middle].filter(Boolean).join(' '),
+            [last, first].filter(Boolean).join(' '),
+            [first, last].filter(Boolean).join(', '),
+            [last, first].filter(Boolean).join(', '),
+        ];
+    }
+
     function runSearch() {
-        const query = (searchInput.value || '').toLowerCase().trim();
+        const query = normalize(searchInput.value);
         dropdown.innerHTML = '';
         hiddenInput.value = '';
 
         if (!query) {
-            closeDropdown();
+            showDropdownMessage('Enter a resident name or ID first.');
             return;
         }
 
         const matches = residents.filter(function (person) {
             const id = Number(person.id);
 
-            // Skip residents already added
             if (existingMemberIds.has(id)) return false;
+            if (id === currentResidentId) return false;
 
-            const fullName = (
-                person.lastName + ' ' +
-                person.firstName + ' ' +
-                (person.middleName ?? '')
-            ).toLowerCase();
+            const searchableNames = buildSearchTerms(person);
 
-            return fullName.includes(query) || id.toString().includes(query);
+            return searchableNames.some(function (value) {
+                return value.includes(query);
+            }) || id.toString().includes(query);
         }).slice(0, 8);
 
         if (matches.length === 0) {
-            closeDropdown();
+            showDropdownMessage('No matching residents found.');
             return;
         }
 
@@ -158,13 +207,11 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdown.classList.remove('d-none');
     }
 
-    // Do not reveal dropdown on typing
     searchInput.addEventListener('input', function () {
         hiddenInput.value = '';
         closeDropdown();
     });
 
-    // Press Enter to search (prevent form submit)
     searchInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -172,18 +219,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Click button to search
     searchBtn.addEventListener('click', function () {
         runSearch();
         searchInput.focus();
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function (e) {
-        if (!form.contains(e.target)) closeDropdown();
+        if (!modalEl.contains(e.target)) {
+            closeDropdown();
+        }
     });
 
-    // Prevent submit unless a resident is selected
     form.addEventListener('submit', function (e) {
         if (!hiddenInput.value) {
             e.preventDefault();
@@ -192,15 +238,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Optional: clear on modal open
-    const modalEl = document.getElementById('addHouseholdMemberModal');
-    if (modalEl) {
-        modalEl.addEventListener('shown.bs.modal', function () {
-            searchInput.value = '';
-            hiddenInput.value = '';
-            closeDropdown();
-        });
-    }
-});
+    modalEl.addEventListener('shown.bs.modal', function () {
+        searchInput.value = '';
+        hiddenInput.value = '';
+        closeDropdown();
+        searchInput.focus();
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAddMemberModal);
+} else {
+    initializeAddMemberModal();
+}
 </script>
 @endpush

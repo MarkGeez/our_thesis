@@ -243,7 +243,7 @@
                                                 </div>
                                                 <div class="modal-body p-4">
                                                     <section>
-                                                        <h6>Defendant Information</h6>
+                                                        <h6>Respondent Information</h6>
                                                         <div class="info-box">
                                                             <div class="row gy-3">
                                                                 <div class="col-sm-6">

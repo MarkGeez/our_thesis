@@ -1172,7 +1172,7 @@ document.addEventListener('click', function(e) {
                                         statusBadge = '<span class="badge bg-success">Approved</span>';
                                         break;
                                     case 'picked_up':
-                                        statusBadge = '<span class="badge bg-secondary">Picked up</span>';
+                                        statusBadge = '<span class="badge bg-secondary">Received</span>';
                                         break;
                                     case 'declined':
                                         statusBadge = '<span class="badge bg-danger">Declined</span>';
@@ -1237,7 +1237,7 @@ document.addEventListener('click', function(e) {
                         statusBadge = '<span class="badge bg-success">Approved</span>';
                         break;
                     case 'picked_up':
-                        statusBadge = '<span class="badge bg-secondary">Picked up</span>';
+                        statusBadge = '<span class="badge bg-secondary">Received</span>';
                         break;
                     case 'declined':
                         statusBadge = '<span class="badge bg-danger">Declined</span>';

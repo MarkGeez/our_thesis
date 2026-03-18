@@ -176,6 +176,7 @@
                         <select name="blotter_type" class="form-select">
                             <option value="regular" {{ old('blotter_type', $defaultBlotterType) === 'regular' ? 'selected' : '' }}>Regular Blotter</option>
                             <option value="vawc" {{ old('blotter_type', $defaultBlotterType) === 'vawc' ? 'selected' : '' }}>VAWC Blotter</option>
+                            <option value="katarungang_pambarangay" {{ old('blotter_type', $defaultBlotterType) === 'katarungang_pambarangay' ? 'selected' : '' }}>Katarungang Pambarangay</option>
                         </select>
                     @else
                         <input type="hidden" name="blotter_type" value="{{ old('blotter_type', $defaultBlotterType) }}">

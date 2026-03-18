@@ -704,6 +704,13 @@
                                     <i class="fa fa-user-shield"></i>
                                     <span>Submit VAWC Blotter</span>
                                 </button>
+                                <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#katarungangPambarangayBlotterModal">
+                                    <i class="fa fa-scale-balanced"></i>
+                                    <span>Submit Katarungang Pambarangay</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -759,6 +766,12 @@
                                 <a class="nav-link {{ ($activeTab ?? 'all') === 'vawc' ? 'active' : '' }}"
                                    href="{{ route('admin.blotter.index', array_merge(request()->except('page', 'tab'), ['tab' => 'vawc'])) }}">
                                     <i class="fas fa-user-shield me-2"></i>VAWC
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ ($activeTab ?? 'all') === 'katarungang_pambarangay' ? 'active' : '' }}"
+                                   href="{{ route('admin.blotter.index', array_merge(request()->except('page', 'tab'), ['tab' => 'katarungang_pambarangay'])) }}">
+                                    <i class="fas fa-scale-balanced me-2"></i>Katarungang Pambarangay
                                 </a>
                             </li>
                         </ul>
@@ -845,15 +858,8 @@
                                                 $displayStatus = $statusLabels[$statusKey] ?? ucfirst(str_replace('_', ' ', $statusKey));
                                                 $typeKey = $blotter->blotter_type ?? 'regular';
                                                 $displayType = $typeLabels[$typeKey] ?? ucfirst((string) $typeKey);
-                                                $terminalStatuses = ['referredToPnp', 'resolved'];
-                                                $isTerminal = in_array($statusKey, $terminalStatuses, true);
-                                                $uiClass = match ($statusKey) {
-                                                    'barangayBlotter' => 'status-default',
-                                                    'first', 'second', 'third' => 'status-pending',
-                                                    'brgyHearing' => 'status-ongoing',
-                                                    'coldCase', 'criminalCase', 'referredToPnp', 'resolved' => 'status-closed',
-                                                    default => 'status-default',
-                                                };
+                                                $canUpdate = \App\Http\Controllers\BlotterController::canBeUpdated($typeKey, $statusKey);
+                                                $uiClass = \App\Http\Controllers\BlotterController::getStatusUiClass($statusKey);
                                             @endphp
 
                                             <tr>
@@ -877,13 +883,13 @@
                                                             <span>View</span>
                                                         </button>
 
-                                                        @if($isTerminal)
+                                                        @if(!$canUpdate)
                                                             <button class="btn btn-sm btn-outline-secondary btn-action shadow-sm"
                                                                     type="button"
                                                                     disabled
-                                                                    title="This blotter is already closed and cannot be updated.">
+                                                                    title="{{ $typeKey === 'regular' ? 'Regular blotters cannot be updated after encoding.' : 'This blotter can no longer be updated.' }}">
                                                                 <i class="fa fa-lock"></i>
-                                                                <span>Closed</span>
+                                                                <span>{{ $typeKey === 'regular' ? 'Locked' : 'Closed' }}</span>
                                                             </button>
                                                         @else
                                                             <button class="btn btn-sm btn-outline-primary btn-action shadow-sm"
@@ -1047,18 +1053,7 @@
                                                                     <div class="history-list timeline">
                                                                         @foreach ($blotter->updates as $hist)
                                                                             @php
-                                                                                $normalized = strtolower($hist->status ?? '');
-                                                                                $badgeClass = match(true) {
-                                                                                    str_contains($normalized, 'first')      => 'pending',
-                                                                                    str_contains($normalized, 'second')     => 'pending',
-                                                                                    str_contains($normalized, 'third')      => 'pending',
-                                                                                    str_contains($normalized, 'brgyHearing')=> 'ongoing',
-                                                                                    str_contains($normalized, 'coldCase')   => 'closed',
-                                                                                    str_contains($normalized, 'criminalCase') => 'closed',
-                                                                                    str_contains($normalized, 'referred')  => 'closed',
-                                                                                    str_contains($normalized, 'resolved')  => 'resolved',
-                                                                                    default                                 => 'pending',
-                                                                                };
+                                                                                $badgeClass = \App\Http\Controllers\BlotterController::getTimelineBadgeClass($hist->status);
                                                                             @endphp
                                                                             <div class="timeline-item">
                                                                                 <span class="timeline-dot"></span>
@@ -1173,6 +1168,26 @@
                             <div class="modal-body pt-3">
                                 @include('forms.blotter', [
                                     'defaultBlotterType' => 'vawc',
+                                    'showBlotterTypeSelector' => false,
+                                ])
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="katarungangPambarangayBlotterModal" tabindex="-1" aria-labelledby="katarungangPambarangayBlotterModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0">
+                                <div>
+                                    <h5 class="modal-title fw-bold" id="katarungangPambarangayBlotterModalLabel">Submit Katarungang Pambarangay</h5>
+                                    <small class="text-muted">Provide the incident details and parties involved.</small>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-3">
+                                @include('forms.blotter', [
+                                    'defaultBlotterType' => 'katarungang_pambarangay',
                                     'showBlotterTypeSelector' => false,
                                 ])
                             </div>
@@ -1317,12 +1332,13 @@
             switch (statusValue) {
                 case 'resolved':
                     return 'Once marked as "' + label + '", this blotter becomes terminal. You can no longer update or revert this case status.';
-                case 'referredToPnp':
+                case 'referred_to_pnp':
                     return 'Once marked as "' + label + '", this blotter becomes terminal in barangay records. Further status updates will no longer be allowed.';
-                case 'criminalCase':
+                case 'criminal_civil_case':
                     return 'This marks legal escalation and will be permanently recorded in the case history.';
-                case 'coldCase':
-                    return 'This marks the case as inactive for now and records the current state in history.';
+                case 'certificate_to_file_action':
+                case 'barangay_protection_order':
+                    return 'This outcome will be recorded permanently in the blotter history.';
                 default:
                     return 'This update will be recorded in status history and will change the current case status.';
             }
@@ -1368,7 +1384,9 @@
 
         @if($errors->any() && (old('plaintiffName') || old('plaintiffLastName') || old('blotterDescription')))
             const selectedBlotterType = "{{ old('blotter_type', 'regular') }}";
-            const targetModalId = selectedBlotterType === 'vawc' ? 'vawcBlotterModal' : 'blotterModal';
+            const targetModalId = selectedBlotterType === 'vawc'
+                ? 'vawcBlotterModal'
+                : (selectedBlotterType === 'katarungang_pambarangay' ? 'katarungangPambarangayBlotterModal' : 'blotterModal');
             const submitBlotterModalEl = document.getElementById(targetModalId);
             if (submitBlotterModalEl) {
                 const submitBlotterModal = new bootstrap.Modal(submitBlotterModalEl);

@@ -26,26 +26,25 @@
                                     <div class="info-label">Current Status</div>
                                     @php
                                         $statusLabels = [
-                                            'barangayBlotter' => 'Barangay Blotter',
-                                            'first' => 'First Summon',
-                                            'second' => 'Second Summon',
-                                            'third' => 'Third Summon',
-                                            'brgyHearing' => 'Barangay Hearing',
-                                            'coldCase' => 'Cold Case',
-                                            'criminalCase' => 'Criminal Case',
-                                            'referredToPnp' => 'Referred to PNP',
+                                            'filed' => 'Filed',
+                                            'first_hearing' => 'First Hearing',
+                                            'second_hearing' => 'Second Hearing',
+                                            'third_hearing' => 'Third Hearing',
+                                            'for_summons' => 'For Summons',
+                                            'criminal_civil_case' => 'Criminal Case/Civil Case',
+                                            'referred_to_pnp' => 'Referred to PNP',
+                                            'certificate_to_file_action' => 'Certificate to File Action',
+                                            'barangay_protection_order' => 'Barangay Protection Order',
                                             'resolved' => 'Resolved',
                                         ];
                                         $currentStatus = $blotter->current_status ?? $blotter->status;
                                         $displayStatus = $statusLabels[$currentStatus] ?? ucfirst(strtolower($currentStatus));
                                         $badgeClass = match($currentStatus) {
-                                            'barangayBlotter' => 'secondary',
-                                            'first', 'second' => 'primary',
-                                            'third' => 'info',
-                                            'brgyHearing' => 'warning text-dark',
-                                            'coldCase' => 'secondary',
-                                            'criminalCase' => 'danger',
-                                            'referredToPnp' => 'dark',
+                                            'filed' => 'secondary',
+                                            'first_hearing', 'second_hearing', 'third_hearing', 'for_summons' => 'primary',
+                                            'barangay_protection_order' => 'warning text-dark',
+                                            'criminal_civil_case', 'certificate_to_file_action' => 'danger',
+                                            'referred_to_pnp' => 'dark',
                                             'resolved' => 'success',
                                             default => 'secondary'
                                         };
@@ -68,13 +67,14 @@
                             <label class="info-label">Select New Status *</label>
                             <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                                 <option value="" disabled>-- Choose Option --</option>
-                                <option value="first" {{ old('status', $blotter->status) === 'first' ? 'selected' : '' }}>First Summon</option>
-                                <option value="second" {{ old('status', $blotter->status) === 'second' ? 'selected' : '' }}>Second Summon</option>
-                                <option value="third" {{ old('status', $blotter->status) === 'third' ? 'selected' : '' }}>Third Summon</option>
-                                <option value="brgyHearing" {{ old('status', $blotter->status) === 'brgyHearing' ? 'selected' : '' }}>Barangay Hearing</option>
-                                <option value="coldCase" {{ old('status', $blotter->status) === 'coldCase' ? 'selected' : '' }}>Cold Case</option>
-                                <option value="criminalCase" {{ old('status', $blotter->status) === 'criminalCase' ? 'selected' : '' }}>Criminal Case</option>
-                                <option value="referredToPnp" {{ old('status', $blotter->status) === 'referredToPnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="first_hearing" {{ old('status', $blotter->status) === 'first_hearing' ? 'selected' : '' }}>First Hearing</option>
+                                <option value="second_hearing" {{ old('status', $blotter->status) === 'second_hearing' ? 'selected' : '' }}>Second Hearing</option>
+                                <option value="third_hearing" {{ old('status', $blotter->status) === 'third_hearing' ? 'selected' : '' }}>Third Hearing</option>
+                                <option value="for_summons" {{ old('status', $blotter->status) === 'for_summons' ? 'selected' : '' }}>For Summons</option>
+                                <option value="criminal_civil_case" {{ old('status', $blotter->status) === 'criminal_civil_case' ? 'selected' : '' }}>Criminal Case/Civil Case</option>
+                                <option value="referred_to_pnp" {{ old('status', $blotter->status) === 'referred_to_pnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="certificate_to_file_action" {{ old('status', $blotter->status) === 'certificate_to_file_action' ? 'selected' : '' }}>Certificate to File Action</option>
+                                <option value="barangay_protection_order" {{ old('status', $blotter->status) === 'barangay_protection_order' ? 'selected' : '' }}>Barangay Protection Order</option>
                                 <option value="resolved" {{ old('status', $blotter->status) === 'resolved' ? 'selected' : '' }}>Resolved</option>
                             </select>
                             @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror

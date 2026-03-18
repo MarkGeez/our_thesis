@@ -201,10 +201,26 @@ class HouseholdController extends Controller
             // New table stores only household_id, resident_id, encoded_by.
             $validated = $request->validate([
                 'resident_id' => 'required|exists:residents,id',
-                'relationship' => 'required|alpha'
+                'relationship' => 'required|string|max:50'
             ]);
 
-            $selectedId = $validated['resident_id'];
+            $selectedId = (int) $validated['resident_id'];
+
+            if ((int) $resident->id === $selectedId) {
+                return back()->withErrors([
+                    'resident_id' => 'You cannot add yourself as a family member.',
+                ]);
+            }
+
+            $alreadyTagged = FamilyMember::where('household_id', $household->id)
+                ->where('resident_id', $selectedId)
+                ->exists();
+
+            if ($alreadyTagged) {
+                return back()->withErrors([
+                    'resident_id' => 'That resident is already added as a family member.',
+                ]);
+            }
 
             $familyMember = FamilyMember::create([
                 'household_id' => $household->id,
@@ -246,6 +262,94 @@ class HouseholdController extends Controller
         $member->update($validated);
 
         return redirect()->back()->with('success', 'Family member details successfully updated.');
+    }
+
+    public function updateHead($id)
+    {
+        $user = auth()->user();
+
+        $currentResident = Resident::where('user_id', $user->id)->first();
+
+        if (!$currentResident) {
+            $currentResident = Resident::where('firstName', $user->firstName)
+                ->where('lastName', $user->lastName)
+                ->first();
+        }
+
+        if (!$currentResident) {
+            return redirect()->back()->with('error', 'Resident record not found.');
+        }
+
+        $member = FamilyMember::with('resident')->findOrFail($id);
+
+        $currentHeadMembership = HouseholdResident::where('household_id', $member->household_id)
+            ->where('resident_id', $currentResident->id)
+            ->where('is_household_head', true)
+            ->first();
+
+        if (!$currentHeadMembership) {
+            return redirect()->back()->with('error', 'Only the current household head can assign a new head.');
+        }
+
+        $newHeadResident = $member->resident;
+
+        if (!$newHeadResident) {
+            return redirect()->back()->with('error', 'Selected resident not found.');
+        }
+
+        if (!$newHeadResident->user_id) {
+            return redirect()->back()->with('error', 'The selected resident must have an account before becoming the household head.');
+        }
+
+        HouseholdResident::firstOrCreate(
+            [
+                'household_id' => $member->household_id,
+                'resident_id' => $newHeadResident->id,
+            ],
+            [
+                'is_household_head' => false,
+            ]
+        );
+
+        $householdResidentIds = HouseholdResident::where('household_id', $member->household_id)
+            ->pluck('resident_id');
+
+        HouseholdResident::where('household_id', $member->household_id)
+            ->update(['is_household_head' => false]);
+
+        if ($householdResidentIds->isNotEmpty()) {
+            Resident::whereIn('id', $householdResidentIds)->update(['headOfFamily' => 'no']);
+        }
+
+        $currentHeadMembership->update(['is_household_head' => false]);
+        $currentResident->update(['headOfFamily' => 'no']);
+
+        HouseholdResident::where('household_id', $member->household_id)
+            ->where('resident_id', $newHeadResident->id)
+            ->update(['is_household_head' => true]);
+
+        $newHeadResident->update(['headOfFamily' => 'yes']);
+
+        FamilyMember::where('household_id', $member->household_id)
+            ->where('encoded_by', $user->id)
+            ->update(['encoded_by' => $newHeadResident->user_id]);
+
+        FamilyMember::where('household_id', $member->household_id)
+            ->where('resident_id', $newHeadResident->id)
+            ->delete();
+
+        FamilyMember::updateOrCreate(
+            [
+                'household_id' => $member->household_id,
+                'resident_id' => $currentResident->id,
+            ],
+            [
+                'encoded_by' => $newHeadResident->user_id,
+                'relationship' => 'Member',
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Household head updated successfully.');
     }
 
     public function search(Request $request)

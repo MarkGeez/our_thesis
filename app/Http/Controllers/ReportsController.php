@@ -21,6 +21,7 @@ use App\Models\Feedbacks;
 use App\Services\ActiveLogRecordDetails;
 use Carbon\Carbon;
 use Auth;
+use Illuminate\Validation\Rule;
 
 class ReportsController extends Controller
 {
@@ -149,10 +150,12 @@ public function generatePopulation(Request $request)
 
 public function generateBlotter(Request $request)
 {
+    $allowedStatuses = array_merge(['all', 'pending', 'ongoing', 'closed'], BlotterController::getReportStatusOptions());
+
     $request->validate([
         'report_name' => 'required',
-        'blotter_status' => 'nullable|in:all,pending,ongoing,closed,barangayBlotter,first,second,third,brgyHearing,coldCase,criminalCase,referredToPnp,resolved',
-        'blotter_type' => 'nullable|in:all,regular,vawc',
+        'blotter_status' => ['nullable', Rule::in($allowedStatuses)],
+        'blotter_type' => 'nullable|in:all,regular,vawc,katarungang_pambarangay',
         'complainant_name' => 'nullable|string|max:150',
         'date_from' => 'nullable|date',
         'date_to' => 'nullable|date|after_or_equal:date_from',
@@ -362,7 +365,7 @@ public function generateOfficials(Request $request)
         'total_records' => $officials->count(),
     ]);
 
-    return redirect()->back()->with('success', 'Barangay officials report generated successfully.');
+    return redirect()->back()->with('success', 'Officials list reports generated successfully.');
 }
 
 public function generateArchives(Request $request)
@@ -665,11 +668,20 @@ private function buildBlotterReportQuery(array $filters)
 
     if ($status !== 'all') {
         if ($status === 'pending') {
-            $query->whereIn('current_status', ['barangayBlotter', 'first', 'second', 'third']);
+            $query->whereIn('current_status', array_merge(
+                BlotterController::getPendingStatuses(),
+                ['barangayBlotter', 'first', 'second', 'third']
+            ));
         } elseif ($status === 'ongoing') {
-            $query->where('current_status', 'brgyHearing');
+            $query->whereIn('current_status', array_merge(
+                BlotterController::getOngoingStatuses(),
+                ['brgyHearing']
+            ));
         } elseif ($status === 'closed') {
-            $query->whereIn('current_status', ['coldCase', 'criminalCase', 'referredToPnp', 'resolved']);
+            $query->whereIn('current_status', array_merge(
+                BlotterController::getClosedStatuses(),
+                ['coldCase', 'criminalCase', 'referredToPnp']
+            ));
         } else {
             $query->where('current_status', $status);
         }
