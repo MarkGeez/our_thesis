@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('module_visits', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('module_key', 100);
+            $table->timestamp('last_visited_at');
+            $table->timestamps();
+
+            $table->unique(['user_id', 'module_key']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('module_visits');
+    }
+};

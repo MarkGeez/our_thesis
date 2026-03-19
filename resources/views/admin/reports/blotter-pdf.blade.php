@@ -212,25 +212,29 @@
                 <thead>
                     <tr>
                         <th style="width: 8%;">Date</th>
-                        <th style="width: 15%;">Complainant</th>
-                        <th style="width: 15%;">Respondent</th>
-                        <th style="width: 30%;">Description</th>
-                        <th style="width: 12%;">Status</th>
-                        <th style="width: 20%;">Notes</th>
+                        <th style="width: 12%;">Complainant</th>
+                        <th style="width: 12%;">Respondent</th>
+                        <th style="width: 10%;">Type</th>
+                        <th style="width: 22%;">Description</th>
+                        <th style="width: 14%;">Status</th>
+                        <th style="width: 22%;">Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($chunk as $blotter)
+                        @php
+                            $statusLabel = \App\Http\Controllers\BlotterController::getStatusLabel($blotter->current_status);
+                            $blotterTypeMap = ['regular' => 'Regular', 'vawc' => 'VAWC', 'katarungang_pambarangay' => 'Katarungang Pambarangay'];
+                            $blotterType = strtolower((string) ($blotter->blotter_type ?? 'regular'));
+                            $displayType = $blotterTypeMap[$blotterType] ?? ucfirst((string) $blotterType);
+                        @endphp
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($blotter->created_at)->format('M d, Y') }}</td>
                             <td>{{ $blotter->plaintiffName }}</td>
                             <td>{{ $blotter->defendantName ?? '-' }}</td>
-                            <td>{{ Str::limit($blotter->blotterDescription, 100) }}</td>
-                            <td>
-                                <span class="status-{{ strtolower($blotter->current_status) }}">
-                                    {{ $blotter->current_status }}
-                                </span>
-                            </td>
+                            <td><strong>{{ $displayType }}</strong></td>
+                            <td>{{ Str::limit($blotter->blotterDescription, 80) }}</td>
+                            <td><strong>{{ $statusLabel }}</strong></td>
                             <td>{{ Str::limit($blotter->statusDescription ?? '', 50) }}</td>
                         </tr>
                     @endforeach
@@ -253,7 +257,7 @@
                 <div class="footer-column">
                     <div class="footer-label">Contact</div>
                     <div class="footer-text">
-                        {{ \App\Models\Setting::get('contact_number', '0999-123-4567') }} · 
+                {{ \App\Models\Setting::get('contact_number', '09170000000') }} ·
                         {{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}
                     </div>
                 </div>

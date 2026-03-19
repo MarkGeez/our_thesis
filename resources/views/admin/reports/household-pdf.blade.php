@@ -281,7 +281,7 @@
                 <div class="footer-column">
                     <div class="footer-label">Contact</div>
                     <div class="footer-text">
-                        {{ \App\Models\Setting::get('contact_number', '0999-123-4567') }} · 
+                {{ \App\Models\Setting::get('contact_number', '09170000000') }} ·
                         {{ \App\Models\Setting::get('contact_email', 'brgy249@email.com') }}
                     </div>
                 </div>

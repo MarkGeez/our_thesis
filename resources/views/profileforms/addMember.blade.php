@@ -22,6 +22,19 @@
     background: #f1f5f9;
 }
 
+.resident-option-name {
+    display: block;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.resident-option-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
 .search-help {
     font-size: 0.8rem;
     color: #94a3b8;
@@ -157,6 +170,30 @@ function initializeAddMemberModal() {
         ];
     }
 
+    function formatBirthday(value) {
+        if (!value) return 'Birthday: N/A';
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+            return 'Birthday: ' + value;
+        }
+
+        return 'Birthday: ' + parsed.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+        });
+    }
+
+    function formatSex(value) {
+        if (!value) return 'Sex: N/A';
+        return 'Sex: ' + formatName(value);
+    }
+
+    function formatContact(value) {
+        return 'Contact: ' + (value || 'N/A');
+    }
+
     function runSearch() {
         const query = normalize(searchInput.value);
         dropdown.innerHTML = '';
@@ -192,11 +229,18 @@ function initializeAddMemberModal() {
             const last = formatName(person.lastName);
             const first = formatName(person.firstName);
             const middle = formatName(person.middleName);
+            const fullName = `${last}, ${first}${middle ? ' ' + middle : ''}`;
+            const birthday = formatBirthday(person.birthday);
+            const sex = formatSex(person.sex);
+            const contact = formatContact(person.contactNo);
 
-            option.textContent = `${last}, ${first} ${middle ? middle : ''} (ID: ${person.id})`;
+            option.innerHTML = `
+                <span class="resident-option-name">${fullName} (ID: ${person.id})</span>
+                <span class="resident-option-meta">${birthday} | ${sex} | ${contact}</span>
+            `;
 
             option.addEventListener('click', function () {
-                searchInput.value = option.textContent;
+                searchInput.value = `${fullName} (ID: ${person.id})`;
                 hiddenInput.value = person.id;
                 closeDropdown();
             });

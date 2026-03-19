@@ -107,7 +107,7 @@
             </div>
             <div class="col-md-5">
                 <label class="form-label">Contact Number</label>
-                <input name="plaintiffContactNumber" class="form-control" placeholder="0917-000-0000">
+                <input type="tel" name="plaintiffContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
             </div>
             <div class="col-md-5">
                 <label class="form-label">Address</label>
@@ -141,7 +141,7 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label">Contact Number <span class="text-muted">(Optional)</span></label>
-                <input name="defendantContactNumber" class="form-control" placeholder="09xx-xxx-xxxx">
+                <input type="tel" name="defendantContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
             </div>
         </div>
     </div>
@@ -156,7 +156,7 @@
                 </div>
                                     <label class="form-label">Witness Contact Number</label>
 
-                <input name="witnessContactNumber" class="form-control" placeholder="Phone Number">
+                <input type="tel" name="witnessContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
             </div>
         </div>
 
@@ -176,6 +176,7 @@
                         <select name="blotter_type" class="form-select">
                             <option value="regular" {{ old('blotter_type', $defaultBlotterType) === 'regular' ? 'selected' : '' }}>Regular Blotter</option>
                             <option value="vawc" {{ old('blotter_type', $defaultBlotterType) === 'vawc' ? 'selected' : '' }}>VAWC Blotter</option>
+                            <option value="katarungang_pambarangay" {{ old('blotter_type', $defaultBlotterType) === 'katarungang_pambarangay' ? 'selected' : '' }}>Katarungang Pambarangay</option>
                         </select>
                     @else
                         <input type="hidden" name="blotter_type" value="{{ old('blotter_type', $defaultBlotterType) }}">

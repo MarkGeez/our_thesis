@@ -1,4 +1,7 @@
-@php $themeColor = \App\Models\Setting::get('theme', '#0061f7'); @endphp
+@php
+    $themeColor = \App\Models\Setting::get('theme', '#0061f7');
+    $sidebarNotifications = app(\App\Services\SidebarNotificationService::class)->forUser(auth()->user());
+@endphp
 <style>
 .sidebar {
     background: {{ $themeColor }} !important;
@@ -389,6 +392,21 @@
         rgba(0, 0, 0, 0.08) 100%
     ) !important;
 }
+
+.sidebar-notification-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 1px solid #ffffff;
+    flex-shrink: 0;
+}
+
+.sidebar.sidebar--light .sidebar-notification-dot {
+    border-color: rgba(255, 255, 255, 0.95);
+}
 </style>
 
 <aside class="sidebar" data-theme="{{ $themeColor }}">
@@ -473,9 +491,20 @@
             <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>Announcements
         </a>
     </li>
-    <li>
-        <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
+        <li>
+            <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
                                     <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
+                @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_COMPLAINTS_RECORDS] ?? false)
+                    <span class="sidebar-notification-dot" aria-label="New complaint records"></span>
+                @endif
+        </a>
+    </li>
+    <li>
+        <a class="{{ Request::routeIs('subadmin.certificateRequest') ? 'active' : '' }}" href="{{ route('subadmin.certificateRequest') }}">
+            <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Certificate Requests
+            @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_CERTIFICATE_REQUESTS] ?? false)
+                <span class="sidebar-notification-dot" aria-label="New certificate requests"></span>
+            @endif
         </a>
     </li>
     <li>
@@ -537,4 +566,3 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-

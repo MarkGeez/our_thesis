@@ -107,6 +107,7 @@ $user = auth()->user();
                 <label class="form-label">Contact Number</label>
                 <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
                 <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
+                <input type="tel" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000" required>
             </div>
         </div>
 

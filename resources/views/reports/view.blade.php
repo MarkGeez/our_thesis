@@ -264,19 +264,30 @@
                                 @elseif($type == 'blotter')
                                     @php
                                         $blotterStatusMap = [
-                                            'barangayBlotter' => 'Barangay Blotter',
-                                            'first' => 'First Summon',
-                                            'second' => 'Second Summon',
-                                            'third' => 'Third Summon',
+                                            'filed' => 'Filed',
+                                            'first_hearing' => 'First Hearing',
+                                            'second_hearing' => 'Second Hearing',
+                                            'third_hearing' => 'Third Hearing',
+                                            'for_summons' => 'For Summons',
+                                            'criminal_civil_case' => 'Criminal Case/Civil Case',
+                                            'referred_to_pnp' => 'Referred to PNP',
+                                            'certificate_to_file_action' => 'Certificate to File Action',
+                                            'barangay_protection_order' => 'Barangay Protection Order',
+                                            'resolved' => 'Resolved',
+                                            // Legacy support
+                                            'barangayBlotter' => 'Filed',
+                                            'first' => 'First Hearing',
+                                            'second' => 'Second Hearing',
+                                            'third' => 'Third Hearing',
                                             'brgyHearing' => 'Barangay Hearing',
                                             'coldCase' => 'Cold Case',
                                             'criminalCase' => 'Criminal Case',
-                                            'referredToPnp' => 'Referred To PNP',
-                                            'resolved' => 'Resolved',
+                                            'referredToPnp' => 'Referred to PNP',
                                         ];
                                         $blotterTypeMap = [
                                             'regular' => 'Regular',
                                             'vawc' => 'VAWC',
+                                            'katarungang_pambarangay' => 'Katarungang Pambarangay',
                                         ];
                                         $blotterStatus = $row->current_status ?? $row->status;
                                         $blotterType = strtolower((string) ($row->blotter_type ?? 'regular'));

@@ -1444,17 +1444,18 @@
                             <label class="form-label fw-semibold">Status <span class="text-muted">(Optional)</span></label>
                             <select name="blotter_status" class="form-select">
                                 <option value="all" {{ old('blotter_status', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (Barangay Blotter-Third Summon)</option>
-                                <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Hearing)</option>
+                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (Filed to For Summons)</option>
+                                <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Protection Order)</option>
                                 <option value="closed" {{ old('blotter_status') === 'closed' ? 'selected' : '' }}>Closed</option>
-                                <option value="barangayBlotter" {{ old('blotter_status') === 'barangayBlotter' ? 'selected' : '' }}>Barangay Blotter</option>
-                                <option value="first" {{ old('blotter_status') === 'first' ? 'selected' : '' }}>First Summon</option>
-                                <option value="second" {{ old('blotter_status') === 'second' ? 'selected' : '' }}>Second Summon</option>
-                                <option value="third" {{ old('blotter_status') === 'third' ? 'selected' : '' }}>Third Summon</option>
-                                <option value="brgyHearing" {{ old('blotter_status') === 'brgyHearing' ? 'selected' : '' }}>Barangay Hearing</option>
-                                <option value="coldCase" {{ old('blotter_status') === 'coldCase' ? 'selected' : '' }}>Cold Case</option>
-                                <option value="criminalCase" {{ old('blotter_status') === 'criminalCase' ? 'selected' : '' }}>Criminal Case</option>
-                                <option value="referredToPnp" {{ old('blotter_status') === 'referredToPnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="filed" {{ old('blotter_status') === 'filed' ? 'selected' : '' }}>Filed</option>
+                                <option value="first_hearing" {{ old('blotter_status') === 'first_hearing' ? 'selected' : '' }}>First Hearing</option>
+                                <option value="second_hearing" {{ old('blotter_status') === 'second_hearing' ? 'selected' : '' }}>Second Hearing</option>
+                                <option value="third_hearing" {{ old('blotter_status') === 'third_hearing' ? 'selected' : '' }}>Third Hearing</option>
+                                <option value="for_summons" {{ old('blotter_status') === 'for_summons' ? 'selected' : '' }}>For Summons</option>
+                                <option value="criminal_civil_case" {{ old('blotter_status') === 'criminal_civil_case' ? 'selected' : '' }}>Criminal Case/Civil Case</option>
+                                <option value="referred_to_pnp" {{ old('blotter_status') === 'referred_to_pnp' ? 'selected' : '' }}>Referred to PNP</option>
+                                <option value="certificate_to_file_action" {{ old('blotter_status') === 'certificate_to_file_action' ? 'selected' : '' }}>Certificate to File Action</option>
+                                <option value="barangay_protection_order" {{ old('blotter_status') === 'barangay_protection_order' ? 'selected' : '' }}>Barangay Protection Order</option>
                                 <option value="resolved" {{ old('blotter_status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
                             </select>
                         </div>
@@ -1464,6 +1465,7 @@
                                 <option value="all" {{ old('blotter_type', 'all') === 'all' ? 'selected' : '' }}>All</option>
                                 <option value="regular" {{ old('blotter_type') === 'regular' ? 'selected' : '' }}>Regular</option>
                                 <option value="vawc" {{ old('blotter_type') === 'vawc' ? 'selected' : '' }}>VAWC</option>
+                                <option value="katarungang_pambarangay" {{ old('blotter_type') === 'katarungang_pambarangay' ? 'selected' : '' }}>Katarungang Pambarangay</option>
                             </select>
                         </div>
                         <div class="col-md-6">

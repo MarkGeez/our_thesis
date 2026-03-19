@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use Illuminate\Http\Request;
 
 use App\Models\Announcement;
@@ -23,22 +24,7 @@ use App\Models\CertificateRequest;
 
 class AdminController extends Controller
 {
-    private function getHeadCandidateResidents()
-    {
-        return Resident::with('households:id')
-            ->select('id', 'firstName', 'middleName', 'lastName', 'headOfFamily')
-            ->get()
-            ->map(function (Resident $resident) {
-                return [
-                    'id' => $resident->id,
-                    'firstName' => $resident->firstName,
-                    'middleName' => $resident->middleName,
-                    'lastName' => $resident->lastName,
-                    'headOfFamily' => $resident->headOfFamily,
-                    'householdIds' => $resident->households->pluck('id')->values(),
-                ];
-            });
-    }
+    use ValidatesContactNumbers;
 
     public function dashboard(): View
     {
@@ -72,9 +58,8 @@ class AdminController extends Controller
     }
     
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
-    $residents = Resident::select('id','firstName','middleName','lastName')->get();
-    $headCandidateResidents = $this->getHeadCandidateResidents();
-    return view('admin.profile', compact('user', 'resident', 'members', 'residents', 'headCandidateResidents'));
+    $residents = Resident::select('id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo')->get();
+    return view('admin.profile', compact('user', 'resident', 'members', 'residents'));
 }
     public function adminComplaint():View{
         $admin = Auth::user();
@@ -287,9 +272,9 @@ class AdminController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'theme' => 'nullable|string|max:7',
             'contact_address' => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:50',
+            'contact_number' => $this->nullableContactNumberRules(),
             'contact_email' => 'nullable|email|max:255',
-        ]);
+        ], $this->contactNumberMessages(['contact_number']));
 
         $settings = Setting::first() ?? new Setting();
 

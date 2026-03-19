@@ -137,12 +137,24 @@
         .table.blotter-table td[data-col="plaintiff"] { width: 16%; }
         .table.blotter-table th[data-col="defendant"],
         .table.blotter-table td[data-col="defendant"] { width: 16%; }
+        .table.blotter-table th[data-col="blotter_type"],
+        .table.blotter-table td[data-col="blotter_type"] { width: 16%; }
         .table.blotter-table th[data-col="status"],
-        .table.blotter-table td[data-col="status"] { width: 10%; }
+        .table.blotter-table td[data-col="status"] { width: 13%; }
         .table.blotter-table th[data-col="details"],
-        .table.blotter-table td[data-col="details"] { width: 24%; }
+        .table.blotter-table td[data-col="details"] { width: 17%; }
         .table.blotter-table th[data-col="status_history"],
-        .table.blotter-table td[data-col="status_history"] { width: 34%; }
+        .table.blotter-table td[data-col="status_history"] { width: 22%; }
+
+        .table.blotter-table td[data-col="blotter_type"],
+        .table.blotter-table td[data-col="status"],
+        .table.blotter-table th[data-col="blotter_type"],
+        .table.blotter-table th[data-col="status"] {
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: none;
+            white-space: normal;
+        }
 
         .table.complaint-table th[data-col="complainant"],
         .table.complaint-table td[data-col="complainant"] { width: 14%; }
@@ -765,19 +777,30 @@
                             @elseif($type == 'blotter')
                                 @php
                                     $blotterStatusMap = [
-                                        'barangayBlotter' => 'Barangay Blotter',
-                                        'first' => 'First Summon',
-                                        'second' => 'Second Summon',
-                                        'third' => 'Third Summon',
+                                        'filed' => 'Filed',
+                                        'first_hearing' => 'First Hearing',
+                                        'second_hearing' => 'Second Hearing',
+                                        'third_hearing' => 'Third Hearing',
+                                        'for_summons' => 'For Summons',
+                                        'criminal_civil_case' => 'Criminal Case/Civil Case',
+                                        'referred_to_pnp' => 'Referred to PNP',
+                                        'certificate_to_file_action' => 'Certificate to File Action',
+                                        'barangay_protection_order' => 'Barangay Protection Order',
+                                        'resolved' => 'Resolved',
+                                        // Legacy support
+                                        'barangayBlotter' => 'Filed',
+                                        'first' => 'First Hearing',
+                                        'second' => 'Second Hearing',
+                                        'third' => 'Third Hearing',
                                         'brgyHearing' => 'Barangay Hearing',
                                         'coldCase' => 'Cold Case',
                                         'criminalCase' => 'Criminal Case',
-                                        'referredToPnp' => 'Referred To PNP',
-                                        'resolved' => 'Resolved',
+                                        'referredToPnp' => 'Referred to PNP',
                                     ];
                                     $blotterTypeMap = [
                                         'regular' => 'Regular',
                                         'vawc' => 'VAWC',
+                                        'katarungang_pambarangay' => 'Katarungang Pambarangay',
                                     ];
                                     $blotterStatus = $row->current_status ?? $row->status;
                                     $blotterType = strtolower((string) ($row->blotter_type ?? 'regular'));
@@ -962,7 +985,7 @@
     </div>
     <div class="footer-contact-row">
         <i class="fas fa-phone-alt"></i>
-        <span>{{ \App\Models\Setting::get('contact_number', '0999-123-4567') }}</span>
+                            <span>{{ \App\Models\Setting::get('contact_number', '09170000000') }}</span>
     </div>
 </div>
 

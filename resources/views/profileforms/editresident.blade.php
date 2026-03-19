@@ -1,36 +1,4 @@
 <style>
-    .resident-dropdown {
-        position: absolute;
-        z-index: 1050;
-        background: white;
-        border: 1px solid #dee2e6;
-        width: 100%;
-        max-height: 250px;
-        overflow-y: auto;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border-radius: 4px;
-    }
-
-    .resident-option {
-        padding: 12px 15px;
-        cursor: pointer;
-        border-bottom: 1px solid #f1f1f1;
-        font-size: 14px;
-    }
-
-    .resident-option:hover {
-        background-color: #f8f9fa;
-        color: #007bff;
-    }
-
-    .new-head-container {
-        border-left: 3px solid #0d6efd;
-        padding-left: 15px;
-        background-color: #f0f7ff;
-        padding-bottom: 10px;
-        border-radius: 5px;
-    }
-
     .form-control, .form-select {
         background-color: #ffffff !important;
         border: 1.5px solid #adb5bd !important;
@@ -75,9 +43,6 @@
         border-color: rgba(239, 68, 68, 0.55);
     }
 </style>
-@php
-    $householdId = optional($resident->households->first())->id;
-@endphp
 <form action="{{ route(auth()->user()->role . '.update.ownInfo', $resident->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -157,6 +122,8 @@
                 <input type="number" name="contactNo" class="form-control form-control-lg"
                        value="{{ old('contactNo', $resident->contactNo) }}" >
                 <div id="residentContactError" class="auth-alert auth-alert-error  text-black" style="display: none;"></div>
+                <input type="tel" name="contactNo" class="form-control form-control-lg"
+                       value="{{ old('contactNo', $resident->contactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
             </div>
 
             <div class="col-md-6">
@@ -220,8 +187,8 @@
 
             <div class="col-md-6">
                 <label class="form-label">Emergency Contact No.</label>
-                <input type="number" name="emergencyContactNo" class="form-control form-control-lg"
-                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" >
+                <input type="tel" name="emergencyContactNo" class="form-control form-control-lg"
+                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
             </div>
         </div>
 
@@ -243,52 +210,10 @@
 
             <div class="col-md-6">
                 <label class="form-label">Head of Family</label>
-                @if($resident->headOfFamily === 'yes')
-                    <select
-                        name="headOfFamily"
-                        id="headOfFamilySelect_{{ $resident->id }}"
-                        class="form-select form-control-lg head-of-family-trigger"
-                        data-resident-id="{{ $resident->id }}"
-                        data-original-value="{{ $resident->headOfFamily }}"
-                        required
-                    >
-                        <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
-                        <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
-                    </select>
-                @else
-                    <input type="hidden" name="headOfFamily" value="no">
-                    <input type="text" class="form-control form-control-lg" value="{{ ucfirst(old('headOfFamily', $resident->headOfFamily)) }}" readonly>
-                @endif
+              <input type="text" class="form-control form-control-lg" 
+       value="{{ ucfirst(old('headOfFamily', $resident->headOfFamily)) }}" readonly>
             </div>
         </div>
-
-        @if($resident->headOfFamily === 'yes')
-            <div class="row mb-3 new-head-container" id="newHeadContainer_{{ $resident->id }}" style="display: none;">
-                <div class="col-md-12">
-                    <label class="form-label">Select New Head of Family</label>
-                    <div class="mb-0 position-relative search-box-container"
-                         data-resident-id="{{ $resident->id }}"
-                         data-household-id="{{ $householdId }}">
-                        <div class="input-group">
-                            <input type="text"
-                                   class="form-control new-head-search-input"
-                                   placeholder="Enter resident name then press Enter or click Search"
-                                   autocomplete="off">
-                            <button type="button" class="btn btn-outline-primary new-head-search-btn">
-                                Search
-                            </button>
-                        </div>
-
-                        <input type="hidden" name="new_head_id" class="new-head-id-input" value="{{ old('new_head_id') }}">
-                        <div class="resident-dropdown new-head-dropdown d-none"></div>
-                        <div class="form-text">
-                            Search only residents from the same household who are not currently a head of family.
-                            <span class="text-danger">Make sure to search residents from the same household before entering for a new head.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
 
         <div class="row mb-3">
             <div class="col-md-12">
@@ -316,7 +241,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const headCandidateResidents = @json($headCandidateResidents ?? []);
         const resBirthday = document.getElementById('resident_birthday');
         const resOpenDate = document.getElementById('resident_openDate');
         const residentContactInput = document.querySelector('input[name="contactNo"]');
@@ -418,169 +342,5 @@
                 populateHouses(this.value);
             });
         }
-
-        function formatName(value) {
-            return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : '';
-        }
-
-        function closeNewHeadDropdown(container) {
-            const dropdown = container.querySelector('.new-head-dropdown');
-            if (!dropdown) {
-                return;
-            }
-
-            dropdown.classList.add('d-none');
-            dropdown.innerHTML = '';
-        }
-
-        function clearNewHeadSelection(container) {
-            const searchInput = container.querySelector('.new-head-search-input');
-            const hiddenInput = container.querySelector('.new-head-id-input');
-
-            if (searchInput) {
-                searchInput.value = '';
-            }
-
-            if (hiddenInput) {
-                hiddenInput.value = '';
-            }
-
-            closeNewHeadDropdown(container);
-        }
-
-        function updateNewHeadVisibility(select) {
-            const resId = select.dataset.residentId;
-            const originalValue = select.dataset.originalValue;
-            const container = document.getElementById(`newHeadContainer_${resId}`);
-
-            if (!container) {
-                return;
-            }
-
-            if (originalValue === 'yes' && select.value === 'no') {
-                container.style.display = 'flex';
-            } else {
-                container.style.display = 'none';
-                clearNewHeadSelection(container);
-            }
-        }
-
-        function runNewHeadSearch(container) {
-            const searchInput = container.querySelector('.new-head-search-input');
-            const dropdown = container.querySelector('.new-head-dropdown');
-            const hiddenInput = container.querySelector('.new-head-id-input');
-            const currentResidentId = Number(container.dataset.residentId);
-            const householdId = Number(container.dataset.householdId);
-            const query = (searchInput.value || '').toLowerCase().trim();
-
-            if (!dropdown || !hiddenInput) {
-                return;
-            }
-
-            dropdown.innerHTML = '';
-            hiddenInput.value = '';
-
-            if (!query || !householdId) {
-                closeNewHeadDropdown(container);
-                return;
-            }
-
-            const matches = headCandidateResidents.filter(function (person) {
-                const residentId = Number(person.id);
-                const householdIds = Array.isArray(person.householdIds)
-                    ? person.householdIds.map(Number)
-                    : [];
-
-                if (residentId === currentResidentId) return false;
-                if (String(person.headOfFamily).toLowerCase() === 'yes') return false;
-                if (!householdIds.includes(householdId)) return false;
-
-                const fullName = (
-                    `${person.lastName} ${person.firstName} ${person.middleName ?? ''}`
-                ).toLowerCase();
-
-                return fullName.includes(query) || residentId.toString().includes(query);
-            }).slice(0, 8);
-
-            if (matches.length === 0) {
-                dropdown.innerHTML = '<div class="p-2 text-muted">No eligible non-head residents found</div>';
-                dropdown.classList.remove('d-none');
-                return;
-            }
-
-            matches.forEach(function (person) {
-                const option = document.createElement('div');
-                const last = formatName(person.lastName);
-                const first = formatName(person.firstName);
-                const middle = formatName(person.middleName);
-
-                option.className = 'resident-option';
-                option.textContent = `${last}, ${first}${middle ? ' ' + middle : ''} (ID: ${person.id})`;
-
-                option.addEventListener('click', function () {
-                    searchInput.value = option.textContent;
-                    hiddenInput.value = person.id;
-                    closeNewHeadDropdown(container);
-                });
-
-                dropdown.appendChild(option);
-            });
-
-            dropdown.classList.remove('d-none');
-        }
-
-        document.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
-            updateNewHeadVisibility(select);
-
-            select.addEventListener('change', function () {
-                updateNewHeadVisibility(select);
-            });
-        });
-
-        document.querySelectorAll('.search-box-container').forEach(function (container) {
-            const searchInput = container.querySelector('.new-head-search-input');
-            const searchButton = container.querySelector('.new-head-search-btn');
-            const hiddenInput = container.querySelector('.new-head-id-input');
-            const form = container.closest('form');
-
-            if (!searchInput || !searchButton || !hiddenInput) {
-                return;
-            }
-
-            searchButton.addEventListener('click', function () {
-                runNewHeadSearch(container);
-            });
-
-            searchInput.addEventListener('input', function () {
-                hiddenInput.value = '';
-                closeNewHeadDropdown(container);
-            });
-
-            searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    runNewHeadSearch(container);
-                }
-            });
-
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    const wrapper = container.closest('[id^="newHeadContainer_"]');
-                    const isVisible = wrapper && wrapper.style.display !== 'none';
-
-                    if (isVisible && !hiddenInput.value) {
-                        e.preventDefault();
-                        alert('Please select a new Head of Family from the dropdown.');
-                        searchInput.focus();
-                    }
-                });
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.search-box-container')) {
-                document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
-            }
-        });
     });
 </script>

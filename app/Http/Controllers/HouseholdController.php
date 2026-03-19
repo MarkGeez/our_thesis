@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use Illuminate\Http\Request;
 use App\Models\Street;
 use App\Models\House;
@@ -12,6 +13,8 @@ use App\Models\FamilyMember;
 
 class HouseholdController extends Controller
 {
+    use ValidatesContactNumbers;
+
     public function showHousehold()
     {
         $street = Street::withCount('houses')->get();
@@ -254,8 +257,8 @@ class HouseholdController extends Controller
             'birthdate' => 'required|date|before:today',
             'sex' => 'required|in:male,female',
             'relationship' => 'required|string|max:50',
-            'contactNumber' => 'nullable|string|max:20',
-        ]);
+            'contactNumber' => $this->nullableContactNumberRules(),
+        ], $this->contactNumberMessages(['contactNumber']));
 
         $validated['is_inactive'] = $request->boolean('is_inactive');
         $member = FamilyMember::findOrFail($id);

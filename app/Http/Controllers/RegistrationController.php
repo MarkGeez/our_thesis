@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Models\User;
 use App\Models\Resident;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
+    use ValidatesContactNumbers;
+
     public function showRegister(): View
     {
         return view('auth.register');
@@ -24,10 +27,10 @@ class RegistrationController extends Controller
             'lastName'        => 'required|string|max:50',
             'email'           => 'required|string|email|max:255|unique:users,email',
             'password'        => 'required|string|min:8|max:255',
-            'contactNumber'   => 'required|string|digits:11',
+            'contactNumber'   => $this->requiredContactNumberRules(),
             'birthday'        => 'required|date|before:today',
             'proofOfIdentity' => 'required|image|mimes:jpg,png,jpeg|max:4096'
-        ]);
+        ], $this->contactNumberMessages(['contactNumber']));
 
         $firstName = Resident::normalizeNamePart($request->firstName);
         $middleName = Resident::normalizeNamePart($request->middleName);

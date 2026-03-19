@@ -952,6 +952,7 @@
                                                                 <label>Contact No.</label>
                                                                 <input type="text" name="contactNo" class="form-control js-contact-number" value="{{ old('contactNo', $resident->contactNo) }}" required>
                                                                 <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
+                                                                <input type="tel" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
                                                             </div>
                                                         </div>
 
@@ -1088,57 +1089,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('new-head-search-btn')) {
-            const container = e.target.closest('.search-box-container');
-            if (!container) {
-                return;
-            }
+            // Find the container SPECIFIC to this modal
+            const container = e.target.closest('.position-relative');
+            const searchInput = container.querySelector('.new-head-search-input');
+            const dropdown = container.querySelector('.new-head-dropdown');
+            
+            const query = searchInput.value.toLowerCase().trim();
+            dropdown.innerHTML = '';
+
+            if (!query) return dropdown.classList.add('d-none');
 
             runNewHeadSearch(container);
         }
 
-        if (!e.target.closest('.search-box-container')) {
-            document.querySelectorAll('.search-box-container').forEach(closeNewHeadDropdown);
-        }
-    });
+            if (matches.length > 0) {
+                matches.forEach(person => {
+                    const option = document.createElement('div');
+                    option.className = 'resident-option p-2 border-bottom';
+                    option.style.cursor = 'pointer';
+                    option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
 
-    document.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
-        updateNewHeadVisibility(select);
-
-        select.addEventListener('change', function () {
-            updateNewHeadVisibility(select);
-        });
-    });
-
-    document.querySelectorAll('.search-box-container').forEach(function (container) {
-        const searchInput = container.querySelector('.new-head-search-input');
-        const hiddenInput = container.querySelector('.new-head-id-input');
-        const form = container.closest('form');
-
-        searchInput.addEventListener('input', function () {
-            hiddenInput.value = '';
-            closeNewHeadDropdown(container);
-        }
-
-        );
-
-        searchInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                runNewHeadSearch(container);
+                    option.addEventListener('click', function () {
+                        // Crucial: Update the hidden input in THIS modal only
+                        searchInput.value = this.textContent;
+                        container.querySelector('.new-head-id-input').value = person.id;
+                        dropdown.classList.add('d-none');
+                    });
+                    dropdown.appendChild(option);
+                });
+                dropdown.classList.remove('d-none');
             }
-        });
-
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                const wrapper = container.closest('[id^="newHeadContainer_"]');
-                const isVisible = wrapper && wrapper.style.display !== 'none';
-
-                if (isVisible && !hiddenInput.value) {
-                    e.preventDefault();
-                    alert('Please select a new Head of Family from the dropdown.');
-                    searchInput.focus();
-                }
-            });
+        }
+    });
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-box-container')) {
+            document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
         }
     });
 });
@@ -1199,7 +1185,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name" required>
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
+<<<<<<< HEAD
                                                         <input type="text" max="11" min="10" id="emergencyContactNo{{ $resident->id }} js-contact-number" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09123456789" required>
+=======
+                                                        <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
+>>>>>>> 3e19178b6b1cef8105283dd76d1afba879e2daa2
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1312,9 +1302,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
+<<<<<<< HEAD
     <input type="text" id="contactNo" name="contactNo" class="form-control js-contact-number @error('contactNo') is-invalid @enderror" 
            value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
     <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
+=======
+    <input type="tel" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
+           value="{{ old('contactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" >
+>>>>>>> 3e19178b6b1cef8105283dd76d1afba879e2daa2
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1376,8 +1371,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Emergency Contact No -->
     <label for="emergencyContactNo">Emergency Contact No.</label>
-    <input type="text" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
-           value="{{ old('emergencyContactNo') }}" placeholder="09xxxxxxxxx ">
+    <input type="tel" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
+           value="{{ old('emergencyContactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
     @error('emergencyContactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
