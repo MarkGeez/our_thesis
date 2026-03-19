@@ -47,6 +47,22 @@
         background-color: #f8f9fa;
         color: #007bff;
     }
+    .resident-option-name {
+        display: block;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .resident-option-meta {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+    .resident-dropdown-message {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
     #newHeadContainer {
         border-left: 3px solid #0d6efd; /* Visual cue that this field is required now */
         padding-left: 15px;
@@ -950,7 +966,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
-                                                                <input type="text" name="contactNo" class="form-control js-contact-number" value="{{ old('contactNo', $resident->contactNo) }}" required>
+                                                                <input type="text" name="contactNo" class="form-control js-contact-number" value="{{ old('contactNo', $resident->contactNo) }}">
                                                                 <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
                                                             </div>
                                                         </div>
@@ -969,7 +985,8 @@
 
     <div class="mb-3 position-relative search-box-container"
          data-resident-id="{{ $resident->id }}"
-         data-household-id="{{ $householdId }}">
+         data-household-id="{{ $householdId }}"
+         data-house-id="{{ $houseId }}">
         <div class="input-group">
             <input type="text" 
                    class="form-control new-head-search-input" 
@@ -997,6 +1014,53 @@ document.addEventListener('DOMContentLoaded', function () {
         return value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : '';
     }
 
+    function normalize(value) {
+        return (value || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function buildSearchTerms(person) {
+        const first = normalize(person.firstName);
+        const middle = normalize(person.middleName);
+        const last = normalize(person.lastName);
+
+        return [
+            [first, middle, last].filter(Boolean).join(' '),
+            [first, last].filter(Boolean).join(' '),
+            [last, first, middle].filter(Boolean).join(' '),
+            [last, first].filter(Boolean).join(' '),
+            [first, last].filter(Boolean).join(', '),
+            [last, first].filter(Boolean).join(', '),
+        ];
+    }
+
+    function formatBirthday(value) {
+        if (!value) return 'Birthday: N/A';
+
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) {
+            return 'Birthday: ' + value;
+        }
+
+        return 'Birthday: ' + parsed.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit'
+        });
+    }
+
+    function formatSex(value) {
+        if (!value) return 'Sex: N/A';
+        return 'Sex: ' + formatName(value);
+    }
+
+    function formatAge(value) {
+        return 'Age: ' + (value || 'N/A');
+    }
+
+    function formatContact(value) {
+        return 'Contact: ' + (value || 'N/A');
+    }
+
     function closeNewHeadDropdown(container) {
         const dropdown = container.querySelector('.new-head-dropdown');
         dropdown.classList.add('d-none');
@@ -1013,6 +1077,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const resId = select.dataset.residentId;
         const originalValue = select.dataset.originalValue;
         const container = document.getElementById(`newHeadContainer_${resId}`);
+        const hiddenInput = container ? container.querySelector('.new-head-id-input') : null;
 
         if (!container) {
             return;
@@ -1020,8 +1085,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (originalValue === 'yes' && select.value === 'no') {
             container.style.display = 'block';
+            if (hiddenInput) {
+                hiddenInput.required = true;
+            }
         } else {
             container.style.display = 'none';
+            if (hiddenInput) {
+                hiddenInput.required = false;
+            }
             clearNewHeadSelection(container);
         }
     }
@@ -1032,12 +1103,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const hiddenInput = container.querySelector('.new-head-id-input');
         const currentResidentId = Number(container.dataset.residentId);
         const householdId = Number(container.dataset.householdId);
-        const query = (searchInput.value || '').toLowerCase().trim();
+        const houseId = Number(container.dataset.houseId);
+        const query = normalize(searchInput.value);
 
         dropdown.innerHTML = '';
         hiddenInput.value = '';
 
-        if (!query || !householdId) {
+        if (!query || (!householdId && !houseId)) {
             closeNewHeadDropdown(container);
             return;
         }
@@ -1047,20 +1119,27 @@ document.addEventListener('DOMContentLoaded', function () {
             const householdIds = Array.isArray(person.householdIds)
                 ? person.householdIds.map(Number)
                 : [];
+            const houseIds = Array.isArray(person.houseIds)
+                ? person.houseIds.map(Number)
+                : [];
 
             if (residentId === currentResidentId) return false;
             if (String(person.headOfFamily).toLowerCase() === 'yes') return false;
-            if (!householdIds.includes(householdId)) return false;
 
-            const fullName = (
-                `${person.lastName} ${person.firstName} ${person.middleName ?? ''}`
-            ).toLowerCase();
+            const sameHousehold = householdId ? householdIds.includes(householdId) : false;
+            const sameHouse = houseId ? houseIds.includes(houseId) : false;
 
-            return fullName.includes(query) || residentId.toString().includes(query);
+            if (!sameHousehold && !sameHouse) return false;
+
+            const searchableNames = buildSearchTerms(person);
+
+            return searchableNames.some(function (value) {
+                return value.includes(query);
+            }) || residentId.toString().includes(query);
         }).slice(0, 8);
 
         if (matches.length === 0) {
-            dropdown.innerHTML = '<div class="p-2 text-muted">No eligible non-head residents found</div>';
+            dropdown.innerHTML = '<div class="resident-dropdown-message">No eligible non-head residents found.</div>';
             dropdown.classList.remove('d-none');
             return;
         }
@@ -1070,12 +1149,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const last = formatName(person.lastName);
             const first = formatName(person.firstName);
             const middle = formatName(person.middleName);
+            const fullName = `${last}, ${first}${middle ? ' ' + middle : ''}`;
+            const birthday = formatBirthday(person.birthday);
+            const age = formatAge(person.age);
+            const sex = formatSex(person.sex);
+            const contact = formatContact(person.contactNo);
 
             option.className = 'resident-option';
-            option.textContent = `${last}, ${first}${middle ? ' ' + middle : ''} (ID: ${person.id})`;
+            option.innerHTML = `
+                <span class="resident-option-name">${fullName} (ID: ${person.id})</span>
+                <span class="resident-option-meta">${birthday} | ${age} | ${sex} | ${contact}</span>
+            `;
 
             option.addEventListener('click', function () {
-                searchInput.value = option.textContent;
+                searchInput.value = `${fullName} (ID: ${person.id})`;
                 hiddenInput.value = person.id;
                 closeNewHeadDropdown(container);
             });
@@ -1087,42 +1174,96 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('click', function (e) {
-    if (e.target.classList.contains('new-head-search-btn')) {
-        // Find the container SPECIFIC to this modal
-        const container = e.target.closest('.position-relative');
-        const searchInput = container.querySelector('.new-head-search-input');
-        const dropdown = container.querySelector('.new-head-dropdown');
-        
-        const query = searchInput.value.toLowerCase().trim();
-        dropdown.innerHTML = '';
+        const searchButton = e.target.closest('.new-head-search-btn');
 
-        if (!query) return dropdown.classList.add('d-none');
+        if (searchButton) {
+            const container = searchButton.closest('.search-box-container');
+
+            if (container) {
+                runNewHeadSearch(container);
+            }
+        }
+
+        if (!e.target.closest('.search-box-container')) {
+            document.querySelectorAll('.new-head-dropdown').forEach(function (dropdown) {
+                dropdown.classList.add('d-none');
+            });
+        }
+    });
+
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('new-head-search-input')) {
+            return;
+        }
+
+        const container = e.target.closest('.search-box-container');
+
+        if (!container) {
+            return;
+        }
+
+        container.querySelector('.new-head-id-input').value = '';
+
+        if (!e.target.value.trim()) {
+            closeNewHeadDropdown(container);
+            return;
+        }
 
         runNewHeadSearch(container);
+    });
 
-        if (matches.length > 0) {
-            matches.forEach(person => {
-                const option = document.createElement('div');
-                option.className = 'resident-option p-2 border-bottom';
-                option.style.cursor = 'pointer';
-                option.textContent = `${person.lastName}, ${person.firstName} (ID: ${person.id})`;
-
-                option.addEventListener('click', function () {
-                    // Crucial: Update the hidden input in THIS modal only
-                    searchInput.value = this.textContent;
-                    container.querySelector('.new-head-id-input').value = person.id;
-                    dropdown.classList.add('d-none');
-                });
-                dropdown.appendChild(option);
-            });
-            dropdown.classList.remove('d-none');
+    document.addEventListener('keydown', function (e) {
+        if (!e.target.classList.contains('new-head-search-input') || e.key !== 'Enter') {
+            return;
         }
-    }
-}); // ✅ missing parenthesis fixed here
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.search-box-container')) {
-            document.querySelectorAll('.new-head-dropdown').forEach(d => d.classList.add('d-none'));
+
+        e.preventDefault();
+
+        const container = e.target.closest('.search-box-container');
+
+        if (container) {
+            runNewHeadSearch(container);
+        }
+    });
+
+    document.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
+        updateNewHeadVisibility(select);
+
+        select.addEventListener('change', function () {
+            updateNewHeadVisibility(select);
+        });
+    });
+
+    document.addEventListener('shown.bs.modal', function (event) {
+        event.target.querySelectorAll('.head-of-family-trigger').forEach(function (select) {
+            updateNewHeadVisibility(select);
+        });
+    });
+
+    document.addEventListener('submit', function (event) {
+        const form = event.target;
+        const select = form.querySelector('.head-of-family-trigger');
+
+        if (!select) {
+            return;
+        }
+
+        const container = document.getElementById(`newHeadContainer_${select.dataset.residentId}`);
+        const hiddenInput = container ? container.querySelector('.new-head-id-input') : null;
+
+        if (
+            select.dataset.originalValue === 'yes' &&
+            select.value === 'no' &&
+            hiddenInput &&
+            !hiddenInput.value
+        ) {
+            event.preventDefault();
+            container.style.display = 'block';
+            hiddenInput.required = true;
+            const searchInput = container.querySelector('.new-head-search-input');
+            if (searchInput) {
+                searchInput.focus();
+            }
         }
     });
 });
@@ -1180,10 +1321,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <hr class="mt-4">
 
                                                         <label for="emergencyContactName{{ $resident->id }}">Emergency Contact Name</label>
-                                                        <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name" required>
+                                                        <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name">
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
-                                                        <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
+                                                        <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1296,14 +1437,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
-<<<<<<< HEAD
     <input type="text" id="contactNo" name="contactNo" class="form-control js-contact-number @error('contactNo') is-invalid @enderror" 
            value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
     <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
-=======
-    <input type="tel" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
-           value="{{ old('contactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" >
->>>>>>> 3e19178b6b1cef8105283dd76d1afba879e2daa2
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

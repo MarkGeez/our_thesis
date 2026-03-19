@@ -190,7 +190,7 @@
 
         .btn-toggle-pw:hover { color: white; }
 
-        /* ── PASSWORD REQUIREMENTS ────────────────────────── */
+        /* ── PASSWORD REQUIREMENTS HINT ───────────────────── */
         .pw-requirements {
             background: rgba(45,125,253,0.1);
             border-left: 3px solid var(--primary-blue);
@@ -225,7 +225,7 @@
             border: 1px solid rgba(239,68,68,0.45);
         }
 
-        /* Inline field error */
+        /* ── INLINE FIELD ERROR ───────────────────────────── */
         .field-error {
             border-radius: 7px;
             padding: 0.35rem 0.6rem;
@@ -288,30 +288,6 @@
             .auth-card { padding: 2rem 1.4rem; border-radius: 24px; }
             .brand-header h1 { font-size: 2.2rem; }
         }
-
-        .auth-alert {
-            border-radius: 8px;
-            padding: 0.45rem 0.65rem;
-            margin-top: 0.35rem;
-            font-size: 0.72rem;
-            line-height: 1.4;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.45rem;
-            border: 1px solid transparent;
-            font-weight: 500;
-        }
-
-        .auth-alert i {
-            margin-top: 1px;
-            flex-shrink: 0;
-        }
-
-        .auth-alert-error {
-            background: rgba(239, 68, 68, 0.22);
-            color: #fef2f2;
-            border-color: rgba(239, 68, 68, 0.55);
-        }
     </style>
 </head>
 <body>
@@ -321,45 +297,6 @@
 
 <div class="auth-card">
 
-            <div class="input-with-icon">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" value="{{ old('email') }}" required>
-                <i class="fa-solid fa-envelope input-icon"></i>
-                @error('email')
-                    <div class="text-danger small">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="input-with-icon">
-                <label for="password" class="form-label">New Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Enter new password" required>
-                <i class="fa-solid fa-lock input-icon"></i>
-                <div id="passwordError" class="auth-alert auth-alert-error" style="display: none;"></div>
-                <div class="password-requirements">
-                    Minimum 8 characters required
-                </div>
-                @error('password')
-                    <div class="text-danger small">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="input-with-icon">
-                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm your password" required>
-                <i class="fa-solid fa-lock input-icon"></i>
-                <div id="passwordMismatchError" class="auth-alert auth-alert-error text-black" style="display: none;">
-                    <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
-                </div>
-                @error('password_confirmation')
-                    <div class="text-danger small">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <button type="submit" class="btn btn-primary fw-bold">Reset Password</button>
-        </form>
-
-        <div class="back-to-login">
-            <a href="{{ route('login') }}"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>
     <!-- ── BRAND HEADER ──────────────────────────────────── -->
     <header class="brand-header">
         <div class="d-flex justify-content-center gap-3 mb-3">
@@ -383,52 +320,7 @@
         </div>
     @endif
 
-    <script>
-        (function () {
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordInput = document.getElementById('password_confirmation');
-            const passwordError = document.getElementById('passwordError');
-            const passwordMismatchError = document.getElementById('passwordMismatchError');
-
-            if (!passwordInput || !confirmPasswordInput || !passwordError || !passwordMismatchError) {
-                return;
-            }
-
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-            function validatePasswordMatch() {
-                if (
-                    passwordInput.value !== confirmPasswordInput.value &&
-                    confirmPasswordInput.value.length > 0
-                ) {
-                    passwordMismatchError.style.display = 'block';
-                } else {
-                    passwordMismatchError.style.display = 'none';
-                }
-            }
-
-            passwordInput.addEventListener('input', function () {
-                if (passwordInput.value.length === 0) {
-                    passwordError.style.display = 'none';
-                    passwordError.textContent = '';
-                } else if (!passwordRegex.test(passwordInput.value)) {
-                    passwordError.style.display = 'block';
-                    passwordError.textContent = 'Min 8 chars, 1 uppercase, 1 number.';
-                } else {
-                    passwordError.style.display = 'none';
-                    passwordError.textContent = '';
-                }
-
-                validatePasswordMatch();
-            });
-
-            confirmPasswordInput.addEventListener('input', function () {
-                validatePasswordMatch();
-            });
-        })();
-    </script>
-
-    <form action="{{ route('password.update') }}" method="POST" novalidate>
+    <form action="{{ route('password.update') }}" method="POST" novalidate id="resetForm">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
 
@@ -461,8 +353,13 @@
                     <i class="fa-solid fa-eye"></i>
                 </button>
             </div>
+            <!-- Static hint shown always -->
             <div class="pw-requirements">
-                <i class="fa-solid fa-circle-info"></i>Minimum 8 characters required
+                <i class="fa-solid fa-circle-info"></i>Minimum of 8 characters, 1 uppercase letter, 1 number.
+            </div>
+            <!-- Live strength error injected by JS -->
+            <div id="passwordError" class="field-error" style="display:none;">
+                <i class="fa-solid fa-circle-exclamation"></i><div></div>
             </div>
             @error('password')
             <div class="field-error">
@@ -482,6 +379,10 @@
                         aria-label="Show confirm password" aria-pressed="false">
                     <i class="fa-solid fa-eye"></i>
                 </button>
+            </div>
+            <!-- Live mismatch error injected by JS -->
+            <div id="passwordMismatchError" class="field-error" style="display:none;">
+                <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
             </div>
             @error('password_confirmation')
             <div class="field-error">
@@ -505,7 +406,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ── PASSWORD TOGGLES ──────────────────────────────────────────
+    // ── PASSWORD VISIBILITY TOGGLES ──────────────────────────────
     document.querySelectorAll('.btn-toggle-pw').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const input = document.getElementById(btn.getAttribute('data-toggle-target'));
@@ -519,7 +420,61 @@
         });
     });
 
-    // ── CURSOR GLOW ───────────────────────────────────────────────
+    // ── ELEMENT REFS ──────────────────────────────────────────────
+    const passwordInput         = document.getElementById('password');
+    const confirmPasswordInput  = document.getElementById('password_confirmation');
+    const passwordError         = document.getElementById('passwordError');
+    const passwordMismatchError = document.getElementById('passwordMismatchError');
+
+    // Password must be at least 8 chars, 1 uppercase, 1 number
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    // ── LIVE PASSWORD STRENGTH (co-programmer's validation) ───────
+    passwordInput.addEventListener('input', function () {
+        const val = this.value;
+
+        if (val.length === 0) {
+            passwordError.style.display = 'none';
+            passwordError.querySelector('div').textContent = '';
+        } else if (!passwordRegex.test(val)) {
+            passwordError.style.display = 'flex';
+            passwordError.querySelector('div').textContent =
+                'Min. 8 characters, at least 1 uppercase letter and 1 number.';
+        } else {
+            passwordError.style.display = 'none';
+            passwordError.querySelector('div').textContent = '';
+        }
+
+        validatePasswordMatch();
+    });
+
+    // ── LIVE MISMATCH CHECK ───────────────────────────────────────
+    confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+
+    function validatePasswordMatch() {
+        const mismatch = confirmPasswordInput.value.length > 0 &&
+                         passwordInput.value !== confirmPasswordInput.value;
+        passwordMismatchError.style.display = mismatch ? 'flex' : 'none';
+    }
+
+    // ── FORM SUBMIT — BLOCK IF LIVE ERRORS EXIST ─────────────────
+    document.getElementById('resetForm').addEventListener('submit', function (e) {
+        const val = passwordInput.value;
+
+        if (!passwordRegex.test(val)) {
+            e.preventDefault();
+            passwordError.style.display = 'flex';
+            passwordError.querySelector('div').textContent =
+                'Min. 8 characters, at least 1 uppercase letter and 1 number.';
+        }
+
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            e.preventDefault();
+            passwordMismatchError.style.display = 'flex';
+        }
+    });
+
+    // ── CURSOR GLOW (desktop only) ────────────────────────────────
     const glow = document.getElementById('cursorGlow');
     if (window.matchMedia('(pointer: fine)').matches) {
         document.addEventListener('mousemove', function (e) {
@@ -530,12 +485,12 @@
         glow.style.display = 'none';
     }
 
-    // ── PARTICLES ─────────────────────────────────────────────────
+    // ── FLOATING PARTICLES ────────────────────────────────────────
     (function () {
         const canvas = document.getElementById('particle-canvas');
         const ctx    = canvas.getContext('2d');
         let W, H, particles = [];
-        const COLORS = ['rgba(45,125,253,', 'rgba(255,215,0,', 'rgba(255,215,0,'];
+        const COLORS = ['rgba(45,125,253,', 'rgba(255,215,0,', 'rgba(255,255,255,'];
         function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
         function rand(a, b) { return Math.random() * (b - a) + a; }

@@ -21,8 +21,8 @@ class ResidentController extends Controller
 {
     private function getHeadCandidateResidents()
     {
-        return Resident::with('households:id')
-            ->select('id', 'firstName', 'middleName', 'lastName', 'headOfFamily')
+        return Resident::with('households:id,house_id')
+            ->select('id', 'firstName', 'middleName', 'lastName', 'birthday', 'age', 'sex', 'contactNo', 'headOfFamily')
             ->get()
             ->map(function (Resident $resident) {
                 return [
@@ -30,8 +30,13 @@ class ResidentController extends Controller
                     'firstName' => $resident->firstName,
                     'middleName' => $resident->middleName,
                     'lastName' => $resident->lastName,
+                    'birthday' => $resident->birthday,
+                    'age' => $resident->age,
+                    'sex' => $resident->sex,
+                    'contactNo' => $resident->contactNo,
                     'headOfFamily' => $resident->headOfFamily,
                     'householdIds' => $resident->households->pluck('id')->values(),
+                    'houseIds' => $resident->households->pluck('house_id')->filter()->values(),
                 ];
             });
     }

@@ -57,6 +57,12 @@ class NonResidentController extends Controller
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
 
+        if ($user->resident) {
+            $user->resident->contactNo = $validated['contactNumber'];
+            $user->resident->birthday = $validated['birthday'];
+            $user->resident->save();
+        }
+
         if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
@@ -99,7 +105,6 @@ class NonResidentController extends Controller
         $validated = $request->validate([
             'houseNo' => 'required|string|max:255',
             'street' => 'required|string|max:255',
-            'contactNo' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
             'age' => 'required|integer',
             'sex' => 'required|in:male,female',
@@ -110,7 +115,9 @@ class NonResidentController extends Controller
             'religion' => 'nullable|string|max:255',
             'emergencyContactName' => 'required|string|max:255',
             'emergencyContactNo' => $this->requiredContactNumberRules(),
-        ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
+        ], $this->contactNumberMessages(['emergencyContactNo']));
+
+        $validated['contactNo'] = $resident->user->contactNumber ?? $resident->contactNo;
         
         $resident->update($validated);
         

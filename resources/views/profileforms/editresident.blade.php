@@ -42,6 +42,19 @@
         color: #fef2f2;
         border-color: rgba(239, 68, 68, 0.55);
     }
+
+    .resident-option-name {
+        font-weight: 600;
+    }
+
+    .resident-option-meta {
+        font-size: 0.82rem;
+        color: #6c757d;
+    }
+
+    .resident-dropdown-message {
+        font-size: 0.9rem;
+    }
 </style>
 <form action="{{ route(auth()->user()->role . '.update.ownInfo', $resident->id) }}" method="POST">
     @csrf
@@ -52,6 +65,8 @@
             $currentHouse = optional($resident->households->first())->house;
             $currentStreetId = optional($currentHouse)->street_id;
             $currentHouseId = optional($currentHouse)->id;
+            $currentHouseholdId = optional($resident->households->first())->id;
+            $isCurrentHead = ($resident->headOfFamily ?? null) === 'yes';
 
             $religionOptions = [
                 'Unknown',
@@ -119,11 +134,8 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
-                <input type="number" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" >
-                <div id="residentContactError" class="auth-alert auth-alert-error  text-black" style="display: none;"></div>
-                <input type="tel" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000">
+              <input type="text" class="form-control form-control-lg"
+                  value="{{ optional($resident->user)->contactNumber ?? $resident->contactNo ?? 'N/A' }}" readonly>
             </div>
 
             <div class="col-md-6">
@@ -210,10 +222,52 @@
 
             <div class="col-md-6">
                 <label class="form-label">Head of Family</label>
-              <input type="text" class="form-control form-control-lg" 
-       value="{{ ucfirst(old('headOfFamily', $resident->headOfFamily)) }}" readonly>
+                @if ($isCurrentHead)
+                    <select
+                        name="headOfFamily"
+                        class="form-select form-control-lg profile-head-of-family-trigger"
+                        data-original-value="{{ $resident->headOfFamily }}"
+                        data-resident-id="{{ $resident->id }}"
+                    >
+                        <option value="yes" {{ old('headOfFamily', $resident->headOfFamily) === 'yes' ? 'selected' : '' }}>Yes</option>
+                        <option value="no" {{ old('headOfFamily', $resident->headOfFamily) === 'no' ? 'selected' : '' }}>No</option>
+                    </select>
+                @else
+                    <input type="hidden" name="headOfFamily" value="no">
+                    <input type="text" class="form-control form-control-lg" value="No" readonly>
+                    <small class="text-muted d-block mt-2">Only the current household head can transfer head status.</small>
+                @endif
             </div>
         </div>
+
+        @if ($isCurrentHead)
+            <div
+                class="border rounded p-3 mt-2 mb-3 profile-new-head-search-container d-none"
+                data-resident-id="{{ $resident->id }}"
+                data-household-id="{{ $currentHouseholdId }}"
+                data-house-id="{{ $currentHouseId }}"
+            >
+                <label class="form-label" for="profile_new_head_search_{{ $resident->id }}">Select New Head of Family</label>
+                <div class="input-group mb-2">
+                    <input
+                        type="text"
+                        id="profile_new_head_search_{{ $resident->id }}"
+                        class="form-control profile-new-head-search-input"
+                        placeholder="Search a resident from the same household or house"
+                        autocomplete="off"
+                    >
+                    <button type="button" class="btn btn-outline-primary profile-new-head-search-btn">Search</button>
+                </div>
+                <div class="form-text mb-2">
+                    This only appears when a current head changes from `Yes` to `No`.
+                </div>
+                <input type="hidden" name="new_head_id" class="profile-new-head-id-input" value="{{ old('new_head_id') }}">
+                <div class="list-group profile-new-head-results d-none"></div>
+                @error('new_head_id')
+                    <div class="text-danger small mt-2">{{ $message }}</div>
+                @enderror
+            </div>
+        @endif
 
         <div class="row mb-3">
             <div class="col-md-12">
@@ -241,15 +295,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const headCandidateResidents = @json($headCandidateResidents ?? []);
         const resBirthday = document.getElementById('resident_birthday');
         const resOpenDate = document.getElementById('resident_openDate');
-        const residentContactInput = document.querySelector('input[name="contactNo"]');
-        const residentContactError = document.getElementById('residentContactError');
         const rawDate = "{{ old('birthday', $resident->birthday) }}";
-
-        if (residentContactError) {
-            residentContactError.style.display = 'none';
-        }
+        const profileHeadSelect = document.querySelector('.profile-head-of-family-trigger');
+        const newHeadContainer = document.querySelector('.profile-new-head-search-container');
         
         // Birthday handling
         if (rawDate && resBirthday) {
@@ -271,35 +322,171 @@
             });
         }
 
-        function validateResidentContact() {
-            if (!residentContactInput || !residentContactError) {
+        function normalize(value) {
+            return String(value || '').trim().toLowerCase();
+        }
+
+        function formatBirthday(value) {
+            if (!value) {
+                return 'Birthday: N/A';
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return 'Birthday: N/A';
+            }
+
+            return 'Birthday: ' + date.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
+        }
+
+        function formatAge(value) {
+            return value ? 'Age: ' + value : 'Age: N/A';
+        }
+
+        function formatSex(value) {
+            return 'Sex: ' + (value ? String(value).charAt(0).toUpperCase() + String(value).slice(1) : 'N/A');
+        }
+
+        function formatContact(value) {
+            return 'Contact: ' + (value || 'N/A');
+        }
+
+        function buildSearchTerms(person) {
+            return [
+                person.firstName,
+                person.middleName,
+                person.lastName,
+                [person.firstName, person.middleName, person.lastName].filter(Boolean).join(' '),
+            ].map(normalize).filter(Boolean);
+        }
+
+        function updateNewHeadVisibility() {
+            if (!profileHeadSelect || !newHeadContainer) {
                 return;
             }
 
-            residentContactInput.value = residentContactInput.value.replace(/[^0-9]/g, '');
-            if (residentContactInput.value.length > 11) {
-                residentContactInput.value = residentContactInput.value.slice(0, 11);
+            const shouldShow = normalize(profileHeadSelect.dataset.originalValue) === 'yes'
+                && normalize(profileHeadSelect.value) === 'no';
+
+            newHeadContainer.classList.toggle('d-none', !shouldShow);
+
+            const newHeadIdInput = newHeadContainer.querySelector('.profile-new-head-id-input');
+            if (newHeadIdInput) {
+                newHeadIdInput.required = shouldShow;
+                if (!shouldShow) {
+                    newHeadIdInput.value = '';
+                }
             }
 
-            if (residentContactInput.value.length === 0) {
-                residentContactError.style.display = 'none';
-                residentContactError.textContent = '';
-                residentContactInput.setCustomValidity('');
-            } else if (residentContactInput.value.length !== 11) {
-                residentContactError.style.display = 'block';
-                residentContactError.textContent = 'Must be exactly 11 digits.';
-                residentContactInput.setCustomValidity('Must be exactly 11 digits.');
-            } else {
-                residentContactError.style.display = 'none';
-                residentContactError.textContent = '';
-                residentContactInput.setCustomValidity('');
+            const searchInput = newHeadContainer.querySelector('.profile-new-head-search-input');
+            const results = newHeadContainer.querySelector('.profile-new-head-results');
+            if (!shouldShow && searchInput && results) {
+                searchInput.value = '';
+                results.innerHTML = '';
+                results.classList.add('d-none');
             }
         }
 
-        if (residentContactInput) {
-            residentContactInput.addEventListener('input', function () {
-                validateResidentContact();
+        function runProfileNewHeadSearch() {
+            if (!newHeadContainer) {
+                return;
+            }
+
+            const residentId = Number(newHeadContainer.dataset.residentId);
+            const householdId = Number(newHeadContainer.dataset.householdId);
+            const houseId = Number(newHeadContainer.dataset.houseId);
+            const searchInput = newHeadContainer.querySelector('.profile-new-head-search-input');
+            const results = newHeadContainer.querySelector('.profile-new-head-results');
+            const query = normalize(searchInput ? searchInput.value : '');
+
+            if (!results) {
+                return;
+            }
+
+            const matches = headCandidateResidents.filter(function (person) {
+                if (Number(person.id) === residentId) return false;
+                if (normalize(person.headOfFamily) === 'yes') return false;
+
+                const sameHousehold = Array.isArray(person.householdIds) && person.householdIds.some(function (id) {
+                    return Number(id) === householdId;
+                });
+                const sameHouse = Array.isArray(person.houseIds) && person.houseIds.some(function (id) {
+                    return Number(id) === houseId;
+                });
+
+                if (!sameHousehold && !sameHouse) return false;
+                if (!query) return true;
+
+                return buildSearchTerms(person).some(function (term) {
+                    return term.includes(query);
+                });
             });
+
+            results.innerHTML = '';
+            results.classList.remove('d-none');
+
+            if (!matches.length) {
+                results.innerHTML = '<div class="list-group-item resident-dropdown-message text-muted">No eligible resident found.</div>';
+                return;
+            }
+
+            matches.forEach(function (person) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'list-group-item list-group-item-action';
+                button.innerHTML =
+                    '<div class="resident-option-name">' +
+                        [person.firstName, person.middleName, person.lastName].filter(Boolean).join(' ') +
+                    '</div>' +
+                    '<div class="resident-option-meta">' +
+                        [formatBirthday(person.birthday), formatAge(person.age), formatSex(person.sex), formatContact(person.contactNo)].join(' | ') +
+                    '</div>';
+
+                button.addEventListener('click', function () {
+                    const newHeadIdInput = newHeadContainer.querySelector('.profile-new-head-id-input');
+                    if (newHeadIdInput) {
+                        newHeadIdInput.value = person.id;
+                    }
+
+                    if (searchInput) {
+                        searchInput.value = [person.firstName, person.middleName, person.lastName].filter(Boolean).join(' ');
+                    }
+
+                    results.innerHTML = '';
+                    results.classList.add('d-none');
+                });
+
+                results.appendChild(button);
+            });
+        }
+
+        if (profileHeadSelect) {
+            profileHeadSelect.addEventListener('change', updateNewHeadVisibility);
+            updateNewHeadVisibility();
+        }
+
+        if (newHeadContainer) {
+            const searchInput = newHeadContainer.querySelector('.profile-new-head-search-input');
+            const searchButton = newHeadContainer.querySelector('.profile-new-head-search-btn');
+
+            if (searchButton) {
+                searchButton.addEventListener('click', runProfileNewHeadSearch);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', runProfileNewHeadSearch);
+                searchInput.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        runProfileNewHeadSearch();
+                    }
+                });
+            }
         }
 
         // Street and House dropdown relationship

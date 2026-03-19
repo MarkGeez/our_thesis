@@ -376,7 +376,8 @@
         <h1>REGISTRATION</h1>
     </header>
 
-    <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" novalidate>
+    <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" novalidate
+          id="registerForm">
         @csrf
 
         <!-- ── PERSONAL INFORMATION ──────────────────────────── -->
@@ -412,7 +413,9 @@
                 </div>
                 @enderror
             </div>
-              <div class="col-md-4">
+
+            <!-- Last Name -->
+            <div class="col-md-4">
                 <label for="lastName" class="form-label">Last Name</label>
                 <div class="input-group @error('lastName') is-invalid-group @enderror">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
@@ -425,91 +428,6 @@
                 </div>
                 @enderror
             </div>
-
-                <div class="input-with-icon mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-field-wrap">
-                        <input type="password" name="password" id="password" class="form-control"
-                        placeholder="Enter your password" required>
-                        <i class="fa-solid fa-lock input-icon"></i>
-                    </div>
-                    <div id="passwordError" class="auth-alert auth-alert-error" style="display: none;"></div>
-                    @error('password')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="input-with-icon mb-3" id="confirmPasswordContainer" style="display: none;">
-                    <label for="password_confirmation" class="form-label">Confirm Password</label>
-                    <div class="input-field-wrap">
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                        placeholder="Confirm your password">
-                        <i class="fa-solid fa-lock input-icon"></i>
-                    </div>
-                    <div id="passwordMismatchError" class="auth-alert auth-alert-error text-black" style="display: none;">
-                        <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
-                    </div>
-                    @error('password_confirmation')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="input-with-icon mb-3">
-                    <label for="contact" class="form-label">Contact Number</label>
-                    <div class="input-field-wrap">
-                        <input type="text" name="contactNumber" id="contact" class="form-control"
-                        placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
-                        <i class="fa-solid fa-phone input-icon"></i>
-                    </div>
-                    <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
-                    @error('contactNumber')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="birthday" class="form-label">Birthday</label>
-                    <input type="date" name="birthday" id="birthday" class="form-control"
-                    value="{{ old('birthday') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
-                    @error('birthday')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Proof of Identity</label>
-                    
-                    <div class="proof-instruction">
-                        <p>
-                            <i class="fas fa-info-circle"></i> 
-                            Submit a clear photo of your valid ID or any image proof to verify your residency in Barangay 249.
-                        </p>
-                    </div>
-
-                    <input type="file" accept=".jpg, .jpeg, .png" name="proofOfIdentity"
-                        id="proofOfIdentity" class="form-control">
-                        
-                    @error('proofOfIdentity')
-                        <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="terms-container">
-                    <div class="form-check">
-                        <input class="terms-checkbox" type="checkbox" name="terms_accepted" id="terms_accepted" value="1" required>
-                        <label class="terms-text" for="terms_accepted">
-                            I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms & Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a> of the e-Barangay System.
-                        </label>
-                    </div>
-                    @error('terms_accepted')
-                        <div class="auth-alert auth-alert-error mt-2"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <button type="submit" class="btn btn-primary fw-bold" id="submitBtn" disabled>Register</button>
-            </form>
-
-            <p class="text-light mt-3" id="textforlogin" style="text-align: center">Already have an account? <a href="{{ route('login') }}" class="text-light fw-bold">Login</a></p>
         </div>
 
         <div class="row g-4 mb-5">
@@ -536,6 +454,10 @@
                     <input type="tel" name="contactNumber" id="contactNumber" class="form-control"
                            placeholder="09170000000" value="{{ old('contactNumber') }}"
                            inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
+                </div>
+                {{-- Live contact error injected by JS --}}
+                <div id="contactError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div></div>
                 </div>
                 @error('contactNumber')
                 <div class="auth-alert auth-alert-error">
@@ -574,6 +496,10 @@
                             aria-label="Show password" aria-pressed="false">
                         <i class="fa-solid fa-eye"></i>
                     </button>
+                </div>
+                {{-- Live password strength error injected by JS --}}
+                <div id="passwordError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div></div>
                 </div>
                 @error('password')
                 <div class="auth-alert auth-alert-error">
@@ -723,7 +649,6 @@
             const input = document.getElementById(btn.getAttribute('data-toggle-target'));
             const icon  = btn.querySelector('i');
             if (!input || !icon) return;
-
             const showing  = input.type === 'text';
             input.type     = showing ? 'password' : 'text';
             icon.className = showing ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
@@ -732,127 +657,50 @@
         });
     });
 
-    // ── CONFIRM PASSWORD REVEAL & MISMATCH VALIDATION ───────────
+    // ── ELEMENT REFS ──────────────────────────────────────────────
     const passwordInput         = document.getElementById('password');
     const confirmWrapper        = document.getElementById('confirmPasswordWrapper');
     const confirmPasswordInput  = document.getElementById('password_confirmation');
     const passwordMismatchError = document.getElementById('passwordMismatchError');
+    const passwordError         = document.getElementById('passwordError');
+    const contactInput          = document.getElementById('contactNumber');
+    const contactError          = document.getElementById('contactError');
+    const submitBtn             = document.getElementById('submitBtn');
+    const termsCheckbox         = document.getElementById('terms_accepted');
 
+    // Password must be at least 8 chars, 1 uppercase, 1 number
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    // ── PASSWORD — LIVE STRENGTH + CONFIRM REVEAL ─────────────────
     passwordInput.addEventListener('input', function () {
-        if (this.value.length > 0) {
+        const val = this.value;
+
+        // Show/hide confirm field
+        if (val.length > 0) {
             confirmWrapper.classList.add('visible');
         } else {
             confirmWrapper.classList.remove('visible');
             confirmPasswordInput.value = '';
             passwordMismatchError.style.display = 'none';
         }
+
+        // Live strength feedback (co-programmer's validation)
+        if (val.length === 0) {
+            passwordError.style.display = 'none';
+            passwordError.querySelector('div').textContent = '';
+        } else if (!passwordRegex.test(val)) {
+            passwordError.style.display = 'flex';
+            passwordError.querySelector('div').textContent =
+                'Minimum of 8 characters, at least 1 uppercase letter and 1 number.';
+        } else {
+            passwordError.style.display = 'none';
+            passwordError.querySelector('div').textContent = '';
+        }
+
         validatePasswordMatch();
     });
 
-        // Password and contact number validation for Register
-        (function() {
-            const passwordInput = document.getElementById('password');
-            const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
-            const confirmPasswordInput = document.getElementById('password_confirmation');
-            const passwordMismatchError = document.getElementById('passwordMismatchError');
-            const contactInput = document.getElementById('contact');
-            let passwordError = document.getElementById('passwordError');
-            let contactError = document.getElementById('contactError');
-
-            // Add error containers if not present
-            if (!passwordError) {
-                passwordError = document.createElement('div');
-                passwordError.id = 'passwordError';
-                passwordError.className = 'auth-alert auth-alert-error';
-                passwordInput.parentNode.appendChild(passwordError);
-            }
-            if (!contactError) {
-                contactError = document.createElement('div');
-                contactError.id = 'contactError';
-                contactError.className = 'auth-alert auth-alert-error';
-                contactInput.parentNode.appendChild(contactError);
-            }
-
-            // Keep empty error boxes hidden until user starts typing invalid input.
-            passwordError.style.display = 'none';
-            contactError.style.display = 'none';
-
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-            passwordInput.addEventListener('input', function() {
-                // Show confirm password container if password has content
-                if (this.value.length > 0) {
-                    confirmPasswordContainer.style.display = 'block';
-                } else {
-                    confirmPasswordContainer.style.display = 'none';
-                    passwordMismatchError.style.display = 'none';
-                    confirmPasswordInput.value = '';
-                }
-                validatePasswordMatch();
-                // Password validation
-                if (passwordInput.value.length === 0) {
-                    passwordError.style.display = 'none';
-                    passwordError.textContent = "";
-                } else if (!passwordRegex.test(passwordInput.value)) {
-                    passwordError.style.display = 'block';
-                    passwordError.textContent = "Min 8 chars, 1 uppercase, 1 number.";
-                } else {
-                    passwordError.style.display = 'none';
-                    passwordError.textContent = "";
-                }
-            });
-
-            confirmPasswordInput.addEventListener('input', function() {
-                validatePasswordMatch();
-            });
-
-            function validatePasswordMatch() {
-                if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
-                    passwordMismatchError.style.display = 'block';
-                } else {
-                    passwordMismatchError.style.display = 'none';
-                }
-            }
-
-            // CONTACT VALIDATION (LIVE)
-            contactInput.addEventListener('input', () => {
-                contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
-                if (contactInput.value.length > 11) {
-                    contactInput.value = contactInput.value.slice(0, 11);
-                }
-                if (contactInput.value.length === 0) {
-                    contactError.style.display = 'none';
-                    contactError.textContent = "";
-                } else if (contactInput.value.length !== 11) {
-                    contactError.style.display = 'block';
-                    contactError.textContent = "Must be exactly 11 digits.";
-                } else {
-                    contactError.style.display = 'none';
-                    contactError.textContent = "";
-                }
-            });
-
-            // Enable/disable submit button based on checkbox
-            document.getElementById('terms_accepted').addEventListener('change', function() {
-                document.getElementById('submitBtn').disabled = !this.checked;
-            });
-
-            // Prevent submit if errors
-            function checkBeforeSubmit() {
-    const password = document.getElementById('password').value;
-    const contact = document.getElementById('contact').value;
-
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    const contactRegex = /^\d{11}$/;
-
-    if (!passwordRegex.test(password) || !contactRegex.test(contact)) {
-        alert("Please fix errors first.");
-        return false;
-    }
-
-    return true;
-}
-        })();
+    // ── CONFIRM PASSWORD — MISMATCH CHECK ────────────────────────
     confirmPasswordInput.addEventListener('input', validatePasswordMatch);
 
     function validatePasswordMatch() {
@@ -861,9 +709,54 @@
         passwordMismatchError.style.display = mismatch ? 'flex' : 'none';
     }
 
-    // ── TERMS CHECKBOX ENABLES SUBMIT ────────────────────────────
-    document.getElementById('terms_accepted').addEventListener('change', function () {
-        document.getElementById('submitBtn').disabled = !this.checked;
+    // ── CONTACT NUMBER — LIVE VALIDATION (co-programmer's) ───────
+    contactInput.addEventListener('input', function () {
+        // Strip non-numeric characters
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // Enforce max 11 digits
+        if (this.value.length > 11) {
+            this.value = this.value.slice(0, 11);
+        }
+
+        if (this.value.length === 0) {
+            contactError.style.display = 'none';
+            contactError.querySelector('div').textContent = '';
+        } else if (this.value.length !== 11) {
+            contactError.style.display = 'flex';
+            contactError.querySelector('div').textContent =
+                'Contact number must be exactly 11 digits.';
+        } else {
+            contactError.style.display = 'none';
+            contactError.querySelector('div').textContent = '';
+        }
+    });
+
+    // ── TERMS CHECKBOX — ENABLES SUBMIT ──────────────────────────
+    termsCheckbox.addEventListener('change', function () {
+        submitBtn.disabled = !this.checked;
+    });
+
+    // ── FORM SUBMIT — BLOCK IF LIVE ERRORS EXIST ─────────────────
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        const pwVal      = passwordInput.value;
+        const contactVal = contactInput.value;
+        const contactRx  = /^\d{11}$/;
+
+        if (!passwordRegex.test(pwVal) || !contactRx.test(contactVal)) {
+            e.preventDefault();
+
+            if (!passwordRegex.test(pwVal)) {
+                passwordError.style.display = 'flex';
+                passwordError.querySelector('div').textContent =
+                    'Minimum of 8 characters, at least 1 uppercase letter and 1 number.';
+            }
+            if (!contactRx.test(contactVal)) {
+                contactError.style.display = 'flex';
+                contactError.querySelector('div').textContent =
+                    'Contact number must be exactly 11 digits.';
+            }
+        }
     });
 
     // ── CURSOR GLOW (desktop only) ────────────────────────────────
@@ -877,7 +770,7 @@
         glow.style.display = 'none';
     }
 
-    // ── FLOATING PARTICLES (ported from index.blade.php) ─────────
+    // ── FLOATING PARTICLES ────────────────────────────────────────
     (function () {
         const canvas = document.getElementById('particle-canvas');
         const ctx    = canvas.getContext('2d');

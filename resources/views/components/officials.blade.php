@@ -360,7 +360,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                         @endif
 
                         @if(!$showControls && $official && $resident)
-                            <p class="official-public-hint mb-0">Click to view public profile</p>
+                            <p class="official-public-hint mb-0" style= "color: gray;">Click to view public profile</p>
                         @endif
                     </div>
                 </div>

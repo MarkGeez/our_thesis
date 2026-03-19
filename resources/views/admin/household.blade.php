@@ -135,52 +135,28 @@
         .loading-spinner { text-align: center; padding: 40px; color: #64748b; }
         .no-data-message { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; font-size: 0.9rem; }
 
-        .stats-card {
-            border: none;
-            border-radius: 14px;
-            background: #ffffff;
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-            height: 100%;
+        .search-dropdown {
+            margin-top: 6px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
         }
 
-        .stats-card .card-body {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
+        .search-dropdown .list-group-item {
+            border-left: 0;
+            border-right: 0;
+            padding: 8px 10px;
         }
 
-        .stats-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            background: rgba(13, 110, 253, 0.1);
-            color: #0d6efd;
+        .search-dropdown .list-group-item:first-child {
+            border-top: 0;
         }
 
-        .stats-title {
-            font-size: 0.78rem;
-            color: #64748b;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .stats-number {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-            line-height: 1.1;
-        }
-
-        .stats-caption {
-            font-size: 0.78rem;
-            color: #64748b;
-            margin-top: 4px;
+        .search-dropdown .list-group-item:last-child {
+            border-bottom: 0;
         }
     </style>
 </head>
@@ -199,56 +175,68 @@
                     <h2 style="color:#000000; margin: 20px 45px;">Household Management</h2>
                 </div>
 
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-crown"></i></span>
-                                <div>
-                                    <div class="stats-title">Household Heads</div>
-                                    <div class="stats-number">{{ $stats['total_heads'] ?? 0 }}</div>
-                                    <div class="stats-caption">Heads tagged in households</div>
+                {{-- High-level household statistics --}}
+                @isset($stats)
+                    <div class="row g-3 mb-4 px-3">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="icon-box">
+                                        <i class="fas fa-home-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="stat-label">Total Households</div>
+                                        <div class="stat-value">{{ $stats['total_households'] ?? 0 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="icon-box">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div>
+                                        <div class="stat-label">Household Heads</div>
+                                        <div class="stat-value">{{ $stats['total_heads'] ?? 0 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="icon-box">
+                                        <i class="fas fa-people-group"></i>
+                                    </div>
+                                    <div>
+                                        <div class="stat-label">Tagged Members</div>
+                                        <div class="stat-value">{{ $stats['total_members'] ?? 0 }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body d-flex align-items-center gap-3">
+                                    <div class="icon-box">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <div class="stat-label">Households With Members</div>
+                                        <div class="stat-value">
+                                            {{ $stats['households_with_members'] ?? 0 }}
+                                            <span class="text-muted" style="font-size: 0.8rem;">
+                                                ({{ $stats['household_coverage_rate'] ?? 0 }}%)
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-users"></i></span>
-                                <div>
-                                    <div class="stats-title">Families Active</div>
-                                    <div class="stats-number">{{ $stats['families_with_members'] ?? 0 }}</div>
-                                    <div class="stats-caption">{{ $stats['head_engagement_rate'] ?? 0 }}% of heads added members</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-people-group"></i></span>
-                                <div>
-                                    <div class="stats-title">Tagged Members</div>
-                                    <div class="stats-number">{{ $stats['total_members'] ?? 0 }}</div>
-                                    <div class="stats-caption">Avg {{ $stats['average_members_per_family'] ?? 0 }} per active family</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <span class="stats-icon"><i class="fas fa-house"></i></span>
-                                <div>
-                                    <div class="stats-title">Household Coverage</div>
-                                    <div class="stats-number">{{ $stats['households_with_members'] ?? 0 }}/{{ $stats['total_households'] ?? 0 }}</div>
-                                    <div class="stats-caption">{{ $stats['household_coverage_rate'] ?? 0 }}% have members</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endisset
 
                 <div class="row g-4">
                     @foreach ($street as $streets)
@@ -289,7 +277,19 @@
                     <span id="streetNameDisplay">Houses</span>
                 </h5>
                 <div class="ms-3 flex-grow-1">
-                    <input type="text" class="form-control form-control-sm" id="houseSearchInput" placeholder="Search house number...">
+                    <div class="input-group input-group-sm">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="houseSearchInput"
+                            placeholder="Search house no. or head/member name..."
+                        >
+                        <button class="btn btn-outline-primary" type="button" id="houseSearchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="houseSearchDropdown" class="list-group search-dropdown d-none"></div>
+                    <small id="houseSearchFeedback" class="text-muted" style="font-size: 0.7rem;"></small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -309,6 +309,13 @@
 <script>
 $(document).ready(function() {
     const housesModal = new bootstrap.Modal(document.getElementById('housesModal'));
+    const houseGroupsCache = {};
+    const houseNoById = {};
+    let currentStreetId = null;
+    let allHousesLoaded = false;
+    let preloadInProgress = false;
+    let liveSearchTimer = null;
+    const preloadCallbacks = [];
 
     function toTitleCase(value) {
         return (value || '').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()).trim();
@@ -330,11 +337,137 @@ $(document).ready(function() {
         return `<span class="glass-avatar-fallback ${extraClass}"><i class="fas ${iconClass}"></i></span>`;
     }
 
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function hideSearchDropdown() {
+        $('#houseSearchDropdown').addClass('d-none').empty();
+    }
+
+    function collectNameMatches(term) {
+        const matches = [];
+        const seen = new Set();
+
+        Object.entries(houseGroupsCache).forEach(([houseId, groups]) => {
+            const normalizedHouseId = Number(houseId);
+            const houseNo = houseNoById[normalizedHouseId] ?? '';
+
+            (groups || []).forEach(group => {
+                const headRes = (group.head && group.head.resident) ? group.head.resident : {};
+                const headName = (formatFullName(headRes) || '').trim();
+                if (headName && headName.toLowerCase().includes(term)) {
+                    const key = `head-${normalizedHouseId}-${headRes.id || headName}`;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        matches.push({
+                            houseId: normalizedHouseId,
+                            houseNo,
+                            name: headName,
+                            role: 'Household Head'
+                        });
+                    }
+                }
+
+                (group.members || []).forEach(member => {
+                    const memberRes = member.resident || {};
+                    const memberName = (formatFullName(memberRes) || '').trim();
+                    if (memberName && memberName.toLowerCase().includes(term)) {
+                        const key = `member-${normalizedHouseId}-${memberRes.id || memberName}`;
+                        if (!seen.has(key)) {
+                            seen.add(key);
+                            matches.push({
+                                houseId: normalizedHouseId,
+                                houseNo,
+                                name: memberName,
+                                role: member.relationship ? `Family Member • ${toTitleCase(member.relationship)}` : 'Family Member'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+
+        return matches;
+    }
+
+    function refreshSearchDropdown() {
+        const query = ($('#houseSearchInput').val() || '').trim();
+        if (!query || !allHousesLoaded) {
+            hideSearchDropdown();
+            return;
+        }
+
+        const matches = collectNameMatches(query.toLowerCase()).slice(0, 12);
+        if (!matches.length) {
+            hideSearchDropdown();
+            return;
+        }
+
+        const html = matches.map(match => {
+            const encodedName = encodeURIComponent(match.name);
+            return `
+                <button type="button" class="list-group-item list-group-item-action search-suggestion-item" data-house-id="${match.houseId}" data-query="${encodedName}">
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <span class="fw-semibold">${escapeHtml(match.name)}</span>
+                        <span class="badge bg-light text-primary border">House ${escapeHtml(match.houseNo)}</span>
+                    </div>
+                    <small class="text-muted">${escapeHtml(match.role)}</small>
+                </button>`;
+        }).join('');
+
+        $('#houseSearchDropdown').removeClass('d-none').html(html);
+    }
+
+    function preloadAllHouseholds(done) {
+        if (allHousesLoaded) {
+            if (typeof done === 'function') {
+                done();
+            }
+            return;
+        }
+
+        if (typeof done === 'function') {
+            preloadCallbacks.push(done);
+        }
+
+        if (preloadInProgress) {
+            return;
+        }
+
+        preloadInProgress = true;
+        ensureAllHousesLoaded(function() {
+            allHousesLoaded = true;
+            preloadInProgress = false;
+            while (preloadCallbacks.length) {
+                const callback = preloadCallbacks.shift();
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        });
+    }
+
     $('.view-houses-btn').click(function() {
         const streetId = $(this).data('street-id');
         const streetName = $(this).data('street-name');
+        currentStreetId = streetId;
+
+        Object.keys(houseGroupsCache).forEach(key => delete houseGroupsCache[key]);
+        Object.keys(houseNoById).forEach(key => delete houseNoById[key]);
+        allHousesLoaded = false;
+        preloadInProgress = false;
+        preloadCallbacks.length = 0;
+
         $('#streetNameDisplay').text(streetName + ' - Houses');
         $('#houseSearchInput').val('');
+        $('#houseSearchFeedback').text('');
+        hideSearchDropdown();
         $('#housesModalBody').html('<div class="loading-spinner"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-3">Loading houses...</p></div>');
         housesModal.show();
         loadHouses(streetId);
@@ -358,6 +491,7 @@ $(document).ready(function() {
         let html = '';
         houses.forEach(house => {
             const count = (house.heads_count ?? house.households_count ?? 0);
+            houseNoById[house.id] = house.house_no;
             html += `
                 <div class="house-card" data-house-id="${house.id}" data-house-no="${house.house_no}">
                     <div class="house-header">
@@ -389,14 +523,29 @@ $(document).ready(function() {
                 section.removeClass('show');
             }
         });
+
+        preloadAllHouseholds(function() {
+            refreshSearchDropdown();
+        });
     }
 
-    function loadHouseholdHeads(houseId) {
+    function loadHouseholdHeads(houseId, done) {
         $.ajax({
             url: `/admin/households/houses/${houseId}`,
             method: 'GET',
             success: function(response) {
-                if (response.success) displayHouseholdHeads(houseId, response.groups || []);
+                if (response.success) {
+                    houseGroupsCache[houseId] = response.groups || [];
+                    displayHouseholdHeads(houseId, response.groups || []);
+                    if (typeof done === 'function') {
+                        done();
+                    }
+                }
+            },
+            error: function() {
+                if (typeof done === 'function') {
+                    done();
+                }
             }
         });
     }
@@ -458,17 +607,161 @@ $(document).ready(function() {
             html += '<div class="no-data-message">No households found</div>';
         }
         section.html(html + '</div>').addClass('show').data('loaded', true);
-        
     }
 
-    function filterHouses(query) {
-        const term = query.toLowerCase();
-        $('.house-card').each(function() {
-            $(this).toggle($(this).data('house-no').toString().toLowerCase().includes(term));
+    function ensureAllHousesLoaded(callback) {
+        const cards = $('.house-card');
+        if (!cards.length) {
+            callback();
+            return;
+        }
+
+        let pending = 0;
+
+        cards.each(function() {
+            const houseId = $(this).data('house-id');
+            const section = $('#heads-' + houseId);
+            if (!section.data('loaded')) {
+                pending++;
+                loadHouseholdHeads(houseId, function() {
+                    pending--;
+                    if (pending === 0) {
+                        callback();
+                    }
+                });
+            }
         });
+
+        if (pending === 0) {
+            callback();
+        }
     }
 
-    $('#houseSearchInput').on('input', function() { filterHouses($(this).val()); });
+    function runUnifiedSearch(options = {}) {
+        const query = ($('#houseSearchInput').val() || '').trim();
+        const preferredHouseId = options.preferredHouseId ? Number(options.preferredHouseId) : null;
+        const feedback = $('#houseSearchFeedback');
+        feedback.text('');
+
+        if (!query) {
+            // Reset view: show all houses, collapse details
+            $('.house-card').show().removeClass('active').each(function() {
+                $(this).find('.expand-icon').removeClass('rotated');
+            });
+            $('.heads-section').removeClass('show');
+            hideSearchDropdown();
+            return;
+        }
+
+        if (!allHousesLoaded) {
+            feedback.text('Preparing household data for head/member search...');
+            preloadAllHouseholds(function() {
+                const currentQuery = ($('#houseSearchInput').val() || '').trim();
+                if (currentQuery && currentQuery === query) {
+                    runUnifiedSearch(options);
+                    refreshSearchDropdown();
+                }
+            });
+            return;
+        }
+
+        const term = query.toLowerCase();
+
+        const matchedHouseIds = new Set();
+
+        // Match by house number
+        $('.house-card').each(function() {
+            const houseNo = ($(this).data('house-no') || '').toString().toLowerCase();
+            if (houseNo.includes(term)) {
+                matchedHouseIds.add($(this).data('house-id'));
+            }
+        });
+
+        // Match by head/member names
+        collectNameMatches(term).forEach(match => {
+            matchedHouseIds.add(match.houseId);
+        });
+
+        if (matchedHouseIds.size === 0) {
+            feedback.text('No matching house number, head, or member found for this street.');
+            return;
+        }
+
+        // Hide non-matching houses, collapse all first
+        $('.house-card').each(function() {
+            const houseId = $(this).data('house-id');
+            const isMatch = matchedHouseIds.has(houseId);
+            $(this).toggle(isMatch);
+            $(this).removeClass('active');
+            $(this).find('.expand-icon').removeClass('rotated');
+        });
+        $('.heads-section').removeClass('show');
+
+        let firstTarget = null;
+        if (preferredHouseId && matchedHouseIds.has(preferredHouseId)) {
+            firstTarget = $(`.house-card[data-house-id="${preferredHouseId}"]`)[0] || null;
+        }
+
+        matchedHouseIds.forEach(houseId => {
+            const card = $(`.house-card[data-house-id="${houseId}"]`);
+            const section = $(`#heads-${houseId}`);
+            if (card.length && section.length) {
+                card.addClass('active');
+                card.find('.expand-icon').addClass('rotated');
+                section.addClass('show');
+                if (!firstTarget) {
+                    firstTarget = card[0];
+                }
+            }
+        });
+
+        if (firstTarget) {
+            firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    $('#houseSearchBtn').on('click', function() {
+        runUnifiedSearch();
+        refreshSearchDropdown();
+    });
+
+    $('#houseSearchDropdown').on('click', '.search-suggestion-item', function() {
+        const houseId = Number($(this).data('house-id'));
+        const selectedName = decodeURIComponent($(this).attr('data-query') || '');
+        $('#houseSearchInput').val(selectedName);
+        hideSearchDropdown();
+        runUnifiedSearch({ preferredHouseId: houseId });
+    });
+
+    $('#houseSearchInput').on('input', function() {
+        clearTimeout(liveSearchTimer);
+        liveSearchTimer = setTimeout(function() {
+            runUnifiedSearch();
+            refreshSearchDropdown();
+        }, 200);
+    });
+
+    $('#houseSearchInput').on('focus', function() {
+        refreshSearchDropdown();
+    });
+
+    $('#houseSearchInput').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            hideSearchDropdown();
+            runUnifiedSearch();
+        }
+    });
+
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#houseSearchInput, #houseSearchDropdown').length) {
+            hideSearchDropdown();
+        }
+    });
+
+    $('#housesModal').on('hidden.bs.modal', function() {
+        hideSearchDropdown();
+    });
 });
 </script>
 <!-- Bootstrap JS -->

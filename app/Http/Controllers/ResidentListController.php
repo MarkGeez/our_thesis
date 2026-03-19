@@ -140,8 +140,8 @@ public function showResidents(Request $request)
         'lastName'
     )->get();
 
-    $headCandidateResidents = Resident::with('households:id')
-        ->select('id', 'firstName', 'middleName', 'lastName', 'headOfFamily')
+    $headCandidateResidents = Resident::with('households:id,house_id')
+        ->select('id', 'firstName', 'middleName', 'lastName', 'birthday', 'age', 'sex', 'contactNo', 'headOfFamily')
         ->get()
         ->map(function (Resident $resident) {
             return [
@@ -149,8 +149,13 @@ public function showResidents(Request $request)
                 'firstName' => $resident->firstName,
                 'middleName' => $resident->middleName,
                 'lastName' => $resident->lastName,
+                'birthday' => $resident->birthday,
+                'age' => $resident->age,
+                'sex' => $resident->sex,
+                'contactNo' => $resident->contactNo,
                 'headOfFamily' => $resident->headOfFamily,
                 'householdIds' => $resident->households->pluck('id')->values(),
+                'houseIds' => $resident->households->pluck('house_id')->filter()->values(),
             ];
         });
 
@@ -239,10 +244,10 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'firstName' => 'required|string|max:70',
             'middleName' => 'nullable|string|max:70',
             'lastName' => 'required|string|max:70',
-            'contactNo' => $this->requiredContactNumberRules(),
+            'contactNo' => $this->nullableContactNumberRules(),
             'birthday' => 'required|date',
-            'emergencyContactNo' => $this->requiredContactNumberRules(),
-            'emergencyContactName' => 'required|string|max:255',
+            'emergencyContactNo' => $this->nullableContactNumberRules(),
+            'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
             'sex' => 'required|in:male,female',
             'parent' => 'required|in:yes,no,single',
@@ -255,6 +260,17 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
 
         $validated = $this->normalizeResidentPayload($validated);
+
+        // Mirror encode behavior: blank contact/emergency fields become explicit "N/A"
+        $validated['contactNo'] = filled($validated['contactNo'] ?? null)
+            ? trim((string) $validated['contactNo'])
+            : 'N/A';
+        $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
+            ? trim((string) $validated['emergencyContactNo'])
+            : 'N/A';
+        $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
+            ? trim((string) $validated['emergencyContactName'])
+            : 'N/A';
 
         if($request->hasFile('image_path')){
         // Delete old image if exists
@@ -296,13 +312,36 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
                     ->first();
 
                 if (!$newHeadMembership) {
+                    $sameHouseMembership = HouseholdResident::query()
+                        ->where('resident_id', $newHeadId)
+                        ->whereHas('household', function ($query) use ($household) {
+                            $query->where('house_id', $household->house_id);
+                        })
+                        ->first();
+
+                    if ($sameHouseMembership) {
+                        $newHeadMembership = HouseholdResident::firstOrCreate(
+                            [
+                                'household_id' => $householdResident->household_id,
+                                'resident_id' => $newHeadId,
+                            ],
+                            [
+                                'is_household_head' => false,
+                            ]
+                        );
+                    }
+                }
+
+                if (!$newHeadMembership) {
                     throw ValidationException::withMessages([
-                        'new_head_id' => 'The selected new Head of Family must belong to the same household.',
+                        'new_head_id' => 'The selected new Head of Family must belong to the same house or household.',
                     ]);
                 }
 
                 Resident::whereKey($newHeadId)->update(['headOfFamily' => 'yes']);
-                $newHeadMembership->update(['is_household_head' => true]);
+                HouseholdResident::where('household_id', $newHeadMembership->household_id)
+                    ->where('resident_id', $newHeadMembership->resident_id)
+                    ->update(['is_household_head' => true]);
             }
 
             if ($requestedHeadStatus === 'yes') {
@@ -359,10 +398,9 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         return redirect()->back()->with('success', 'Resident archived successfully!');
     }
 
-   public function updateOwnInfo(Request $request, $id)
+public function updateOwnInfo(Request $request, $id)
 {
     $validated = $request->validate([
-        'contactNo' => $this->requiredContactNumberRules(),
         'birthday' => 'required|date',
         'emergencyContactNo' => $this->nullableContactNumberRules(),
         'emergencyContactName' => 'nullable|string|max:255',
@@ -374,7 +412,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         'headOfFamily' => 'nullable|in:yes,no',
         'religion' => 'nullable|string|max:255',
         'new_head_id' => 'nullable|exists:residents,id'
-    ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
+    ], $this->contactNumberMessages(['emergencyContactNo']));
 
     $resident = Resident::findOrFail($id);
 
@@ -384,35 +422,95 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         return back()->withErrors(['error' => 'You can only update your own information.']);
     }
 
+    $validated['contactNo'] = $resident->user->contactNumber ?? $resident->contactNo;
     $validated = $this->normalizeResidentPayload($validated);
+
+    // Align with encode behavior: blank emergency contact fields are stored as "N/A"
+    $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
+        ? trim((string) $validated['emergencyContactNo'])
+        : 'N/A';
+    $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
+        ? trim((string) $validated['emergencyContactName'])
+        : 'N/A';
+
     $requestedHeadStatus = $validated['headOfFamily'] ?? $resident->headOfFamily;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Handle Head of Family Replacement
-    |--------------------------------------------------------------------------
-    */
+    DB::transaction(function () use ($request, $resident, $validated, $requestedHeadStatus) {
+        $householdResident = HouseholdResident::where('resident_id', $resident->id)->firstOrFail();
+        $household = Household::findOrFail($householdResident->household_id);
 
-    if ($resident->headOfFamily === 'yes' && $requestedHeadStatus === 'no') {
+        if ($resident->headOfFamily === 'yes' && $requestedHeadStatus === 'no') {
+            $newHeadId = $request->new_head_id;
 
-        if (!$request->new_head_id) {
-            return back()->withErrors(['error' => 'Please select a new Head of Family.']);
+            if (!$newHeadId) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'Please select a new Head of Family.',
+                ]);
+            }
+
+            if ((int) $newHeadId === (int) $resident->id) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'The replacement head of family must be a different resident.',
+                ]);
+            }
+
+            $newHeadMembership = HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', $newHeadId)
+                ->first();
+
+            if (!$newHeadMembership) {
+                $sameHouseMembership = HouseholdResident::query()
+                    ->where('resident_id', $newHeadId)
+                    ->whereHas('household', function ($query) use ($household) {
+                        $query->where('house_id', $household->house_id);
+                    })
+                    ->first();
+
+                if ($sameHouseMembership) {
+                    $newHeadMembership = HouseholdResident::firstOrCreate(
+                        [
+                            'household_id' => $householdResident->household_id,
+                            'resident_id' => $newHeadId,
+                        ],
+                        [
+                            'is_household_head' => false,
+                        ]
+                    );
+                }
+            }
+
+            if (!$newHeadMembership) {
+                throw ValidationException::withMessages([
+                    'new_head_id' => 'The selected new Head of Family must belong to the same house or household.',
+                ]);
+            }
+
+            Resident::whereKey($newHeadId)->update(['headOfFamily' => 'yes']);
+            HouseholdResident::where('household_id', $newHeadMembership->household_id)
+                ->where('resident_id', $newHeadMembership->resident_id)
+                ->update(['is_household_head' => true]);
         }
 
-        $newHead = Resident::find($request->new_head_id);
-        $newHead->update([
-            'headOfFamily' => 'yes'
+        if ($requestedHeadStatus === 'yes') {
+            $otherResidentIds = HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', '!=', $resident->id)
+                ->pluck('resident_id');
+
+            if ($otherResidentIds->isNotEmpty()) {
+                Resident::whereIn('id', $otherResidentIds)->update(['headOfFamily' => 'no']);
+            }
+
+            HouseholdResident::where('household_id', $householdResident->household_id)
+                ->where('resident_id', '!=', $resident->id)
+                ->update(['is_household_head' => false]);
+        }
+
+        $resident->update(Arr::except($validated, ['new_head_id']));
+        $householdResident->update([
+            'is_household_head' => $requestedHeadStatus === 'yes',
         ]);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Resident
-    |--------------------------------------------------------------------------
-    */
-
-    $resident->update($validated);
-    $this->syncLinkedUserFromResident($resident->fresh('user'), $validated);
+        $this->syncLinkedUserFromResident($resident->fresh('user'), $validated);
+    });
 
     return redirect()
         ->route($user->role . '.profile')
