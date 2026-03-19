@@ -30,6 +30,31 @@
         font-size: 13px;
         margin-top: 5px;
     }
+
+    .auth-alert {
+        border-radius: 8px;
+        padding: 0.45rem 0.65rem;
+        margin-top: 0.35rem;
+        font-size: 0.72rem;
+        line-height: 1.4;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.45rem;
+        border: 1px solid transparent;
+        font-weight: 500;
+    }
+
+    .auth-alert i {
+        margin-top: 1px;
+        flex-shrink: 0;
+    }
+
+    .auth-alert-error {
+        background: rgba(239, 68, 68, 0.22);
+        color: #fef2f2;
+        border-color: rgba(239, 68, 68, 0.55);
+    }
+
     .password-section.d-none {
         display: none !important;
     }
@@ -81,6 +106,7 @@ $user = auth()->user();
             <div class="col-md-6">
                 <label class="form-label">Contact Number</label>
                 <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
+                <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
             </div>
         </div>
 
@@ -107,7 +133,7 @@ $user = auth()->user();
         <hr>
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="text-muted mb-0">Password</h6>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="togglePasswordSection">
+            <button type="button" class="btn btn-outline-primary btn-sm text-black" id="togglePasswordSection">
                 Change Password
             </button>
         </div>
@@ -127,6 +153,7 @@ $user = auth()->user();
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
+                    <div id="passwordError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -141,6 +168,9 @@ $user = auth()->user();
                         <span class="input-group-text" onclick="togglePassword('password_confirmation')" style="cursor: pointer;">
                             <i class="fas fa-eye"></i>
                         </span>
+                    </div>
+                    <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display: none;">
+                        <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
                     </div>
                 </div>
             </div>
@@ -162,8 +192,25 @@ $user = auth()->user();
         const togglePasswordSectionBtn = document.getElementById('togglePasswordSection');
         const passwordInput = document.getElementById('password');
         const passwordConfirmationInput = document.getElementById('password_confirmation');
+        const passwordError = document.getElementById('passwordError');
+        const passwordMismatchError = document.getElementById('passwordMismatchError');
+        const contactInput = document.querySelector('input[name="contactNumber"]');
+        const contactError = document.getElementById('contactError');
         const rawDate = "{{ old('birthday', $user->birthday) }}";
         const hasPasswordErrors = @json($errors->has('password') || $errors->has('password_confirmation'));
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        if (passwordError) {
+            passwordError.style.display = 'none';
+        }
+
+        if (passwordMismatchError) {
+            passwordMismatchError.style.display = 'none';
+        }
+
+        if (contactError) {
+            contactError.style.display = 'none';
+        }
 
         if (rawDate && birthdayInput) {
             const d = new Date(rawDate);
@@ -197,6 +244,63 @@ $user = auth()->user();
             }
         }
 
+        function validatePasswordPolicy() {
+            if (!passwordInput || !passwordError) {
+                return;
+            }
+
+            if (passwordInput.value.length === 0) {
+                passwordError.style.display = 'none';
+                passwordError.textContent = '';
+            } else if (!passwordRegex.test(passwordInput.value)) {
+                passwordError.style.display = 'block';
+                passwordError.textContent = 'Min 8 chars, 1 uppercase, 1 number.';
+            } else {
+                passwordError.style.display = 'none';
+                passwordError.textContent = '';
+            }
+        }
+
+        function validatePasswordMatch() {
+            if (!passwordInput || !passwordConfirmationInput || !passwordMismatchError) {
+                return;
+            }
+
+            if (
+                passwordInput.value !== passwordConfirmationInput.value &&
+                passwordConfirmationInput.value.length > 0
+            ) {
+                passwordMismatchError.style.display = 'block';
+            } else {
+                passwordMismatchError.style.display = 'none';
+            }
+        }
+
+        function validateContactNumber() {
+            if (!contactInput || !contactError) {
+                return;
+            }
+
+            contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
+            if (contactInput.value.length > 11) {
+                contactInput.value = contactInput.value.slice(0, 11);
+            }
+
+            if (contactInput.value.length === 0) {
+                contactError.style.display = 'none';
+                contactError.textContent = '';
+                contactInput.setCustomValidity('');
+            } else if (contactInput.value.length !== 11) {
+                contactError.style.display = 'block';
+                contactError.textContent = 'Must be exactly 11 digits.';
+                contactInput.setCustomValidity('Must be exactly 11 digits.');
+            } else {
+                contactError.style.display = 'none';
+                contactError.textContent = '';
+                contactInput.setCustomValidity('');
+            }
+        }
+
         if (openDateBtn && birthdayInput) {
             openDateBtn.addEventListener('click', function () {
                 if (birthdayInput.showPicker) {
@@ -204,6 +308,25 @@ $user = auth()->user();
                 } else {
                     birthdayInput.focus();
                 }
+            });
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function () {
+                validatePasswordPolicy();
+                validatePasswordMatch();
+            });
+        }
+
+        if (passwordConfirmationInput) {
+            passwordConfirmationInput.addEventListener('input', function () {
+                validatePasswordMatch();
+            });
+        }
+
+        if (contactInput) {
+            contactInput.addEventListener('input', function () {
+                validateContactNumber();
             });
         }
 
@@ -226,6 +349,13 @@ $user = auth()->user();
                     if (passwordConfirmationInput) {
                         passwordConfirmationInput.value = '';
                         passwordConfirmationInput.type = 'password';
+                    }
+                    if (passwordError) {
+                        passwordError.style.display = 'none';
+                        passwordError.textContent = '';
+                    }
+                    if (passwordMismatchError) {
+                        passwordMismatchError.style.display = 'none';
                     }
                 }
             });

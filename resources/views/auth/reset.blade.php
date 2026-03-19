@@ -170,6 +170,30 @@
             background-color: rgba(0, 0, 0, 0.1);
             border-radius: 5px;
         }
+
+        .auth-alert {
+            border-radius: 8px;
+            padding: 0.45rem 0.65rem;
+            margin-top: 0.35rem;
+            font-size: 0.72rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .auth-alert i {
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .auth-alert-error {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.55);
+        }
     </style>
 </head>
 <body class="d-flex justify-content-center align-items-start vh-100" style="padding-top: 40px;">
@@ -203,6 +227,7 @@
                 <label for="password" class="form-label">New Password</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter new password" required>
                 <i class="fa-solid fa-lock input-icon"></i>
+                <div id="passwordError" class="auth-alert auth-alert-error" style="display: none;"></div>
                 <div class="password-requirements">
                     Minimum 8 characters required
                 </div>
@@ -215,6 +240,9 @@
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
                 <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Confirm your password" required>
                 <i class="fa-solid fa-lock input-icon"></i>
+                <div id="passwordMismatchError" class="auth-alert auth-alert-error text-black" style="display: none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
+                </div>
                 @error('password_confirmation')
                     <div class="text-danger small">{{ $message }}</div>
                 @enderror
@@ -234,6 +262,51 @@
     </div>
 
     </div>
+
+    <script>
+        (function () {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('password_confirmation');
+            const passwordError = document.getElementById('passwordError');
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
+
+            if (!passwordInput || !confirmPasswordInput || !passwordError || !passwordMismatchError) {
+                return;
+            }
+
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+            function validatePasswordMatch() {
+                if (
+                    passwordInput.value !== confirmPasswordInput.value &&
+                    confirmPasswordInput.value.length > 0
+                ) {
+                    passwordMismatchError.style.display = 'block';
+                } else {
+                    passwordMismatchError.style.display = 'none';
+                }
+            }
+
+            passwordInput.addEventListener('input', function () {
+                if (passwordInput.value.length === 0) {
+                    passwordError.style.display = 'none';
+                    passwordError.textContent = '';
+                } else if (!passwordRegex.test(passwordInput.value)) {
+                    passwordError.style.display = 'block';
+                    passwordError.textContent = 'Min 8 chars, 1 uppercase, 1 number.';
+                } else {
+                    passwordError.style.display = 'none';
+                    passwordError.textContent = '';
+                }
+
+                validatePasswordMatch();
+            });
+
+            confirmPasswordInput.addEventListener('input', function () {
+                validatePasswordMatch();
+            });
+        })();
+    </script>
 
 </body>
 </html>

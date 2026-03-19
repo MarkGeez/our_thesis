@@ -55,6 +55,25 @@
         font-weight: 600;
         margin-bottom: 6px;
     }
+
+    .auth-alert {
+        border-radius: 8px;
+        padding: 0.45rem 0.65rem;
+        margin-top: 0.35rem;
+        font-size: 0.72rem;
+        line-height: 1.4;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.45rem;
+        border: 1px solid transparent;
+        font-weight: 500;
+    }
+
+    .auth-alert-error {
+        background: rgba(239, 68, 68, 0.22);
+        color: #fef2f2;
+        border-color: rgba(239, 68, 68, 0.55);
+    }
 </style>
 @php
     $householdId = optional($resident->households->first())->id;
@@ -137,6 +156,7 @@
                 <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
                 <input type="number" name="contactNo" class="form-control form-control-lg"
                        value="{{ old('contactNo', $resident->contactNo) }}" >
+                <div id="residentContactError" class="auth-alert auth-alert-error  text-black" style="display: none;"></div>
             </div>
 
             <div class="col-md-6">
@@ -299,7 +319,13 @@
         const headCandidateResidents = @json($headCandidateResidents ?? []);
         const resBirthday = document.getElementById('resident_birthday');
         const resOpenDate = document.getElementById('resident_openDate');
+        const residentContactInput = document.querySelector('input[name="contactNo"]');
+        const residentContactError = document.getElementById('residentContactError');
         const rawDate = "{{ old('birthday', $resident->birthday) }}";
+
+        if (residentContactError) {
+            residentContactError.style.display = 'none';
+        }
         
         // Birthday handling
         if (rawDate && resBirthday) {
@@ -318,6 +344,37 @@
                 } else {
                     resBirthday.focus();
                 }
+            });
+        }
+
+        function validateResidentContact() {
+            if (!residentContactInput || !residentContactError) {
+                return;
+            }
+
+            residentContactInput.value = residentContactInput.value.replace(/[^0-9]/g, '');
+            if (residentContactInput.value.length > 11) {
+                residentContactInput.value = residentContactInput.value.slice(0, 11);
+            }
+
+            if (residentContactInput.value.length === 0) {
+                residentContactError.style.display = 'none';
+                residentContactError.textContent = '';
+                residentContactInput.setCustomValidity('');
+            } else if (residentContactInput.value.length !== 11) {
+                residentContactError.style.display = 'block';
+                residentContactError.textContent = 'Must be exactly 11 digits.';
+                residentContactInput.setCustomValidity('Must be exactly 11 digits.');
+            } else {
+                residentContactError.style.display = 'none';
+                residentContactError.textContent = '';
+                residentContactInput.setCustomValidity('');
+            }
+        }
+
+        if (residentContactInput) {
+            residentContactInput.addEventListener('input', function () {
+                validateResidentContact();
             });
         }
 

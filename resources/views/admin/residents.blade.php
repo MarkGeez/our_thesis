@@ -365,6 +365,30 @@
         .invalid-feedback {
             font-weight: 500;
         }
+
+        .auth-alert {
+            border-radius: 8px;
+            padding: 0.45rem 0.65rem;
+            margin-top: 0.35rem;
+            font-size: 0.72rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .auth-alert i {
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .auth-alert-error {
+            background: rgba(239, 68, 68, 0.22);
+            color: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.55);
+        }
     </style>
 </head>
 <body>
@@ -926,7 +950,8 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
-                                                                <input type="text" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" required>
+                                                                <input type="text" name="contactNo" class="form-control js-contact-number" value="{{ old('contactNo', $resident->contactNo) }}" required>
+                                                                <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
                                                             </div>
                                                         </div>
 
@@ -1174,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name" required>
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
-                                                        <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09123456789" required>
+                                                        <input type="text" max="11" min="10" id="emergencyContactNo{{ $resident->id }} js-contact-number" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09123456789" required>
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1287,8 +1312,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
-    <input type="text" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
+    <input type="text" id="contactNo" name="contactNo" class="form-control js-contact-number @error('contactNo') is-invalid @enderror" 
            value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
+    <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -1522,6 +1548,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isNaN(parsed)) return;
                 calculateAge(parsed, targetId);
             });
+        });
+
+        function bindContactValidation(input) {
+            const errorBox = input.parentElement
+                ? input.parentElement.querySelector('.contact-validation-error')
+                : null;
+
+            if (!errorBox) {
+                return;
+            }
+
+            errorBox.style.display = 'none';
+
+            input.addEventListener('input', function () {
+                input.value = input.value.replace(/[^0-9]/g, '');
+                if (input.value.length > 11) {
+                    input.value = input.value.slice(0, 11);
+                }
+
+                if (input.value.length === 0) {
+                    errorBox.style.display = 'none';
+                    errorBox.textContent = '';
+                    input.setCustomValidity('');
+                } else if (input.value.length !== 11) {
+                    errorBox.style.display = 'block';
+                    errorBox.textContent = 'Must be exactly 11 digits.';
+                    input.setCustomValidity('Must be exactly 11 digits.');
+                } else {
+                    errorBox.style.display = 'none';
+                    errorBox.textContent = '';
+                    input.setCustomValidity('');
+                }
+            });
+        }
+
+        document.querySelectorAll('.js-contact-number').forEach(function (input) {
+            bindContactValidation(input);
         });
 
         // --- NEW: Initialize Flatpickr for Official Assignment dates ---

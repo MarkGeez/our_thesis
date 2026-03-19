@@ -348,6 +348,7 @@
                         placeholder="Enter your password" required>
                         <i class="fa-solid fa-lock input-icon"></i>
                     </div>
+                    <div id="passwordError" class="auth-alert auth-alert-error" style="display: none;"></div>
                     @error('password')
                     <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
@@ -360,7 +361,7 @@
                         placeholder="Confirm your password">
                         <i class="fa-solid fa-lock input-icon"></i>
                     </div>
-                    <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display: none;">
+                    <div id="passwordMismatchError" class="auth-alert auth-alert-error text-black" style="display: none;">
                         <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
                     </div>
                     @error('password_confirmation')
@@ -369,12 +370,13 @@
                 </div>
 
                 <div class="input-with-icon mb-3">
-                    <label for="contactNumber" class="form-label">Contact Number</label>
+                    <label for="contact" class="form-label">Contact Number</label>
                     <div class="input-field-wrap">
-                        <input type="text" name="contactNumber" id="contactNumber" class="form-control"
+                        <input type="text" name="contactNumber" id="contact" class="form-control"
                         placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
                         <i class="fa-solid fa-phone input-icon"></i>
                     </div>
+                    <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
                     @error('contactNumber')
                     <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
@@ -508,10 +510,110 @@
             }
         }
 
-        // Enable/disable submit button based on checkbox
-        document.getElementById('terms_accepted').addEventListener('change', function() {
-            document.getElementById('submitBtn').disabled = !this.checked;
-        });
+        // Password and contact number validation for Register
+        (function() {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
+            const confirmPasswordInput = document.getElementById('password_confirmation');
+            const passwordMismatchError = document.getElementById('passwordMismatchError');
+            const contactInput = document.getElementById('contact');
+            let passwordError = document.getElementById('passwordError');
+            let contactError = document.getElementById('contactError');
+
+            // Add error containers if not present
+            if (!passwordError) {
+                passwordError = document.createElement('div');
+                passwordError.id = 'passwordError';
+                passwordError.className = 'auth-alert auth-alert-error';
+                passwordInput.parentNode.appendChild(passwordError);
+            }
+            if (!contactError) {
+                contactError = document.createElement('div');
+                contactError.id = 'contactError';
+                contactError.className = 'auth-alert auth-alert-error';
+                contactInput.parentNode.appendChild(contactError);
+            }
+
+            // Keep empty error boxes hidden until user starts typing invalid input.
+            passwordError.style.display = 'none';
+            contactError.style.display = 'none';
+
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+            passwordInput.addEventListener('input', function() {
+                // Show confirm password container if password has content
+                if (this.value.length > 0) {
+                    confirmPasswordContainer.style.display = 'block';
+                } else {
+                    confirmPasswordContainer.style.display = 'none';
+                    passwordMismatchError.style.display = 'none';
+                    confirmPasswordInput.value = '';
+                }
+                validatePasswordMatch();
+                // Password validation
+                if (passwordInput.value.length === 0) {
+                    passwordError.style.display = 'none';
+                    passwordError.textContent = "";
+                } else if (!passwordRegex.test(passwordInput.value)) {
+                    passwordError.style.display = 'block';
+                    passwordError.textContent = "Min 8 chars, 1 uppercase, 1 number.";
+                } else {
+                    passwordError.style.display = 'none';
+                    passwordError.textContent = "";
+                }
+            });
+
+            confirmPasswordInput.addEventListener('input', function() {
+                validatePasswordMatch();
+            });
+
+            function validatePasswordMatch() {
+                if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
+                    passwordMismatchError.style.display = 'block';
+                } else {
+                    passwordMismatchError.style.display = 'none';
+                }
+            }
+
+            // CONTACT VALIDATION (LIVE)
+            contactInput.addEventListener('input', () => {
+                contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
+                if (contactInput.value.length > 11) {
+                    contactInput.value = contactInput.value.slice(0, 11);
+                }
+                if (contactInput.value.length === 0) {
+                    contactError.style.display = 'none';
+                    contactError.textContent = "";
+                } else if (contactInput.value.length !== 11) {
+                    contactError.style.display = 'block';
+                    contactError.textContent = "Must be exactly 11 digits.";
+                } else {
+                    contactError.style.display = 'none';
+                    contactError.textContent = "";
+                }
+            });
+
+            // Enable/disable submit button based on checkbox
+            document.getElementById('terms_accepted').addEventListener('change', function() {
+                document.getElementById('submitBtn').disabled = !this.checked;
+            });
+
+            // Prevent submit if errors
+            function checkBeforeSubmit() {
+    const password = document.getElementById('password').value;
+    const contact = document.getElementById('contact').value;
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const contactRegex = /^\d{11}$/;
+
+    if (!passwordRegex.test(password) || !contactRegex.test(contact)) {
+        alert("Please fix errors first.");
+        return false;
+    }
+
+    return true;
+}
+        })();
     </script>
 </body>
 </html>
