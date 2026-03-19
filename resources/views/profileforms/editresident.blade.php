@@ -134,9 +134,10 @@
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
-                <input type="number" name="contactNo" class="form-control form-control-lg"
-                       value="{{ old('contactNo', $resident->contactNo) }}" >
+                  <label class="form-label">Contact Number <span style="font-size: 12px; color: #6c757d; font-weight: 400;">Updates in user profile</span></label>
+                  <input type="text" name="contactNo" id="contactNo" class="form-control form-control-lg"
+                      value="{{ old('contactNo', $resident->contactNo) }}" >
+                  <div id="contactNoError" class="invalid-feedback"></div>
             </div>
 
             <div class="col-md-6">
@@ -199,9 +200,10 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Emergency Contact No.</label>
-                <input type="number" name="emergencyContactNo" class="form-control form-control-lg"
-                       value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" >
+                  <label class="form-label">Emergency Contact No.</label>
+                  <input type="text" name="emergencyContactNo" id="emergencyContactNo" class="form-control form-control-lg"
+                      value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" >
+                  <div id="emergencyContactNoError" class="invalid-feedback"></div>
             </div>
         </div>
 
@@ -295,6 +297,39 @@
 </form>
 
 <script>
+    // Contact number validation for resident
+    document.addEventListener('DOMContentLoaded', function () {
+        const contactNoInput = document.getElementById('contactNo');
+        const contactNoError = document.getElementById('contactNoError');
+        if (contactNoInput && contactNoError) {
+            contactNoInput.addEventListener('input', () => {
+                contactNoInput.value = contactNoInput.value.replace(/[^0-9]/g, '');
+                if (contactNoInput.value.length > 11) {
+                    contactNoInput.value = contactNoInput.value.slice(0, 11);
+                }
+                if (contactNoInput.value.length !== 11) {
+                    contactNoError.textContent = "Must be exactly 11 digits.";
+                } else {
+                    contactNoError.textContent = "";
+                }
+            });
+        }
+        const emergencyContactNoInput = document.getElementById('emergencyContactNo');
+        const emergencyContactNoError = document.getElementById('emergencyContactNoError');
+        if (emergencyContactNoInput && emergencyContactNoError) {
+            emergencyContactNoInput.addEventListener('input', () => {
+                emergencyContactNoInput.value = emergencyContactNoInput.value.replace(/[^0-9]/g, '');
+                if (emergencyContactNoInput.value.length > 11) {
+                    emergencyContactNoInput.value = emergencyContactNoInput.value.slice(0, 11);
+                }
+                if (emergencyContactNoInput.value.length !== 11) {
+                    emergencyContactNoError.textContent = "Must be exactly 11 digits.";
+                } else {
+                    emergencyContactNoError.textContent = "";
+                }
+            });
+        }
+    });
     document.addEventListener('DOMContentLoaded', function () {
         const headCandidateResidents = @json($headCandidateResidents ?? []);
         const resBirthday = document.getElementById('resident_birthday');

@@ -289,7 +289,7 @@
         <div class="card shadow">
             <h3 class="text-center mb-3 text-light">Register</h3>
 
-            <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" novalidate>
+            <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" onsubmit="checkBeforeSubmit()" novalidate>
                 @csrf
 
                 <!-- Your existing form fields (unchanged) -->
@@ -348,6 +348,7 @@
                         placeholder="Enter your password" required>
                         <i class="fa-solid fa-lock input-icon"></i>
                     </div>
+                    <div id="passwordError" class="auth-alert auth-alert-error" style="display:none;"></div>
                     @error('password')
                     <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
@@ -375,6 +376,7 @@
                         placeholder="Enter your contact number" value="{{ old('contactNumber') }}" required>
                         <i class="fa-solid fa-phone input-icon"></i>
                     </div>
+                    <div id="contactError" class="auth-alert auth-alert-error" style="display:none;"></div>
                     @error('contactNumber')
                     <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
                     @enderror
@@ -483,6 +485,11 @@
         const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
         const confirmPasswordInput = document.getElementById('password_confirmation');
         const passwordMismatchError = document.getElementById('passwordMismatchError');
+        const passwordError = document.getElementById('passwordError');
+        const contactInput = document.getElementById('contactNumber');
+        const contactError = document.getElementById('contactError');
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const contactRegex = /^\d{0,11}$/;
 
         passwordInput.addEventListener('input', function() {
             // Show confirm password container if password has content
@@ -494,6 +501,14 @@
                 confirmPasswordInput.value = '';
             }
             validatePasswordMatch();
+            // Password validation
+            if (!passwordRegex.test(passwordInput.value)) {
+                passwordError.style.display = 'block';
+                passwordError.textContent = "Mininum 8 chararacters, 1 uppercase, 1 number.";
+            } else {
+                passwordError.style.display = 'none';
+                passwordError.textContent = "";
+            }
         });
 
         confirmPasswordInput.addEventListener('input', function() {
@@ -508,10 +523,39 @@
             }
         }
 
+        // CONTACT VALIDATION (LIVE)
+        contactInput.addEventListener('input', () => {
+            contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
+            if (contactInput.value.length > 11) {
+                contactInput.value = contactInput.value.slice(0, 11);
+            }
+            if (contactInput.value.length !== 11) {
+                contactError.style.display = 'block';
+                contactError.textContent = "Must be exactly 11 digits.";
+            } else {
+                contactError.style.display = 'none';
+                contactError.textContent = "";
+            }
+        });
+
         // Enable/disable submit button based on checkbox
         document.getElementById('terms_accepted').addEventListener('change', function() {
             document.getElementById('submitBtn').disabled = !this.checked;
         });
+
+        function checkBeforeSubmit() {
+    if (
+        (passwordError && passwordError.textContent) ||
+        (contactError && contactError.textContent)
+    ) {
+        alert("Please fix errors first.");
+        return false;
+    }
+    return true;
+}
+
+        // Attach to form
+        document.querySelector('form[action*="register.attempt"]').setAttribute('onsubmit', 'return checkBeforeSubmit()');
     </script>
 </body>
 </html>

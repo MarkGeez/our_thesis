@@ -180,6 +180,7 @@
         <p class="card-description">Create a new password for your account. Make sure it's strong and secure.</p>
         
         <form action="{{ route('password.update') }}" method="post">
+
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
 
@@ -203,8 +204,8 @@
                 <label for="password" class="form-label">New Password</label>
                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter new password" required>
                 <i class="fa-solid fa-lock input-icon"></i>
-                <div class="password-requirements">
-                    Minimum 8 characters required
+                <div class="password-requirements" id="passwordError">
+                    Minimum 8 characters required. Atleast 1 capital letter and 1 digit. 
                 </div>
                 @error('password')
                     <div class="text-danger small">{{ $message }}</div>
@@ -222,6 +223,34 @@
 
             <button type="submit" class="btn btn-primary fw-bold">Reset Password</button>
         </form>
+
+        <script>
+        const passwordInput = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        passwordInput.addEventListener('input', () => {
+            if (!passwordRegex.test(passwordInput.value)) {
+                passwordError.textContent = "Min 8 chars, 1 uppercase, 1 number.";
+            } else {
+                passwordError.textContent = "";
+            }
+        });
+
+        function checkBeforeSubmit() {
+    if (
+        (passwordError && passwordError.textContent) ||
+        (contactError && contactError.textContent)
+    ) {
+        alert("Please fix errors first.");
+        return false;
+    }
+    return true;
+}
+
+        // Attach to form
+        document.querySelector('form[action*="password.update"]').setAttribute('onsubmit', 'return checkBeforeSubmit()');
+        </script>
 
         <div class="back-to-login">
             <a href="{{ route('login') }}"><i class="fa-solid fa-arrow-left"></i> Back to Login</a>

@@ -39,7 +39,7 @@
 $user = auth()->user();
 @endphp
 
-<form method="POST" action="{{ route(auth()->user()->role . '.update.profile', auth()->user()->id) }}" enctype="multipart/form-data"> 
+<form method="POST" onsubmit="return checkBeforeSubmit()" action="{{ route(auth()->user()->role . '.update.profile', auth()->user()->id) }}" enctype="multipart/form-data"> 
     @csrf 
     @method('PUT')
     
@@ -80,7 +80,8 @@ $user = auth()->user();
 
             <div class="col-md-6">
                 <label class="form-label">Contact Number</label>
-                <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
+                <input type="text" name="contactNumber" id="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
+                <div id="contactError" class="invalid-feedback"></div>
             </div>
         </div>
 
@@ -127,6 +128,7 @@ $user = auth()->user();
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
+                    <div id="passwordError" class="invalid-feedback"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -155,6 +157,22 @@ $user = auth()->user();
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Contact number validation
+        const contactInput = document.getElementById('contactNumber');
+        const contactError = document.getElementById('contactError');
+        if (contactInput && contactError) {
+            contactInput.addEventListener('input', () => {
+                contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
+                if (contactInput.value.length > 11) {
+                    contactInput.value = contactInput.value.slice(0, 11);
+                }
+                if (contactInput.value.length !== 11) {
+                    contactError.textContent = "Must be exactly 11 digits.";
+                } else {
+                    contactError.textContent = "";
+                }
+            });
+        }
         const birthdayInput = document.getElementById('user_birthday');
         const openDateBtn = document.getElementById('user_openDate');
         const errorDisplay = document.getElementById('birthday_error');
@@ -236,4 +254,29 @@ $user = auth()->user();
         const input = document.getElementById(id);
         input.type = input.type === 'password' ? 'text' : 'password';
     }
+// Password validation
+const passwordInput = document.getElementById('password');
+const passwordError = document.getElementById('passwordError');
+const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+if (passwordInput && passwordError) {
+    passwordInput.addEventListener('input', () => {
+        if (!passwordRegex.test(passwordInput.value)) {
+            passwordError.textContent = "Min 8 chars, 1 uppercase, 1 number.";
+        } else {
+            passwordError.textContent = "";
+        }
+    });
+}
+function checkBeforeSubmit() {
+    if (
+        (passwordError && passwordError.textContent) ||
+        (contactError && contactError.textContent)
+    ) {
+        alert("Please fix errors first.");
+        return false;
+    }
+    return true;
+}
+
+// Attach to form
 </script>
