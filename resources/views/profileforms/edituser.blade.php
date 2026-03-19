@@ -107,7 +107,6 @@ $user = auth()->user();
                 <label class="form-label">Contact Number</label>
                 <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
                 <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
-                <input type="tel" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" placeholder="09170000000" required>
             </div>
         </div>
 
@@ -164,14 +163,14 @@ $user = auth()->user();
                             type="password"
                             name="password_confirmation"
                             id="password_confirmation"
-                            class="form-control"
+                            class="form-control text-black"
                         >
                         <span class="input-group-text" onclick="togglePassword('password_confirmation')" style="cursor: pointer;">
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
                     <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display: none;">
-                        <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
+                        <i class="fa-solid fa-circle-exclamation text-black"></i><div class="text-black">Passwords do not match</div>
                     </div>
                 </div>
             </div>
