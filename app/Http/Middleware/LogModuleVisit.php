@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\ActiveLogger;
+use App\Services\SidebarNotificationService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -10,12 +11,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LogModuleVisit
 {
+    public function __construct(
+        private readonly SidebarNotificationService $sidebarNotificationService
+    ) {
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->isMethod('get') && !$request->ajax() && !$request->expectsJson()) {
             $user = $request->user();
 
             if ($user && in_array($user->role, ['admin', 'subadmin'], true)) {
+                $routeName = $request->route()?->getName();
                 $module = $this->resolveModuleName($request);
                 $roleLabel = $user->role === 'subadmin' ? 'Subadmin' : 'Admin';
 
@@ -25,6 +32,12 @@ class LogModuleVisit
                     null,
                     sprintf('%s visited %s module', $roleLabel, $module)
                 );
+
+                $trackedModuleKey = $this->sidebarNotificationService->resolveTrackedModuleKey($routeName);
+
+                if ($trackedModuleKey !== null) {
+                    $this->sidebarNotificationService->markVisited($user, $trackedModuleKey);
+                }
             }
         }
 

@@ -3,515 +3,745 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Barangay 249</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo:wght@300;400;600;700&family=Oswald:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Your existing styles remain exactly the same */
+        :root {
+            --primary-blue: #2d7dfd;
+            --accent-gold: #ffd700;
+            --glass-white: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        /* =============================================
+           BASE & BACKGROUND
+        ============================================= */
         body {
-            background-image: url('{{ asset("images/brgy249_background.jpg") }}');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                              url('{{ asset("images/brgy249_background.jpg") }}');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            font-weight: bolder;
+            min-height: 100vh;
+            color: white;
+            font-family: 'Exo', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+            overflow-x: hidden;
         }
 
-        .card {
-            width: 100vw;
-            max-width: 500px;
-            padding: 0.75rem;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 0 12px 6px rgba(255, 255, 255, 0.6);
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle, rgba(45, 125, 253, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+        }
+
+        /* =============================================
+           LARGE GLASS CONTAINER
+        ============================================= */
+        .register-container {
             position: relative;
-            overflow: hidden;
+            z-index: 1;
+            width: 100%;
+            max-width: 1100px;
+            background: var(--glass-white);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 4rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: fadeInScale 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
-        .card::before {
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* =============================================
+           BRAND HEADER
+        ============================================= */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .brand-header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            letter-spacing: 4px;
+            margin-bottom: 0;
+            background: linear-gradient(to bottom, #fff, #bdc3c7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-header h3 {
+            font-family: 'Oswald', sans-serif;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        /* =============================================
+           SECTION LABELS
+        ============================================= */
+        .section-label {
+            font-family: 'Oswald', sans-serif;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-label::after {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            flex: 1;
             height: 1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.8),
-                transparent
-            );
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 1px;
-            height: 100%;
-            background: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.8),
-                transparent,
-                rgba(255, 255, 255, 0.3)
-            );
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
+        /* =============================================
+           FORM CONTROLS
+        ============================================= */
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
             margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .input-with-icon {
-            position: relative;
+        .input-group {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
         }
 
-        /* Inner wrapper keeps icon anchored to input, not the whole field group */
-        .input-field-wrap {
-            position: relative;
+        .input-group.is-invalid-group {
+            border-color: rgba(239, 68, 68, 0.7);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
         }
 
-        /* Auth-alert error style matching login.blade */
+        .input-group:focus-within {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(45, 125, 253, 0.25);
+        }
+
+        .input-group-text {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            padding-left: 15px;
+        }
+
+        .form-control,
+        .form-select {
+            background: transparent !important;
+            border: none !important;
+            color: white !important;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            box-shadow: none !important;
+        }
+
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) opacity(0.5);
+            cursor: pointer;
+        }
+
+        input[type="file"].form-control {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        /* =============================================
+           PASSWORD TOGGLE
+        ============================================= */
+        .btn-toggle-pw {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            padding-right: 15px;
+            padding-left: 10px;
+            transition: color 0.3s;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .btn-toggle-pw:hover { color: white; }
+
+        /* =============================================
+           VALIDATION ERROR ALERTS
+        ============================================= */
         .auth-alert {
             border-radius: 8px;
-            padding: 0.45rem 0.65rem;
-            margin-top: 0.35rem;
+            padding: 0.4rem 0.65rem;
+            margin-top: 0.45rem;
             font-size: 0.72rem;
             line-height: 1.4;
             display: flex;
             align-items: flex-start;
-            gap: 0.45rem;
-            border: 1px solid transparent;
+            gap: 0.4rem;
             font-weight: 500;
         }
 
-        .auth-alert i {
-            margin-top: 1px;
-            flex-shrink: 0;
-        }
+        .auth-alert i { margin-top: 1px; flex-shrink: 0; }
 
         .auth-alert-error {
-            background: rgba(239, 68, 68, 0.22);
+            background: rgba(239, 68, 68, 0.18);
             color: #fef2f2;
-            border-color: rgba(239, 68, 68, 0.55);
+            border: 1px solid rgba(239, 68, 68, 0.45);
         }
 
-        .form-control {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            font-size: 0.8rem;
-            padding: 0.35rem 0.5rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+        /* =============================================
+           CONFIRM PASSWORD (smooth reveal)
+        ============================================= */
+        #confirmPasswordWrapper {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.38s ease, opacity 0.3s ease;
         }
 
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 1); 
+        #confirmPasswordWrapper.visible {
+            max-height: 200px;
             opacity: 1;
-            font-weight: 500;
         }
 
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            color: #fff;
-            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.58);
+        /* =============================================
+           PROOF OF IDENTITY NOTICE
+        ============================================= */
+        .proof-notice {
+            background: rgba(45, 125, 253, 0.1);
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 0 8px 8px 0;
+            padding: 0.65rem 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
         }
 
-        .form-label {
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem !important;
-            color: rgba(255, 255, 255, 0.9);
-        }
+        .proof-notice i { color: #6fb1ff; margin-right: 6px; }
 
-        .input-with-icon .form-control {
-            padding-right: 2.5rem; 
-            font-size: 0.7rem;
-            padding: 0.4rem 2.5rem 0.4rem 0.5rem; 
-        }
-
-        .input-field-wrap .input-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #fff !important;
-            pointer-events: none;
-        }
-
-        .mb-3 {
-            margin-bottom: 0.75rem !important; 
-        }
-
-        button {
-            width: 100%;
-            padding: 0.5rem !important; 
-        }
-
-        .divider {
-            height: 1px;
-            background-color: #dee2e6;
-            margin: 0.75rem 0; 
-        }
-
-        .text-light.small {
-            font-size: 0.67rem; 
-            margin: 0 2px 
-        }
-        #textforlogin {
-            font-size: 0.9rem;
-            font-weight: normal !important;
-        }
-        .imageBrgy {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 16px;
-        }
-
-        .imageBrgy img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        @media (max-width: 480px) {
-            .imageBrgy img {
-                width: 56px;
-                height: 56px;
-            }
-        }
-
-        .image-container img.uniform-image {
-            width: 90px;
-            height: 90px;
-            object-fit: cover;
-            border-radius: none;
-            box-shadow: none;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 480px) {
-            .image-container img.uniform-image {
-                width: 90px;
-                height: 90px;
-            }
-        }
-
-        #brgy249logo {
-            border-radius: 100%;
-        }
-
-       /* --- IMPROVED TERMS & CONDITIONS STYLES --- */
+        /* =============================================
+           TERMS CONTAINER
+        ============================================= */
         .terms-container {
-            background: rgba(0, 0, 0, 0.15); /* Darker overlay for better text contrast */
-            border-radius: 12px;
-            padding: 12px;
-            margin: 1.5rem 0;
+            background: rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
         }
 
         .form-check {
             display: flex;
-            align-items: flex-start; /* Aligns checkbox with the first line of text */
+            align-items: flex-start;
             padding-left: 0;
             margin-bottom: 0;
         }
 
         .terms-checkbox {
-            min-width: 18px;
-            height: 18px;
+            min-width: 16px;
+            height: 16px;
             margin-top: 3px;
-            margin-right: 12px;
+            margin-right: 10px;
+            flex-shrink: 0;
             cursor: pointer;
-            accent-color: #0d6efd;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            accent-color: var(--primary-blue);
         }
 
         .terms-text {
-            font-size: 0.78rem;
-            line-height: 1.5;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.75);
             cursor: pointer;
         }
 
         .terms-text a {
-            color: #6fb1ff; /* Brighter blue for visibility on dark/blur background */
+            color: #6fb1ff;
             text-decoration: none;
-            border-bottom: 1px solid rgba(111, 177, 255, 0.4);
-            transition: all 0.2s;
+            font-weight: 600;
+            transition: color 0.2s;
         }
 
-        .terms-text a:hover {
+        .terms-text a:hover { color: #fff; }
+
+        /* =============================================
+           SUBMIT BUTTON
+        ============================================= */
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2a88 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            width: 100%;
+            margin-top: 20px;
             color: #fff;
-            border-bottom-color: #fff;
+            transition: all 0.4s;
+            cursor: pointer;
         }
 
-        
-        .proof-instruction {
-    background: rgba(255, 255, 255, 0.1);
-    border-left: 3px solid #6fb1ff;
-    padding: 8px 12px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-}
+        .btn-register:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(45, 125, 253, 0.4);
+            border-color: var(--accent-gold);
+        }
 
-.proof-instruction p {
-    font-size: 0.72rem;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0;
-    font-weight: normal;
-}
+        .btn-register:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-.proof-instruction i {
-    margin-right: 5px;
-    color: #6fb1ff;
-}
+        /* =============================================
+           LOGIN LINK
+        ============================================= */
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-link a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover { text-decoration: underline; }
+
+        /* =============================================
+           RESPONSIVE
+        ============================================= */
+        @media (max-width: 992px) {
+            .register-container { padding: 2.5rem 2rem; }
+            .brand-header h1 { font-size: 3rem; }
+        }
+
+        @media (max-width: 576px) {
+            .register-container { padding: 2rem 1.2rem; border-radius: 24px; }
+            .brand-header h1 { font-size: 2.4rem; }
+        }
     </style>
 </head>
-<body class="d-flex justify-content-center align-items-start vh-100" style="padding-top: 40px;">
-    <div class="d-flex flex-column align-items-center">
-        <div class="card shadow">
-            <h3 class="text-center mb-3 text-light">Register</h3>
+<body>
 
-            <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" novalidate>
-                @csrf
+<canvas id="particle-canvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
 
-                <!-- Your existing form fields (unchanged) -->
-                <div class="input-with-icon mb-3">
-                    <label for="firstName" class="form-label">First Name</label>
-                    <div class="input-field-wrap">
-                        <input type="text" name="firstName" id="firstName" class="form-control"
-                        placeholder="Enter your first name" value="{{ old('firstName') }}" required>
-                        <i class="fa-solid fa-user input-icon"></i>
-                    </div>
-                    @error('firstName')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+<div class="register-container">
+
+    <!-- ── BRAND HEADER ──────────────────────────────────────── -->
+    <header class="brand-header">
+        <div class="d-flex justify-content-center gap-3 mb-3">
+            <img src="{{ asset('images/Brgy-logo-1.png') }}" height="70"
+                 style="border-radius:50%; background:rgba(255,255,255,0.15); padding:3px; object-fit:contain;">
+            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" height="70" style="object-fit:contain;">
+        </div>
+        <h3>e-Barangay Portal</h3>
+        <h1>REGISTRATION</h1>
+    </header>
+
+    <form action="{{ route('register.attempt') }}" method="POST" enctype="multipart/form-data" novalidate>
+        @csrf
+
+        <!-- ── PERSONAL INFORMATION ──────────────────────────── -->
+        <div class="section-label">Personal Information</div>
+
+        <div class="row g-4 mb-4">
+            <!-- First Name -->
+            <div class="col-md-4">
+                <label for="firstName" class="form-label">First Name</label>
+                <div class="input-group @error('firstName') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="firstName" id="firstName" class="form-control"
+                           placeholder="Juan" value="{{ old('firstName') }}" required>
                 </div>
-
-                <div class="input-with-icon mb-3">
-                    <label for="middleName" class="form-label">Middle Name</label>
-                    <div class="input-field-wrap">
-                        <input type="text" name="middleName" id="middleName" class="form-control"
-                        placeholder="Enter your middle name" value="{{ old('middleName') }}" required>
-                        <i class="fa-solid fa-user input-icon"></i>
-                    </div>
-                    @error('middleName')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+                @error('firstName')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
                 </div>
+                @enderror
+            </div>
 
-                <div class="input-with-icon mb-3">
-                    <label for="lastName" class="form-label">Last Name</label>
-                    <div class="input-field-wrap">
-                        <input type="text" name="lastName" id="lastName" class="form-control"
-                        placeholder="Enter your last name" value="{{ old('lastName') }}" required>
-                        <i class="fa-solid fa-user input-icon"></i>
-                    </div>
-                    @error('lastName')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+            <!-- Middle Name -->
+            <div class="col-md-4">
+                <label for="middleName" class="form-label">Middle Name</label>
+                <div class="input-group @error('middleName') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="middleName" id="middleName" class="form-control"
+                           placeholder="Santos" value="{{ old('middleName') }}" required>
                 </div>
-
-                <div class="input-with-icon mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <div class="input-field-wrap">
-                        <input type="text" name="email" id="email" class="form-control"
-                        placeholder="Enter your email" value="{{ old('email') }}" required>
-                        <i class="fa-solid fa-envelope input-icon"></i>
-                    </div>
-                    @error('email')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+                @error('middleName')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
                 </div>
+                @enderror
+            </div>
 
-                <div class="input-with-icon mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-field-wrap">
-                        <input type="password" name="password" id="password" class="form-control"
-                        placeholder="Enter your password" required>
-                        <i class="fa-solid fa-lock input-icon"></i>
-                    </div>
-                    @error('password')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+            <!-- Last Name -->
+            <div class="col-md-4">
+                <label for="lastName" class="form-label">Last Name</label>
+                <div class="input-group @error('lastName') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" name="lastName" id="lastName" class="form-control"
+                           placeholder="Dela Cruz" value="{{ old('lastName') }}" required>
                 </div>
-
-                <div class="input-with-icon mb-3" id="confirmPasswordContainer" style="display: none;">
-                    <label for="password_confirmation" class="form-label">Confirm Password</label>
-                    <div class="input-field-wrap">
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                        placeholder="Confirm your password">
-                        <i class="fa-solid fa-lock input-icon"></i>
-                    </div>
-                    <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display: none;">
-                        <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
-                    </div>
-                    @error('password_confirmation')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
+                @error('lastName')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
                 </div>
-
-                <div class="input-with-icon mb-3">
-                    <label for="contactNumber" class="form-label">Contact Number</label>
-                    <div class="input-field-wrap">
-                        <input type="tel" name="contactNumber" id="contactNumber" class="form-control"
-                        placeholder="09170000000" value="{{ old('contactNumber') }}" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
-                        <i class="fa-solid fa-phone input-icon"></i>
-                    </div>
-                    @error('contactNumber')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="birthday" class="form-label">Birthday</label>
-                    <input type="date" name="birthday" id="birthday" class="form-control"
-                    value="{{ old('birthday') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
-                    @error('birthday')
-                    <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Proof of Identity</label>
-                    
-                    <div class="proof-instruction">
-                        <p>
-                            <i class="fas fa-info-circle"></i> 
-                            Submit a clear photo of your valid ID or any image proof to verify your residency in Barangay 249.
-                        </p>
-                    </div>
-
-                    <input type="file" accept=".jpg, .jpeg, .png" name="proofOfIdentity"
-                        id="proofOfIdentity" class="form-control">
-                        
-                    @error('proofOfIdentity')
-                        <div class="auth-alert auth-alert-error"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <div class="terms-container">
-                    <div class="form-check">
-                        <input class="terms-checkbox" type="checkbox" name="terms_accepted" id="terms_accepted" value="1" required>
-                        <label class="terms-text" for="terms_accepted">
-                            I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms & Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a> of the e-Barangay System.
-                        </label>
-                    </div>
-                    @error('terms_accepted')
-                        <div class="auth-alert auth-alert-error mt-2"><i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div></div>
-                    @enderror
-                </div>
-
-                <button type="submit" class="btn btn-primary fw-bold" id="submitBtn" disabled>Register</button>
-            </form>
-
-            <p class="text-light mt-3" id="textforlogin" style="text-align: center">Already have an account? <a href="{{ route('login') }}" class="text-light fw-bold">Login</a></p>
+                @enderror
+            </div>
         </div>
 
-        <div class="image-container d-flex justify-content-center mt-4 gap-3">
-            <img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Image 1" class="uniform-image" id="brgy249logo">
-            <img src="{{ asset('images/Bagong_Pilipinas_logo.png') }}" alt="Image 2" class="uniform-image">
+        <div class="row g-4 mb-5">
+            <!-- Email -->
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email Address</label>
+                <div class="input-group @error('email') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" name="email" id="email" class="form-control"
+                           placeholder="juan@example.com" value="{{ old('email') }}" required>
+                </div>
+                @error('email')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
+
+            <!-- Contact Number -->
+            <div class="col-md-3">
+                <label for="contactNumber" class="form-label">Contact Number</label>
+                <div class="input-group @error('contactNumber') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                    <input type="tel" name="contactNumber" id="contactNumber" class="form-control"
+                           placeholder="09170000000" value="{{ old('contactNumber') }}"
+                           inputmode="numeric" pattern="^09\d{9}$" maxlength="11" required>
+                </div>
+                @error('contactNumber')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
+
+            <!-- Birthday -->
+            <div class="col-md-3">
+                <label for="birthday" class="form-label">Birthday</label>
+                <div class="input-group @error('birthday') is-invalid-group @enderror">
+                    <input type="date" name="birthday" id="birthday" class="form-control px-3"
+                           value="{{ old('birthday') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
+                </div>
+                @error('birthday')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
         </div>
+
+        <!-- ── ACCOUNT SECURITY ──────────────────────────────── -->
+        <div class="section-label">Account Security</div>
+
+        <div class="row g-4 mb-5">
+            <!-- Password -->
+            <div class="col-md-6">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group @error('password') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" name="password" id="password" class="form-control"
+                           placeholder="••••••••" required>
+                    <button type="button" class="btn-toggle-pw" data-toggle-target="password"
+                            aria-label="Show password" aria-pressed="false">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                @error('password')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
+
+            <!-- Confirm Password — revealed when password has input -->
+            <div class="col-md-6" id="confirmPasswordWrapper">
+                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                <div class="input-group @error('password_confirmation') is-invalid-group @enderror">
+                    <span class="input-group-text"><i class="fa-solid fa-shield-check"></i></span>
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                           class="form-control" placeholder="••••••••">
+                    <button type="button" class="btn-toggle-pw" data-toggle-target="password_confirmation"
+                            aria-label="Show confirm password" aria-pressed="false">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div id="passwordMismatchError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Passwords do not match</div>
+                </div>
+                @error('password_confirmation')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
+        </div>
+
+        <!-- ── RESIDENCY VERIFICATION ────────────────────────── -->
+        <div class="section-label">Residency Verification</div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="proof-notice">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Submit a clear photo of your valid Government ID or any image proof to verify your residency in Barangay 249.
+                    Accepted formats: JPG, JPEG, PNG.
+                </div>
+                <div class="input-group @error('proofOfIdentity') is-invalid-group @enderror">
+                    <input type="file" name="proofOfIdentity" id="proofOfIdentity"
+                           class="form-control" accept=".jpg,.jpeg,.png">
+                </div>
+                @error('proofOfIdentity')
+                <div class="auth-alert auth-alert-error">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+                </div>
+                @enderror
+            </div>
+        </div>
+
+        <!-- ── TERMS & CONDITIONS ────────────────────────────── -->
+        <div class="terms-container mb-2">
+            <div class="form-check">
+                <input class="terms-checkbox" type="checkbox" name="terms_accepted"
+                       id="terms_accepted" value="1" required>
+                <label class="terms-text" for="terms_accepted">
+                    I agree to the
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms &amp; Conditions</a>
+                    and
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                    of the e-Barangay System.
+                </label>
+            </div>
+            @error('terms_accepted')
+            <div class="auth-alert auth-alert-error mt-2">
+                <i class="fa-solid fa-circle-exclamation"></i><div>{{ $message }}</div>
+            </div>
+            @enderror
+        </div>
+
+        <!-- ── SUBMIT ─────────────────────────────────────────── -->
+        <button type="submit" class="btn-register" id="submitBtn" disabled>
+            CREATE ACCOUNT <i class="fa-solid fa-arrow-right ms-2"></i>
+        </button>
+    </form>
+
+    <div class="login-link">
+        Already have an account? <a href="{{ route('login') }}">Login Here</a>
     </div>
+</div>
 
-    <!-- TERMS & CONDITIONS MODAL -->
-    <div class="modal fade" id="termsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="background: rgba(255,255,255,0.98); border-radius: 15px;">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Terms & Conditions</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body py-0" style="font-size: 0.85rem; line-height: 1.6; max-height: 400px; overflow-y: auto;">
-                    <p><strong>1. Eligibility:</strong> You must be a legitimate resident of the barangay.</p>
-                    <p><strong>2. Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account.</p>
-                    <p><strong>3. Accurate Information:</strong> You agree to provide accurate, current, and complete information.</p>
-                    <p><strong>4. System Use:</strong> The system is for legitimate barangay services only.</p>
-                    <p><strong>5. Data Privacy:</strong> Personal data is protected per RA 10173 (Data Privacy Act).</p>
-                    <p><strong>6. Prohibited Activities:</strong> No spam, harassment, false reports, or illegal activities. </p>
-                    <p><strong>7. Document Requests:</strong> Submitted documents become barangay property for record-keeping and verification purposes.</p>
-                    <p><strong>8. System Changes:</strong> Barangay reserves the right to modify, suspend, or terminate the system without notice.</p>
-                    <p><strong>9. Limitation of Liability:</strong> Barangay not liable for system downtime, data loss, or indirect damages.</p>
-                    <p><strong>10. Governing Law:</strong> Subject to Philippine laws and barangay jurisdiction.</p>
-                    <p>By registering, you acknowledge you've read and agree to these terms.</p>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">I Understand</button>
-                </div>
+
+<!-- ============================================================
+     TERMS & CONDITIONS MODAL
+============================================================ -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background:rgba(255,255,255,0.98); border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="font-family:'Oswald',sans-serif;">
+                    <i class="fa-solid fa-file-contract text-primary me-2"></i>Terms &amp; Conditions
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem; line-height:1.7; color:#333;">
+                <p><strong>1. Eligibility:</strong> You must be a legitimate resident of the barangay.</p>
+                <p><strong>2. Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account.</p>
+                <p><strong>3. Accurate Information:</strong> You agree to provide accurate, current, and complete information.</p>
+                <p><strong>4. System Use:</strong> The system is for legitimate barangay services only.</p>
+                <p><strong>5. Data Privacy:</strong> Personal data is protected per RA 10173 (Data Privacy Act).</p>
+                <p><strong>6. Prohibited Activities:</strong> No spam, harassment, false reports, or illegal activities.</p>
+                <p><strong>7. Document Requests:</strong> Submitted documents become barangay property for record-keeping and verification purposes.</p>
+                <p><strong>8. System Changes:</strong> Barangay reserves the right to modify, suspend, or terminate the system without notice.</p>
+                <p><strong>9. Limitation of Liability:</strong> Barangay not liable for system downtime, data loss, or indirect damages.</p>
+                <p><strong>10. Governing Law:</strong> Subject to Philippine laws and barangay jurisdiction.</p>
+                <p class="mb-0 text-muted" style="font-size:0.78rem;">By registering, you acknowledge you have read and agree to these terms.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal">I Understand</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="privacyModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="background: rgba(255,255,255,0.98); border-radius: 15px;">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Privacy Policy</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="font-size: 0.85rem;">
-                    <p>We collect only necessary data for official barangay functions. Your data is stored securely and never shared with third parties without consent.</p>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Got it</button>
-                </div>
+<!-- ============================================================
+     PRIVACY POLICY MODAL
+============================================================ -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:rgba(255,255,255,0.98); border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="font-family:'Oswald',sans-serif;">
+                    <i class="fa-solid fa-shield-halved text-success me-2"></i>Privacy Policy
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="font-size:0.85rem; line-height:1.7; color:#333;">
+                <p>We collect only necessary data for official barangay functions. Your data is stored securely and never shared with third parties without consent.</p>
+                <p class="mb-0">All information is handled in compliance with the <strong>Data Privacy Act of 2012 (RA 10173)</strong>.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-success px-4 fw-bold" data-bs-dismiss="modal">Got it</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Show/hide confirm password field and validate password match
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordContainer = document.getElementById('confirmPasswordContainer');
-        const confirmPasswordInput = document.getElementById('password_confirmation');
-        const passwordMismatchError = document.getElementById('passwordMismatchError');
 
-        passwordInput.addEventListener('input', function() {
-            // Show confirm password container if password has content
-            if (this.value.length > 0) {
-                confirmPasswordContainer.style.display = 'block';
-            } else {
-                confirmPasswordContainer.style.display = 'none';
-                passwordMismatchError.style.display = 'none';
-                confirmPasswordInput.value = '';
-            }
-            validatePasswordMatch();
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── PASSWORD VISIBILITY TOGGLES ──────────────────────────────
+    document.querySelectorAll('.btn-toggle-pw').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById(btn.getAttribute('data-toggle-target'));
+            const icon  = btn.querySelector('i');
+            if (!input || !icon) return;
+
+            const showing  = input.type === 'text';
+            input.type     = showing ? 'password' : 'text';
+            icon.className = showing ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+            btn.setAttribute('aria-pressed', String(!showing));
+            btn.setAttribute('aria-label',  showing ? 'Show password' : 'Hide password');
         });
+    });
 
-        confirmPasswordInput.addEventListener('input', function() {
-            validatePasswordMatch();
-        });
+    // ── CONFIRM PASSWORD REVEAL & MISMATCH VALIDATION ───────────
+    const passwordInput         = document.getElementById('password');
+    const confirmWrapper        = document.getElementById('confirmPasswordWrapper');
+    const confirmPasswordInput  = document.getElementById('password_confirmation');
+    const passwordMismatchError = document.getElementById('passwordMismatchError');
 
-        function validatePasswordMatch() {
-            if (passwordInput.value !== confirmPasswordInput.value && confirmPasswordInput.value.length > 0) {
-                passwordMismatchError.style.display = 'block';
-            } else {
-                passwordMismatchError.style.display = 'none';
-            }
+    passwordInput.addEventListener('input', function () {
+        if (this.value.length > 0) {
+            confirmWrapper.classList.add('visible');
+        } else {
+            confirmWrapper.classList.remove('visible');
+            confirmPasswordInput.value = '';
+            passwordMismatchError.style.display = 'none';
         }
+        validatePasswordMatch();
+    });
 
-        // Enable/disable submit button based on checkbox
-        document.getElementById('terms_accepted').addEventListener('change', function() {
-            document.getElementById('submitBtn').disabled = !this.checked;
+    confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+
+    function validatePasswordMatch() {
+        const mismatch = confirmPasswordInput.value.length > 0 &&
+                         passwordInput.value !== confirmPasswordInput.value;
+        passwordMismatchError.style.display = mismatch ? 'flex' : 'none';
+    }
+
+    // ── TERMS CHECKBOX ENABLES SUBMIT ────────────────────────────
+    document.getElementById('terms_accepted').addEventListener('change', function () {
+        document.getElementById('submitBtn').disabled = !this.checked;
+    });
+
+    // ── CURSOR GLOW (desktop only) ────────────────────────────────
+    const glow = document.getElementById('cursorGlow');
+    if (window.matchMedia('(pointer: fine)').matches) {
+        document.addEventListener('mousemove', function (e) {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top  = e.clientY + 'px';
         });
-    </script>
+    } else {
+        glow.style.display = 'none';
+    }
+
+    // ── FLOATING PARTICLES (ported from index.blade.php) ─────────
+    (function () {
+        const canvas = document.getElementById('particle-canvas');
+        const ctx    = canvas.getContext('2d');
+        let W, H, particles = [];
+        const COLORS = ['rgba(45,125,253,', 'rgba(255,215,0,', 'rgba(255,255,255,'];
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        function Particle() { this.reset(); }
+        Particle.prototype.reset = function () {
+            this.x       = rand(0, W);
+            this.y       = rand(0, H);
+            this.r       = rand(0.5, 2.5);
+            this.vx      = rand(-0.3, 0.3);
+            this.vy      = rand(-0.5, -0.1);
+            this.color   = COLORS[Math.floor(Math.random() * COLORS.length)];
+            this.alpha   = rand(0.1, 0.5);
+            this.life    = 0;
+            this.maxLife = rand(200, 600);
+        };
+        Particle.prototype.update = function () {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life++;
+            if (this.y < -5 || this.life > this.maxLife) this.reset();
+        };
+        Particle.prototype.draw = function () {
+            const progress = this.life / this.maxLife;
+            const a = this.alpha * (1 - Math.pow(progress - 0.5, 2) * 4);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fillStyle = this.color + Math.max(0, a) + ')';
+            ctx.fill();
+        };
+
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+        function loop() {
+            ctx.clearRect(0, 0, W, H);
+            particles.forEach(function (p) { p.update(); p.draw(); });
+            requestAnimationFrame(loop);
+        }
+        loop();
+    })();
+</script>
 </body>
 </html>

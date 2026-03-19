@@ -26,6 +26,10 @@
             color: var(--text-primary);
         }
 
+        .main-wrapper {
+            min-width: 0;
+        }
+
         .main.users.chart-page {
             background-color: var(--light-bg);
             min-height: 100vh;
@@ -177,6 +181,11 @@
             align-items: center;
             margin-bottom: 1.5rem;
             margin-top: 0.5rem;
+        }
+
+        .filter-controls {
+            flex-wrap: wrap;
+            min-width: 0;
         }
 
         .filter-group {
@@ -799,7 +808,7 @@
                                         </div>
                                     </div>
 
-                                        <div class="d-flex align-items-center gap-3">
+                                        <div class="d-flex align-items-center gap-3 filter-controls">
                                             <div class="filter-group">
                                                 <span class="filter-label d-none d-md-inline">Status:</span>
                                                 <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">

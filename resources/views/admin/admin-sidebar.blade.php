@@ -1,5 +1,8 @@
 <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
-@php $themeColor = \App\Models\Setting::get('theme', '#0061f7'); @endphp
+@php
+    $themeColor = \App\Models\Setting::get('theme', '#0061f7');
+    $sidebarNotifications = app(\App\Services\SidebarNotificationService::class)->forUser(auth()->user());
+@endphp
 
 <style>
 .sidebar{
@@ -377,6 +380,21 @@
         rgba(0, 0, 0, 0.08) 100%
     ) !important;
 }
+
+.sidebar-notification-dot{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 1px solid #ffffff;
+    flex-shrink: 0;
+}
+
+.sidebar.sidebar--light .sidebar-notification-dot{
+    border-color: rgba(255, 255, 255, 0.95);
+}
 </style>
 
 
@@ -482,12 +500,18 @@
                     <a class="{{ Request::routeIs('admin.household') ? 'active' : '' }}"
                        href="{{ route('admin.household') }}">
                         <span class="icon"><i class="fa-solid fa-house-user"></i></span>Household
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_HOUSEHOLD] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New household entries"></span>
+                        @endif
                     </a>
                 </li>
                 <li>
                     <a class="{{ Request::routeIs('admin.users') ? 'active' : '' }}"
                        href="{{ route('admin.users') }}">
                         <span class="icon"><i class="fa-solid fa-users"></i></i></span>Users
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_USERS] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New user entries"></span>
+                        @endif
                     </a>
                 </li>
                 <li>
@@ -504,14 +528,20 @@
                 <li>
                     <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Certificate Requests</p>
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Certificate Requests
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_CERTIFICATE_REQUESTS] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New certificate requests"></span>
+                        @endif
                     </a>
                 </li>
 
                 <li>
                     <a class="{{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
                        href="{{ route('admin.complaintRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records</p>
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_COMPLAINTS_RECORDS] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New complaint records"></span>
+                        @endif
                     </a>
                 </li>
  
@@ -543,6 +573,9 @@
                     <a class="{{ Request::routeIs('admin.activityLogs') ? 'active' : '' }}"
                        href="{{ route('admin.activityLogs') }}">
                         <span class="icon"><i class="fa-solid fa-history"></i></span>Activity Logs
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_ACTIVITY_LOGS] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New activity log entries"></span>
+                        @endif
                     </a>
                 </li>
                 <li>
