@@ -120,6 +120,7 @@ public function generatePopulation(Request $request)
         'report_name' => 'required',
         'age_group' => 'nullable|in:children,youth,adults,senior',
         'gender' => 'nullable|in:male,female',
+        'resident_type' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
         'street_id' => 'nullable|exists:streets,id',
         'house_id' => 'nullable|exists:houses,id',
         'street' => 'nullable|string', // backward compatibility
@@ -606,6 +607,13 @@ private function buildPopulationReportQuery(array $filters)
 
     if (!empty($filters['gender'])) {
         $query->where('sex', $filters['gender']);
+    }
+
+    if (!empty($filters['resident_type']) && \Schema::hasColumn('residents', 'type')) {
+        $query->where(function ($q) use ($filters) {
+            $q->whereJsonContains('type', $filters['resident_type'])
+                ->orWhere('type', $filters['resident_type']);
+        });
     }
 
     if (!empty($filters['street_id'])) {

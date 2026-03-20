@@ -472,6 +472,13 @@
                     'Alternative Learning System Graduate',
                     'Special Education',
                 ];
+
+                $residentTypeOptions = [
+                    'voter' => 'Voter',
+                    'senior_citizen' => 'Senior Citizen',
+                    'pwd' => 'PWD',
+                    'solo_parent' => 'Solo Parent',
+                ];
             @endphp
             <div class="main-container">
                 <div class="page-header">
@@ -777,6 +784,25 @@
                                                             <h6 class="mb-3 text-uppercase fw-bold text-primary" style="letter-spacing:0.5px; border-left:4px solid #0d6efd; padding-left:10px;">
                                                                 Family & Status
                                                             </h6>
+                                                            @php
+                                                                $residentTypeLabels = [
+                                                                    'voter' => 'Voter',
+                                                                    'senior_citizen' => 'Senior Citizen',
+                                                                    'pwd' => 'PWD',
+                                                                    'solo_parent' => 'Solo Parent',
+                                                                ];
+                                                                $rawResidentTypes = is_array($resident->type)
+                                                                    ? $resident->type
+                                                                    : (filled($resident->type) ? [$resident->type] : []);
+                                                                $residentTypes = collect($rawResidentTypes)
+                                                                    ->filter()
+                                                                    ->map(function ($residentType) use ($residentTypeLabels) {
+                                                                        return $residentTypeLabels[$residentType]
+                                                                            ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+                                                                    })
+                                                                    ->unique()
+                                                                    ->values();
+                                                            @endphp
                                                             <div class="row g-3 px-2">
                                                                 <div class="col-md-6">
                                                                     <div class="fw-semibold text-secondary small text-uppercase">Head of Family</div>
@@ -785,6 +811,10 @@
                                                                 <div class="col-md-6">
                                                                     <div class="fw-semibold text-secondary small text-uppercase">Parent Status</div>
                                                                     <div class="fs-6 fw-medium">{{ ucfirst($resident->parent) }}</div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="fw-semibold text-secondary small text-uppercase">Resident Type</div>
+                                                                    <div class="fs-6 fw-medium">{{ $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : 'N/A' }}</div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="fw-semibold text-secondary small text-uppercase">Currently Enrolled</div>
@@ -905,6 +935,29 @@
                                                             </div>
                                                         </div>
 @php
+    $selectedResidentTypes = collect(old('type', is_array($resident->type) ? $resident->type : (filled($resident->type) ? [$resident->type] : [])))
+        ->filter()
+        ->map(function ($value) {
+            return strtolower(trim((string) $value));
+        })
+        ->values();
+@endphp
+<fieldset style="border: 2px solid #4A90E2; padding: 15px; border-radius: 8px; font-family: sans-serif;" class="mt-3 mb-3">
+    <legend style="padding: 0 10px; color: #4A90E2; font-weight: bold; font-size: 1rem;">Resident Type</legend>
+    <input type="hidden" name="type[]" value="">
+    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
+        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="type[]"
+                value="{{ $typeValue }}"
+                {{ $selectedResidentTypes->contains($typeValue) ? 'checked' : '' }}
+            >
+            {{ $typeLabel }}
+        </label>
+    @endforeach
+</fieldset>
+@php
     $household = $resident->households->first();
     $houseId   = $household?->house_id;
     $streetId  = $household?->house?->street_id;
@@ -966,7 +1019,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
-                                                                <input type="text" name="contactNo" class="form-control js-contact-number" value="{{ old('contactNo', $resident->contactNo) }}">
+                                                                <input type="text" required name="contactNo" class="form-control js-contact-number" required value="{{ old('contactNo', $resident->contactNo) }}">
                                                                 <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
                                                             </div>
                                                         </div>
@@ -1365,7 +1418,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="modal-body">
                             <form action="{{ route($user->role . '.encode.residents') }}" method="post" enctype="multipart/form-data">
     @csrf
-    
+
+    @php
+        $selectedCreateTypes = collect(old('type', []))
+            ->filter()
+            ->map(function ($value) {
+                return strtolower(trim((string) $value));
+            })
+            ->values();
+    @endphp
+   <fieldset style="border: 2px solid #4A90E2; padding: 15px; border-radius: 8px; width: fit-content; font-family: sans-serif;">
+    <legend style="padding: 0 10px; color: #4A90E2; font-weight: bold;">User Category</legend>
+
+    <input type="hidden" name="type[]" value="">
+    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
+        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="type[]"
+                value="{{ $typeValue }}"
+                {{ $selectedCreateTypes->contains($typeValue) ? 'checked' : '' }}
+            >
+            {{ $typeLabel }}
+        </label>
+    @endforeach
+</fieldset>
+
     <!-- First Name -->
     <label>First Name</label>
     <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" 
@@ -1438,7 +1516,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
     <label for="contactNo">Contact No.</label>
     <input type="text" id="contactNo" name="contactNo" class="form-control js-contact-number @error('contactNo') is-invalid @enderror" 
-           value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
+           value="{{ old('contactNo') }}" required placeholder="09xxxxxxxxx" >
     <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
     @error('contactNo')
         <div class="invalid-feedback">{{ $message }}</div>
@@ -1463,7 +1541,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <option value="">Select Parent Status</option>
         <option value="yes" {{ old('parent') === 'yes' ? 'selected' : '' }}>Yes</option>
         <option value="no" {{ old('parent') === 'no' ? 'selected' : '' }}>No</option>
-        <option value="single" {{ old('parent') === 'single' ? 'selected' : '' }}>Single Parent</option>
     </select>
     @error('parent')
         <div class="invalid-feedback">{{ $message }}</div>

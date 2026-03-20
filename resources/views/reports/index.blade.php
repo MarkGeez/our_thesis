@@ -1326,6 +1326,16 @@
                             </select>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">Resident Type <span class="text-muted">(Optional)</span></label>
+                            <select name="resident_type" class="form-select">
+                                <option value="">All</option>
+                                <option value="voter" {{ old('resident_type') == 'voter' ? 'selected' : '' }}>Voter</option>
+                                <option value="senior_citizen" {{ old('resident_type') == 'senior_citizen' ? 'selected' : '' }}>Senior Citizen</option>
+                                <option value="pwd" {{ old('resident_type') == 'pwd' ? 'selected' : '' }}>PWD</option>
+                                <option value="solo_parent" {{ old('resident_type') == 'solo_parent' ? 'selected' : '' }}>Solo Parent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Street <span class="text-muted">(Optional)</span></label>
                             <select name="street_id" class="form-select" id="populationStreetFilter">
                                 <option value="">All</option>
@@ -1357,7 +1367,6 @@
                                 <option value="">All</option>
                                 <option value="yes" {{ old('parent') == 'yes' ? 'selected' : '' }}>Yes</option>
                                 <option value="no" {{ old('parent') == 'no' ? 'selected' : '' }}>No</option>
-                                <option value="single" {{ old('parent') == 'single' ? 'selected' : '' }}>Single Parent</option>
                             </select>
                         </div>
                         <div class="col-md-6">

@@ -128,6 +128,7 @@
                                 <th data-col="street">Street</th>
                                 <th data-col="house_no">House No.</th>
                                 <th data-col="parent_status">Parent Status</th>
+                                <th data-col="resident_type">Resident Type</th>
                                 @if(\Schema::hasColumn('residents', 'civil_status'))
                                     <th data-col="civil_status">Civil Status</th>
                                 @endif
@@ -250,6 +251,23 @@
                                         $residentHouse = optional(optional($row->households->first())->house);
                                         $residentStreet = optional($residentHouse->street)->street_name ?? ($row->street ?? null);
                                         $residentHouseNo = $residentHouse->house_no ?? ($row->houseNo ?? null);
+                                        $residentTypeLabels = [
+                                            'voter' => 'Voter',
+                                            'senior_citizen' => 'Senior Citizen',
+                                            'pwd' => 'PWD',
+                                            'solo_parent' => 'Solo Parent',
+                                        ];
+                                        $rawResidentTypes = is_array($row->type)
+                                            ? $row->type
+                                            : (filled($row->type) ? [$row->type] : []);
+                                        $residentTypes = collect($rawResidentTypes)
+                                            ->filter()
+                                            ->map(function ($residentType) use ($residentTypeLabels) {
+                                                return $residentTypeLabels[$residentType]
+                                                    ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+                                            })
+                                            ->unique()
+                                            ->values();
                                     @endphp
                                     <td data-col="full_name">{{ ucwords(strtolower($row->firstName)) }} {{ ucwords(strtolower($row->middleName)) }} {{ ucwords(strtolower($row->lastName)) }}</td>
                                     <td data-col="birthdate">{{ $row->birthday }}</td>
@@ -258,6 +276,7 @@
                                     <td data-col="street">{{ $residentStreet ?? 'N/A' }}</td>
                                     <td data-col="house_no">{{ $residentHouseNo ?? 'N/A' }}</td>
                                     <td data-col="parent_status">{{ ucfirst($row->parent) }}</td>
+                                    <td data-col="resident_type">{{ $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : 'N/A' }}</td>
                                     @if(\Schema::hasColumn('residents', 'civil_status'))
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                     @endif

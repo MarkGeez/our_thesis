@@ -30,6 +30,11 @@ class Resident extends Model
         'EncodedBy',
         'user_id',
         'image_path',
+        'type',
+    ];
+
+    protected $casts = [
+        'type' => 'array',
     ];
 
     protected static function booted()

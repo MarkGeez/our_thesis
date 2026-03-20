@@ -22,6 +22,29 @@ class ResidentListController extends Controller
 {
     use ValidatesContactNumbers;
 
+    private const RESIDENT_TYPE_OPTIONS = [
+        'voter',
+        'senior_citizen',
+        'pwd',
+        'solo_parent',
+    ];
+
+private function normalizeResidentTypes($types): ?array
+{
+    $normalized = collect($types)
+        ->map(function ($value) {
+            return strtolower(trim((string) $value));
+        })
+        ->filter(function (string $value) {
+            return $value !== '' && in_array($value, self::RESIDENT_TYPE_OPTIONS, true);
+        })
+        ->unique()
+        ->values()
+        ->all();
+
+    return empty($normalized) ? null : $normalized;
+}
+
 private function normalizeResidentPayload(array $validated): array
 {
     if (array_key_exists('firstName', $validated)) {
@@ -51,6 +74,10 @@ private function normalizeResidentPayload(array $validated): array
     if (!empty($validated['birthday'])) {
         $validated['birthday'] = Carbon::parse($validated['birthday'])->format('Y-m-d');
         $validated['age'] = Carbon::parse($validated['birthday'])->age;
+    }
+
+    if (array_key_exists('type', $validated)) {
+        $validated['type'] = $this->normalizeResidentTypes($validated['type']);
     }
 
     return $validated;
@@ -188,6 +215,8 @@ public function searchResidents(Request $request)
             'religion' => 'nullable|string|max:255',
             'educationalAttainment' => 'nullable|string',
             'headOfFamily' => 'required|in:yes,no',
+            'type' => 'nullable|array',
+            'type.*' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
             'image_path' => 'nullable|mimes:jpg,jpeg,png|max:4096', // Changed to match form
             'house_id' => 'required|exists:houses,id',
         ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
@@ -200,10 +229,8 @@ public function searchResidents(Request $request)
             $validated['image_path'] = $image;
         }
 
-        // Format names
-        $validated['firstName'] = strtolower(trim($validated['firstName']));
-        $validated['middleName'] = strtolower(trim($validated['middleName']));
-        $validated['lastName'] = strtolower(trim($validated['lastName']));
+        $validated = $this->normalizeResidentPayload($validated);
+
         $validated['contactNo'] = filled($validated['contactNo'] ?? null)
             ? trim((string) $validated['contactNo'])
             : 'N/A';
@@ -255,6 +282,8 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'educationalAttainment' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:255',
             'headOfFamily' => 'required|in:yes,no',
+            'type' => 'nullable|array',
+            'type.*' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
             'new_head_id' => 'nullable|exists:residents,id',
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:4096'
         ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
