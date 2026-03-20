@@ -76,9 +76,26 @@ private function normalizeResidentPayload(array $validated): array
         $validated['age'] = Carbon::parse($validated['birthday'])->age;
     }
 
+    $normalizedTypes = [];
     if (array_key_exists('type', $validated)) {
-        $validated['type'] = $this->normalizeResidentTypes($validated['type']);
+        $normalizedTypes = $this->normalizeResidentTypes($validated['type']) ?? [];
     }
+
+    $isSeniorCitizenWorthy = !empty($validated['birthday'])
+        && isset($validated['age'])
+        && (int) $validated['age'] >= 60;
+
+    $normalizedTypes = array_values(array_filter($normalizedTypes, function (string $residentType): bool {
+        return $residentType !== 'senior_citizen';
+    }));
+
+    if ($isSeniorCitizenWorthy) {
+        $normalizedTypes[] = 'senior_citizen';
+    }
+
+    $validated['type'] = empty($normalizedTypes)
+        ? null
+        : array_values(array_unique($normalizedTypes));
 
     return $validated;
 }

@@ -29,6 +29,7 @@ class Blotter extends Model
     'witnessContactNumber',
     'proof',
     'blotterDescription',
+    'incident_date_time',
     'blotter_type',
     'schedule',
     'encodedBy',
@@ -40,6 +41,7 @@ class Blotter extends Model
 
     protected $casts = [
         'is_finished' => 'boolean',
+        'incident_date_time' => 'datetime',
     ];
 
    public function isFinished(): bool {

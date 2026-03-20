@@ -54,6 +54,33 @@
                     <div class="col-7 text-capitalize">{{ $resident->headOfFamily }}</div>
                 </div>
 
+                @php
+                    $residentTypeLabels = [
+                        'voter' => 'Voter',
+                        'senior_citizen' => 'Senior Citizen',
+                        'pwd' => 'PWD',
+                        'solo_parent' => 'Solo Parent',
+                    ];
+
+                    $rawResidentTypes = is_array($resident->type)
+                        ? $resident->type
+                        : (filled($resident->type) ? [$resident->type] : []);
+
+                    $residentTypes = collect($rawResidentTypes)
+                        ->filter()
+                        ->map(function ($residentType) use ($residentTypeLabels) {
+                            return $residentTypeLabels[$residentType]
+                                ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+                        })
+                        ->unique()
+                        ->values();
+                @endphp
+
+                <div class="row mb-2">
+                    <div class="col-5 text-muted">Resident Type</div>
+                    <div class="col-7">{{ $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : 'N/A' }}</div>
+                </div>
+
                 <div class="row mb-2">
                     <div class="col-5 text-muted">Education</div>
                     <div class="col-7">{{ $resident->educationalAttainment ?? 'N/A' }}</div>
@@ -75,6 +102,8 @@
                     <div class="col-5 text-muted">Emergency No.</div>
                     <div class="col-7">{{ $resident->emergencyContactNo }}</div>
                 </div>
+
+                
 
             @else
                 <div class="alert alert-warning mb-0">

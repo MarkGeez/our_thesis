@@ -898,6 +898,43 @@
                             <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Role</small>
                             <p class="fw-semibold mb-0 text-capitalize" id="profileRole">-</p>
                         </div>
+                        <div class="col-md-6" id="profileResidentTypeRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Resident Type</small>
+                            <p class="fw-semibold mb-0" id="profileResidentType">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileParentRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Parent Status</small>
+                            <p class="fw-semibold mb-0" id="profileParentStatus">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileEnrolledRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Enrolled</small>
+                            <p class="fw-semibold mb-0" id="profileEnrollmentStatus">-</p>
+                        </div>
+                        <div class="col-md-4" id="profileHeadRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Head of Family</small>
+                            <p class="fw-semibold mb-0" id="profileHeadOfFamily">-</p>
+                        </div>
+                        <div class="col-md-6" id="profileEducationRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Educational Attainment</small>
+                            <p class="fw-semibold mb-0" id="profileEducationalAttainment">-</p>
+                        </div>
+                        <div class="col-md-6" id="profileReligionRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Religion</small>
+                            <p class="fw-semibold mb-0" id="profileReligion">-</p>
+                        </div>
+                        <div class="col-md-6" id="profileEmergencyNameRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Emergency Contact Name</small>
+                            <p class="fw-semibold mb-0" id="profileEmergencyContactName">-</p>
+                        </div>
+                        <div class="col-md-6" id="profileEmergencyNoRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Emergency Contact No.</small>
+                            <p class="fw-semibold mb-0" id="profileEmergencyContactNo">-</p>
+                        </div>
+                        <div class="col-12" id="profileAddressRow" style="display:none;">
+                            <small class="text-muted text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Address</small>
+                            <p class="fw-semibold mb-0" id="profileAddress">-</p>
+                        </div>
+                        
                     </div>
                     <hr class="my-4">
                     <div class="row mb-4" id="profileHistorySection" style="display:none;">
@@ -1097,6 +1134,15 @@ document.addEventListener('click', function(e) {
         document.getElementById('profileAgeRow').style.display = 'none';
         document.getElementById('profileSexRow').style.display = 'none';
         document.getElementById('profileRoleRow').style.display = 'none';
+        document.getElementById('profileResidentTypeRow').style.display = 'none';
+        document.getElementById('profileParentRow').style.display = 'none';
+        document.getElementById('profileEnrolledRow').style.display = 'none';
+        document.getElementById('profileHeadRow').style.display = 'none';
+        document.getElementById('profileEducationRow').style.display = 'none';
+        document.getElementById('profileReligionRow').style.display = 'none';
+        document.getElementById('profileEmergencyNameRow').style.display = 'none';
+        document.getElementById('profileEmergencyNoRow').style.display = 'none';
+        document.getElementById('profileAddressRow').style.display = 'none';
         document.getElementById('profileHistorySection').style.display = 'none';
         document.getElementById('profileHistoryLoading').style.display = 'none';
         document.getElementById('profileHistoryContent').style.display = 'none';
@@ -1139,6 +1185,43 @@ document.addEventListener('click', function(e) {
                 if (data.role) {
                     document.getElementById('profileRole').textContent = data.role;
                     document.getElementById('profileRoleRow').style.display = 'block';
+                }
+
+                if (data.residentType) {
+                    document.getElementById('profileResidentType').textContent = data.residentType;
+                    document.getElementById('profileResidentTypeRow').style.display = 'block';
+                }
+                if (data.parentStatus) {
+                    document.getElementById('profileParentStatus').textContent = data.parentStatus;
+                    document.getElementById('profileParentRow').style.display = 'block';
+                }
+                if (data.enrollmentStatus) {
+                    document.getElementById('profileEnrollmentStatus').textContent = data.enrollmentStatus;
+                    document.getElementById('profileEnrolledRow').style.display = 'block';
+                }
+                if (data.headOfFamily) {
+                    document.getElementById('profileHeadOfFamily').textContent = data.headOfFamily;
+                    document.getElementById('profileHeadRow').style.display = 'block';
+                }
+                if (data.educationalAttainment) {
+                    document.getElementById('profileEducationalAttainment').textContent = data.educationalAttainment;
+                    document.getElementById('profileEducationRow').style.display = 'block';
+                }
+                if (data.religion) {
+                    document.getElementById('profileReligion').textContent = data.religion;
+                    document.getElementById('profileReligionRow').style.display = 'block';
+                }
+                if (data.emergencyContactName) {
+                    document.getElementById('profileEmergencyContactName').textContent = data.emergencyContactName;
+                    document.getElementById('profileEmergencyNameRow').style.display = 'block';
+                }
+                if (data.emergencyContactNo) {
+                    document.getElementById('profileEmergencyContactNo').textContent = data.emergencyContactNo;
+                    document.getElementById('profileEmergencyNoRow').style.display = 'block';
+                }
+                if (data.address) {
+                    document.getElementById('profileAddress').textContent = data.address;
+                    document.getElementById('profileAddressRow').style.display = 'block';
                 }
                 
                 document.getElementById('profileLoading').style.display = 'none';

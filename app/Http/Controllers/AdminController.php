@@ -26,6 +26,48 @@ class AdminController extends Controller
 {
     use ValidatesContactNumbers;
 
+    private function formatResidentTypes($types): ?string
+    {
+        $labels = [
+            'voter' => 'Voter',
+            'senior_citizen' => 'Senior Citizen',
+            'pwd' => 'PWD',
+            'solo_parent' => 'Solo Parent',
+        ];
+
+        $rawResidentTypes = is_array($types)
+            ? $types
+            : (filled($types) ? [$types] : []);
+
+        $residentTypes = collect($rawResidentTypes)
+            ->filter()
+            ->map(function ($residentType) use ($labels) {
+                return $labels[$residentType]
+                    ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+            })
+            ->unique()
+            ->values();
+
+        return $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : null;
+    }
+
+    private function formatResidentAddress(?Resident $resident): ?string
+    {
+        if (!$resident) {
+            return null;
+        }
+
+        $house = optional($resident->households->first())->house;
+        $street = optional($house)->street;
+
+        $parts = array_filter([
+            $house?->house_no,
+            $street?->street_name,
+        ], fn ($value) => filled($value));
+
+        return !empty($parts) ? implode(' ', $parts) : null;
+    }
+
     private function getHeadCandidateResidents()
     {
         return Resident::with('households:id,house_id')
@@ -374,6 +416,9 @@ class AdminController extends Controller
     public function getUserInfo(int $id)
     {
         $user = User::findOrFail($id);
+        $resident = Resident::with('households.house.street')
+            ->where('user_id', $user->id)
+            ->first();
         
         return response()->json([
             'fullName' => trim("{$user->firstName} {$user->middleName} {$user->lastName}"),
@@ -382,12 +427,21 @@ class AdminController extends Controller
             'birthday' => $user->birthday ? \Carbon\Carbon::parse($user->birthday)->format('F d, Y') : null,
             'role' => $user->role,
             'profileImage' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+            'residentType' => $resident ? $this->formatResidentTypes($resident->type) : null,
+            'parentStatus' => $resident?->parent ? ucfirst((string) $resident->parent) : null,
+            'enrollmentStatus' => $resident?->enrolled ? ucfirst((string) $resident->enrolled) : null,
+            'headOfFamily' => $resident?->headOfFamily ? ucfirst((string) $resident->headOfFamily) : null,
+            'educationalAttainment' => $resident?->educationalAttainment,
+            'religion' => $resident?->religion,
+            'emergencyContactName' => $resident?->emergencyContactName,
+            'emergencyContactNo' => $resident?->emergencyContactNo,
+            'address' => $this->formatResidentAddress($resident),
         ]);
     }
 
     public function getResidentInfo(int $id)
     {
-        $resident = Resident::findOrFail($id);
+        $resident = Resident::with('households.house.street')->findOrFail($id);
         
         return response()->json([
             'fullName' => trim("{$resident->firstName} {$resident->middleName} {$resident->lastName}"),
@@ -397,6 +451,15 @@ class AdminController extends Controller
             'age' => $resident->age,
             'sex' => $resident->sex,
             'profileImage' => $resident->image_path ? asset('storage/' . $resident->image_path) : null,
+            'residentType' => $this->formatResidentTypes($resident->type),
+            'parentStatus' => $resident->parent ? ucfirst((string) $resident->parent) : null,
+            'enrollmentStatus' => $resident->enrolled ? ucfirst((string) $resident->enrolled) : null,
+            'headOfFamily' => $resident->headOfFamily ? ucfirst((string) $resident->headOfFamily) : null,
+            'educationalAttainment' => $resident->educationalAttainment,
+            'religion' => $resident->religion,
+            'emergencyContactName' => $resident->emergencyContactName,
+            'emergencyContactNo' => $resident->emergencyContactNo,
+            'address' => $this->formatResidentAddress($resident),
         ]);
     }
 

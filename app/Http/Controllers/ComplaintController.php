@@ -12,6 +12,47 @@ use Illuminate\Http\JsonResponse;
 
 class ComplaintController extends Controller
 {
+    private function formatResidentTypes($types): ?string
+    {
+        $labels = [
+            'voter' => 'Voter',
+            'senior_citizen' => 'Senior Citizen',
+            'pwd' => 'PWD',
+            'solo_parent' => 'Solo Parent',
+        ];
+
+        $rawResidentTypes = is_array($types)
+            ? $types
+            : (filled($types) ? [$types] : []);
+
+        $residentTypes = collect($rawResidentTypes)
+            ->filter()
+            ->map(function ($residentType) use ($labels) {
+                return $labels[$residentType]
+                    ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+            })
+            ->unique()
+            ->values();
+
+        return $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : null;
+    }
+
+    private function formatResidentAddress($resident): ?string
+    {
+        if (!$resident) {
+            return null;
+        }
+
+        $house = optional($resident->households->first())->house;
+        $street = optional($house)->street;
+
+        $parts = array_filter([
+            $house?->house_no,
+            $street?->street_name,
+        ], fn ($value) => filled($value));
+
+        return !empty($parts) ? implode(' ', $parts) : null;
+    }
 
     public function submitComplaint(Request $request):RedirectResponse{
         $user= Auth::user();
@@ -192,7 +233,7 @@ class ComplaintController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $user = \App\Models\User::with('resident')->find($userId);
+        $user = \App\Models\User::with('resident.households.house.street')->find($userId);
         if (!$user) {
             return response()->json(['error' => 'Complainant not found'], 404);
         }
@@ -218,6 +259,15 @@ class ComplaintController extends Controller
             'role' => $user->role,
             'age' => $resident?->age,
             'sex' => $resident?->sex,
+            'residentType' => $resident ? $this->formatResidentTypes($resident->type) : null,
+            'parentStatus' => $resident?->parent ? ucfirst((string) $resident->parent) : null,
+            'enrollmentStatus' => $resident?->enrolled ? ucfirst((string) $resident->enrolled) : null,
+            'headOfFamily' => $resident?->headOfFamily ? ucfirst((string) $resident->headOfFamily) : null,
+            'educationalAttainment' => $resident?->educationalAttainment,
+            'religion' => $resident?->religion,
+            'emergencyContactName' => $resident?->emergencyContactName,
+            'emergencyContactNo' => $resident?->emergencyContactNo,
+            'address' => $this->formatResidentAddress($resident),
             'profileImage' => $profileImage,
             'history' => [
                 'total' => $history->count(),

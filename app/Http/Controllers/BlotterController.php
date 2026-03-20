@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Models\Blotter;
 use App\Models\UpdateBlotter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
@@ -418,6 +419,7 @@ class BlotterController extends Controller
             'defendantContactNumber' => $this->nullableContactNumberRules(),
             'witnessContactNumber' => $this->nullableContactNumberRules(),
             'blotterDescription' => 'required|string',
+            'incident_date_time' => 'nullable|date',
             'blotter_type' => ['nullable', Rule::in(self::BLOTTER_TYPES)],
             'proof' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
         ], $this->contactNumberMessages([
@@ -434,6 +436,9 @@ class BlotterController extends Controller
 
         $blotterType = $request->input('blotter_type', 'regular');
         $initialStatus = self::INITIAL_STATUS;
+        $incidentDateTime = $request->filled('incident_date_time')
+            ? Carbon::parse($request->incident_date_time)->format('Y-m-d H:i:s')
+            : null;
 
         $blotter = Blotter::create([
             'plaintiffName' => $request->plaintiffName,
@@ -452,6 +457,7 @@ class BlotterController extends Controller
             'witnessContactNumber' => $request->witnessContactNumber,
             'proof' => $proofPath,
             'blotterDescription' => $request->blotterDescription,
+            'incident_date_time' => $incidentDateTime,
             'blotter_type' => $blotterType,
             'schedule' => $request->schedule,
             'encodedBy' => Auth::id(),

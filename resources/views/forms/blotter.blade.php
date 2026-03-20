@@ -182,6 +182,15 @@
                         <input type="hidden" name="blotter_type" value="{{ old('blotter_type', $defaultBlotterType) }}">
                     @endif
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Incident Date & Time <span class="text-muted">(Optional)</span></label>
+                      <input type="text"
+                           name="incident_date_time"
+                          class="form-control datetime-picker"
+                          value="{{ old('incident_date_time') }}"
+                          placeholder="Click to enter incident date and time...">
+                    <small class="form-text text-muted">Leave blank if the exact incident date and time is unknown.</small>
+                </div>
                 <label class="form-label">Attach Blotter Image</label>
                 <input type="file" name="proof" accept="image/jpg, image/jpeg, image/png" class="form-control">
                 <small class="form-text text-muted">JPG, JPEG, or PNG (max 5MB)</small>
@@ -203,26 +212,4 @@
     </div>
 </form>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const scheduleInput = document.getElementById('blotter_schedule');
-        const scheduleTrigger = document.querySelector('.blotter-form .schedule-trigger');
-        const rawSchedule = "{{ old('schedule') }}";
 
-        if (scheduleInput && rawSchedule) {
-            scheduleInput.value = rawSchedule;
-        }
-
-        // Only open picker when clicking the calendar icon, not the input itself
-        if (scheduleTrigger && scheduleInput) {
-            scheduleTrigger.addEventListener('click', function (event) {
-                event.preventDefault();
-                if (typeof scheduleInput.showPicker === 'function') {
-                    scheduleInput.showPicker();
-                } else {
-                    scheduleInput.focus();
-                }
-            });
-        }
-    });
-</script>

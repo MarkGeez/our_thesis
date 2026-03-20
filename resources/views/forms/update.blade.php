@@ -250,8 +250,12 @@
                                                 $updaterName = $hist->updater->email ?? null;
                                             }
                                         }
+                                        $historyDate = $hist->date
+                                            ? \Illuminate\Support\Carbon::parse($hist->date)->format('M d, Y')
+                                            : ($hist->created_at ? $hist->created_at->format('M d, Y h:i A') : 'N/A');
                                     @endphp
                                     <div class="timeline-meta">
+                                        <span><i class="fa fa-calendar me-1 text-primary"></i>{{ $historyDate }}</span>
                                         <span><i class="fa fa-user-shield me-1 text-primary"></i>{{ ucwords($updaterName ?? 'Unknown') }}</span>
                                     </div>
                                     @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
@@ -312,7 +316,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
+                        {{--  <label for="date_{{ $blotter->id }}" class="form-label">Update Date <span class="text-danger">*</span></label>
                         <div class="input-group date-group">
                             <input type="date" name="date" id="date_{{ $blotter->id }}" value="{{ old('date', now()->toDateString()) }}" class="form-control" required>
                             <span class="input-group-text" id="date_trigger_{{ $blotter->id }}" style="cursor: pointer;"><i class="fa fa-calendar"></i></span>
@@ -320,7 +324,7 @@
                         @error('date')
                             <div class="error-text mt-1">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div>--}}
 
                     <div class="col-md-12">
                         <label for="remarks_{{ $blotter->id }}" class="form-label">Remarks / Notes <span class="text-danger">*</span></label>

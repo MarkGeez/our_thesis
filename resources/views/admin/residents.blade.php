@@ -942,21 +942,8 @@
         })
         ->values();
 @endphp
-<fieldset style="border: 2px solid #4A90E2; padding: 15px; border-radius: 8px; font-family: sans-serif;" class="mt-3 mb-3">
-    <legend style="padding: 0 10px; color: #4A90E2; font-weight: bold; font-size: 1rem;">Resident Type</legend>
-    <input type="hidden" name="type[]" value="">
-    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
-        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
-            <input
-                type="checkbox"
-                name="type[]"
-                value="{{ $typeValue }}"
-                {{ $selectedResidentTypes->contains($typeValue) ? 'checked' : '' }}
-            >
-            {{ $typeLabel }}
-        </label>
-    @endforeach
-</fieldset>
+
+
 @php
     $household = $resident->households->first();
     $houseId   = $household?->house_id;
@@ -1378,6 +1365,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
                                                         <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
+                                                        
+                                                         <fieldset style="border: 2px solid #bbbbbb; padding: 15px; border-radius: 8px; width: 100%; font-family: sans-serif;" class="mt-3 mb-3">
+
+    <label for="headOfFamily">Check all that applies for the resident.</label>
+    <input type="hidden" name="type[]" value="">
+    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
+        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="type[]"
+                value="{{ $typeValue }}"
+                class="resident-type-checkbox{{ $typeValue === 'senior_citizen' ? ' resident-type-senior' : '' }}"
+                {{ $selectedResidentTypes->contains($typeValue) ? 'checked' : '' }}
+            >
+            {{ $typeLabel }}
+        </label>
+    @endforeach
+</fieldset>
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1427,22 +1432,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             ->values();
     @endphp
-   <fieldset style="border: 2px solid #4A90E2; padding: 15px; border-radius: 8px; width: fit-content; font-family: sans-serif;">
-    <legend style="padding: 0 10px; color: #4A90E2; font-weight: bold;">User Category</legend>
-
-    <input type="hidden" name="type[]" value="">
-    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
-        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
-            <input
-                type="checkbox"
-                name="type[]"
-                value="{{ $typeValue }}"
-                {{ $selectedCreateTypes->contains($typeValue) ? 'checked' : '' }}
-            >
-            {{ $typeLabel }}
-        </label>
-    @endforeach
-</fieldset>
+   
 
     <!-- First Name -->
     <label>First Name</label>
@@ -1630,6 +1620,23 @@ document.addEventListener('DOMContentLoaded', function () {
     @error('headOfFamily')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
+    <fieldset style="border: 2px solid #bbbbbb; padding: 15px; border-radius: 8px; width: 100%; font-family: sans-serif;" class="mt-3">
+    {{--  <legend style="padding: 0 10px; color: #4A90E2; font-weight: bold;">User Category</legend>--}}
+     <label for="headOfFamily">Check all that applies for the resident.</label>
+    <input type="hidden" name="type[]" value="">
+    @foreach ($residentTypeOptions as $typeValue => $typeLabel)
+        <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="type[]"
+                value="{{ $typeValue }}"
+                class="resident-type-checkbox{{ $typeValue === 'senior_citizen' ? ' resident-type-senior' : '' }}"
+                {{ $selectedCreateTypes->contains($typeValue) ? 'checked' : '' }}
+            >
+            {{ $typeLabel }}
+        </label>
+    @endforeach
+</fieldset>
 
     <!-- REMOVED DUPLICATE CONTACT NO FIELD THAT WAS HERE -->
 
@@ -1711,6 +1718,49 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById(targetInputId).value = age;
         }
 
+        function calculateAgeValue(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function isSeniorCitizenEligible(rawBirthday) {
+            if (!rawBirthday) {
+                return false;
+            }
+
+            const parsedBirthday = new Date(rawBirthday);
+            if (isNaN(parsedBirthday)) {
+                return false;
+            }
+
+            return calculateAgeValue(parsedBirthday) >= 60;
+        }
+
+        function syncSeniorCitizenTypeForForm(form) {
+            if (!form) return;
+
+            const birthdayInput = form.querySelector('.resident-date-input');
+            const seniorCitizenCheckbox = form.querySelector('.resident-type-senior');
+
+            if (!birthdayInput || !seniorCitizenCheckbox) {
+                return;
+            }
+
+            const eligible = isSeniorCitizenEligible(birthdayInput.value);
+            seniorCitizenCheckbox.checked = eligible;
+            seniorCitizenCheckbox.disabled = true;
+            seniorCitizenCheckbox.title = eligible
+                ? 'Automatically selected for residents aged 60 and above.'
+                : 'This is automatically selected only for residents aged 60 and above.';
+        }
+
         function normalizeToYmd(raw) {
             if (!raw) return '';
             const d = new Date(raw);
@@ -1731,6 +1781,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const formatted = normalizeToYmd(raw);
             if (formatted) input.value = formatted;
             input.max = normalizeToYmd(new Date()) || input.max;
+
+            syncSeniorCitizenTypeForForm(input.closest('form'));
         });
 
         document.querySelectorAll('.resident-date-open').forEach(function (trigger) {
@@ -1743,12 +1795,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.querySelectorAll('.resident-date-input').forEach(function (input) {
             input.addEventListener('change', function () {
-                if (!input.value) return;
                 const targetId = input.getAttribute('data-age-target');
-                if (!targetId) return;
-                const parsed = new Date(input.value);
-                if (isNaN(parsed)) return;
-                calculateAge(parsed, targetId);
+                if (targetId) {
+                    const parsed = new Date(input.value);
+                    if (!isNaN(parsed)) {
+                        calculateAge(parsed, targetId);
+                    }
+                }
+
+                syncSeniorCitizenTypeForForm(input.closest('form'));
             });
         });
 

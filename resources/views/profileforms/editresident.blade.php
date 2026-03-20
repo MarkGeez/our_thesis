@@ -67,6 +67,25 @@
             $currentHouseId = optional($currentHouse)->id;
             $currentHouseholdId = optional($resident->households->first())->id;
             $isCurrentHead = ($resident->headOfFamily ?? null) === 'yes';
+            $residentTypeLabels = [
+                'voter' => 'Voter',
+                'senior_citizen' => 'Senior Citizen',
+                'pwd' => 'PWD',
+                'solo_parent' => 'Solo Parent',
+            ];
+
+            $rawResidentTypes = is_array($resident->type)
+                ? $resident->type
+                : (filled($resident->type) ? [$resident->type] : []);
+
+            $residentTypes = collect($rawResidentTypes)
+                ->filter()
+                ->map(function ($residentType) use ($residentTypeLabels) {
+                    return $residentTypeLabels[$residentType]
+                        ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
+                })
+                ->unique()
+                ->values();
 
             $religionOptions = [
                 'Unknown',
@@ -188,6 +207,13 @@
             </div>
         </div>
 
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="fw-semibold text-secondary small text-uppercase">Resident Type</div>
+                <div class="fs-6 fw-medium">{{ $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : 'N/A' }}</div>
+            </div>
+        </div>
+
         <h6 class="text-muted mb-3">Other Details</h6>
 
         <div class="row mb-3">
@@ -283,6 +309,7 @@
                         <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
                     @endforeach
                 </select>
+                
             </div>
         </div>
     </div>
