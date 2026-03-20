@@ -3,6 +3,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('template/css/style.min.css') }}"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
         .status-container {
@@ -253,6 +254,29 @@
             align-items: flex-start;
             gap: 8px;
         }
+
+        .complaint-meta {
+            width: 100%;
+            font-size: 13px;
+            color: #4b5563;
+            background-color: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .complaint-attachment {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .complaint-attachment img {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
     </style>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -279,7 +303,7 @@
                 <div class="modal fade complaint-modal" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form action="{{ route('admin.submit.complaint') }}" method="POST" id="complaintForm">
+                            <form action="{{ route('admin.submit.complaint') }}" method="POST" id="complaintForm" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="complaintModalLabel">
@@ -329,6 +353,42 @@
                                             <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
                                         @enderror
                                     </div>
+
+                                    <div class="form-group-wrapper">
+                                        <label for="complaint_datetime" class="form-label">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            Complaint Date & Time (Optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="complaint_datetime"
+                                            id="complaint_datetime"
+                                            value="{{ old('complaint_datetime') }}"
+                                            class="form-control datetime-picker"
+                                            placeholder="Click to enter complaint date and time..."
+                                        >
+                                        @error('complaint_datetime')
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group-wrapper">
+                                        <label for="attachment_image" class="form-label">
+                                            <i class="fas fa-image"></i>
+                                            Image Attachment (Optional)
+                                        </label>
+                                        <input
+                                            type="file"
+                                            name="attachment_image"
+                                            id="attachment_image"
+                                            class="form-control"
+                                            accept="image/*"
+                                        >
+                                        <small class="text-muted">Accepted formats: JPG, JPEG, PNG, WEBP (max 5MB)</small>
+                                        @error('attachment_image')
+                                            <div class="text-danger small mt-2" style="font-size: 12px;"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <div class="modal-footer">
@@ -357,9 +417,26 @@
                                     </div>
                                     
                                     <div class="complaint-details">
-                                        <span class="remarks-label">Complaint Details</span>hr
+                                        <span class="remarks-label">Complaint Details</span>
                                         {{ $complaints->details }}
                                     </div>
+
+                                    @if($complaints->complaint_datetime)
+                                        <div class="complaint-meta">
+                                            <span class="remarks-label mb-1">Complaint Date & Time</span>
+                                            <i class="fa-solid fa-clock me-1"></i>
+                                            {{ $complaints->complaint_datetime->format('M d, Y g:i A') }}
+                                        </div>
+                                    @endif
+
+                                    @if($complaints->attachment_path)
+                                        @php $attachmentUrl = asset('storage/' . ltrim($complaints->attachment_path, '/')); @endphp
+                                        <div class="complaint-attachment">
+                                            <span class="remarks-label">Image Attachment</span>
+                                            <a href="{{ $attachmentUrl }}" target="_blank" rel="noopener noreferrer" class="d-inline-block mb-2 small">View full image</a>
+                                            <img src="{{ $attachmentUrl }}" alt="Complaint attachment">
+                                        </div>
+                                    @endif
                                     
                                     <div class="complaint-footer">
                                         <div class="d-flex align-items-center gap-2">
@@ -408,6 +485,7 @@
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 @if ($errors->any())
     <script>
@@ -422,6 +500,14 @@
 @endif
 
 <script>
+    flatpickr('.datetime-picker', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        altInput: true,
+        altFormat: 'F j, Y h:i K',
+        time_24hr: false
+    });
+
     // Character counter for details textarea
     const detailsTextarea = document.getElementById('details');
     const charCount = document.getElementById('charCount');

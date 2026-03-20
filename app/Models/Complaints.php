@@ -14,8 +14,14 @@ class Complaints extends Model
         'complainantName',
         'address',
         'details',
+        'attachment_path',
+        'complaint_datetime',
         'remarks',
         'status',
+    ];
+
+    protected $casts = [
+        'complaint_datetime' => 'datetime',
     ];
 
     protected static function booted()

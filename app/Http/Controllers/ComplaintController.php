@@ -19,8 +19,15 @@ class ComplaintController extends Controller
 
         $request->validate([
             "address"=> "required|string|max:100",
-            "details"=> "required|string|max:10000"
+            "details"=> "required|string|max:10000",
+            "complaint_datetime" => "nullable|date",
+            "attachment_image" => "nullable|image|mimes:jpg,jpeg,png,webp|max:5120",
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment_image')) {
+            $attachmentPath = $request->file('attachment_image')->store('complaints/attachments', 'public');
+        }
 
         Complaints::create([
 
@@ -29,6 +36,10 @@ class ComplaintController extends Controller
             "complainantName"=>  trim($user->firstName . " " . ($user->middleName ?? '') . " " . $user->lastName),
             "address"=> $request->address,
             "details"=> $request->details,
+            "attachment_path" => $attachmentPath,
+            "complaint_datetime" => $request->filled('complaint_datetime')
+                ? \Carbon\Carbon::parse($request->input('complaint_datetime'))
+                : null,
             "respondent_id"=> null,
             "status" => "pending"
 

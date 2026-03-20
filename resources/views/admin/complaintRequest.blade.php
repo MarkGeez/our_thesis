@@ -507,6 +507,27 @@
                                                 <div class="section-divider">Location</div>
                                                 <p class="px-2 text-muted mb-4"><i class="fa-solid fa-location-dot me-1"></i> {{ $complaint->address }}</p>
 
+                                                <div class="section-divider">Complaint Date & Time</div>
+                                                <p class="px-2 text-muted mb-4">
+                                                    <i class="fa-solid fa-clock me-1"></i>
+                                                    {{ $complaint->complaint_datetime ? $complaint->complaint_datetime->format('M d, Y g:i A') : 'Not provided by complainant.' }}
+                                                </p>
+
+                                                <div class="section-divider">Image Attachment</div>
+                                                @if($complaint->attachment_path)
+                                                    @php $attachmentUrl = asset('storage/' . ltrim($complaint->attachment_path, '/')); @endphp
+                                                    <div class="mb-4">
+                                                        <a href="{{ $attachmentUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary mb-2">
+                                                            <i class="fa-solid fa-up-right-from-square me-1"></i> Open Full Image
+                                                        </a>
+                                                        <div>
+                                                            <img src="{{ $attachmentUrl }}" alt="Complaint attachment" class="img-fluid rounded border" style="max-height: 320px;">
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <p class="px-2 text-muted mb-4">No image attachment provided.</p>
+                                                @endif
+
                                                 <div class="section-divider">Admin Remarks</div>
                                                 @php
                                                     $remarksText = $complaint->remarks ?? '';
