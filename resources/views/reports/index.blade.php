@@ -493,7 +493,7 @@
             <div class="card h-100 text-center action-card" data-bs-toggle="modal" data-bs-target="#modalOfficialsReport">
                 <div class="card-body py-4">
                     <i class="fas fa-users-gear fa-3x mb-3" style="color:#1d4ed8;"></i>
-                    <h5 class="fw-bold mb-1">Officials List Reports</h5>
+                    <h5 class="fw-bold mb-1">Officials List Report</h5>
                     <p class="text-muted small mb-0">Barangay officials by position and term timeline</p>
                 </div>
             </div>
@@ -639,7 +639,7 @@
             <input type="hidden" name="report_form_type" value="officials">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-users-gear me-2" style="color:#1d4ed8;"></i>Generate Officials List Reports</h5>
+                    <h5 class="modal-title"><i class="fas fa-users-gear me-2" style="color:#1d4ed8;"></i>Generate Barangay Officials Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1302,6 +1302,15 @@
                             Fields marked as <strong>(Optional)</strong> can be left blank.
                         </span>
                     </div>
+                    @php
+                        $selectedResidentTypes = collect(old('resident_types', old('resident_type', [])))
+                            ->flatten()
+                            ->map(fn ($value) => strtolower(trim((string) $value)))
+                            ->filter()
+                            ->unique()
+                            ->values()
+                            ->all();
+                    @endphp
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
@@ -1327,13 +1336,29 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Resident Type <span class="text-muted">(Optional)</span></label>
-                            <select name="resident_type" class="form-select">
-                                <option value="">All</option>
-                                <option value="voter" {{ old('resident_type') == 'voter' ? 'selected' : '' }}>Voter</option>
-                                <option value="senior_citizen" {{ old('resident_type') == 'senior_citizen' ? 'selected' : '' }}>Senior Citizen</option>
-                                <option value="pwd" {{ old('resident_type') == 'pwd' ? 'selected' : '' }}>PWD</option>
-                                <option value="solo_parent" {{ old('resident_type') == 'solo_parent' ? 'selected' : '' }}>Solo Parent</option>
-                            </select>
+                            <div class="border rounded p-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" style="background-color: #dbdbdb;" name="resident_types[]" value="voter" id="residentTypeVoter" {{ in_array('voter', $selectedResidentTypes, true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="residentTypeVoter">Voter</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" style="background-color: #dbdbdb;" name="resident_types[]" value="senior_citizen" id="residentTypeSenior" {{ in_array('senior_citizen', $selectedResidentTypes, true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="residentTypeSenior">Senior Citizen</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" style="background-color: #dbdbdb;" name="resident_types[]" value="pwd" id="residentTypePwd" {{ in_array('pwd', $selectedResidentTypes, true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="residentTypePwd">PWD</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" style="background-color: #dbdbdb;" name="resident_types[]" value="solo_parent" id="residentTypeSoloParent" {{ in_array('solo_parent', $selectedResidentTypes, true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="residentTypeSoloParent">Solo Parent</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" style="background-color: #dbdbdb;" name="resident_types[]" value="others" id="residentTypeOthers" {{ in_array('others', $selectedResidentTypes, true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="residentTypeOthers">Others (No Resident Type)</label>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-1">Leave all unchecked to include all resident types.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Street <span class="text-muted">(Optional)</span></label>
@@ -1367,6 +1392,7 @@
                                 <option value="">All</option>
                                 <option value="yes" {{ old('parent') == 'yes' ? 'selected' : '' }}>Yes</option>
                                 <option value="no" {{ old('parent') == 'no' ? 'selected' : '' }}>No</option>
+                                <option value="single" {{ old('parent') == 'single' ? 'selected' : '' }}>Single Parent</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -1453,18 +1479,17 @@
                             <label class="form-label fw-semibold">Status <span class="text-muted">(Optional)</span></label>
                             <select name="blotter_status" class="form-select">
                                 <option value="all" {{ old('blotter_status', 'all') === 'all' ? 'selected' : '' }}>All</option>
-                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (Filed to For Summons)</option>
-                                <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Protection Order)</option>
+                                <option value="pending" {{ old('blotter_status') === 'pending' ? 'selected' : '' }}>Pending (Barangay Blotter-Third Summon)</option>
+                                <option value="ongoing" {{ old('blotter_status') === 'ongoing' ? 'selected' : '' }}>Ongoing (Barangay Hearing)</option>
                                 <option value="closed" {{ old('blotter_status') === 'closed' ? 'selected' : '' }}>Closed</option>
-                                <option value="filed" {{ old('blotter_status') === 'filed' ? 'selected' : '' }}>Filed</option>
-                                <option value="first_hearing" {{ old('blotter_status') === 'first_hearing' ? 'selected' : '' }}>First Hearing</option>
-                                <option value="second_hearing" {{ old('blotter_status') === 'second_hearing' ? 'selected' : '' }}>Second Hearing</option>
-                                <option value="third_hearing" {{ old('blotter_status') === 'third_hearing' ? 'selected' : '' }}>Third Hearing</option>
-                                <option value="for_summons" {{ old('blotter_status') === 'for_summons' ? 'selected' : '' }}>For Summons</option>
-                                <option value="criminal_civil_case" {{ old('blotter_status') === 'criminal_civil_case' ? 'selected' : '' }}>Criminal Case/Civil Case</option>
-                                <option value="referred_to_pnp" {{ old('blotter_status') === 'referred_to_pnp' ? 'selected' : '' }}>Referred to PNP</option>
-                                <option value="certificate_to_file_action" {{ old('blotter_status') === 'certificate_to_file_action' ? 'selected' : '' }}>Certificate to File Action</option>
-                                <option value="barangay_protection_order" {{ old('blotter_status') === 'barangay_protection_order' ? 'selected' : '' }}>Barangay Protection Order</option>
+                                <option value="barangayBlotter" {{ old('blotter_status') === 'barangayBlotter' ? 'selected' : '' }}>Barangay Blotter</option>
+                                <option value="first" {{ old('blotter_status') === 'first' ? 'selected' : '' }}>First Summon</option>
+                                <option value="second" {{ old('blotter_status') === 'second' ? 'selected' : '' }}>Second Summon</option>
+                                <option value="third" {{ old('blotter_status') === 'third' ? 'selected' : '' }}>Third Summon</option>
+                                <option value="brgyHearing" {{ old('blotter_status') === 'brgyHearing' ? 'selected' : '' }}>Barangay Hearing</option>
+                                <option value="coldCase" {{ old('blotter_status') === 'coldCase' ? 'selected' : '' }}>Cold Case</option>
+                                <option value="criminalCase" {{ old('blotter_status') === 'criminalCase' ? 'selected' : '' }}>Criminal Case</option>
+                                <option value="referredToPnp" {{ old('blotter_status') === 'referredToPnp' ? 'selected' : '' }}>Referred to PNP</option>
                                 <option value="resolved" {{ old('blotter_status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
                             </select>
                         </div>
@@ -1474,7 +1499,6 @@
                                 <option value="all" {{ old('blotter_type', 'all') === 'all' ? 'selected' : '' }}>All</option>
                                 <option value="regular" {{ old('blotter_type') === 'regular' ? 'selected' : '' }}>Regular</option>
                                 <option value="vawc" {{ old('blotter_type') === 'vawc' ? 'selected' : '' }}>VAWC</option>
-                                <option value="katarungang_pambarangay" {{ old('blotter_type') === 'katarungang_pambarangay' ? 'selected' : '' }}>Katarungang Pambarangay</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -1999,7 +2023,7 @@
         autoFillReportTitle('modalCertificateReport', 'Certificate');
         autoFillReportTitle('modalComplaintReport', 'Complaint');
         autoFillReportTitle('modalActivityReport', 'Activity Logs');
-        autoFillReportTitle('modalOfficialsReport', 'Officials List Reports');
+        autoFillReportTitle('modalOfficialsReport', 'Barangay Officials');
         autoFillReportTitle('modalArchivesReport', 'Archives');
         autoFillReportTitle('modalAnnouncementsReport', 'Announcements');
         autoFillReportTitle('modalFeedbackReport', 'Feedback');

@@ -25,6 +25,21 @@ use Illuminate\Validation\Rule;
 
 class ReportsController extends Controller
 {
+private const REPORT_RESIDENT_TYPE_OPTIONS = [
+    'voter',
+    'senior_citizen',
+    'pwd',
+    'solo_parent',
+];
+
+private const REPORT_RESIDENT_TYPE_OPTIONS_WITH_OTHERS = [
+    'voter',
+    'senior_citizen',
+    'pwd',
+    'solo_parent',
+    'others',
+];
+
 private function applyInclusiveDateRange($query, string $column, ?string $from, ?string $to)
 {
     if (!empty($from) && !empty($to)) {
@@ -39,6 +54,20 @@ private function applyInclusiveDateRange($query, string $column, ?string $from, 
     }
 
     return $query;
+}
+
+private function normalizeResidentTypesFilter($types): array
+{
+    return collect(is_array($types) ? $types : [$types])
+        ->map(function ($value) {
+            return strtolower(trim((string) $value));
+        })
+        ->filter(function (string $value): bool {
+            return $value !== '' && in_array($value, self::REPORT_RESIDENT_TYPE_OPTIONS_WITH_OTHERS, true);
+        })
+        ->unique()
+        ->values()
+        ->all();
 }
 
 public function index()
@@ -120,7 +149,9 @@ public function generatePopulation(Request $request)
         'report_name' => 'required',
         'age_group' => 'nullable|in:children,youth,adults,senior',
         'gender' => 'nullable|in:male,female',
-        'resident_type' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
+        'resident_types' => 'nullable|array',
+        'resident_types.*' => 'nullable|in:voter,senior_citizen,pwd,solo_parent,others',
+        'resident_type' => 'nullable|in:voter,senior_citizen,pwd,solo_parent,others',
         'street_id' => 'nullable|exists:streets,id',
         'house_id' => 'nullable|exists:houses,id',
         'street' => 'nullable|string', // backward compatibility
@@ -131,6 +162,18 @@ public function generatePopulation(Request $request)
         'birthday_to' => 'nullable|date_format:Y-m-d',
     ]);
     $filters = $request->except(['_token', 'report_form_type']);
+    $normalizedResidentTypes = $this->normalizeResidentTypesFilter(
+        $request->input('resident_types', $request->input('resident_type'))
+    );
+
+    if (!empty($normalizedResidentTypes)) {
+        $filters['resident_types'] = $normalizedResidentTypes;
+    } else {
+        unset($filters['resident_types']);
+    }
+
+    unset($filters['resident_type']);
+
     $query = $this->buildPopulationReportQuery($filters);
     $residents = $query->get();
 
@@ -582,6 +625,9 @@ private function buildPopulationReportQuery(array $filters)
     $query = Resident::query()->with([
         'households.house.street:id,street_name',
     ]);
+    $residentTypes = $this->normalizeResidentTypesFilter(
+        $filters['resident_types'] ?? ($filters['resident_type'] ?? [])
+    );
 
     // backward compatibility for old reports that used 'filter' => 'senior'
     if (empty($filters['age_group']) && (($filters['filter'] ?? null) === 'senior')) {
@@ -609,10 +655,33 @@ private function buildPopulationReportQuery(array $filters)
         $query->where('sex', $filters['gender']);
     }
 
-    if (!empty($filters['resident_type']) && \Schema::hasColumn('residents', 'type')) {
-        $query->where(function ($q) use ($filters) {
-            $q->whereJsonContains('type', $filters['resident_type'])
-                ->orWhere('type', $filters['resident_type']);
+    if (!empty($residentTypes)) {
+        $selectedResidentTypes = array_values(array_filter($residentTypes, function (string $residentType): bool {
+            return in_array($residentType, self::REPORT_RESIDENT_TYPE_OPTIONS, true);
+        }));
+        $includeOthers = in_array('others', $residentTypes, true);
+
+        $query->where(function ($residentTypeQuery) use ($selectedResidentTypes, $includeOthers) {
+            if (!empty($selectedResidentTypes)) {
+                $residentTypeQuery->where(function ($typedResidentsQuery) use ($selectedResidentTypes) {
+                    foreach ($selectedResidentTypes as $residentType) {
+                        $typedResidentsQuery->orWhereJsonContains('type', $residentType);
+                    }
+                });
+            }
+
+            if ($includeOthers) {
+                $otherResidentsConstraint = function ($otherResidentsQuery) {
+                    $otherResidentsQuery->whereNull('type')
+                        ->orWhereJsonLength('type', 0);
+                };
+
+                if (!empty($selectedResidentTypes)) {
+                    $residentTypeQuery->orWhere($otherResidentsConstraint);
+                } else {
+                    $residentTypeQuery->where($otherResidentsConstraint);
+                }
+            }
         });
     }
 
