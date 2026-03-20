@@ -122,7 +122,28 @@ class AdminController extends Controller
     }
     
     $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
-    $residents = Resident::select('id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo')->get();
+    // Include address fields for family-member suggestions (street + house number).
+    $residents = Resident::with('households.house.street')
+        ->get(['id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo', 'age'])
+        ->map(function (Resident $r) {
+            $household = $r->households->first();
+            $house = $household?->house;
+            $street = $house?->street;
+
+            return [
+                'id' => $r->id,
+                'firstName' => $r->firstName,
+                'middleName' => $r->middleName,
+                'lastName' => $r->lastName,
+                'birthday' => $r->birthday,
+                'age' => $r->age,
+                'sex' => $r->sex,
+                'contactNo' => $r->contactNo,
+                'streetId' => $street?->id,
+                'streetName' => $street?->street_name,
+                'houseNo' => $house?->house_no,
+            ];
+        });
     $headCandidateResidents = $this->getHeadCandidateResidents();
     return view('admin.profile', compact('user', 'resident', 'members', 'residents', 'headCandidateResidents'));
 }

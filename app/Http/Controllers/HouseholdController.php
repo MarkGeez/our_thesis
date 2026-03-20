@@ -358,7 +358,28 @@ class HouseholdController extends Controller
     public function search(Request $request)
     {
         $keyword = $request->keyword;
-        $residents = Resident::select('id', 'firstName', 'lastName', 'middleName')->get();
+        // Include address fields for family-member suggestions (street + house number).
+        $residents = Resident::with('households.house.street')
+            ->get(['id', 'firstName', 'middleName', 'lastName', 'birthday', 'age', 'sex', 'contactNo'])
+            ->map(function (Resident $r) {
+                $household = $r->households->first();
+                $house = $household?->house;
+                $street = $house?->street;
+
+                return [
+                    'id' => $r->id,
+                    'firstName' => $r->firstName,
+                    'middleName' => $r->middleName,
+                    'lastName' => $r->lastName,
+                    'birthday' => $r->birthday,
+                    'age' => $r->age,
+                    'sex' => $r->sex,
+                    'contactNo' => $r->contactNo,
+                    'streetId' => $street?->id,
+                    'streetName' => $street?->street_name,
+                    'houseNo' => $house?->house_no,
+                ];
+            });
         return view('profileforms.addMember', compact('residents'));
     }
 }

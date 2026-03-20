@@ -1,13 +1,14 @@
 <style>
 .resident-dropdown {
-    position: absolute;
+    position: relative;
     width: 100%;
     background: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     margin-top: 4px;
     z-index: 2000;
-    max-height: 240px;
+    /* Prevent the dropdown from covering fields below in the modal */
+    max-height: 160px;
     overflow-y: auto;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
@@ -137,6 +138,19 @@ function initializeAddMemberModal() {
         return;
     }
 
+    const currentResident = residents.find(p => Number(p.id) === currentResidentId) || null;
+    const headLastNameNorm = normalize(currentResident?.lastName);
+
+    function residentHouseKey(person) {
+        if (!person) return null;
+        if (person.streetId === null || person.streetId === undefined) return null;
+        const houseNoNorm = normalize(person.houseNo);
+        if (!houseNoNorm) return null;
+        return `${person.streetId}-${houseNoNorm}`;
+    }
+
+    const headHouseKey = residentHouseKey(currentResident);
+
     function closeDropdown() {
         dropdown.classList.add('d-none');
         dropdown.innerHTML = '';
@@ -194,6 +208,96 @@ function initializeAddMemberModal() {
         return 'Contact: ' + (value || 'N/A');
     }
 
+    function renderDropdownOptions(people, options = {}) {
+        dropdown.innerHTML = '';
+        const headerTitle = options?.headerTitle ? options.headerTitle : null;
+        if (headerTitle) {
+            const header = document.createElement('div');
+            header.classList.add('resident-dropdown-message');
+            header.style.fontWeight = '700';
+            header.textContent = headerTitle;
+            dropdown.appendChild(header);
+        }
+
+        people.forEach(function (item) {
+            const person = item?.person ? item.person : item;
+            const note = item?.note ? item.note : null;
+
+            const option = document.createElement('div');
+            option.classList.add('resident-option');
+
+            const last = formatName(person.lastName);
+            const first = formatName(person.firstName);
+            const middle = formatName(person.middleName);
+            const fullName = `${last}, ${first}${middle ? ' ' + middle : ''}`;
+            const birthday = formatBirthday(person.birthday);
+            const sex = formatSex(person.sex);
+            const contact = formatContact(person.contactNo);
+
+            option.innerHTML = `
+                <span class="resident-option-name">${fullName} (ID: ${person.id})</span>
+                <span class="resident-option-meta">${birthday} | ${sex} | ${contact}${note ? '<br><span style="color:#0d6efd;font-weight:600;">' + note + '</span>' : ''}</span>
+            `;
+
+            option.addEventListener('click', function () {
+                searchInput.value = `${fullName} (ID: ${person.id})`;
+                hiddenInput.value = person.id;
+                closeDropdown();
+            });
+
+            dropdown.appendChild(option);
+        });
+
+        dropdown.classList.remove('d-none');
+    }
+
+    function getSuggestedResidents() {
+        if (!currentResident) return [];
+
+        // If head has no address information, fall back to same-last-name suggestions.
+        // (Otherwise, suggestions are based on same street + house number.)
+        if (!headHouseKey) {
+            const lastNameFallback = residents
+                .filter(function (person) {
+                    const id = Number(person.id);
+                    if (existingMemberIds.has(id)) return false;
+                    if (id === currentResidentId) return false;
+                    return headLastNameNorm && normalize(person.lastName) === headLastNameNorm;
+                })
+                .slice(0, 8);
+            return lastNameFallback;
+        }
+
+        const suggested = residents
+            .filter(function (person) {
+                const id = Number(person.id);
+                if (existingMemberIds.has(id)) return false;
+                if (id === currentResidentId) return false;
+
+                const addressMatch = headHouseKey && residentHouseKey(person) === headHouseKey;
+                // Only suggest residents from the same street + house number.
+                return addressMatch;
+            })
+            .map(function (person) {
+                const addressMatch = headHouseKey && residentHouseKey(person) === headHouseKey;
+                const lastMatch = headLastNameNorm && normalize(person.lastName) === headLastNameNorm;
+                const note = lastMatch
+                    ? 'Suggested: same last name and same street/house as head'
+                    : 'Suggested: same street/house as head';
+                return {
+                    person,
+                    // Same last name + same street+house should float to the top.
+                    score: (addressMatch ? 2 : 0) + (lastMatch ? 2 : 0),
+                    note
+                };
+            })
+            .sort((a, b) => b.score - a.score)
+            .map(x => ({ person: x.person, note: x.note }))
+            .slice(0, 8);
+
+        return suggested;
+    }
+
     function runSearch() {
         const query = normalize(searchInput.value);
         dropdown.innerHTML = '';
@@ -222,33 +326,7 @@ function initializeAddMemberModal() {
             return;
         }
 
-        matches.forEach(function (person) {
-            const option = document.createElement('div');
-            option.classList.add('resident-option');
-
-            const last = formatName(person.lastName);
-            const first = formatName(person.firstName);
-            const middle = formatName(person.middleName);
-            const fullName = `${last}, ${first}${middle ? ' ' + middle : ''}`;
-            const birthday = formatBirthday(person.birthday);
-            const sex = formatSex(person.sex);
-            const contact = formatContact(person.contactNo);
-
-            option.innerHTML = `
-                <span class="resident-option-name">${fullName} (ID: ${person.id})</span>
-                <span class="resident-option-meta">${birthday} | ${sex} | ${contact}</span>
-            `;
-
-            option.addEventListener('click', function () {
-                searchInput.value = `${fullName} (ID: ${person.id})`;
-                hiddenInput.value = person.id;
-                closeDropdown();
-            });
-
-            dropdown.appendChild(option);
-        });
-
-        dropdown.classList.remove('d-none');
+        renderDropdownOptions(matches, { headerTitle: null });
     }
 
     searchInput.addEventListener('input', function () {
@@ -285,7 +363,12 @@ function initializeAddMemberModal() {
     modalEl.addEventListener('shown.bs.modal', function () {
         searchInput.value = '';
         hiddenInput.value = '';
-        closeDropdown();
+        const suggested = getSuggestedResidents();
+        if (!suggested.length) {
+            showDropdownMessage('No suggested residents found. Use search to tag a resident.');
+        } else {
+            renderDropdownOptions(suggested, { headerTitle: 'Suggested Members' });
+        }
         searchInput.focus();
     });
 }
