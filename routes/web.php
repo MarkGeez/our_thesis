@@ -119,6 +119,9 @@ Route::prefix('admin/blotter')
         // Store new blotter
         Route::post('/', [BlotterController::class, 'submitBlotter'])
             ->name('store');
+        // Resident search for blotter complainant/respondent autofill
+        Route::get('/residents/search', [BlotterController::class, 'searchResidents'])
+            ->name('residents.search');
         // Show update form - Use different URI pattern
         Route::get('/{id}/edit', [BlotterController::class, 'showUpdateForm'])
             ->name('update.form');

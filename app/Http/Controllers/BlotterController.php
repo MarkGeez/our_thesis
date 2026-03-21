@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Models\Blotter;
+use App\Models\Resident;
 use App\Models\UpdateBlotter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -300,6 +301,21 @@ class BlotterController extends Controller
             ->all();
     }
 
+    private function normalizeNullableContactNumber(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = preg_replace('/\s+/', '', (string) $value);
+
+        if ($normalized === '' || preg_match('/^09\d{9}$/', $normalized) !== 1) {
+            return null;
+        }
+
+        return $normalized;
+    }
+
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
@@ -410,9 +426,123 @@ class BlotterController extends Controller
         return view('admin.Blotter');
     }
 
+    public function searchResidents(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+
+        if ($search === '') {
+            return response()->json(['data' => []]);
+        }
+
+        $normalizedSearch = strtolower(preg_replace('/\s+/', ' ', $search));
+        $searchLike = '%' . $normalizedSearch . '%';
+
+        $residents = Resident::query()
+            ->with(['households.house.street'])
+            ->select(['id', 'firstName', 'middleName', 'lastName', 'age', 'contactNo'])
+            ->where(function ($query) use ($search, $searchLike) {
+                $query->whereRaw('LOWER(CONCAT_WS(" ", firstName, middleName, lastName)) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(CONCAT_WS(" ", firstName, lastName)) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(CONCAT_WS(" ", lastName, firstName, middleName)) LIKE ?', [$searchLike])
+                    ->orWhereRaw('LOWER(CONCAT_WS(" ", lastName, firstName)) LIKE ?', [$searchLike]);
+
+                if (preg_match('/^\d+$/', $search) === 1) {
+                    $query->orWhere('id', (int) $search)
+                        ->orWhere('id', 'like', '%' . $search . '%');
+                }
+            })
+            ->orderBy('lastName')
+            ->orderBy('firstName')
+            ->limit(10)
+            ->get()
+            ->map(function (Resident $resident) {
+                $household = $resident->households->first();
+                $house = $household?->house;
+                $street = $house?->street;
+
+                $address = collect([
+                    filled($house?->house_no) ? 'House ' . $house->house_no : null,
+                    $street?->street_name,
+                ])->filter()->implode(', ');
+
+                $firstName = ucwords((string) $resident->firstName);
+                $middleName = ucwords((string) $resident->middleName);
+                $lastName = ucwords((string) $resident->lastName);
+
+                return [
+                    'id' => $resident->id,
+                    'first_name' => $firstName,
+                    'middle_name' => $middleName,
+                    'last_name' => $lastName,
+                    'full_name' => trim($firstName . ' ' . $middleName . ' ' . $lastName),
+                    'age' => $resident->age,
+                    'contact_no' => $this->normalizeNullableContactNumber($resident->contactNo),
+                    'address' => $address !== '' ? $address : 'N/A',
+                ];
+            })
+            ->values();
+
+        return response()->json(['data' => $residents]);
+    }
+
     public function submitBlotter(Request $request)
     {
+        $plaintiffPartyType = (string) $request->input('plaintiff_party_type', 'non_resident');
+        $defendantPartyType = (string) $request->input('defendant_party_type', 'non_resident');
+
+        if ($plaintiffPartyType === 'resident' && $request->filled('plaintiff_resident_id')) {
+            $resident = Resident::query()->with(['households.house.street'])->find($request->input('plaintiff_resident_id'));
+
+            if ($resident) {
+                $household = $resident->households->first();
+                $house = $household?->house;
+                $street = $house?->street;
+
+                $address = collect([
+                    filled($house?->house_no) ? 'House ' . $house->house_no : null,
+                    $street?->street_name,
+                ])->filter()->implode(', ');
+
+                $request->merge([
+                    'plaintiffName' => ucwords((string) $resident->firstName),
+                    'plaintiffMiddleName' => ucwords((string) $resident->middleName),
+                    'plaintiffLastName' => ucwords((string) $resident->lastName),
+                    'plaintiffAge' => $resident->age,
+                    'plaintiffContactNumber' => $this->normalizeNullableContactNumber($resident->contactNo),
+                    'plaintiffAddress' => $address !== '' ? $address : $request->input('plaintiffAddress'),
+                ]);
+            }
+        }
+
+        if ($defendantPartyType === 'resident' && $request->filled('defendant_resident_id')) {
+            $resident = Resident::query()->with(['households.house.street'])->find($request->input('defendant_resident_id'));
+
+            if ($resident) {
+                $household = $resident->households->first();
+                $house = $household?->house;
+                $street = $house?->street;
+
+                $address = collect([
+                    filled($house?->house_no) ? 'House ' . $house->house_no : null,
+                    $street?->street_name,
+                ])->filter()->implode(', ');
+
+                $request->merge([
+                    'defendantName' => ucwords((string) $resident->firstName),
+                    'defendantMiddleName' => ucwords((string) $resident->middleName),
+                    'defendantLastName' => ucwords((string) $resident->lastName),
+                    'defendantAge' => $resident->age,
+                    'defendantContactNumber' => $this->normalizeNullableContactNumber($resident->contactNo),
+                    'defendantAddress' => $address !== '' ? $address : $request->input('defendantAddress'),
+                ]);
+            }
+        }
+
         $request->validate([
+            'plaintiff_party_type' => ['required', Rule::in(['resident', 'non_resident'])],
+            'defendant_party_type' => ['required', Rule::in(['resident', 'non_resident'])],
+            'plaintiff_resident_id' => ['nullable', 'integer', 'exists:residents,id', 'required_if:plaintiff_party_type,resident'],
+            'defendant_resident_id' => ['nullable', 'integer', 'exists:residents,id', 'required_if:defendant_party_type,resident'],
             'plaintiffName' => 'required|string',
             'plaintiffLastName' => 'required|string',
             'plaintiffContactNumber' => $this->nullableContactNumberRules(),
@@ -426,7 +556,10 @@ class BlotterController extends Controller
             'plaintiffContactNumber',
             'defendantContactNumber',
             'witnessContactNumber',
-        ]));
+        ]) + [
+            'plaintiff_resident_id.required_if' => 'Please select a complainant resident from the search results.',
+            'defendant_resident_id.required_if' => 'Please select a respondent resident from the search results.',
+        ]);
 
         $proofPath = null;
 
