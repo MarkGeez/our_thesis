@@ -1582,7 +1582,7 @@
                                 <option value="">-- Select Status --</option>
                                 <option value="All" selected>All Status</option>
                                 <option value="Pending">Pending</option>
-                                <option value="Declined">Declined</option>
+                                <option value="Rejected">Rejected</option>
                                 <option value="Approved">Approved</option>
                             </select>
                         </div>

@@ -1,10 +1,6 @@
-@php
-    $themeColor = \App\Models\Setting::get('theme', '#0061f7');
-    $sidebarNotifications = app(\App\Services\SidebarNotificationService::class)->forUser(auth()->user());
-@endphp
 <style>
 .sidebar {
-    background: {{ $themeColor }} !important;
+    background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
     height: 100vh;
     overflow: hidden;
     display: flex;
@@ -23,7 +19,7 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    background: {{ $themeColor }} !important;
+    background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
     flex-shrink: 0;
 }
 
@@ -32,6 +28,9 @@
     flex: 1;
     overflow-y: hidden;
     padding-right: 6px;
+    scrollbar-gutter: stable;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     min-height: 0; /* Important for flex scrolling */
 }
 
@@ -48,6 +47,11 @@
 /* cleaner scrollbar */
 .sidebar-body::-webkit-scrollbar{
     width: 6px;
+}
+.sidebar-body::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+    display: none;
 }
 .sidebar-body::-webkit-scrollbar-track{
     background: transparent;
@@ -69,10 +73,10 @@
 .cat-sub-menu a {
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin: 4px 0;
+    margin: 2px 0;
     border-radius: 12px;
     overflow: hidden;
-    padding-left: 12px;
+    padding-left: 8px;
 }
 
 /* Active state for main menu items */
@@ -84,7 +88,7 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: translateX(4px);
+    transform: none;
 }
 
 /* Left accent border - more prominent */
@@ -143,7 +147,7 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: translateX(4px);
+    transform: none;
 }
 
 .show-cat-btn.active::before {
@@ -169,20 +173,20 @@
 .sidebar-body-menu a:hover:not(.active),
 .cat-sub-menu a:hover:not(.active) {
     background: rgba(255, 255, 255, 0.12) !important;
-    transform: translateX(2px);
+    transform: none;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 /* Submenu active indication */
 .cat-sub-menu {
     position: relative;
-    padding-left: 8px;
+    padding-left: 4px;
 }
 
 .cat-sub-menu::before {
     content: '';
     position: absolute;
-    left: 20px;
+    left: 16px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -191,7 +195,7 @@
 }
 
 .cat-sub-menu a {
-    padding-left: 45px !important;
+    padding-left: 34px !important;
 }
 
 /* Animations */
@@ -236,21 +240,10 @@
         rgba(255, 255, 255, 0.15) 100%
     ) !important;
 }
-.sidebar-body-menu a:hover:not(.active),
-.cat-sub-menu a:hover:not(.active),
-.show-cat-btn:hover:not(.active){
-    padding-left: 16px; /* adjust: 14px to 20px */
-}
-
-/* Keep submenu indentation but still add a little space on hover */
-.cat-sub-menu a:hover:not(.active){
-    padding-left: 52px !important; /* was 45px, adds +7px */
-}
-
 /* Optional: ensure icon has breathing room from the left edge */
 .sidebar-body-menu a .icon,
 .cat-sub-menu a .icon{
-    margin-left: 6px;
+    margin-left: 2px;
 }
 
 /* If your template makes links inline, this helps padding apply cleanly */
@@ -259,7 +252,9 @@
 .show-cat-btn{
     display: flex;
     align-items: center;
-    gap: 10px; /* space between icon and text */
+    flex-wrap: nowrap;
+    min-width: 0;
+    gap: 8px; /* space between icon and text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -277,139 +272,9 @@
 .cat-sub-menu a {
     font-size: 0.875rem;
 }
-
-/* ============================================
-   LIGHT SIDEBAR CONTRAST ADJUSTMENTS
-   ============================================ */
-
-/* Light sidebar scrollbar styling */
-.sidebar.sidebar--light .sidebar-body::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
-}
-
-.sidebar.sidebar--light .sidebar-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.4);
-}
-
-/* Dark text for light backgrounds */
-.sidebar.sidebar--light .sidebar-body-menu a,
-.sidebar.sidebar--light .cat-sub-menu a,
-.sidebar.sidebar--light .show-cat-btn {
-    color: #333333 !important;
-}
-
-/* Light background active state with dark text */
-.sidebar.sidebar--light .sidebar-body-menu a.active,
-.sidebar.sidebar--light .cat-sub-menu a.active {
-    background: rgba(0, 0, 0, 0.12) !important;
-    color: #1a1a1a !important;
-    box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.15),
-        inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-}
-
-/* Dark accent border for light sidebar active state */
-.sidebar.sidebar--light .sidebar-body-menu a.active::before,
-.sidebar.sidebar--light .cat-sub-menu a.active::before {
-    background: linear-gradient(180deg, #333333 0%, rgba(51, 51, 51, 0.8) 100%);
-    box-shadow: 
-        2px 0 10px rgba(0, 0, 0, 0.25),
-        0 0 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Dark gradient for light sidebar active state */
-.sidebar.sidebar--light .sidebar-body-menu a.active::after,
-.sidebar.sidebar--light .cat-sub-menu a.active::after {
-    background: linear-gradient(180deg, 
-        transparent 0%, 
-        rgba(0, 0, 0, 0.3) 50%, 
-        transparent 100%);
-}
-
-/* Dark text for active icons in light sidebar */
-.sidebar.sidebar--light .sidebar-body-menu a.active .icon,
-.sidebar.sidebar--light .cat-sub-menu a.active .icon {
-    color: #333333 !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-}
-
-/* Light sidebar show category button active state */
-.sidebar.sidebar--light .show-cat-btn.active {
-    background: rgba(0, 0, 0, 0.12) !important;
-    color: #1a1a1a !important;
-    box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.15),
-        inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar.sidebar--light .show-cat-btn.active::before {
-    background: linear-gradient(180deg, #333333 0%, rgba(51, 51, 51, 0.8) 100%);
-    box-shadow: 
-        2px 0 10px rgba(0, 0, 0, 0.25),
-        0 0 20px rgba(0, 0, 0, 0.15);
-}
-
-.sidebar.sidebar--light .show-cat-btn.active .icon {
-    color: #333333 !important;
-}
-
-/* Hover state for light sidebar */
-.sidebar.sidebar--light .sidebar-body-menu a:hover:not(.active),
-.sidebar.sidebar--light .cat-sub-menu a:hover:not(.active) {
-    background: rgba(0, 0, 0, 0.08) !important;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
-}
-
-/* Submenu vertical line for light sidebar */
-.sidebar.sidebar--light .cat-sub-menu::before {
-    background: rgba(0, 0, 0, 0.15);
-}
-
-/* Focus state for light sidebar */
-.sidebar.sidebar--light .sidebar-body-menu a:focus,
-.sidebar.sidebar--light .cat-sub-menu a:focus {
-    outline: 2px solid rgba(0, 0, 0, 0.3);
-    outline-offset: 2px;
-}
-
-/* Logo text color for light sidebar */
-.sidebar.sidebar--light .logo-text .logo-title {
-    color: #333333 !important;
-}
-
-/* System menu title for light sidebar */
-.sidebar.sidebar--light .system-menu__title {
-    color: rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Light mode active state gradient */
-.sidebar.sidebar--light .sidebar-body-menu a.active,
-.sidebar.sidebar--light .show-cat-btn.active {
-    background: linear-gradient(
-        90deg, 
-        rgba(0, 0, 0, 0.15) 0%, 
-        rgba(0, 0, 0, 0.1) 50%,
-        rgba(0, 0, 0, 0.08) 100%
-    ) !important;
-}
-
-.sidebar-notification-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin-left: auto;
-    border-radius: 50%;
-    background: #dc2626;
-    border: 1px solid #ffffff;
-    flex-shrink: 0;
-}
-
-.sidebar.sidebar--light .sidebar-notification-dot {
-    border-color: rgba(255, 255, 255, 0.95);
-}
 </style>
 
-<aside class="sidebar" data-theme="{{ $themeColor }}">
+<aside class="sidebar">
     <div class="sidebar-start">
         <div class="sidebar-head">
             <a href="{{ route('subadmin.dashboard') }}" class="logo-wrapper">
@@ -461,21 +326,21 @@
     @endphp
 
     <li>
-    <a class="show-cat-btn {{ $servicesActive ? 'active' : '' }}" href="javascript:void(0)">
+    <a class="show-cat-btn {{ $servicesActive ? 'show' : '' }}" href="javascript:void(0)">
          E-Barangay Services
         <span class="category__btn transparent-btn" title="Open list">
             <span class="sr-only">Open list</span>
             <span class="icon arrow-down" aria-hidden="true"></span>
         </span>
     </a>
-    <ul class="cat-sub-menu {{ $servicesActive ? 'visible' : '' }}">
+    <ul class="cat-sub-menu" style="{{ $servicesActive ? 'display:block;' : 'display:none;' }}">
         <li>
             <a class="{{ Request::routeIs('subadmin.subadminCertificate*') ? 'active' : '' }}" href="{{ route('subadmin.subadminCertificate') }}">
-                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Certificates
+                <span class="icon"><i class="fa-solid fa-file-lines"></i></span>My Documents
             </a>
         </li>
         <li>
-            <a class="{{ Request::routeIs('subadmin.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
+            <a class="{{ Request::routeIs('subadmin.complaint*') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
                 <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
             </a>
         </li>
@@ -491,20 +356,9 @@
             <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>Announcements
         </a>
     </li>
-        <li>
-            <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
-                                    <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
-                @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_COMPLAINTS_RECORDS] ?? false)
-                    <span class="sidebar-notification-dot" aria-label="New complaint records"></span>
-                @endif
-        </a>
-    </li>
     <li>
-        <a class="{{ Request::routeIs('subadmin.certificateRequest') ? 'active' : '' }}" href="{{ route('subadmin.certificateRequest') }}">
-            <span class="icon"><i class="fa-solid fa-file-lines"></i></span>Certificate Requests
-            @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_CERTIFICATE_REQUESTS] ?? false)
-                <span class="sidebar-notification-dot" aria-label="New certificate requests"></span>
-            @endif
+        <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
+                                    <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
         </a>
     </li>
     <li>
@@ -524,32 +378,40 @@
 </aside>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    (function applySidebarContrast() {
-        const sidebar = document.querySelector('.sidebar');
-        if (!sidebar) return;
-        const hex = (sidebar.dataset.theme || '#0061f7').replace('#', '');
-        if (hex.length !== 6) return;
-        function toLinear(c) { return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
-        const r = toLinear(parseInt(hex.substr(0, 2), 16) / 255);
-        const g = toLinear(parseInt(hex.substr(2, 2), 16) / 255);
-        const b = toLinear(parseInt(hex.substr(4, 2), 16) / 255);
-        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        if (luminance > 0.35) sidebar.classList.add('sidebar--light');
-    })();
+    // 1. SELECT ALL TOGGLE BUTTONS
+    const menuToggles = document.querySelectorAll('.show-cat-btn');
 
-    // Auto-open active submenu on load
+    menuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const submenu = this.nextElementSibling;
+            
+            // Toggle the 'show' class for arrow rotation
+            this.classList.toggle('show');
+
+            // Toggle the submenu visibility
+            if (submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+            } else {
+                submenu.style.display = 'block';
+            }
+        });
+    });
+
+    // 2. AUTO-OPEN ACTIVE SUBMENU ON LOAD
     const activeItem = document.querySelector('.sidebar .active');
     if (activeItem) {
         const submenu = activeItem.closest('.cat-sub-menu');
         if (submenu) {
-            submenu.classList.add('visible');
+            submenu.style.display = 'block';
             const toggle = submenu.previousElementSibling;
             if (toggle && toggle.classList.contains('show-cat-btn')) {
-                toggle.classList.add('active');
+                toggle.classList.add('show'); 
+                // Note: We don't add 'active' here so the parent stays dark
             }
         }
 
-        // Scroll active item into view
+        // 3. SCROLL ACTIVE INTO VIEW
         const sidebarBody = document.querySelector('.sidebar-body');
         if (sidebarBody) {
             setTimeout(function() {

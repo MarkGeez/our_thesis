@@ -189,6 +189,12 @@
     .update-form .error-text { color: #e57373; font-size: 0.85rem; }
 
     .update-form .text-danger { color: #ff6b6b !important; }
+
+    .update-form .form-select option:disabled {
+        color: #9ca3af;
+        background-color: #f3f4f6;
+        font-style: italic;
+    }
 </style>
 
 <div class="update-form p-2">
@@ -305,11 +311,12 @@
                                     $isSelectable = $selectableStatuses->contains($status);
                                 @endphp
                                 <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isSelectable ? '' : 'disabled' }}>
-                                    {{ $displayLabel }}
+                                    {{ $displayLabel }}{{ $isSelectable ? '' : ' — Unavailable' }}
                                 </option>
                             @endforeach
                         </select>
-                        <small class="form-text text-muted">Hearing statuses must follow sequence. Other statuses can still be selected anytime.</small>
+                        <small class="form-text text-muted d-block">Statuses marked as “Unavailable” are locked and cannot be selected for this case.</small>
+                        <small class="form-text text-muted d-block">Hearing statuses must follow sequence. Other statuses can still be selected anytime.</small>
                         @error('status')
                             <div class="error-text mt-1">{{ $message }}</div>
                         @enderror

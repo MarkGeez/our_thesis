@@ -388,7 +388,7 @@
                                                         </span>
                                                         @break
                                                     @case('picked_up')
-                                                        <span class="badge bg-secondary">
+                                                        <span class="badge bg-info">
                                                             <i class="fas fa-box"></i>
                                                             Received
                                                         </span>
@@ -396,7 +396,7 @@
                                                     @case('declined')
                                                         <span class="badge bg-danger">
                                                             <i class="fas fa-times-circle"></i>
-                                                            Declined
+                                                            Rejected
                                                         </span>
                                                         @break
                                                     @default

@@ -34,6 +34,9 @@
     flex: 1;
     overflow-y: hidden;
     padding-right: 6px;
+    scrollbar-gutter: stable;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     min-height: 0; /* Important for flex scrolling */
 }
 
@@ -50,6 +53,11 @@
 /* optional: cleaner scrollbar */
 .sidebar-body::-webkit-scrollbar{
     width: 6px;
+}
+.sidebar-body::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+    display: none;
 }
 .sidebar-body::-webkit-scrollbar-track{
     background: transparent;
@@ -71,9 +79,10 @@
 .cat-sub-menu a {
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin: 4px 0;
+    margin: 2px 0;
     border-radius: 12px;
     overflow: hidden;
+    padding-left: 8px;
     
 }
 
@@ -86,8 +95,8 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: translateX(4px);
-    padding-left: 12px;
+    transform: none;
+    padding-left: 8px;
 }
 
 /* Left accent border - more prominent */
@@ -146,7 +155,7 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: translateX(4px);
+    transform: none;
 }
 
 .show-cat-btn.active::before {
@@ -172,20 +181,19 @@
 .sidebar-body-menu a:hover:not(.active),
 .cat-sub-menu a:hover:not(.active) {
     background: rgba(255, 255, 255, 0.12) !important;
-    transform: translateX(2px);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 /* Submenu active indication */
 .cat-sub-menu {
     position: relative;
-    padding-left: 8px;
+    padding-left: 4px;
 }
 
 .cat-sub-menu::before {
     content: '';
     position: absolute;
-    left: 20px;
+    left: 16px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -194,7 +202,7 @@
 }
 
 .cat-sub-menu a {
-    padding-left: 45px !important;
+    padding-left: 34px !important;
 }
 
 /* Animations */
@@ -239,21 +247,10 @@
     ) !important;
 }
 
-.sidebar-body-menu a:hover:not(.active),
-.cat-sub-menu a:hover:not(.active),
-.show-cat-btn:hover:not(.active){
-    padding-left: 16px; /* adjust: 14px to 20px */
-}
-
-/* Keep submenu indentation but still add a little space on hover */
-.cat-sub-menu a:hover:not(.active){
-    padding-left: 52px !important; /* was 45px, adds +7px */
-}
-
 /* Optional: ensure icon has breathing room from the left edge */
 .sidebar-body-menu a .icon,
 .cat-sub-menu a .icon{
-    margin-left: 6px;
+    margin-left: 2px;
 }
 
 /* If your template makes links inline, this helps padding apply cleanly */
@@ -262,7 +259,9 @@
 .show-cat-btn{
     display: flex;
     align-items: center;
-    gap: 10px; /* space between icon and text */
+    flex-wrap: nowrap;
+    min-width: 0;
+    gap: 8px; /* space between icon and text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

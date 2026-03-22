@@ -220,7 +220,7 @@
                             <td>{{ Str::limit($request->purpose ?? '', 80) }}</td>
                             <td>
                                 <span class="status-{{ strtolower($request->status) }}">
-                                    {{ ucfirst($request->status) }}
+                                    {{ strtolower((string) $request->status) === 'declined' ? 'Rejected' : ucfirst($request->status) }}
                                 </span>
                             </td>
                             <td>{{ $request->user->role ?? '-' }}</td>

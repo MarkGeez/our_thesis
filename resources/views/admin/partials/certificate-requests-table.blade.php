@@ -80,7 +80,7 @@
                     <option value="pending" {{ request('status_filter') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status_filter') === 'approved' ? 'selected' : '' }}>Approved</option>
                     <option value="picked_up" {{ request('status_filter') === 'picked_up' ? 'selected' : '' }}>Received</option>
-                    <option value="declined" {{ request('status_filter') === 'declined' ? 'selected' : '' }}>Declined</option>
+                    <option value="declined" {{ request('status_filter') === 'declined' ? 'selected' : '' }}>Rejected</option>
                 </select>
             </div>
         @endif
@@ -134,11 +134,12 @@
                 <tr>
                     <th>Cert ID</th>
                     <th>Requester</th>
+                    <th>Request <br> Date</th>
                     <th>Certificate Type</th>
                     <th>Purpose</th>
                     <th>Status</th>
                     <th>Updated By</th>
-                    <th>Date</th>
+                    
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -155,6 +156,7 @@
                             @endif
                         </button>
                     </td>
+                    <td>{{ $request->created_at->format('M d, Y g:i A') }}</td>
                     <td><span >{{ ucfirst($request->certificate_type) }}</span></td>
                     <td>
                         <div class="d-flex gap-2 align-items-center">
@@ -170,8 +172,8 @@
                         @switch($request->status)
                             @case('pending') <span class="badge bg-warning text-dark">Pending</span> @break
                             @case('approved') <span class="badge bg-success">Approved</span> @break
-                            @case('picked_up') <span class="badge bg-secondary">Received</span> @break
-                            @case('declined') <span class="badge bg-danger">Declined</span> @break
+                            @case('picked_up') <span class="badge bg-info">Received</span> @break
+                            @case('declined') <span class="badge bg-danger">Rejected</span> @break
                             @default <span class="badge bg-secondary">{{ $request->status }}</span>
                         @endswitch
                     </td>
@@ -179,12 +181,12 @@
                         @if($request->approver)
                             <small>{{ ucwords(strtolower($request->approver->firstName . ' ' . $request->approver->lastName)) }}</small>
                             <br>
-                            <small class="text-muted">{{ $request->approved_at?->format('M d, Y H:i') ?? '-' }}</small>
+                            <small class="text-muted">{{ $request->approved_at?->format('M d, Y g:i A') ?? '-' }}</small>
                         @else
                             <span class="text-muted">-</span>
                         @endif
                     </td>
-                    <td>{{ $request->created_at->format('M d, Y H:i') }}</td>
+                    
                     <td class="text-center">
     <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 action-btns">
         @if($request->status === 'pending')
@@ -216,7 +218,7 @@
             </button>
         @endif
 
-        @if($request->status === 'declined' && $request->decline_reason)
+        @if($request->status === 'rejected' && $request->decline_reason)
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#declineReasonModal" data-reason="{{ $request->decline_reason }}">
                 Reason
             </button>

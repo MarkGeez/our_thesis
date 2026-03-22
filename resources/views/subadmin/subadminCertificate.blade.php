@@ -389,13 +389,13 @@
                                                     @case('picked_up')
                                                         <span class="badge bg-secondary">
                                                             <i class="fas fa-box"></i>
-                                                            Received
+                                                            Picked Up
                                                         </span>
                                                         @break
                                                     @case('declined')
                                                         <span class="badge bg-danger">
                                                             <i class="fas fa-times-circle"></i>
-                                                            Declined
+                                                            Rejected
                                                         </span>
                                                         @break
                                                     @default
@@ -432,7 +432,7 @@
                                                 @elseif($req->status === 'picked_up')
                                                     <span class="remarks-success">
                                                         <i class="fas fa-check-double"></i>
-                                                        Successfully received
+                                                        Successfully picked up
                                                     </span>
                                                 @elseif($req->status === 'declined' && $req->decline_reason)
                                                     <div class="remarks-muted">
@@ -453,15 +453,7 @@
         </main>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-    
-</script>

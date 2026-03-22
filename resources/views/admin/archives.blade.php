@@ -1,7 +1,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('template/img/svg/logo.svg') }}" type="image/x-icon">
+    <link rel="icon" type="image/png" href="{{ asset(\App\Models\Setting::get('logo')) }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -145,19 +145,6 @@
         .pagination-info-text i {
             color: var(--primary-color);
         }
-
-        .table-filter-bar {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            align-items: center;
-            padding: 1rem 1rem 0 1rem;
-        }
-
-        .table-filter-bar .form-control,
-        .table-filter-bar .form-select {
-            max-width: 240px;
-        }
     </style>
 
 
@@ -183,22 +170,9 @@
         </div>
 
         <div class="records-container">
-                <form method="GET" action="{{ route('admin.archives') }}" class="table-filter-bar">
-                    <input type="text" name="search" class="form-control" placeholder="Search records..." value="{{ request('search') }}">
-                    <select name="sort" class="form-select">
-                        <option value="date_desc" {{ request('sort', 'date_desc') === 'date_desc' ? 'selected' : '' }}>Date: Newest First</option>
-                        <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Date: Oldest First</option>
-                        <option value="type_asc" {{ request('sort') === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
-                        <option value="type_desc" {{ request('sort') === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
-                        <option value="archived_by_asc" {{ request('sort') === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
-                        <option value="archived_by_desc" {{ request('sort') === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Apply</button>
-                    <a href="{{ route('admin.archives') }}" class="btn btn-outline-secondary">Reset</a>
-                </form>
             @if($archive->count() > 0)
                 <div class="table-responsive">
-                    <table id="archivesTable" class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">Archived Type</th>
@@ -207,7 +181,7 @@
                                 <th scope="col">Original Record Details</th>
                             </tr>
                         </thead>
-                        <tbody id="archivesTableBody">
+                        <tbody>
                             @foreach($archive as $item)
                             <tr>
                                 <td>
@@ -255,7 +229,7 @@
                 @endif
             @else
                 <div class="p-5 text-center">
-                    <p class="text-muted mb-0">No archived records found for the current filters. Adjust the filters above or use Reset to return to all records.</p>
+                    <p class="text-muted mb-0">No archived records found.</p>
                 </div>
             @endif
         </div>
@@ -271,3 +245,4 @@
 <script src="{{ asset('template/js/script.js') }}"></script>
 <!--    -- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+

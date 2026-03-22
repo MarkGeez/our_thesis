@@ -229,7 +229,7 @@ public function generateCertificate(Request $request)
 {
     $request->validate([
         'report_name' => 'required',
-        'certificate_status' => 'required|in:All,Pending,Approved,Declined',
+        'certificate_status' => 'required|in:All,Pending,Approved,Declined,Rejected',
         'certificate_type' => 'required|in:All,bonafide,indigency,soloparent,senior,Bonafide,Indigency,Solo-Parent,Senior',
         'date_from' => 'nullable|date',
         'date_to' => 'nullable|date|after_or_equal:date_from',
@@ -242,7 +242,8 @@ public function generateCertificate(Request $request)
         $statusMap = [
             'Pending' => 'pending',
             'Approved' => 'approved',
-            'Declined' => 'declined'
+            'Declined' => 'declined',
+            'Rejected' => 'declined'
         ];
         $status = $statusMap[$request->certificate_status] ?? strtolower($request->certificate_status);
         $query->where('status', $status);
@@ -1071,7 +1072,8 @@ public function view($id)
             $statusMap = [
                 'Pending' => 'pending',
                 'Approved' => 'approved',
-                'Declined' => 'declined'
+                'Declined' => 'declined',
+                'Rejected' => 'declined'
             ];
             $status = $statusMap[$filters['certificate_status']] ?? strtolower($filters['certificate_status']);
             $query->where('status', $status);
@@ -1226,7 +1228,8 @@ public function printTemplate($id)
             $statusMap = [
                 'Pending' => 'pending',
                 'Approved' => 'approved',
-                'Declined' => 'declined'
+                'Declined' => 'declined',
+                'Rejected' => 'declined'
             ];
             $status = $statusMap[$filters['certificate_status']] ?? strtolower($filters['certificate_status']);
             $query->where('status', $status);

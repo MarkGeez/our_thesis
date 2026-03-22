@@ -128,7 +128,6 @@
                                 <th data-col="street">Street</th>
                                 <th data-col="house_no">House No.</th>
                                 <th data-col="parent_status">Parent Status</th>
-                                <th data-col="resident_type">Resident Type</th>
                                 @if(\Schema::hasColumn('residents', 'civil_status'))
                                     <th data-col="civil_status">Civil Status</th>
                                 @endif
@@ -183,7 +182,7 @@
                             @elseif($type == 'feedback')
                                 <th data-col="feedback_user">Submitted By</th>
                                 <th data-col="message">Feedback Message</th>
-                                <th data-col="message_length">Message  <br> Length</th>
+                                <th data-col="message_length">Message Length</th>
                                 <th data-col="submitted_at">Submitted At</th>
                             @elseif($type == 'household' && $householdScope === 'family_members')
                                 <th data-col="head_no">Head #</th>
@@ -251,23 +250,6 @@
                                         $residentHouse = optional(optional($row->households->first())->house);
                                         $residentStreet = optional($residentHouse->street)->street_name ?? ($row->street ?? null);
                                         $residentHouseNo = $residentHouse->house_no ?? ($row->houseNo ?? null);
-                                        $residentTypeLabels = [
-                                            'voter' => 'Voter',
-                                            'senior_citizen' => 'Senior Citizen',
-                                            'pwd' => 'PWD',
-                                            'solo_parent' => 'Solo Parent',
-                                        ];
-                                        $rawResidentTypes = is_array($row->type)
-                                            ? $row->type
-                                            : (filled($row->type) ? [$row->type] : []);
-                                        $residentTypes = collect($rawResidentTypes)
-                                            ->filter()
-                                            ->map(function ($residentType) use ($residentTypeLabels) {
-                                                return $residentTypeLabels[$residentType]
-                                                    ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $residentType));
-                                            })
-                                            ->unique()
-                                            ->values();
                                     @endphp
                                     <td data-col="full_name">{{ ucwords(strtolower($row->firstName)) }} {{ ucwords(strtolower($row->middleName)) }} {{ ucwords(strtolower($row->lastName)) }}</td>
                                     <td data-col="birthdate">{{ $row->birthday }}</td>
@@ -276,37 +258,25 @@
                                     <td data-col="street">{{ $residentStreet ?? 'N/A' }}</td>
                                     <td data-col="house_no">{{ $residentHouseNo ?? 'N/A' }}</td>
                                     <td data-col="parent_status">{{ ucfirst($row->parent) }}</td>
-                                    <td data-col="resident_type">{{ $residentTypes->isNotEmpty() ? $residentTypes->implode(', ') : 'N/A' }}</td>
                                     @if(\Schema::hasColumn('residents', 'civil_status'))
                                         <td data-col="civil_status">{{ $row->civil_status ?? '' }}</td>
                                     @endif
                                 @elseif($type == 'blotter')
                                     @php
                                         $blotterStatusMap = [
-                                            'filed' => 'Filed',
-                                            'first_hearing' => 'First Hearing',
-                                            'second_hearing' => 'Second Hearing',
-                                            'third_hearing' => 'Third Hearing',
-                                            'for_summons' => 'For Summons',
-                                            'criminal_civil_case' => 'Criminal Case/Civil Case',
-                                            'referred_to_pnp' => 'Referred to PNP',
-                                            'certificate_to_file_action' => 'Certificate to File Action',
-                                            'barangay_protection_order' => 'Barangay Protection Order',
-                                            'resolved' => 'Resolved',
-                                            // Legacy support
-                                            'barangayBlotter' => 'Filed',
-                                            'first' => 'First Hearing',
-                                            'second' => 'Second Hearing',
-                                            'third' => 'Third Hearing',
+                                            'barangayBlotter' => 'Barangay Blotter',
+                                            'first' => 'First Summon',
+                                            'second' => 'Second Summon',
+                                            'third' => 'Third Summon',
                                             'brgyHearing' => 'Barangay Hearing',
                                             'coldCase' => 'Cold Case',
                                             'criminalCase' => 'Criminal Case',
-                                            'referredToPnp' => 'Referred to PNP',
+                                            'referredToPnp' => 'Referred To PNP',
+                                            'resolved' => 'Resolved',
                                         ];
                                         $blotterTypeMap = [
                                             'regular' => 'Regular',
                                             'vawc' => 'VAWC',
-                                            'katarungang_pambarangay' => 'Katarungang Pambarangay',
                                         ];
                                         $blotterStatus = $row->current_status ?? $row->status;
                                         $blotterType = strtolower((string) ($row->blotter_type ?? 'regular'));
@@ -339,9 +309,14 @@
                                         @endif
                                     </td>
                                 @elseif($type == 'certificate')
+                                    @php
+                                        $certificateStatusLabel = strtolower((string) $row->status) === 'declined'
+                                            ? 'Rejected'
+                                            : ucwords(str_replace('_', ' ', strtolower((string) $row->status)));
+                                    @endphp
                                     <td data-col="resident">{{ ucwords(strtolower($row->requesterName)) }}</td>
                                     <td data-col="certificate_type">{{ ucfirst(str_replace('_', ' ', $row->certificate_type)) }}</td>
-                                    <td data-col="certificate_status">{{ ucwords(str_replace('_', ' ', strtolower((string) $row->status))) }}</td>
+                                    <td data-col="certificate_status">{{ $certificateStatusLabel }}</td>
                                     <td data-col="certificate_date">{{ $row->created_at ? $row->created_at->format('M d, Y') : '' }}</td>
                                 @elseif($type == 'complaint')
                                     @php

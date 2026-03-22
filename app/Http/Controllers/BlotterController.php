@@ -476,7 +476,7 @@ class BlotterController extends Controller
                     'last_name' => $lastName,
                     'full_name' => trim($firstName . ' ' . $middleName . ' ' . $lastName),
                     'age' => $resident->age,
-                    'contact_no' => $this->normalizeNullableContactNumber($resident->contactNo),
+                    'contact_no' => $resident->contactNo,
                     'address' => $address !== '' ? $address : 'N/A',
                 ];
             })

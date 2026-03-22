@@ -29,6 +29,8 @@
     flex: 1;
     overflow-y: hidden;
     padding-right: 6px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     min-height: 0; /* Important for flex scrolling */
 }
 
@@ -40,6 +42,12 @@
 /* smoother scrolling */
 .sidebar-body{
     scroll-behavior: smooth;
+}
+
+.sidebar-body::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+    display: none;
 }
 
 

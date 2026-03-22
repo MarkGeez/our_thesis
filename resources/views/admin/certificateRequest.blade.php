@@ -739,7 +739,7 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link {{ ($activeTab ?? 'all') === 'declined' ? 'active' : '' }}" id="declined-tab" data-bs-toggle="tab" data-bs-target="#declined" type="button" role="tab">
-                            <i class="fas fa-times-circle me-2"></i>Declined
+                            <i class="fas fa-times-circle me-2"></i>Rejected
                         </button>
                     </li>
                 </ul>
@@ -783,8 +783,8 @@
                         <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
                         <div>Are you sure you want to reject this certificate request? This action cannot be undone.</div>
                     </div>
-                    <label class="form-label fw-semibold">Reason for Rejection (Optional)</label>
-                    <textarea class="form-control" name="decline_reason" rows="4" placeholder="Provide a reason for declining this request..."></textarea>
+                    <label class="form-label fw-semibold">Reason for Rejection</label>
+                    <textarea class="form-control" name="decline_reason" rows="4" placeholder="Provide a reason for rejecting this request..." required></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -826,7 +826,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-info-circle me-2"></i>Decline Reason
+                    <i class="fas fa-info-circle me-2"></i>Rejection Reason
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -962,7 +962,7 @@
                                     <span class="fs-6 fw-bold text-success" id="profileApprovedCount">0</span>
                                 </div>
                                 <div class="col-6 col-md-3">
-                                    <strong class="d-block small">Declined</strong>
+                                    <strong class="d-block small">Rejected</strong>
                                     <span class="fs-6 fw-bold text-danger" id="profileDeclinedCount">0</span>
                                 </div>
                                 <div class="col-6 col-md-3">
@@ -1255,10 +1255,10 @@ document.addEventListener('click', function(e) {
                                         statusBadge = '<span class="badge bg-success">Approved</span>';
                                         break;
                                     case 'picked_up':
-                                        statusBadge = '<span class="badge bg-secondary">Received</span>';
+                                        statusBadge = '<span class="badge bg-info">Received</span>';
                                         break;
                                     case 'declined':
-                                        statusBadge = '<span class="badge bg-danger">Declined</span>';
+                                        statusBadge = '<span class="badge bg-danger">Rejected</span>';
                                         break;
                                 }
                                 
@@ -1320,10 +1320,10 @@ document.addEventListener('click', function(e) {
                         statusBadge = '<span class="badge bg-success">Approved</span>';
                         break;
                     case 'picked_up':
-                        statusBadge = '<span class="badge bg-secondary">Received</span>';
+                        statusBadge = '<span class="badge bg-info">Received</span>';
                         break;
                     case 'declined':
-                        statusBadge = '<span class="badge bg-danger">Declined</span>';
+                        statusBadge = '<span class="badge bg-danger">Rejected</span>';
                         break;
                     default:
                         statusBadge = '<span class="badge bg-secondary">' + data.status + '</span>';
