@@ -79,10 +79,9 @@
 .cat-sub-menu a {
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin: 2px 0;
+    margin: 4px 0;
     border-radius: 12px;
     overflow: hidden;
-    padding-left: 8px;
     
 }
 
@@ -95,8 +94,8 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: none;
-    padding-left: 8px;
+    transform: translateX(4px);
+    padding-left: 12px;
 }
 
 /* Left accent border - more prominent */
@@ -155,7 +154,7 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.2),
         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    transform: none;
+    transform: translateX(4px);
 }
 
 .show-cat-btn.active::before {
@@ -187,13 +186,13 @@
 /* Submenu active indication */
 .cat-sub-menu {
     position: relative;
-    padding-left: 4px;
+    padding-left: 8px;
 }
 
 .cat-sub-menu::before {
     content: '';
     position: absolute;
-    left: 16px;
+    left: 20px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -202,7 +201,7 @@
 }
 
 .cat-sub-menu a {
-    padding-left: 34px !important;
+    padding-left: 45px !important;
 }
 
 /* Animations */
@@ -250,7 +249,7 @@
 /* Optional: ensure icon has breathing room from the left edge */
 .sidebar-body-menu a .icon,
 .cat-sub-menu a .icon{
-    margin-left: 2px;
+    margin-left: 6px;
 }
 
 /* If your template makes links inline, this helps padding apply cleanly */
@@ -261,7 +260,7 @@
     align-items: center;
     flex-wrap: nowrap;
     min-width: 0;
-    gap: 8px; /* space between icon and text */
+    gap: 10px; /* space between icon and text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

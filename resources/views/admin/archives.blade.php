@@ -115,6 +115,27 @@
             color: #1f2937;
         }
 
+        .archive-actions {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+        }
+
+        .resident-name-cell {
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .modal-details-row {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0.55rem 0;
+        }
+
+        .modal-details-row:last-child {
+            border-bottom: none;
+        }
+
         .pagination-container {
             padding: 18px 22px 22px 22px;
             background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
@@ -176,16 +197,36 @@
                         <thead>
                             <tr>
                                 <th scope="col">Archived Type</th>
+                                <th scope="col">Resident Name</th>
                                 <th scope="col">Archived By</th>
                                 <th scope="col">Archived Date</th>
-                                <th scope="col">Original Record Details</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($archive as $item)
+                            @php
+                                $residentName = null;
+
+                                if ($item->record_type === 'resident' && is_array($item->data)) {
+                                    $firstName = trim((string) ($item->data['firstName'] ?? ''));
+                                    $middleName = trim((string) ($item->data['middleName'] ?? ''));
+                                    $lastName = trim((string) ($item->data['lastName'] ?? ''));
+
+                                    $residentName = trim(collect([$firstName, $middleName, $lastName])->filter()->implode(' '));
+                                    $residentName = $residentName !== '' ? ucwords(strtolower($residentName)) : null;
+                                }
+                            @endphp
                             <tr>
                                 <td>
                                     <span class="archive-type">{{ ucfirst($item->record_type) }}</span>
+                                </td>
+                                <td class="resident-name-cell">
+                                    @if($item->record_type === 'resident')
+                                        {{ $residentName ?? 'N/A' }}
+                                    @else
+                                        <span class="text-muted">N/A</span>
+                                    @endif
                                 </td>
                                 <td>
                                     {{ $item->user
@@ -268,6 +309,31 @@
                                     @endif
                                 </td>
                             </tr>
+
+                            <div class="modal fade" id="archiveDetailsModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Archived {{ ucfirst($item->record_type) }} Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @if(is_array($item->data) && count($item->data) > 0)
+                                                <div class="archive-details">
+                                                    @foreach($item->data as $key => $value)
+                                                        <div class="modal-details-row">
+                                                            <span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span>
+                                                            {{ is_array($value) ? json_encode($value) : ($value !== null && $value !== '' ? $value : 'N/A') }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="text-muted">No details available.</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             @endforeach
                         </tbody>
                     </table>
