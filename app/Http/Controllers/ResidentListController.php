@@ -229,7 +229,6 @@ public function searchResidents(Request $request)
             'sex' => 'nullable|in:male,female',
             'parent' => 'nullable|in:yes,no,single',
             'enrolled' => 'nullable|in:yes,no',
-            'religion' => 'nullable|string|max:255',
             'educationalAttainment' => 'nullable|string',
             'headOfFamily' => 'required|in:yes,no',
             'type' => 'nullable|array',
@@ -297,7 +296,6 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'parent' => 'required|in:yes,no,single',
             'enrolled' => 'required|in:yes,no',
             'educationalAttainment' => 'nullable|string|max:255',
-            'religion' => 'nullable|string|max:255',
             'headOfFamily' => 'required|in:yes,no',
             'type' => 'nullable|array',
             'type.*' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
@@ -456,7 +454,6 @@ public function updateOwnInfo(Request $request, $id)
         'enrolled' => 'required|in:yes,no',
         'educationalAttainment' => 'nullable|string|max:255',
         'headOfFamily' => 'nullable|in:yes,no',
-        'religion' => 'nullable|string|max:255',
         'new_head_id' => 'nullable|exists:residents,id'
     ], $this->contactNumberMessages(['emergencyContactNo']));
 

@@ -1006,8 +1006,13 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
+<<<<<<< HEAD
                                                                 <input type="text" required name="contactNo" class="form-control js-contact-number" required value="{{ old('contactNo', $resident->contactNo) }}">
                                                                 <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
+=======
+                                                                <input type="text" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" required>
+                                                                <div id="contactNoErrorEdit{{ $resident->id }}" class="invalid-feedback"></div>
+>>>>>>> origin
                                                             </div>
                                                         </div>
 
@@ -1364,6 +1369,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name">
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
+<<<<<<< HEAD
                                                         <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
                                                         
                                                          <fieldset style="border: 2px solid #bbbbbb; padding: 15px; border-radius: 8px; width: 100%; font-family: sans-serif;" class="mt-3 mb-3">
@@ -1383,6 +1389,10 @@ document.addEventListener('DOMContentLoaded', function () {
         </label>
     @endforeach
 </fieldset>
+=======
+                                                        <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09xxxxxxxxx" required>
+                                                        <div id="emergencyContactNoError{{ $resident->id }}" class="invalid-feedback"></div>
+>>>>>>> origin
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1512,8 +1522,6 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 
-    <hr class="mt-4">
-
     <!-- Sex (Added missing field) -->
     <label for="sex">Sex</label>
     <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror" required>
@@ -1547,16 +1555,13 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 
-    <hr class="mt-4">
-
-   {{--  <!-- Image -->
+    <!-- Image -->
     <label for="image_path">Profile Image</label>
     <input type="file" name="image_path" id="image_path" class="form-control @error('image_path') is-invalid @enderror" 
            accept="image/png, image/jpg, image/jpeg">
     @error('image_path')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
-    --}}
 
     <!-- Emergency Contact Name -->
     <label for="emergencyContactName">Emergency Contact Name</label>
@@ -1571,42 +1576,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <input type="tel" id="emergencyContactNo" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" 
            value="{{ old('emergencyContactNo') }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
     @error('emergencyContactNo')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-
-    <hr class="mt-4">
-
-    <!-- Educational Attainment -->
-    <label for="educationalAttainment">Educational Attainment</label>
-    @php
-        $selectedEducation = old('educationalAttainment', 'Unknown');
-        if (!in_array($selectedEducation, $educationOptions, true)) {
-            $selectedEducation = 'Unknown';
-        }
-    @endphp
-    <select id="educationalAttainment" name="educationalAttainment" class="form-select @error('educationalAttainment') is-invalid @enderror">
-        @foreach ($educationOptions as $option)
-            <option value="{{ $option }}" {{ $selectedEducation === $option ? 'selected' : '' }}>{{ $option }}</option>
-        @endforeach
-    </select>
-    @error('educationalAttainment')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-
-    <!-- Religion -->
-    <label for="religion">Religion</label>
-    @php
-        $selectedReligion = old('religion', 'Unknown');
-        if (!in_array($selectedReligion, $religionOptions, true)) {
-            $selectedReligion = 'Unknown';
-        }
-    @endphp
-    <select id="religion" name="religion" class="form-select @error('religion') is-invalid @enderror">
-        @foreach ($religionOptions as $option)
-            <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
-        @endforeach
-    </select>
-    @error('religion')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 
