@@ -288,7 +288,7 @@
     </div>
    
     @if($canUpdate ?? false)
-        <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data" class="js-blotter-update-form" data-blotter-id="{{ $blotter->id }}">
+        <form method="POST" action="{{ route('admin.blotter.update.store', $blotter->id) }}" enctype="multipart/form-data" class="js-blotter-update-form" data-blotter-id="{{ $blotter->id }}" data-current-status="{{ $blotter->current_status }}">
             @csrf
             @method('PUT')
 
@@ -309,9 +309,11 @@
                                     $isSelected = $selectedStatus === $status;
                                     $displayLabel = $statusLabels[$status] ?? ucfirst(str_replace('_', ' ', $status));
                                     $isSelectable = $selectableStatuses->contains($status);
+                                    $isTaken = $history->contains(fn ($item) => $item->status === $status);
+                                    $isLockedTaken = $isTaken && $status !== 'for_summons';
                                 @endphp
-                                <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ $isSelectable ? '' : 'disabled' }}>
-                                    {{ $displayLabel }}{{ $isSelectable ? '' : ' — Unavailable' }}
+                                <option value="{{ $status }}" {{ $isSelected ? 'selected' : '' }} {{ ($isSelectable && !$isLockedTaken) ? '' : 'disabled' }}>
+                                    {{ $displayLabel }}{{ !$isSelectable ? ' — Unavailable' : ($isLockedTaken ? ' — Already used' : '') }}
                                 </option>
                             @endforeach
                         </select>
@@ -365,24 +367,25 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const dateInput = document.getElementById('date_{{ $blotter->id }}');
-        const trigger = document.getElementById('date_trigger_{{ $blotter->id }}');
-        const rawDate = "{{ old('date') }}";
-
-        if (dateInput && rawDate) {
-            dateInput.value = rawDate;
+        const form = document.querySelector('.js-blotter-update-form[data-blotter-id="{{ $blotter->id }}"]');
+        if (!form) {
+            return;
         }
 
-        // Only open picker when clicking the calendar icon, not the input itself
-        if (trigger && dateInput) {
-            trigger.addEventListener('click', function (event) {
+        form.addEventListener('submit', function (event) {
+            const statusSelect = form.querySelector('select[name="status"]');
+            if (!statusSelect) {
+                return;
+            }
+
+            const selectedStatus = statusSelect.value;
+            const currentStatus = (form.dataset.currentStatus || '').trim();
+
+            if (selectedStatus && selectedStatus === currentStatus && selectedStatus !== 'for_summons') {
                 event.preventDefault();
-                if (typeof dateInput.showPicker === 'function') {
-                    dateInput.showPicker();
-                } else {
-                    dateInput.focus();
-                }
-            });
-        }
+                alert('Please choose another status before submitting this update.');
+                statusSelect.focus();
+            }
+        });
     });
 </script>

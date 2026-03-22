@@ -653,8 +653,15 @@ class BlotterController extends Controller
             'status' => ['required', Rule::in($availableStatuses)],
             'remarks' => 'required|string',
             'photo_path' => 'nullable|mimes:png,jpg,jpeg|max:4096',
-            'date' => 'required|date',
         ]);
+
+        $selectedStatus = (string) $request->input('status');
+        $isStatusTaken = $blotter->updates->contains(fn ($update) => $update->status === $selectedStatus);
+        if ($isStatusTaken && $selectedStatus !== 'for_summons') {
+            return back()
+                ->withInput()
+                ->withErrors(['status' => 'This status has already been used. Please choose another status.']);
+        }
 
         $image = null;
         if ($request->hasFile('photo_path')) {
@@ -667,7 +674,7 @@ class BlotterController extends Controller
             'remarks' => $request->remarks,
             'photo_path' => $image,
             'updated_by' => Auth::id(),
-            'date' => $request->date,
+            'date' => Carbon::now()->toDateString(),
         ]);
 
         $isTerminal = self::isTerminalStatus($type, $request->status);
