@@ -174,7 +174,7 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>Activity ID</th>
                                         <th>User</th>
                                         <th>Module</th>
                                         <th>Action</th>
@@ -186,7 +186,7 @@
                                 <tbody>
                                     @forelse($logs as $log)
                                         <tr>
-                                            <td>{{ $logs->total() - (($logs->currentPage() - 1) * $logs->perPage() + $loop->index) }}</td>
+                                            <td>{{ $log->formatted_id }}</td>
                                             <td>
                                                 @php
                                                     $u = $log->user;
@@ -201,7 +201,7 @@
                                                 <span class="badge-pill-soft badge-action">{{ $log->action ? \Illuminate\Support\Str::headline((string) $log->action) : 'N/A' }}</span>
                                             </td>
                                             <td class="description-cell">{{ $log->resolved_description ?? $log->description }}</td>
-                                            <td>{{ $log->record_id ?? '-' }}</td>
+                                            <td>{{ $log->resolved_record_id ?? ($log->record_id ?? '-') }}</td>
                                             <td>{{ $log->created_at->format('M d, Y g:i A') }}</td>
                                         </tr>
                                     @empty

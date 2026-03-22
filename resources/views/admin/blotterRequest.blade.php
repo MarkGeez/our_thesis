@@ -164,7 +164,7 @@
                             <tbody>
                                 @foreach($blotters as $blotter)
                                     <tr>
-                                        <td>{{ $blotter->id }}</td>
+                                        <td>{{ $blotter->formatted_blotter_number }}</td>
                                         <td>{{ $blotter->user->firstName ?? '' }} {{ $blotter->user->lastName ?? '' }}</td>
                                         <td>{{ $blotter->defendantName }} {{ $blotter->defendantLastName }}</td>
                                         <td>{{ Str::limit($blotter->blotterDescription, 50) }}</td>
@@ -238,7 +238,7 @@
                                         <div class="modal-dialog modal-dialog-centered modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
+                                                    <h5 class="modal-title">Blotter Details {{ $blotter->formatted_blotter_number }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body p-4">

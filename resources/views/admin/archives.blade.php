@@ -197,9 +197,70 @@
                                 <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
                                 <td>
                                     @if(is_array($item->data) && count($item->data) > 0)
+                                        @php
+                                            $prefixMap = [
+                                                'resident' => 'RSDT',
+                                                'residents' => 'RSDT',
+                                                'blotter' => 'BLTR',
+                                                'blotters' => 'BLTR',
+                                                'certificate' => 'CERT',
+                                                'certificates' => 'CERT',
+                                                'household' => 'HSHD',
+                                                'households' => 'HSHD',
+                                                'complaint' => 'CMPL',
+                                                'complaints' => 'CMPL',
+                                                'active log' => 'ACTL',
+                                                'active logs' => 'ACTL',
+                                                'activity' => 'ACTL',
+                                                'activities' => 'ACTL',
+                                                'official' => 'OFFC',
+                                                'officials' => 'OFFC',
+                                                'archive' => 'ARCH',
+                                                'archives' => 'ARCH',
+                                                'announcement' => 'ANNC',
+                                                'announcements' => 'ANNC',
+                                                'feedback' => 'FDBK',
+                                                'feedbacks' => 'FDBK',
+                                                'user' => 'USER',
+                                                'users' => 'USER',
+                                            ];
+
+                                            $formatArchivedId = function ($prefix, $idValue, $dateRef) {
+                                                if (!is_numeric($idValue)) {
+                                                    return $idValue;
+                                                }
+
+                                                $year = $dateRef?->format('Y') ?? now()->format('Y');
+                                                $padLength = strtoupper($prefix) === 'RSDT' ? 5 : 6;
+
+                                                return sprintf('%s-%s-%0' . $padLength . 'd', strtoupper($prefix), $year, (int) $idValue);
+                                            };
+
+                                            $archiveTypeKey = strtolower(trim((string) $item->record_type));
+                                        @endphp
                                         <div class="archive-details">
                                             @foreach($item->data as $key => $value)
-                                                <div><span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span> {{ is_array($value) ? json_encode($value) : $value }}</div>
+                                                @php
+                                                    $displayValue = is_array($value) ? json_encode($value) : $value;
+
+                                                    if (!is_array($value) && (string) $value !== '') {
+                                                        $normalizedKey = strtolower((string) $key);
+
+                                                        if ($normalizedKey === 'id') {
+                                                            $prefix = $prefixMap[$archiveTypeKey] ?? null;
+                                                            if ($prefix) {
+                                                                $displayValue = $formatArchivedId($prefix, $value, $item->created_at);
+                                                            }
+                                                        } elseif (str_ends_with($normalizedKey, '_id')) {
+                                                            $subject = substr($normalizedKey, 0, -3);
+                                                            $prefix = $prefixMap[$subject] ?? null;
+                                                            if ($prefix) {
+                                                                $displayValue = $formatArchivedId($prefix, $value, $item->created_at);
+                                                            }
+                                                        }
+                                                    }
+                                                @endphp
+                                                <div><span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span> {{ $displayValue }}</div>
                                             @endforeach
                                         </div>
                                     @else

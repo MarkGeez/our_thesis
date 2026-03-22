@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ActiveLogger;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class CertificateRequest extends Model
 {
+    use HasFormattedPublicId;
+
     protected $table = 'certificate_requests';
 
     protected $fillable = [
@@ -27,6 +30,15 @@ class CertificateRequest extends Model
         'request_data' => 'array',
         'approved_at' => 'datetime',
     ];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('CERT');
+    }
 
     public const TYPES = ['bonafide', 'indigency', 'soloparent', 'senior'];
 

@@ -221,7 +221,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Blotter #</label>
-                        <div class="fw-semibold">#{{ $blotter->id }}</div>
+                        <div class="fw-semibold">{{ $blotter->formatted_blotter_number }}</div>
                     </div>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                                             @endphp
                                             <span class="timeline-badge {{ $badgeClass }}">{{ $displayLabel }}</span>
                                         </div>
-                                        <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
+                                        <span class="badge bg-light text-dark border">Case {{ $blotter->formatted_blotter_number }}</span>
                                     </div>
                                     <div class="timeline-remarks">{{ $hist->remarks }}</div>
                                     @php
@@ -266,12 +266,12 @@
                                     </div>
                                     @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
                                         <div class="timeline-photo mt-2">
-                                            <img src="{{ Storage::url($hist->photo_path) }}" 
-                                                 alt="Status proof for blotter {{ $blotter->id }}"
+                                                <img src="{{ Storage::url($hist->photo_path) }}" 
+                                                    alt="Status proof for blotter {{ $blotter->formatted_blotter_number }}"
                                                  style="cursor: pointer;"
-                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')"
+                                                    onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '{{ $blotter->formatted_blotter_number }}')"
                                                  title="Click to view full size">
-                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '{{ $blotter->formatted_blotter_number }}')">
                                                 <i class="fa fa-search-plus me-1"></i>View evidence
                                             </button>
                                         </div>

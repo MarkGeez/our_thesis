@@ -218,7 +218,7 @@
             @foreach($chunk as $household)
                 <div class="household-block">
                     <div class="household-header">
-                        Household #{{ $household->id }} - House No. {{ $household->house->house_no ?? '-' }}
+                        Household {{ $household->formatted_id }} - House No. {{ $household->house->house_no ?? '-' }}
                     </div>
 
                     <div class="household-info">

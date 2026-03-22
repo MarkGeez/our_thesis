@@ -664,7 +664,7 @@
                                 <tbody>
                                     @foreach($residents as $resident)
                                         <tr>
-                                            <td class="align-middle">{{ $resident->id }}</td>
+                                            <td class="align-middle">{{ $resident->formatted_id }}</td>
                                             <td class="align-middle"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </td>
                                             <td class="text-center text-nowrap">
                                                 <div class="d-flex justify-content-center align-items-center gap-2 action-btns">
@@ -695,7 +695,7 @@
                                                 <div class="modal-content border-0 shadow">
                                                     <div class="modal-header bg-primary text-white">
                                                         <h5 class="modal-title">
-                                                            <i class="bi bi-person-badge me-2"></i>Resident Details #{{ $resident->id }}
+                                                            <i class="bi bi-person-badge me-2"></i>Resident Details {{ $resident->formatted_id }}
                                                         </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
@@ -912,7 +912,7 @@
                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Resident #{{ $resident->id }}</h5>
+                                                    <h5 class="modal-title">Edit Resident {{ $resident->formatted_id }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body">
@@ -1006,13 +1006,8 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <label>Contact No.</label>
-<<<<<<< HEAD
                                                                 <input type="text" required name="contactNo" class="form-control js-contact-number" required value="{{ old('contactNo', $resident->contactNo) }}">
                                                                 <div class="auth-alert auth-alert-error contact-validation-error text-black" style="display: none;"></div>
-=======
-                                                                <input type="text" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" required>
-                                                                <div id="contactNoErrorEdit{{ $resident->id }}" class="invalid-feedback"></div>
->>>>>>> origin
                                                             </div>
                                                         </div>
 
@@ -1369,7 +1364,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name">
 
                                                         <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
-<<<<<<< HEAD
                                                         <input type="tel" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
                                                         
                                                          <fieldset style="border: 2px solid #bbbbbb; padding: 15px; border-radius: 8px; width: 100%; font-family: sans-serif;" class="mt-3 mb-3">
@@ -1389,10 +1383,6 @@ document.addEventListener('DOMContentLoaded', function () {
         </label>
     @endforeach
 </fieldset>
-=======
-                                                        <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09xxxxxxxxx" required>
-                                                        <div id="emergencyContactNoError{{ $resident->id }}" class="invalid-feedback"></div>
->>>>>>> origin
 
                                                         <div class="text-end mt-4 pt-3 border-top">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>

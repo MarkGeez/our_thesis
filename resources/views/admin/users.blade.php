@@ -1062,7 +1062,7 @@
                                             $roleStyle = $roleStyleMap[$list->role] ?? ['class' => 'role-non-resident', 'icon' => 'fa-user'];
                                         @endphp
                                         <tr>
-                                            <td><strong>#{{ $list->id }}</strong></td>
+                                            <td><strong>{{ $list->formatted_id }}</strong></td>
                                             <td>
                                                 <button type="button"
                                                         class="btn btn-link text-decoration-none p-0 fw-semibold"
@@ -1201,7 +1201,7 @@
                                                                     <div class="detail-value mb-1">
                                                                         {{ ucwords(strtolower(trim(($list->firstName ?? '') . ' ' . ($list->middleName ?? '') . ' ' . ($list->lastName ?? '')))) }}
                                                                     </div>
-                                                                    <small class="text-muted">User #{{ $list->id }}</small>
+                                                                    <small class="text-muted">User {{ $list->formatted_id }}</small>
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-8">

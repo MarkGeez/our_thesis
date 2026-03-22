@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title" id="statusBlotterLabel{{ $blotter->id }}">
-                    <i class="fa fa-flag me-2 text-primary"></i>Update Status #{{ $blotter->id }}
+                    <i class="fa fa-flag me-2 text-primary"></i>Update Status {{ $blotter->formatted_blotter_number }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -20,7 +20,7 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="info-label">Blotter ID</div>
-                                    <div class="fw-bold text-dark">#{{ $blotter->id }}</div>
+                                    <div class="fw-bold text-dark">{{ $blotter->formatted_blotter_number }}</div>
                                 </div>
                                 <div class="col-6 text-end">
                                     <div class="info-label">Current Status</div>

@@ -3,10 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Household extends Model
 {
+    use HasFormattedPublicId;
+
      protected $fillable = ['house_id'];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('HSHD');
+    }
 
     // Household belongs to one house
     public function house()

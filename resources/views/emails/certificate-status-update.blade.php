@@ -75,7 +75,7 @@
         @endif
 
         <div class="details">
-            <p style="margin:0 0 6px 0;"><strong>Request ID:</strong> #{{ $request->id }}</p>
+            <p style="margin:0 0 6px 0;"><strong>Request ID:</strong> {{ $request->formatted_id }}</p>
             <p style="margin:0 0 6px 0;"><strong>Certificate Type:</strong> {{ $certificateType }}</p>
             <p style="margin:0;"><strong>Status:</strong> {{ $statusLabel }}</p>
             @if(!$isApproved && !empty($request->decline_reason))

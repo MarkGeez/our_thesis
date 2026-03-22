@@ -872,7 +872,7 @@
                                             @endphp
 
                                             <tr>
-                                                <td class="case-number">#{{ $blotter->id }}</td>
+                                                <td class="case-number">{{ $blotter->formatted_blotter_number }}</td>
                                                 <td>{{ $displayType }}</td>
                                                 <td>{{ ucwords($blotter->plaintiffName) }} {{ ucwords($blotter->plaintiffLastName) }}</td>
                                                 <td>{{ ucwords($blotter->defendantName) }} {{ ucwords($blotter->defendantLastName) }}</td>
@@ -918,7 +918,7 @@
                                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Blotter Details #{{ $blotter->id }}</h5>
+                                                            <h5 class="modal-title">Blotter Details {{ $blotter->formatted_blotter_number }}</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                         </div>
                                                         <div class="modal-body p-4">
@@ -1021,10 +1021,10 @@
                                                                         <div class="row gy-2">
                                                                             <div class="col-12">
                                                                                 <img src="{{ Storage::url($blotter->proof) }}"
-                                                                                     alt="Evidence for blotter #{{ $blotter->id }}"
+                                                                                     alt="Evidence for blotter {{ $blotter->formatted_blotter_number }}"
                                                                                      class="img-fluid rounded border evidence-img"
                                                                                      style="max-height: 400px; object-fit: contain; cursor: pointer;"
-                                                                                     onclick="showImageModal('{{ Storage::url($blotter->proof) }}', '#{{ $blotter->id }}')"
+                                                                                     onclick="showImageModal('{{ Storage::url($blotter->proof) }}', '{{ $blotter->formatted_blotter_number }}')"
                                                                                      title="Click to view full size">
                                                                             </div>
                                                                             <div class="col-12">
@@ -1074,7 +1074,7 @@
                                                                                             @endphp
                                                                                             <span class="timeline-badge {{ $badgeClass }}">{{ $displayLabel }}</span>
                                                                                         </div>
-                                                                                        <span class="badge bg-light text-dark border">Case #{{ $blotter->id }}</span>
+                                                                                        <span class="badge bg-light text-dark border">Case {{ $blotter->formatted_blotter_number }}</span>
                                                                                     </div>
                                                                                     <div class="timeline-remarks">{{ $hist->remarks }}</div>
                                                                                     @php
@@ -1093,11 +1093,11 @@
                                                                                     @if (!empty($hist->photo_path) && $hist->photo_path !== null && trim($hist->photo_path) !== '')
                                                                                         <div class="timeline-photo mt-2">
                                                                                             <img src="{{ Storage::url($hist->photo_path) }}" 
-                                                                                                 alt="Status proof for blotter {{ $blotter->id }}"
+                                                                                                 alt="Status proof for blotter {{ $blotter->formatted_blotter_number }}"
                                                                                                  style="cursor: pointer;"
-                                                                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')"
+                                                                                                 onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '{{ $blotter->formatted_blotter_number }}')"
                                                                                                  title="Click to view full size">
-                                                                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '#{{ $blotter->id }}')">
+                                                                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="showImageModal('{{ Storage::url($hist->photo_path) }}', '{{ $blotter->formatted_blotter_number }}')">
                                                                                                 <i class="fa fa-search-plus me-1"></i>View evidence
                                                                                             </button>
                                                                                         </div>

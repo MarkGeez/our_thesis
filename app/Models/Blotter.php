@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Services\ActiveLogger;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Blotter extends Model
     
 {
+    use HasFormattedPublicId;
 
     protected $table = 'blotters';
     
@@ -44,9 +46,24 @@ class Blotter extends Model
         'incident_date_time' => 'datetime',
     ];
 
+    protected $appends = [
+        'formatted_id',
+        'formatted_blotter_number',
+    ];
+
    public function isFinished(): bool {
       return $this->is_finished === true;
    }
+
+    public function getFormattedBlotterNumberAttribute(): string
+    {
+        return $this->buildFormattedPublicId('BLTR');
+    }
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->getFormattedBlotterNumberAttribute();
+    }
 
     // App\Models\Blotter.php
 public function updates(): HasMany

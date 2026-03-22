@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\URL;
 use App\Mail\PasswordResetMail;
 use Illuminate\Support\Facades\Mail; 
 use App\Services\ActiveLogger;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    use HasFormattedPublicId;
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +50,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('USER');
+    }
 
     /**
      * Get the attributes that should be cast.

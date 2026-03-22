@@ -105,13 +105,8 @@ $user = auth()->user();
 
             <div class="col-md-6">
                 <label class="form-label">Contact Number</label>
-<<<<<<< HEAD
                 <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
                 <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
-=======
-                <input type="text" name="contactNumber" id="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
-                <div id="contactError" class="invalid-feedback"></div>
->>>>>>> origin
             </div>
         </div>
 

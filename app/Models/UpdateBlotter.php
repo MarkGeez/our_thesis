@@ -17,6 +17,10 @@ class UpdateBlotter extends Model
     'updated_by',
    ];
 
+   protected $appends = [
+      'formatted_blotter_number',
+   ];
+
    
 
 
@@ -27,6 +31,11 @@ class UpdateBlotter extends Model
    public function updater(): BelongsTo
    {
       return $this->belongsTo(User::class, 'updated_by');
+   }
+
+   public function getFormattedBlotterNumberAttribute(): ?string
+   {
+      return $this->blotter?->formatted_blotter_number;
    }
 
 

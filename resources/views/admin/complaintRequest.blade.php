@@ -427,7 +427,7 @@
                                             : ucwords(str_replace(',', ' ', (string) $complaint->complainantName));
                                     @endphp
                                     <tr>
-                                        <td class="text-center fw-bold">{{ $complaint->id }}</td>
+                                        <td class="text-center fw-bold">{{ $complaint->formatted_id }}</td>
                                         <td>
                                             @if(!empty($complaint->complainant_id))
                                                 <button
@@ -483,7 +483,7 @@
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content border-0 shadow">
                                             <div class="modal-header border-0 bg-light">
-                                                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-file-invoice me-2"></i>Complaint #{{ $complaint->id }}</h5>
+                                                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-file-invoice me-2"></i>Complaint {{ $complaint->formatted_id }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body px-4">
@@ -562,7 +562,7 @@
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content border-0 shadow-lg">
                                             <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title">Update Complaint #{{ $complaint->id }}</h5>
+                                                <h5 class="modal-title">Update Complaint {{ $complaint->formatted_id }}</h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
                                             <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="POST">

@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ActiveLogger;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Complaints extends Model
 {
+    use HasFormattedPublicId;
+
     protected $fillable = [
         'complainant_id',
         'respondent_id',
@@ -23,6 +26,15 @@ class Complaints extends Model
     protected $casts = [
         'complaint_datetime' => 'datetime',
     ];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('CMPL');
+    }
 
     protected static function booted()
     {

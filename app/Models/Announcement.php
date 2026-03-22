@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ActiveLogger;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Announcement extends Model
 {
+    use HasFactory;
+    use HasFormattedPublicId;
     
 
     protected $fillable = ['title', 'image', 'details',
@@ -17,7 +20,14 @@ class Announcement extends Model
         return $this->belongsTo(User::class);
     }
 
-    use HasFactory;
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('ANNC');
+    }
 
   protected static function booted()
     {

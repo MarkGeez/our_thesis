@@ -221,6 +221,7 @@ Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->
     Route::delete('/adminServices/{service}/archive', [ServiceController::class,'archive'])->name('services.archive');
     Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
     Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
+    Route::post('/archives/retrieve/{archive}', [ArchiveController::class,'retrieveResident'])->name('archive.retrieve.resident');
     
     Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
     Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
@@ -315,5 +316,4 @@ Route::middleware(['auth', 'role:non-resident'])->group(function(){
         
     });
 });
-
 

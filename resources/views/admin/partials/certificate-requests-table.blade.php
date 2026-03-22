@@ -146,7 +146,7 @@
             <tbody>
                 @foreach($filteredRequests as $request)
                 <tr>
-                    <td><code>{{ $request->id }}</code></td>
+                    <td><code>{{ $request->formatted_id }}</code></td>
                     <td>
                         <button type="button" class="btn btn-link text-decoration-none p-0" data-requester-user-id="{{ $request->user_id }}" data-requester-resident-id="{{ $request->resident_id ?? '' }}" title="View user information">
                             @if($request->resident)

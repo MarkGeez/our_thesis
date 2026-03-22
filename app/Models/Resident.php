@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\ActiveLogger;
 use App\Models\User;
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Resident extends Model
 {
     use HasFactory;
+    use HasFormattedPublicId;
 
     protected $fillable = [
         'firstName',
@@ -36,6 +38,17 @@ class Resident extends Model
     protected $casts = [
         'type' => 'array',
     ];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        $year = $this->created_at?->format('Y') ?? now()->format('Y');
+
+        return sprintf('RSDT-%s-%05d', $year, (int) $this->getKey());
+    }
 
     protected static function booted()
     {

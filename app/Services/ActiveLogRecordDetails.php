@@ -37,6 +37,7 @@ class ActiveLogRecordDetails
         foreach ($logs as $log) {
             $base = trim((string) ($log->description ?? ''));
             $detail = trim(self::resolveDetail($log, $lookups));
+            $log->resolved_record_id = self::resolveRecordId($log, $lookups);
 
             if ($base !== '' && $detail !== '') {
                 $log->resolved_description = $base . ' | ' . $detail;
@@ -80,6 +81,8 @@ class ActiveLogRecordDetails
         $settingIds = self::uniqueIds($idsByModule, ['setting', 'settings']);
         $archiveIds = self::uniqueIds($idsByModule, ['archive', 'archives']);
         $officialIds = self::uniqueIds($idsByModule, ['official', 'officials']);
+        $householdIds = self::uniqueIds($idsByModule, ['household', 'households']);
+        $feedbackIds = self::uniqueIds($idsByModule, ['feedback', 'feedbacks']);
 
         return [
             'users' => empty($userIds) ? collect() : User::query()
@@ -108,7 +111,7 @@ class ActiveLogRecordDetails
                 ->keyBy('id'),
             'blotters' => empty($blotterIds) ? collect() : Blotter::query()
                 ->whereIn('id', $blotterIds)
-                ->get(['id', 'plaintiffName', 'plaintiffLastName', 'defendantName', 'defendantLastName', 'current_status'])
+                ->get(['id', 'plaintiffName', 'plaintiffLastName', 'defendantName', 'defendantLastName', 'current_status', 'created_at'])
                 ->keyBy('id'),
             'settings' => empty($settingIds) ? collect() : Setting::query()
                 ->whereIn('id', $settingIds)
@@ -120,9 +123,74 @@ class ActiveLogRecordDetails
                 ->keyBy('id'),
             'officials' => empty($officialIds) ? collect() : Official::query()
                 ->whereIn('id', $officialIds)
-                ->get(['id', 'resident_id', 'position', 'start', 'end'])
+                ->get(['id', 'resident_id', 'position', 'start', 'end', 'created_at'])
+                ->keyBy('id'),
+            'households' => empty($householdIds) ? collect() : \App\Models\Household::query()
+                ->whereIn('id', $householdIds)
+                ->get(['id', 'house_id', 'created_at'])
+                ->keyBy('id'),
+            'feedbacks' => empty($feedbackIds) ? collect() : \App\Models\Feedbacks::query()
+                ->whereIn('id', $feedbackIds)
+                ->get(['id', 'user_id', 'created_at'])
                 ->keyBy('id'),
         ];
+    }
+
+    private static function resolveRecordId(object $log, array $lookups): string
+    {
+        $module = self::normalizeModule((string) ($log->module ?? ''));
+        $recordId = (int) ($log->record_id ?? 0);
+
+        if ($recordId <= 0) {
+            return '-';
+        }
+
+        if (in_array($module, ['resident', 'residents'], true)) {
+            return (string) ($lookups['residents']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['user', 'users'], true)) {
+            return (string) ($lookups['users']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['blotter', 'blotters'], true)) {
+            return (string) ($lookups['blotters']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['certificate', 'certificates'], true)) {
+            return (string) ($lookups['certificates']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['complaint', 'complaints'], true)) {
+            return (string) ($lookups['complaints']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['official', 'officials'], true)) {
+            return (string) ($lookups['officials']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['archive', 'archives'], true)) {
+            return (string) ($lookups['archives']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['announcement', 'announcements'], true)) {
+            return (string) ($lookups['announcements']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['feedback', 'feedbacks'], true)) {
+            return (string) ($lookups['feedbacks']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['household', 'households'], true)) {
+            return (string) ($lookups['households']->get($recordId)?->formatted_id ?? $recordId);
+        }
+
+        if (in_array($module, ['active log', 'active logs', 'activelog', 'activity', 'activities'], true)) {
+            $year = $log->created_at?->format('Y') ?? now()->format('Y');
+            return sprintf('ACTL-%s-%06d', $year, $recordId);
+        }
+
+        return (string) $recordId;
     }
 
     private static function fullName(?string $first, ?string $middle, ?string $last): string
@@ -199,7 +267,7 @@ class ActiveLogRecordDetails
             }
             $plaintiff = trim(ucwords(strtolower(trim(($record->plaintiffName ?? '') . ' ' . ($record->plaintiffLastName ?? '')))));
             $defendant = trim(ucwords(strtolower(trim(($record->defendantName ?? '') . ' ' . ($record->defendantLastName ?? '')))));
-            return "Blotter: {$plaintiff} vs {$defendant} (Status: {$record->current_status})";
+            return "Blotter {$record->formatted_blotter_number}: {$plaintiff} vs {$defendant} (Status: {$record->current_status})";
         }
 
         if (in_array($module, ['setting', 'settings'], true)) {

@@ -246,7 +246,7 @@
                 <tbody>
                     @foreach($chunk as $resident)
                         <tr>
-                            <td>{{ $resident->id }}</td>
+                            <td>{{ $resident->formatted_id }}</td>
                             <td>{{ $resident->firstName }} {{ $resident->middleName ?? '' }} {{ $resident->lastName }}</td>
                             <td style="text-align: center;">{{ $resident->age ?? '-' }}</td>
                             <td style="text-align: center;">{{ ucfirst($resident->sex ?? '-') }}</td>

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo; // FIXED: Added "Eloquent"
+use App\Models\Concerns\HasFormattedPublicId;
 
 class Official extends Model
 {
+    use HasFormattedPublicId;
+
     protected $fillable = [
         'resident_id',     // You need this
         'position',        // Keep if you need
@@ -14,6 +17,15 @@ class Official extends Model
         'start',           // Keep if you need
         'end'              // Keep if you need
     ];
+
+    protected $appends = [
+        'formatted_id',
+    ];
+
+    public function getFormattedIdAttribute(): string
+    {
+        return $this->buildFormattedPublicId('OFFC');
+    }
 
     public function resident(): BelongsTo
     {

@@ -893,7 +893,7 @@
                                 <td data-col="module">{{ $row->module ? \Illuminate\Support\Str::headline((string) $row->module) : 'N/A' }}</td>
                                 <td data-col="action">{{ $row->action ? \Illuminate\Support\Str::headline((string) $row->action) : 'N/A' }}</td>
                                 <td data-col="description">{{ ($row->resolved_description ?? $row->description) ?: 'N/A' }}</td>
-                                <td data-col="record_id">{{ $row->record_id ?? 'N/A' }}</td>
+                                <td data-col="record_id">{{ $row->resolved_record_id ?? ($row->record_id ?? 'N/A') }}</td>
                                 <td data-col="logged_at">{{ $row->created_at ? $row->created_at->format('M d, Y g:i A') : 'N/A' }}</td>
                             @elseif($type == 'officials')
                                 @php
@@ -924,9 +924,64 @@
                                         ? ucwords(strtolower(trim(($row->user->firstName ?? '') . ' ' . ($row->user->lastName ?? ''))))
                                         : 'N/A';
                                     $archiveData = is_array($row->data) ? $row->data : [];
-                                    $archiveLines = collect($archiveData)->map(function ($value, $key) {
+                                    $prefixMap = [
+                                        'resident' => 'RSDT',
+                                        'residents' => 'RSDT',
+                                        'blotter' => 'BLTR',
+                                        'blotters' => 'BLTR',
+                                        'certificate' => 'CERT',
+                                        'certificates' => 'CERT',
+                                        'household' => 'HSHD',
+                                        'households' => 'HSHD',
+                                        'complaint' => 'CMPL',
+                                        'complaints' => 'CMPL',
+                                        'active log' => 'ACTL',
+                                        'active logs' => 'ACTL',
+                                        'activity' => 'ACTL',
+                                        'activities' => 'ACTL',
+                                        'official' => 'OFFC',
+                                        'officials' => 'OFFC',
+                                        'archive' => 'ARCH',
+                                        'archives' => 'ARCH',
+                                        'announcement' => 'ANNC',
+                                        'announcements' => 'ANNC',
+                                        'feedback' => 'FDBK',
+                                        'feedbacks' => 'FDBK',
+                                        'user' => 'USER',
+                                        'users' => 'USER',
+                                    ];
+                                    $formatArchivedId = function ($prefix, $idValue, $dateRef) {
+                                        if (!is_numeric($idValue)) {
+                                            return $idValue;
+                                        }
+
+                                        $year = $dateRef?->format('Y') ?? now()->format('Y');
+                                        $padLength = strtoupper($prefix) === 'RSDT' ? 5 : 6;
+
+                                        return sprintf('%s-%s-%0' . $padLength . 'd', strtoupper($prefix), $year, (int) $idValue);
+                                    };
+                                    $archiveTypeKey = strtolower(trim((string) $row->record_type));
+                                    $archiveLines = collect($archiveData)->map(function ($value, $key) use ($prefixMap, $archiveTypeKey, $formatArchivedId, $row) {
                                         $label = \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $key));
                                         $display = is_array($value) ? json_encode($value) : (string) $value;
+
+                                        if (!is_array($value) && $display !== '') {
+                                            $normalizedKey = strtolower((string) $key);
+
+                                            if ($normalizedKey === 'id') {
+                                                $prefix = $prefixMap[$archiveTypeKey] ?? null;
+                                                if ($prefix) {
+                                                    $display = $formatArchivedId($prefix, $value, $row->created_at);
+                                                }
+                                            } elseif (str_ends_with($normalizedKey, '_id')) {
+                                                $subject = substr($normalizedKey, 0, -3);
+                                                $prefix = $prefixMap[$subject] ?? null;
+                                                if ($prefix) {
+                                                    $display = $formatArchivedId($prefix, $value, $row->created_at);
+                                                }
+                                            }
+                                        }
+
                                         return $label . ': ' . $display;
                                     })->values();
                                 @endphp
@@ -975,7 +1030,7 @@
                                         ->filter()
                                         ->values();
                                 @endphp
-                                <td data-col="household_id">{{ $row->id }}</td>
+                                <td data-col="household_id">{{ $row->formatted_id ?? $row->id }}</td>
                                 <td data-col="house_heads">{{ $houseHeads->isNotEmpty() ? $houseHeads->implode(', ') : 'N/A' }}</td>
                                 <td data-col="street">{{ $row->house->street->street_name ?? 'N/A' }}</td>
                                 <td data-col="house_no">{{ $row->house->house_no ?? 'N/A' }}</td>
