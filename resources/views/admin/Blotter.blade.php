@@ -294,9 +294,10 @@
 
         .action-buttons {
             display: flex;
+            flex-direction: column;
             gap: 0.5rem;
             justify-content: center;
-            flex-wrap: nowrap;
+            align-items: center;
         }
 
         .btn-sm {
@@ -529,6 +530,40 @@
             margin: 0;
         }
 
+        .submission-buttons-bar {
+            background: #f8fafc;
+            padding: 1.25rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .submission-buttons-bar .btn {
+            padding: 0.625rem 1.1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex: 0 1 auto;
+        }
+
+        @media (max-width: 768px) {
+            .submission-buttons-bar {
+                flex-direction: column;
+            }
+
+            .submission-buttons-bar .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         /* Timeline styles for status history in modal */
         .timeline {
             position: relative;
@@ -658,18 +693,20 @@
                 padding-right: 14px;
             }
 
-            .page-header-actions {
-                width: 100%;
-                margin-left: 0;
-            }
-
-            .page-header-actions .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
             .action-buttons {
                 flex-wrap: wrap;
+            }
+
+            .submission-buttons-bar {
+                padding: 0.85rem 0.75rem;
+                margin-bottom: 1rem;
+                gap: 0.5rem;
+            }
+
+            .submission-buttons-bar .btn {
+                padding: 0.5rem 0.9rem;
+                font-size: 0.85rem;
+                width: 100%;
             }
         }
     </style>
@@ -696,30 +733,6 @@
                                     <h2 class="page-header-title">Manage Blotters</h2>
                                     <p class="page-header-subtitle">Dispute records</p>
                                 </div>
-                            </div>
-
-                            <div class="page-header-actions">
-                                <button class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm"
-                                        type="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#blotterModal">
-                                    <i class="fa fa-plus"></i>
-                                    <span>Submit Regular Blotter</span>
-                                </button>
-                                <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
-                                        type="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#vawcBlotterModal">
-                                    <i class="fa fa-user-shield"></i>
-                                    <span>Submit VAWC Blotter</span>
-                                </button>
-                                <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
-                                        type="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#katarungangPambarangayBlotterModal">
-                                    <i class="fa fa-scale-balanced"></i>
-                                    <span>Submit Katarungang Pambarangay</span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -784,6 +797,30 @@
                                 </a>
                             </li>
                         </ul>
+
+                        <div class="submission-buttons-bar">
+                            <button class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#blotterModal">
+                                <i class="fa fa-plus"></i>
+                                <span>Submit Regular Blotter</span>
+                            </button>
+                            <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#vawcBlotterModal">
+                                <i class="fa fa-user-shield"></i>
+                                <span>Submit VAWC Blotter</span>
+                            </button>
+                            <button class="btn btn-outline-primary d-inline-flex align-items-center gap-2 shadow-sm"
+                                    type="button"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#katarungangPambarangayBlotterModal">
+                                <i class="fa fa-scale-balanced"></i>
+                                <span>Submit Katarungang Pambarangay</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="tab-content" id="blotterTabContent">
@@ -802,7 +839,7 @@
                                             </span>
                                             <input type="text" name="search"
                                                 class="form-control border-start-0 ps-0"
-                                                placeholder="Search complainant, defendant, or status..."
+                                                placeholder="Search ID, complainant, defendant, or status..."
                                                 value="{{ request('search') }}">
                                             <button type="submit" class="btn btn-primary px-3">Apply</button>
                                         </div>
@@ -852,7 +889,7 @@
                                 <table id="blotterTable" class="table table-hover align-middle">
                                     <thead>
                                         <tr>
-                                            <th style="width: 120px;">Blotter No</th>
+                                            <th style="width: 120px;">ID</th>
                                             <th style="width: 140px;">Type</th>
                                             <th>Complainant (Nagrereklamo)</th>
                                             <th>Respondent (Nirereklamo)</th>
@@ -998,6 +1035,22 @@
                                                                             <div class="col-sm-6">
                                                                                 <div class="info-label">Contact Number</div>
                                                                                 <div class="info-value">{{ $blotter->witnessContactNumber ?? 'N/A' }}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </section>
+                                                            @endif
+
+                                                            @if(filled($blotter->incident_date_time))
+                                                                <section>
+                                                                    <h6>Incident Date & Time</h6>
+                                                                    <div class="info-box">
+                                                                        <div class="row gy-2">
+                                                                            <div class="col-12">
+                                                                                <div class="info-label">Date & Time</div>
+                                                                                <div class="info-value">
+                                                                                    {{ \Carbon\Carbon::parse($blotter->incident_date_time)->format('M d, Y g:i A') }}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>

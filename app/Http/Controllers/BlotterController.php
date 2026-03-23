@@ -336,7 +336,13 @@ class BlotterController extends Controller
             $normalizedSearch = self::normalizeSearchTerm($search);
             $searchLike = '%' . $normalizedSearch . '%';
 
-            $query->where(function ($q) use ($search, $matchingStatuses, $matchingTypes, $searchId, $searchLike) {
+            // Extract numeric ID from formatted ID (e.g., "BLTR-2026-000020" -> "20")
+            $formattedIdNumericPart = null;
+            if (preg_match('/^[A-Z]+-\d+-(\d+)$/', strtoupper($search), $matches)) {
+                $formattedIdNumericPart = (int) $matches[1];
+            }
+
+            $query->where(function ($q) use ($search, $matchingStatuses, $matchingTypes, $searchId, $searchLike, $formattedIdNumericPart) {
                 $q->where('id', 'like', '%' . $search . '%')
                     ->orWhereRaw('LOWER(plaintiffName) LIKE ?', [$searchLike])
                     ->orWhereRaw('LOWER(COALESCE(plaintiffMiddleName, "")) LIKE ?', [$searchLike])
@@ -355,6 +361,10 @@ class BlotterController extends Controller
                 if ($searchId !== '') {
                     $q->orWhere('id', (int) $searchId)
                         ->orWhereRaw("CAST(id AS CHAR) LIKE ?", ['%' . $searchId . '%']);
+                }
+
+                if ($formattedIdNumericPart !== null) {
+                    $q->orWhere('id', (int) $formattedIdNumericPart);
                 }
 
                 if ($matchingStatuses !== []) {
@@ -440,16 +450,11 @@ class BlotterController extends Controller
         $residents = Resident::query()
             ->with(['households.house.street'])
             ->select(['id', 'firstName', 'middleName', 'lastName', 'age', 'contactNo'])
-            ->where(function ($query) use ($search, $searchLike) {
+            ->where(function ($query) use ($searchLike) {
                 $query->whereRaw('LOWER(CONCAT_WS(" ", firstName, middleName, lastName)) LIKE ?', [$searchLike])
                     ->orWhereRaw('LOWER(CONCAT_WS(" ", firstName, lastName)) LIKE ?', [$searchLike])
                     ->orWhereRaw('LOWER(CONCAT_WS(" ", lastName, firstName, middleName)) LIKE ?', [$searchLike])
                     ->orWhereRaw('LOWER(CONCAT_WS(" ", lastName, firstName)) LIKE ?', [$searchLike]);
-
-                if (preg_match('/^\d+$/', $search) === 1) {
-                    $query->orWhere('id', (int) $search)
-                        ->orWhere('id', 'like', '%' . $search . '%');
-                }
             })
             ->orderBy('lastName')
             ->orderBy('firstName')

@@ -393,6 +393,12 @@
 .sidebar.sidebar--light .sidebar-notification-dot{
     border-color: rgba(255, 255, 255, 0.95);
 }
+
+/* Compact alignment for long labels */
+.sidebar-body-menu a.compact-label .menu-label {
+    font-size: 0.8rem;
+    margin-left: -6px;
+}
 </style>
 
 
@@ -524,9 +530,9 @@
                     </a>
                 </li>
                 <li>
-                    <a class="{{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
+                    <a class="compact-label {{ Request::routeIs('admin.certificateRequest') ? 'active' : '' }}"
                        href="{{ route('admin.certificateRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span>  Certificate Requests
+                        <span class="icon"><i class="fa-solid fa-file-lines"></i></span> <span class="menu-label">Certificate Requests</span>
                         @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_CERTIFICATE_REQUESTS] ?? false)
                             <span class="sidebar-notification-dot" aria-label="New certificate requests"></span>
                         @endif
@@ -534,9 +540,9 @@
                 </li>
 
                 <li>
-                    <a class="{{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
+                    <a class="compact-label {{ Request::routeIs('admin.complaintRequest') ? 'active' : '' }}"
                        href="{{ route('admin.complaintRequest') }}">
-                        <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
+                        <span class="icon"><i class="fa-solid fa-comments"></i></span> <span class="menu-label">Complaints Records</span>
                         @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_COMPLAINTS_RECORDS] ?? false)
                             <span class="sidebar-notification-dot" aria-label="New complaint records"></span>
                         @endif
@@ -557,6 +563,9 @@
                     <a class="{{ Request::routeIs('admin.archives') ? 'active' : '' }}"
                        href="{{ route('admin.archives') }}">
                         <span class="icon"><i class="fa-solid fa-box-archive"></i></span>Archives
+                        @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_ARCHIVES] ?? false)
+                            <span class="sidebar-notification-dot" aria-label="New archive entries"></span>
+                        @endif
                     </a>
                 </li>
 

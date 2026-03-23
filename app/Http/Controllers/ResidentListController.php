@@ -127,6 +127,32 @@ private function syncLinkedUserFromResident(Resident $resident, array $validated
     $resident->user->save();
 }
 
+private function ensureResidentIdentityIsUnique(array $payload, ?int $ignoreResidentId = null): void
+{
+    $birthday = $payload['birthday'] ?? null;
+
+    if (empty($birthday)) {
+        return;
+    }
+
+    $query = Resident::matchingIdentity(
+        $payload['firstName'] ?? null,
+        $payload['middleName'] ?? null,
+        $payload['lastName'] ?? null,
+        $birthday
+    );
+
+    if ($ignoreResidentId !== null) {
+        $query->where('id', '!=', $ignoreResidentId);
+    }
+
+    if ($query->exists()) {
+        throw ValidationException::withMessages([
+            'firstName' => 'A resident with the same full name and birthday already exists (including inactive records).',
+        ]);
+    }
+}
+
 public function showResidents(Request $request)
 {
     $streets = Street::has('houses')->get();
@@ -139,6 +165,7 @@ public function showResidents(Request $request)
     
     $searchTerm = $request->input('search');
     $sexFilter = $request->input('sex_filter', 'all');
+    $statusFilter = $request->input('status_filter', 'all');
     $sort = $request->input('sort', 'id_desc');
     
     $residentCount = Resident::count();
@@ -148,15 +175,32 @@ public function showResidents(Request $request)
     
     $residents = Resident::with(['user:id,firstName,lastname,profile_image', 'official', 'households.house.street'])
         ->when($searchTerm, function($query, $searchTerm) {
+            $formattedIdNumericPart = null;
+            if (preg_match('/^[A-Z]+-\d+-(\d+)$/', strtoupper((string) $searchTerm), $matches)) {
+                $formattedIdNumericPart = (int) $matches[1];
+            }
+
             return $query->where(function($q) use ($searchTerm) {
                 $q->where('firstName', 'like', "%{$searchTerm}%")
                   ->orWhere('lastName', 'like', "%{$searchTerm}%")
                   ->orWhere('middleName', 'like', "%{$searchTerm}%")
                   ->orWhere('id', 'like', "%{$searchTerm}%");
+            })->when($formattedIdNumericPart !== null, function ($q) use ($formattedIdNumericPart) {
+                return $q->orWhere('id', (int) $formattedIdNumericPart);
             });
         })
         ->when(in_array($sexFilter, ['male', 'female'], true), function ($query) use ($sexFilter) {
             return $query->where('sex', $sexFilter);
+        })
+        ->when(in_array($statusFilter, ['active', 'inactive'], true), function ($query) use ($statusFilter) {
+            if ($statusFilter === 'active') {
+                return $query->where(function ($nested) {
+                    $nested->where('status', 'active')
+                        ->orWhereNull('status');
+                });
+            }
+
+            return $query->where('status', 'inactive');
         });
 
 
@@ -205,7 +249,7 @@ public function showResidents(Request $request)
 
     return view($user->role . '.residents', compact(
     'user', 'residents', 'searchTerm', 'streets', 'houses',
-    'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'sexFilter', 'sort', 'allResidents', 'headCandidateResidents'
+        'residentCount', 'maleCount', 'femaleCount', 'seniorCount', 'sexFilter', 'statusFilter', 'sort', 'allResidents', 'headCandidateResidents'
 ));
 }
 
@@ -229,6 +273,7 @@ public function searchResidents(Request $request)
             'sex' => 'nullable|in:male,female',
             'parent' => 'nullable|in:yes,no,single',
             'enrolled' => 'nullable|in:yes,no',
+            'religion' => 'nullable|string|max:255',
             'educationalAttainment' => 'nullable|string',
             'headOfFamily' => 'required|in:yes,no',
             'type' => 'nullable|array',
@@ -246,6 +291,7 @@ public function searchResidents(Request $request)
         }
 
         $validated = $this->normalizeResidentPayload($validated);
+        $this->ensureResidentIdentityIsUnique($validated);
 
         $validated['contactNo'] = filled($validated['contactNo'] ?? null)
             ? trim((string) $validated['contactNo'])
@@ -256,6 +302,7 @@ public function searchResidents(Request $request)
         $validated['emergencyContactName'] = filled($validated['emergencyContactName'] ?? null)
             ? trim((string) $validated['emergencyContactName'])
             : 'N/A';
+        $validated['status'] = 'active';
         
         // Add encoded by
         $validated['EncodedBy'] = auth()->id();
@@ -296,6 +343,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'parent' => 'required|in:yes,no,single',
             'enrolled' => 'required|in:yes,no',
             'educationalAttainment' => 'nullable|string|max:255',
+            'religion' => 'nullable|string|max:255',
             'headOfFamily' => 'required|in:yes,no',
             'type' => 'nullable|array',
             'type.*' => 'nullable|in:voter,senior_citizen,pwd,solo_parent',
@@ -304,6 +352,7 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         ], $this->contactNumberMessages(['contactNo', 'emergencyContactNo']));
 
         $validated = $this->normalizeResidentPayload($validated);
+        $this->ensureResidentIdentityIsUnique($validated, (int) $resident->id);
 
         // Mirror encode behavior: blank contact/emergency fields become explicit "N/A"
         $validated['contactNo'] = filled($validated['contactNo'] ?? null)
@@ -426,13 +475,34 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             abort(403);
         }
 
-        $resident = Resident::findOrFail($id);
+        $resident = Resident::with('households')->findOrFail($id);
+
+        if (strtolower((string) ($resident->status ?? 'active')) !== 'inactive') {
+            return redirect()->back()->withErrors([
+                'error' => 'Only inactive residents can be archived.',
+            ]);
+        }
+
+        // Capture household membership before deleting the resident (pivot rows are cascade-deleted).
+        $householdResidents = $resident->households
+            ->map(function ($household) {
+                return [
+                    'household_id' => (int) $household->id,
+                    'is_household_head' => (bool) ($household->pivot?->is_household_head ?? false),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $data = $resident->toArray();
+        unset($data['households']); // keep archive payload compact; households are stored in household_residents
+        $data['household_residents'] = $householdResidents;
 
         // Create archive record
         Archive::create([
             'record_type' => 'resident',
             'record_id' => $resident->id,
-            'data' => $resident->toArray(),
+            'data' => $data,
             'archived_by' => $user->id,
         ]);
 
@@ -440,6 +510,26 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
         $resident->delete();
 
         return redirect()->back()->with('success', 'Resident archived successfully!');
+    }
+
+    public function updateResidentStatus(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        if (!$user || $user->role === 'resident' || $user->role === 'non-resident') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $resident = Resident::findOrFail($id);
+        $resident->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back()->with('success', 'Resident status updated successfully.');
     }
 
 public function updateOwnInfo(Request $request, $id)
@@ -454,6 +544,7 @@ public function updateOwnInfo(Request $request, $id)
         'enrolled' => 'required|in:yes,no',
         'educationalAttainment' => 'nullable|string|max:255',
         'headOfFamily' => 'nullable|in:yes,no',
+        'religion' => 'nullable|string|max:255',
         'new_head_id' => 'nullable|exists:residents,id'
     ], $this->contactNumberMessages(['emergencyContactNo']));
 

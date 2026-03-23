@@ -197,7 +197,13 @@ class AdminController extends Controller
 
         $applyCommonFilters = function ($query) use ($search, $sort, $statusFilter, $activeTab, $certificateTypeFilter) {
             if ($search !== '') {
-                $query->where(function ($q) use ($search) {
+                // Extract numeric ID from formatted ID (e.g., "CERT-2026-000001" -> "1")
+                $formattedIdNumericPart = null;
+                if (preg_match('/^[A-Z]+-\d+-(\d+)$/', strtoupper($search), $matches)) {
+                    $formattedIdNumericPart = (int) $matches[1];
+                }
+
+                $query->where(function ($q) use ($search, $formattedIdNumericPart) {
                     $q->where('id', 'like', '%' . $search . '%')
                         ->orWhere('certificate_type', 'like', '%' . $search . '%')
                         ->orWhere('purpose', 'like', '%' . $search . '%')
@@ -210,6 +216,10 @@ class AdminController extends Controller
                             $residentQuery->where('firstName', 'like', '%' . $search . '%')
                                 ->orWhere('lastName', 'like', '%' . $search . '%');
                         });
+
+                    if ($formattedIdNumericPart !== null) {
+                        $q->orWhere('id', (int) $formattedIdNumericPart);
+                    }
                 });
             }
 

@@ -154,7 +154,7 @@
                                class="form-control js-resident-search-input"
                                data-party="plaintiff"
                                autocomplete="off"
-                               placeholder="Type resident name or ID..."
+                               placeholder="Type resident name..."
                                value="{{ old('plaintiff_party_type') === 'resident' ? trim(collect([old('plaintiffName'), old('plaintiffMiddleName'), old('plaintiffLastName')])->filter()->implode(' ')) : '' }}">
                         <button type="button" class="btn btn-outline-primary js-resident-search-btn" data-party="plaintiff">
                             <i class="fa fa-search"></i>
@@ -221,7 +221,7 @@
                                class="form-control js-resident-search-input"
                                data-party="defendant"
                                autocomplete="off"
-                               placeholder="Type resident name or ID..."
+                               placeholder="Type resident name..."
                                value="{{ old('defendant_party_type') === 'resident' ? trim(collect([old('defendantName'), old('defendantMiddleName'), old('defendantLastName')])->filter()->implode(' ')) : '' }}">
                         <button type="button" class="btn btn-outline-primary js-resident-search-btn" data-party="defendant">
                             <i class="fa fa-search"></i>
@@ -299,11 +299,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Incident Date & Time <span class="text-muted">(Optional)</span></label>
-                      <input type="text"
-                           name="incident_date_time"
-                          class="form-control datetime-picker"
-                          value="{{ old('incident_date_time') }}"
-                          placeholder="Click to enter incident date and time...">
+                    <input class="form-control datetime-picker" 
+                           type="text" 
+                           name="incident_date_time" 
+                           id="incident_date_time"
+                           value="{{ old('incident_date_time') }}"
+                           placeholder="Click to select incident date and time...">
                     <small class="form-text text-muted">Leave blank if the exact incident date and time is unknown.</small>
                 </div>
                 <label class="form-label">Attach Blotter Image</label>
@@ -410,8 +411,7 @@
                 residentIdInput.value = resident.id || '';
                 searchInput.value = (resident.full_name || '').trim();
                 preview.innerHTML =
-                    '<strong>Selected Resident:</strong> ' + (resident.full_name || 'N/A') +
-                    ' <span class="text-muted">(ID: ' + (resident.id || 'N/A') + ')</span><br>' +
+                    '<strong>Selected Resident:</strong> ' + (resident.full_name || 'N/A') + '<br>' +
                     'Age: ' + (resident.age || 'N/A') +
                     ' | Contact: ' + (contactNumber || 'N/A') +
                     ' | Address: ' + (resident.address || 'N/A');
@@ -442,8 +442,7 @@
                     const option = document.createElement('div');
                     option.className = 'resident-search-item';
                     option.innerHTML =
-                        '<div class="resident-search-name">' + (resident.full_name || 'N/A') +
-                        ' <span class="text-muted">(ID: ' + (resident.id || 'N/A') + ')</span></div>' +
+                        '<div class="resident-search-name">' + (resident.full_name || 'N/A') + '</div>' +
                         '<div class="resident-search-meta">Age: ' + (resident.age || 'N/A') +
                         ' | Contact: ' + (resident.contact_no || 'N/A') +
                         ' | Address: ' + (resident.address || 'N/A') + '</div>';
@@ -540,5 +539,20 @@
     })();
 </script>
 @endonce
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    flatpickr(".datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",  
+        altInput: true,         
+        altFormat: "F j, Y h:i K", 
+        time_24hr: false
+    });
+});
+</script>
 
 

@@ -1,3 +1,7 @@
+@php
+    $sidebarNotifications = app(\App\Services\SidebarNotificationService::class)->forUser(auth()->user());
+@endphp
+
 <style>
 .sidebar {
     background: {{ \App\Models\Setting::get('theme', '#0061f7') }} !important;
@@ -272,6 +276,17 @@
 .cat-sub-menu a {
     font-size: 0.875rem;
 }
+
+.sidebar-notification-dot{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 1px solid #ffffff;
+    flex-shrink: 0;
+}
 </style>
 
 <aside class="sidebar">
@@ -359,6 +374,14 @@
     <li>
         <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
                                     <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
+        </a>
+    </li>
+    <li>
+        <a class="{{ Request::routeIs('subadmin.archives') ? 'active' : '' }}" href="{{ route('subadmin.archives') }}">
+            <span class="icon"><i class="fa-solid fa-box-archive"></i></span>Archives
+            @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_ARCHIVES] ?? false)
+                <span class="sidebar-notification-dot" aria-label="New archive entries"></span>
+            @endif
         </a>
     </li>
     <li>

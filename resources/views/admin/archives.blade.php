@@ -119,6 +119,20 @@
             display: flex;
             gap: 0.45rem;
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .archive-actions form {
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .archive-actions .btn {
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .resident-name-cell {
@@ -166,6 +180,86 @@
         .pagination-info-text i {
             color: var(--primary-color);
         }
+
+        .archive-tabs {
+            padding: 1rem 1rem 0 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #fff;
+        }
+
+        .archive-tabs .nav-link {
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 700;
+            border-radius: 10px 10px 0 0;
+            padding: 0.75rem 1rem;
+        }
+
+        .archive-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: #eff6ff;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .tab-empty-state {
+            padding: 2.5rem 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .archive-filter-bar {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+
+        .archive-filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .archive-search-group {
+            flex: 1 1 360px;
+            min-width: 260px;
+        }
+
+        .archive-search-group .input-group-text {
+            background: #fff;
+            border-right: 0;
+        }
+
+        .archive-search-group .form-control {
+            border-left: 0;
+        }
+
+        .archive-search-group .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+
+        .archive-filter-controls {
+            display: flex;
+            gap: 0.55rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .archive-filter-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+            margin-right: 0.1rem;
+        }
+
+        .archive-filter-select {
+            min-width: 180px;
+            height: 32px;
+            font-size: 0.85rem;
+        }
     </style>
 
 
@@ -190,154 +284,464 @@
             <h3>Archived records</h3>
         </div>
 
+        @if (session('success'))
+            <div class="alert alert-success m-3" role="alert">{{ session('success') }}</div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger m-3" role="alert">{{ session('error') }}</div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger m-3" role="alert">
+                <div class="fw-bold mb-2">Something went wrong:</div>
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @php
+            $rolePrefix = auth()->user()->role === 'subadmin' ? 'subadmin' : 'admin';
+            $activeTab = request()->query('tab', 'residents');
+            $activeSort = request()->query('sort', 'date_desc');
+            if (!in_array($activeTab, ['residents', 'certificates', 'announcements', 'activity_logs'], true)) {
+                $activeTab = 'residents';
+            }
+
+            $residentArchives = $archive->filter(function ($item) {
+                return in_array(strtolower((string) $item->record_type), ['resident', 'residents'], true);
+            })->values();
+
+            $certificateArchives = $archive->filter(function ($item) {
+                return in_array(strtolower((string) $item->record_type), ['certificate_request', 'certificate_requests'], true);
+            })->values();
+
+            $announcementArchives = $archive->filter(function ($item) {
+                return in_array(strtolower((string) $item->record_type), ['announcement', 'announcements'], true);
+            })->values();
+
+            $activityLogArchives = $archive->filter(function ($item) {
+                return in_array(strtolower((string) $item->record_type), ['active_log', 'active_logs', 'activity_log', 'activity_logs'], true);
+            })->values();
+
+            $certificateResidentIds = $certificateArchives
+                ->pluck('data')
+                ->filter(fn ($data) => is_array($data) && !empty($data['resident_id']))
+                ->map(fn ($data) => (int) $data['resident_id'])
+                ->unique()
+                ->values();
+
+            $certificateUserIds = $certificateArchives
+                ->pluck('data')
+                ->filter(fn ($data) => is_array($data) && !empty($data['user_id']))
+                ->map(fn ($data) => (int) $data['user_id'])
+                ->unique()
+                ->values();
+
+            $residentNameById = \App\Models\Resident::query()
+                ->when($certificateResidentIds->isNotEmpty(), fn ($query) => $query->whereIn('id', $certificateResidentIds))
+                ->get(['id', 'firstName', 'middleName', 'lastName'])
+                ->mapWithKeys(function ($resident) {
+                    $fullName = trim(collect([$resident->firstName, $resident->middleName, $resident->lastName])->filter()->implode(' '));
+                    return [$resident->id => ($fullName !== '' ? ucwords(strtolower($fullName)) : 'N/A')];
+                });
+
+            $userNameById = \App\Models\User::query()
+                ->when($certificateUserIds->isNotEmpty(), fn ($query) => $query->whereIn('id', $certificateUserIds))
+                ->get(['id', 'firstName', 'middleName', 'lastName'])
+                ->mapWithKeys(function ($user) {
+                    $fullName = trim(collect([$user->firstName, $user->middleName, $user->lastName])->filter()->implode(' '));
+                    return [$user->id => ($fullName !== '' ? ucwords(strtolower($fullName)) : 'N/A')];
+                });
+
+            $activityUserIds = $activityLogArchives
+                ->pluck('data')
+                ->filter(fn ($data) => is_array($data) && !empty($data['user_id']))
+                ->map(fn ($data) => (int) $data['user_id'])
+                ->unique()
+                ->values();
+
+            $activityUserNameById = \App\Models\User::query()
+                ->when($activityUserIds->isNotEmpty(), fn ($query) => $query->whereIn('id', $activityUserIds))
+                ->get(['id', 'firstName', 'middleName', 'lastName'])
+                ->mapWithKeys(function ($user) {
+                    $fullName = trim(collect([$user->firstName, $user->middleName, $user->lastName])->filter()->implode(' '));
+                    return [$user->id => ($fullName !== '' ? ucwords(strtolower($fullName)) : 'N/A')];
+                });
+        @endphp
+
         <div class="records-container">
             @if($archive->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Archived Type</th>
-                                <th scope="col">Resident Name</th>
-                                <th scope="col">Archived By</th>
-                                <th scope="col">Archived Date</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($archive as $item)
-                            @php
-                                $residentName = null;
+                <div class="archive-tabs">
+                    <ul class="nav nav-tabs" id="archiveTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $activeTab === 'residents' ? 'active' : '' }}" id="residents-tab" data-bs-toggle="tab" data-bs-target="#residents-pane" type="button" role="tab" aria-controls="residents-pane" aria-selected="{{ $activeTab === 'residents' ? 'true' : 'false' }}">
+                                Residents
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $activeTab === 'certificates' ? 'active' : '' }}" id="certificates-tab" data-bs-toggle="tab" data-bs-target="#certificates-pane" type="button" role="tab" aria-controls="certificates-pane" aria-selected="{{ $activeTab === 'certificates' ? 'true' : 'false' }}">
+                                Certificates
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $activeTab === 'announcements' ? 'active' : '' }}" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements-pane" type="button" role="tab" aria-controls="announcements-pane" aria-selected="{{ $activeTab === 'announcements' ? 'true' : 'false' }}">
+                                Announcements
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link {{ $activeTab === 'activity_logs' ? 'active' : '' }}" id="activity-logs-tab" data-bs-toggle="tab" data-bs-target="#activity-logs-pane" type="button" role="tab" aria-controls="activity-logs-pane" aria-selected="{{ $activeTab === 'activity_logs' ? 'true' : 'false' }}">
+                                Activity Logs
+                            </button>
+                        </li>
+                    </ul>
+                </div>
 
-                                if ($item->record_type === 'resident' && is_array($item->data)) {
-                                    $firstName = trim((string) ($item->data['firstName'] ?? ''));
-                                    $middleName = trim((string) ($item->data['middleName'] ?? ''));
-                                    $lastName = trim((string) ($item->data['lastName'] ?? ''));
+                <div class="tab-content" id="archiveTabsContent">
+                    <div class="tab-pane fade {{ $activeTab === 'residents' ? 'show active' : '' }}" id="residents-pane" role="tabpanel" aria-labelledby="residents-tab" tabindex="0">
+                        <div class="archive-filter-bar">
+                            <form method="GET" action="{{ route($rolePrefix . '.archives') }}" class="archive-filter-form">
+                                <input type="hidden" name="tab" value="residents">
+                                <div class="input-group input-group-sm archive-search-group">
+                                    <span class="input-group-text text-muted"><i class="fa fa-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search residents, archived by, or details..." value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-primary px-3">Search</button>
+                                </div>
+                                <div class="archive-filter-controls">
+                                    <span class="archive-filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
+                                        <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
+                                        <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
+                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
+                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
+                                    </select>
+                                    <a href="{{ route($rolePrefix . '.archives', ['tab' => 'residents']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
+                                </div>
+                            </form>
+                        </div>
+                        @if($residentArchives->isEmpty())
+                            <div class="tab-empty-state">No archived residents found on this page.</div>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Archive Date</th>
+                                            <th scope="col">Archived By</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($residentArchives as $item)
+                                            @php
+                                                $residentPayload = is_array($item->data) ? $item->data : [];
+                                                $firstName = trim((string) ($residentPayload['firstName'] ?? ''));
+                                                $middleName = trim((string) ($residentPayload['middleName'] ?? ''));
+                                                $lastName = trim((string) ($residentPayload['lastName'] ?? ''));
+                                                $residentName = trim(collect([$firstName, $middleName, $lastName])->filter()->implode(' '));
+                                                $residentName = $residentName !== '' ? ucwords(strtolower($residentName)) : 'N/A';
+                                            @endphp
+                                            <tr>
+                                                <td class="resident-name-cell">{{ $residentName }}</td>
+                                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
+                                                <td>
+                                                    {{ $item->user
+                                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
+                                                        : 'Unknown'
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    <div class="archive-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveDetailsModal{{ $item->id }}">
+                                                            <i class="fa-solid fa-eye"></i> View
+                                                        </button>
+                                                        <form action="{{ route($rolePrefix . '.archive.retrieve.resident', $item->id) }}" method="post" onsubmit="return confirm('Retrieve this resident back to active records?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="fa-solid fa-rotate-left"></i> Retrieve
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
 
-                                    $residentName = trim(collect([$firstName, $middleName, $lastName])->filter()->implode(' '));
-                                    $residentName = $residentName !== '' ? ucwords(strtolower($residentName)) : null;
-                                }
-                            @endphp
-                            <tr>
-                                <td>
-                                    <span class="archive-type">{{ ucfirst($item->record_type) }}</span>
-                                </td>
-                                <td class="resident-name-cell">
-                                    @if($item->record_type === 'resident')
-                                        {{ $residentName ?? 'N/A' }}
-                                    @else
-                                        <span class="text-muted">N/A</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $item->user
-                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
-                                        : 'Unknown'
-                                    }}
-                                </td>
+                    <div class="tab-pane fade {{ $activeTab === 'certificates' ? 'show active' : '' }}" id="certificates-pane" role="tabpanel" aria-labelledby="certificates-tab" tabindex="0">
+                        <div class="archive-filter-bar">
+                            <form method="GET" action="{{ route($rolePrefix . '.archives') }}" class="archive-filter-form">
+                                <input type="hidden" name="tab" value="certificates">
+                                <div class="input-group input-group-sm archive-search-group">
+                                    <span class="input-group-text text-muted"><i class="fa fa-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search certificate ID, type, requester, or details..." value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-primary px-3">Search</button>
+                                </div>
+                                <div class="archive-filter-controls">
+                                    <span class="archive-filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
+                                        <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
+                                        <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
+                                        <option value="type_asc" {{ $activeSort === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
+                                        <option value="type_desc" {{ $activeSort === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
+                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
+                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
+                                    </select>
+                                    <a href="{{ route($rolePrefix . '.archives', ['tab' => 'certificates']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
+                                </div>
+                            </form>
+                        </div>
+                        @if($certificateArchives->isEmpty())
+                            <div class="tab-empty-state">No archived certificates found on this page.</div>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Request ID / Type</th>
+                                            <th scope="col">Requester Name</th>
+                                            <th scope="col">Archive Date</th>
+                                            <th scope="col">Archived By</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($certificateArchives as $item)
+                                            @php
+                                                $certificatePayload = is_array($item->data) ? $item->data : [];
+                                                $requestId = $certificatePayload['formatted_id'] ?? ('ID #' . ($certificatePayload['id'] ?? $item->record_id));
+                                                $requestType = isset($certificatePayload['certificate_type'])
+                                                    ? ucwords(str_replace('_', ' ', (string) $certificatePayload['certificate_type']))
+                                                    : 'N/A';
 
-                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
-                                <td>
-                                    @if(is_array($item->data) && count($item->data) > 0)
-                                        @php
-                                            $prefixMap = [
-                                                'resident' => 'RSDT',
-                                                'residents' => 'RSDT',
-                                                'blotter' => 'BLTR',
-                                                'blotters' => 'BLTR',
-                                                'certificate' => 'CERT',
-                                                'certificates' => 'CERT',
-                                                'household' => 'HSHD',
-                                                'households' => 'HSHD',
-                                                'complaint' => 'CMPL',
-                                                'complaints' => 'CMPL',
-                                                'active log' => 'ACTL',
-                                                'active logs' => 'ACTL',
-                                                'activity' => 'ACTL',
-                                                'activities' => 'ACTL',
-                                                'official' => 'OFFC',
-                                                'officials' => 'OFFC',
-                                                'archive' => 'ARCH',
-                                                'archives' => 'ARCH',
-                                                'announcement' => 'ANNC',
-                                                'announcements' => 'ANNC',
-                                                'feedback' => 'FDBK',
-                                                'feedbacks' => 'FDBK',
-                                                'user' => 'USER',
-                                                'users' => 'USER',
-                                            ];
-
-                                            $formatArchivedId = function ($prefix, $idValue, $dateRef) {
-                                                if (!is_numeric($idValue)) {
-                                                    return $idValue;
+                                                $requesterName = null;
+                                                if (!empty($certificatePayload['resident_id'])) {
+                                                    $requesterName = $residentNameById->get((int) $certificatePayload['resident_id']);
                                                 }
+                                                if (!$requesterName && !empty($certificatePayload['user_id'])) {
+                                                    $requesterName = $userNameById->get((int) $certificatePayload['user_id']);
+                                                }
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <div class="fw-semibold">{{ $requestId }}</div>
+                                                    <small class="text-muted">{{ $requestType }}</small>
+                                                </td>
+                                                <td class="resident-name-cell">{{ $requesterName ?? 'N/A' }}</td>
+                                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
+                                                <td>
+                                                    {{ $item->user
+                                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
+                                                        : 'Unknown'
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    <div class="archive-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveDetailsModal{{ $item->id }}">
+                                                            <i class="fa-solid fa-eye"></i> View
+                                                        </button>
+                                                        <form action="{{ route($rolePrefix . '.archive.retrieve.certificate', $item->id) }}" method="post" onsubmit="return confirm('Retrieve this certificate request back to active records?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="fa-solid fa-rotate-left"></i> Retrieve
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
 
-                                                $year = $dateRef?->format('Y') ?? now()->format('Y');
-                                                $padLength = strtoupper($prefix) === 'RSDT' ? 5 : 6;
+                    <div class="tab-pane fade {{ $activeTab === 'announcements' ? 'show active' : '' }}" id="announcements-pane" role="tabpanel" aria-labelledby="announcements-tab" tabindex="0">
+                        <div class="archive-filter-bar">
+                            <form method="GET" action="{{ route($rolePrefix . '.archives') }}" class="archive-filter-form">
+                                <input type="hidden" name="tab" value="announcements">
+                                <div class="input-group input-group-sm archive-search-group">
+                                    <span class="input-group-text text-muted"><i class="fa fa-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search announcement title, archived by, or details..." value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-primary px-3">Search</button>
+                                </div>
+                                <div class="archive-filter-controls">
+                                    <span class="archive-filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
+                                        <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
+                                        <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
+                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
+                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
+                                    </select>
+                                    <a href="{{ route($rolePrefix . '.archives', ['tab' => 'announcements']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
+                                </div>
+                            </form>
+                        </div>
+                        @if($announcementArchives->isEmpty())
+                            <div class="tab-empty-state">No archived announcements found on this page.</div>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Announcement</th>
+                                            <th scope="col">Archived By</th>
+                                            <th scope="col">Archive Date</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($announcementArchives as $item)
+                                            @php
+                                                $announcementPayload = is_array($item->data) ? $item->data : [];
+                                                $announcementTitle = trim((string) ($announcementPayload['title'] ?? 'Untitled Announcement'));
+                                            @endphp
+                                            <tr>
+                                                <td class="resident-name-cell">{{ $announcementTitle !== '' ? $announcementTitle : 'Untitled Announcement' }}</td>
+                                                <td>
+                                                    {{ $item->user
+                                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
+                                                        : 'Unknown'
+                                                    }}
+                                                </td>
+                                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
+                                                <td>
+                                                    <div class="archive-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveDetailsModal{{ $item->id }}">
+                                                            <i class="fa-solid fa-eye"></i> View
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
 
-                                                return sprintf('%s-%s-%0' . $padLength . 'd', strtoupper($prefix), $year, (int) $idValue);
-                                            };
+                    <div class="tab-pane fade {{ $activeTab === 'activity_logs' ? 'show active' : '' }}" id="activity-logs-pane" role="tabpanel" aria-labelledby="activity-logs-tab" tabindex="0">
+                        <div class="archive-filter-bar">
+                            <form method="GET" action="{{ route($rolePrefix . '.archives') }}" class="archive-filter-form">
+                                <input type="hidden" name="tab" value="activity_logs">
+                                <div class="input-group input-group-sm archive-search-group">
+                                    <span class="input-group-text text-muted"><i class="fa fa-search"></i></span>
+                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search activity log ID, module, action, user, or details..." value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-primary px-3">Search</button>
+                                </div>
+                                <div class="archive-filter-controls">
+                                    <span class="archive-filter-label">Sort</span>
+                                    <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
+                                        <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
+                                        <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
+                                        <option value="type_asc" {{ $activeSort === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
+                                        <option value="type_desc" {{ $activeSort === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
+                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
+                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
+                                    </select>
+                                    <a href="{{ route($rolePrefix . '.archives', ['tab' => 'activity_logs']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
+                                </div>
+                            </form>
+                        </div>
+                        @if($activityLogArchives->isEmpty())
+                            <div class="tab-empty-state">No archived activity logs found on this page.</div>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Activity ID</th>
+                                            <th scope="col">User</th>
+                                            <th scope="col">Module / Action</th>
+                                            <th scope="col">Archive Date</th>
+                                            <th scope="col">Archived By</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($activityLogArchives as $item)
+                                            @php
+                                                $activityPayload = is_array($item->data) ? $item->data : [];
+                                                $activityId = $activityPayload['id'] ?? $item->record_id;
+                                                $moduleLabel = isset($activityPayload['module'])
+                                                    ? \Illuminate\Support\Str::headline((string) $activityPayload['module'])
+                                                    : 'N/A';
+                                                $actionLabel = isset($activityPayload['action'])
+                                                    ? \Illuminate\Support\Str::headline((string) $activityPayload['action'])
+                                                    : 'N/A';
+                                                $activityUserName = !empty($activityPayload['user_id'])
+                                                    ? ($activityUserNameById->get((int) $activityPayload['user_id']) ?? 'N/A')
+                                                    : 'N/A';
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $activityId ? 'ACTL-' . str_pad((string) $activityId, 6, '0', STR_PAD_LEFT) : 'N/A' }}</td>
+                                                <td class="resident-name-cell">{{ $activityUserName }}</td>
+                                                <td>
+                                                    <div class="fw-semibold">{{ $moduleLabel }}</div>
+                                                    <small class="text-muted">{{ $actionLabel }}</small>
+                                                </td>
+                                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
+                                                <td>
+                                                    {{ $item->user
+                                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
+                                                        : 'Unknown'
+                                                    }}
+                                                </td>
+                                                <td>
+                                                    <div class="archive-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveDetailsModal{{ $item->id }}">
+                                                            <i class="fa-solid fa-eye"></i> View
+                                                        </button>
+                                                        <form action="{{ route($rolePrefix . '.archive.retrieve.activity-log', $item->id) }}" method="post" onsubmit="return confirm('Retrieve this activity log back to active logs?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="fa-solid fa-rotate-left"></i> Retrieve
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                </div>
 
-                                            $archiveTypeKey = strtolower(trim((string) $item->record_type));
-                                        @endphp
+                @foreach($archive as $item)
+                    <div class="modal fade" id="archiveDetailsModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Archived {{ ucfirst($item->record_type) }} Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    @if(is_array($item->data) && count($item->data) > 0)
                                         <div class="archive-details">
                                             @foreach($item->data as $key => $value)
-                                                @php
-                                                    $displayValue = is_array($value) ? json_encode($value) : $value;
-
-                                                    if (!is_array($value) && (string) $value !== '') {
-                                                        $normalizedKey = strtolower((string) $key);
-
-                                                        if ($normalizedKey === 'id') {
-                                                            $prefix = $prefixMap[$archiveTypeKey] ?? null;
-                                                            if ($prefix) {
-                                                                $displayValue = $formatArchivedId($prefix, $value, $item->created_at);
-                                                            }
-                                                        } elseif (str_ends_with($normalizedKey, '_id')) {
-                                                            $subject = substr($normalizedKey, 0, -3);
-                                                            $prefix = $prefixMap[$subject] ?? null;
-                                                            if ($prefix) {
-                                                                $displayValue = $formatArchivedId($prefix, $value, $item->created_at);
-                                                            }
-                                                        }
-                                                    }
-                                                @endphp
-                                                <div><span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span> {{ $displayValue }}</div>
+                                                <div class="modal-details-row">
+                                                    <span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span>
+                                                    {{ is_array($value) ? json_encode($value) : ($value !== null && $value !== '' ? $value : 'N/A') }}
+                                                </div>
                                             @endforeach
                                         </div>
                                     @else
-                                        <span class="text-muted">No details available</span>
+                                        <span class="text-muted">No details available.</span>
                                     @endif
-                                </td>
-                            </tr>
-
-                            <div class="modal fade" id="archiveDetailsModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Archived {{ ucfirst($item->record_type) }} Details</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            @if(is_array($item->data) && count($item->data) > 0)
-                                                <div class="archive-details">
-                                                    @foreach($item->data as $key => $value)
-                                                        <div class="modal-details-row">
-                                                            <span class="key">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', $key)) }}:</span>
-                                                            {{ is_array($value) ? json_encode($value) : ($value !== null && $value !== '' ? $value : 'N/A') }}
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="text-muted">No details available.</span>
-                                            @endif
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+                    </div>
+                @endforeach
 
                 @if($archive->hasPages())
                     <div class="pagination-container">
@@ -372,4 +776,21 @@
 <script src="{{ asset('template/js/script.js') }}"></script>
 <!--    -- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#archiveTabs button[data-bs-toggle="tab"]').forEach(function (button) {
+        button.addEventListener('shown.bs.tab', function (event) {
+            const targetPane = event.target.getAttribute('data-bs-target') || '';
+            const tab = targetPane.replace('#', '').replace('-pane', '');
+            if (!tab) {
+                return;
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', url.toString());
+        });
+    });
+});
+</script>
 

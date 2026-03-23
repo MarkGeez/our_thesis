@@ -408,7 +408,7 @@
                         @foreach ($myComplaints as $complaints)
                             <div class="complaint-card">
                                 <div class="complaint-header">
-                                    <span class="complaint-id">Complaint ID: {{ $complaints->complainant_id }}</span>
+                                   {{-- <span class="complaint-id">Complaint ID: {{ $complaints->complainant_id }}</span> --}} 
                                     <span class="complaint-date">
                                         {{ date('M d, Y g:i A', strtotime($complaints->created_at)) }}
                                     </span>

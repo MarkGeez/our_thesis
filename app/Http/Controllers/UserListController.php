@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ValidatesContactNumbers;
 use App\Mail\UserAccountStatusUpdateMail;
 use Illuminate\Http\Request;
 use App\Models\Resident;
@@ -14,8 +13,6 @@ use Carbon\Carbon;
 
 class UserListController extends Controller
 {
-    use ValidatesContactNumbers;
-
     private function syncResidentLink(User $user, string $role): void
     {
         if (!in_array($role, ['admin', 'subadmin', 'resident'], true)) {
@@ -50,10 +47,20 @@ class UserListController extends Controller
          // $userList = User::with('resident:houseNo,street,emergencyContactNo,emergencyContactName,age,sex,parent,enrolled,educationalAttainment,headOfFamily,EncodedBy,user_id')
         $userList = User::with('resident:user_id,contactNo,birthday,age,sex,parent,enrolled,educationalAttainment,religion,headOfFamily,emergencyContactNo,emergencyContactName')
         ->when($search, function($query, $search){
-            return $query-> where(function($q) use ($search){
+            // Extract numeric ID from formatted ID (e.g., "USER-2026-000001" -> "1")
+            $formattedIdNumericPart = null;
+            if (preg_match('/^[A-Z]+-\d+-(\d+)$/', strtoupper($search), $matches)) {
+                $formattedIdNumericPart = (int) $matches[1];
+            }
+
+            return $query-> where(function($q) use ($search, $formattedIdNumericPart){
                 $q->where('firstName', 'like', "%{$search}%")
                     ->orWhere('lastName', 'like', "%{$search}%")
                     ->orWhere('id', 'like', "%{$search}%");
+
+                if ($formattedIdNumericPart !== null) {
+                    $q->orWhere('id', (int) $formattedIdNumericPart);
+                }
             });
         })
         ->when(in_array($statusFilter, ['approved', 'pending', 'declined', 'rejected'], true), function ($query) use ($statusFilter) {
@@ -237,7 +244,7 @@ class UserListController extends Controller
 
         $rules = [
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'contactNumber' => $this->requiredContactNumberRules(),
+            'contactNumber' => 'required|string|max:11|',
             'birthday' => 'required|date|before:today',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'proofOfIdentity' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
@@ -249,7 +256,7 @@ class UserListController extends Controller
         }
 
         // Validate the request
-        $validated = $request->validate($rules, $this->contactNumberMessages(['contactNumber']));
+        $validated = $request->validate($rules);
         
         // Update basic info
         $user->email = $validated['email'];

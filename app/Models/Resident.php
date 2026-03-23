@@ -29,6 +29,7 @@ class Resident extends Model
         'educationalAttainment',
         'religion',
         'headOfFamily',
+        'status',
         'EncodedBy',
         'user_id',
         'image_path',
@@ -45,9 +46,7 @@ class Resident extends Model
 
     public function getFormattedIdAttribute(): string
     {
-        $year = $this->created_at?->format('Y') ?? now()->format('Y');
-
-        return sprintf('RSDT-%s-%05d', $year, (int) $this->getKey());
+        return $this->buildFormattedPublicId('RESD');
     }
 
     protected static function booted()

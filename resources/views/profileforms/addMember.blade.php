@@ -235,12 +235,12 @@ function initializeAddMemberModal() {
             const contact = formatContact(person.contactNo);
 
             option.innerHTML = `
-                <span class="resident-option-name">${fullName} (ID: ${person.id})</span>
+                <span class="resident-option-name">${fullName}</span>
                 <span class="resident-option-meta">${birthday} | ${sex} | ${contact}${note ? '<br><span style="color:#0d6efd;font-weight:600;">' + note + '</span>' : ''}</span>
             `;
 
             option.addEventListener('click', function () {
-                searchInput.value = `${fullName} (ID: ${person.id})`;
+                searchInput.value = fullName;
                 hiddenInput.value = person.id;
                 closeDropdown();
             });

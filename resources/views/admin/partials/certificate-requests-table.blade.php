@@ -63,7 +63,7 @@
             </span>
             <input type="text" name="search" 
                    class="form-control border-start-0 ps-0" 
-                   placeholder="Search requester or certificate type..." 
+                   placeholder="Search ID, requester, or certificate type..." 
                    value="{{ request('search') }}">
             <button type="submit" class="btn btn-primary px-3">
                 Search
@@ -132,7 +132,7 @@
         <table class="table table-bordered table-hover bg-white">
             <thead class="table-primary">
                 <tr>
-                    <th>Cert ID</th>
+                    <th>ID</th>
                     <th>Requester</th>
                     <th>Request <br> Date</th>
                     <th>Certificate Type</th>
@@ -146,7 +146,7 @@
             <tbody>
                 @foreach($filteredRequests as $request)
                 <tr>
-                    <td><code>{{ $request->formatted_id }}</code></td>
+                    <td>{{ $request->formatted_id }}</td>
                     <td>
                         <button type="button" class="btn btn-link text-decoration-none p-0" data-requester-user-id="{{ $request->user_id }}" data-requester-resident-id="{{ $request->resident_id ?? '' }}" title="View user information">
                             @if($request->resident)
@@ -216,6 +216,16 @@
             <button type="button" class="btn btn-sm btn-info text-white" data-preview-id="{{ $request->id }}">
                 <i class="fas fa-print me-1"></i>Generate Certificate
             </button>
+        @endif
+
+        @if($request->status === 'picked_up')
+            <form action="{{ route('admin.certificate.archive', $request->id) }}" method="POST" class="d-inline-block m-0" onsubmit="return confirm('Archive this received certificate request?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-box-archive me-1"></i>Archive
+                </button>
+            </form>
         @endif
 
         @if($request->status === 'rejected' && $request->decline_reason)

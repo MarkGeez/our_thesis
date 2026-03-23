@@ -6,6 +6,8 @@ use App\Mail\CertificateStatusUpdateMail;
 use App\Models\CertificateRequest;
 use App\Models\Official;
 use App\Models\Resident;
+use App\Services\ArchiveService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -13,6 +15,17 @@ use Illuminate\View\View;
 
 class CertificateController extends Controller
 {
+    public function archive(CertificateRequest $certificateRequest, ArchiveService $archiveService): RedirectResponse
+    {
+        if ($certificateRequest->status !== 'picked_up') {
+            return back()->withErrors(['error' => 'Only received certificate requests can be archived.']);
+        }
+
+        $archiveService->archive($certificateRequest, 'Archived received certificate request');
+
+        return back()->with('success', 'Certificate request archived successfully.');
+    }
+
     public function store(Request $request)
 {
     $validated = $request->validate([

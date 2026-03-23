@@ -593,6 +593,7 @@
                 <div class="search-section">
                     <form action="{{ route($user->role . '.residents') }}" method="get">
                         <input type="hidden" name="sex_filter" value="{{ request('sex_filter', 'all') }}">
+                        <input type="hidden" name="status_filter" value="{{ request('status_filter', 'all') }}">
                         <input type="hidden" name="sort" value="{{ request('sort', 'id_desc') }}">
                         <div class="row g-2 align-items-end">
                             <div class="col-12 col-md-6">
@@ -632,6 +633,14 @@
                                 </select>
                             </div>
                             <div class="filter-group">
+                                <span class="filter-label">Status</span>
+                                <select name="status_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" {{ request('status_filter', 'all') === 'all' ? 'selected' : '' }}>All</option>
+                                    <option value="active" {{ request('status_filter') === 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ request('status_filter') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
                                 <span class="filter-label">Sort</span>
                                 <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
                                     <option value="id_desc" {{ request('sort', 'id_desc') === 'id_desc' ? 'selected' : '' }}>ID: Newest</option>
@@ -659,14 +668,22 @@
                                         <th>ID</th>
                                         <th>Full Name</th>
                                         <th class="text-center">Actions</th>
+                                        <th class="text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($residents as $resident)
+                                        @php
+                                            $residentDisplayId = $resident->formatted_id;
+                                        @endphp
                                         <tr>
-                                            <td class="align-middle">{{ $resident->formatted_id }}</td>
+                                            <td class="align-middle">{{ $residentDisplayId }}</td>
                                             <td class="align-middle"> {{ ucwords(strtolower($resident->firstName)) }} {{ ucwords(strtolower($resident->middleName)) }} {{ ucwords(strtolower($resident->lastName)) }} </td>
                                             <td class="text-center text-nowrap">
+                                                @php
+                                                    $residentStatus = strtolower((string) ($resident->status ?? 'active'));
+                                                    $isActive = $residentStatus === 'active';
+                                                @endphp
                                                 <div class="d-flex justify-content-center align-items-center gap-2 action-btns">
                                                     <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#viewResident{{ $resident->id }}">
                                                         <i class="fa fa-eye"></i><span>View</span>
@@ -677,14 +694,29 @@
                                                     <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addOfficial{{ $resident->id }}">
                                                         <i class="fa fa-user-tie"></i><span>{{ $resident->official ? 'Edit Official' : 'Set Official' }}</span>
                                                     </button>--}}
-                                                    <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                                            <i class="fa fa-trash"></i><span>Inactive</span>
-                                                        </button>
-                                                    </form>
+                                                    @if($residentStatus === 'inactive')
+                                                        <form action="{{ route($user->role . '.archive.resident', $resident->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                                                <i class="fa fa-trash"></i><span>Archive</span>
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 </div>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <form action="{{ route($user->role . '.residents.update.status', $resident->id) }}" method="POST" class="d-inline-flex align-items-center gap-2">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="hidden" name="status" value="{{ $isActive ? 'inactive' : 'active' }}">
+                                                    <div class="form-check form-switch m-0 d-inline-flex align-items-center gap-2">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="residentStatusToggle{{ $resident->id }}" {{ $isActive ? 'checked' : '' }} onchange="this.form.submit()">
+                                                        <label class="form-check-label small fw-semibold {{ $isActive ? 'text-success' : 'text-secondary' }}" for="residentStatusToggle{{ $resident->id }}">
+                                                            {{ $isActive ? 'Active' : 'Inactive' }}
+                                                        </label>
+                                                    </div>
+                                                </form>
                                             </td>
                                         </tr>
 
@@ -695,7 +727,7 @@
                                                 <div class="modal-content border-0 shadow">
                                                     <div class="modal-header bg-primary text-white">
                                                         <h5 class="modal-title">
-                                                            <i class="bi bi-person-badge me-2"></i>Resident Details {{ $resident->formatted_id }}
+                                                            <i class="bi bi-person-badge me-2"></i>Resident Details {{ $residentDisplayId }}
                                                         </h5>
                                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                     </div>
@@ -912,7 +944,7 @@
                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Resident {{ $resident->formatted_id }}</h5>
+                                                    <h5 class="modal-title">Edit Resident {{ $residentDisplayId }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                 </div>
                                                 <div class="modal-body">
@@ -1542,6 +1574,22 @@ document.addEventListener('DOMContentLoaded', function () {
         <option value="no" {{ old('enrolled') === 'no' ? 'selected' : '' }}>No</option>
     </select>
     @error('enrolled')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    <label for="religion">Religion</label>
+    @php
+        $selectedCreateReligion = old('religion', 'Unknown');
+        if (!in_array($selectedCreateReligion, $religionOptions, true)) {
+            $selectedCreateReligion = 'Unknown';
+        }
+    @endphp
+    <select id="religion" name="religion" class="form-select @error('religion') is-invalid @enderror" required>
+        @foreach ($religionOptions as $option)
+            <option value="{{ $option }}" {{ $selectedCreateReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+        @endforeach
+    </select>
+    @error('religion')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 

@@ -427,8 +427,7 @@
                                             : ucwords(str_replace(',', ' ', (string) $complaint->complainantName));
                                     @endphp
                                     <tr>
-                                        <td class="text-center fw-bold">{{ $complaint->formatted_id }}</td>
-                                        <td>
+<td class="text-left text-dark" style="font-size: 0.78rem;">{{ $complaint->formatted_id }}</td>                                        <td>
                                             @if(!empty($complaint->complainant_id))
                                                 <button
                                                     type="button"
@@ -441,7 +440,7 @@
                                             @else
                                                 <span class="fw-semibold">{{ $complainantDisplayName }}</span>
                                             @endif
-                                            <div class="text-muted small">ID: {{ $complaint->complainant_id }}</div>
+                                            {{--  <div class="text-muted small">ID: {{ $complaint->complainant_id }}</div>--}}
                                         </td>
                                         <td>{{ $complaint->user->contactNumber ?? $complaint->complainant->contactNumber ?? 'N/A' }}</td>
                                         <td class="details-column">
@@ -494,8 +493,12 @@
                                                         <p class="fw-bold">{{ $complainantDisplayName }}</p>
                                                     </div>
                                                     <div class="col-md-6 border-start">
-                                                        <small class="text-muted">Respondent ID</small>
-                                                        <p class="fw-bold text-danger">{{ $complaint->respondent_id ?? 'None' }}</p>
+                                                        <small class="text-muted">Respondent Name</small>
+                                                        <p class="fw-bold text-danger">
+                                                            {{ $complaint->respondent
+                                                                ? ucwords(strtolower(trim(($complaint->respondent->firstName ?? '') . ' ' . ($complaint->respondent->middleName ?? '') . ' ' . ($complaint->respondent->lastName ?? ''))))
+                                                                : 'None' }}
+                                                        </p>
                                                     </div>
                                                 </div>
 

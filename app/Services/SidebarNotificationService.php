@@ -15,6 +15,7 @@ class SidebarNotificationService
     public const MODULE_ACTIVITY_LOGS = 'activity_logs';
     public const MODULE_COMPLAINTS_RECORDS = 'complaints_records';
     public const MODULE_CERTIFICATE_REQUESTS = 'certificate_requests';
+    public const MODULE_ARCHIVES = 'archives';
 
     /**
      * @return array<string, bool>
@@ -27,6 +28,7 @@ class SidebarNotificationService
             self::MODULE_ACTIVITY_LOGS => false,
             self::MODULE_COMPLAINTS_RECORDS => false,
             self::MODULE_CERTIFICATE_REQUESTS => false,
+            self::MODULE_ARCHIVES => false,
         ];
 
         if (!$user || !in_array($user->role, ['admin', 'subadmin'], true) || !Schema::hasTable('module_visits')) {
@@ -77,6 +79,8 @@ class SidebarNotificationService
             'subadmin.complaintRequest' => self::MODULE_COMPLAINTS_RECORDS,
             'admin.certificateRequest',
             'subadmin.certificateRequest' => self::MODULE_CERTIFICATE_REQUESTS,
+            'admin.archives' => self::MODULE_ARCHIVES,
+            'subadmin.archives' => self::MODULE_ARCHIVES,
             default => null,
         };
     }
@@ -95,6 +99,7 @@ class SidebarNotificationService
             self::MODULE_ACTIVITY_LOGS => $this->maxTimestampFromTables(['active_logs']),
             self::MODULE_COMPLAINTS_RECORDS => $this->maxTimestampFromTables(['complaints']),
             self::MODULE_CERTIFICATE_REQUESTS => $this->maxTimestampFromTables(['certificate_requests']),
+            self::MODULE_ARCHIVES => $this->maxTimestampFromTables(['archives']),
             default => null,
         };
     }

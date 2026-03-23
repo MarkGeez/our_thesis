@@ -177,6 +177,7 @@ Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->
     Route::get('/certificate/preview/{id}', [CertificateController::class, 'preview'])->name('certificate.preview');
     Route::get('/certificate/generate/{id}', [CertificateController::class, 'generate'])->name('certificate.generate');
     Route::post('/certificate/print-with-data', [CertificateController::class, 'printWithData'])->name('certificate.printWithData');
+    Route::delete('/certificate/{certificateRequest}/archive', [CertificateController::class, 'archive'])->name('certificate.archive');
     Route::get('/certificate/history/{userId}', [CertificateController::class, 'history'])->name('certificate.history');
     Route::get('/user-info/{id}', [AdminController::class, 'getUserInfo'])->name('user.info');
     Route::get('/resident-info/{id}', [AdminController::class, 'getResidentInfo'])->name('resident.info');
@@ -222,6 +223,8 @@ Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->
     Route::get('/announcements', [AdminController::class, 'announcements'])->name('announcements');
     Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
     Route::post('/archives/retrieve/{archive}', [ArchiveController::class,'retrieveResident'])->name('archive.retrieve.resident');
+    Route::post('/archives/retrieve/certificate/{archive}', [ArchiveController::class,'retrieveCertificateRequest'])->name('archive.retrieve.certificate');
+    Route::post('/archives/retrieve/activity-log/{archive}', [ArchiveController::class,'retrieveActivityLog'])->name('archive.retrieve.activity-log');
     
     Route::get('/create-announcement', [AnnouncementController::class, 'showAnnouncementForm'])->name('create-announcement');
     Route::post('/create-announcement', [AnnouncementController::class, 'createAnnouncement'])->name('submit.announcement');
@@ -236,6 +239,7 @@ Route::middleware(['auth', 'role:admin', 'log.module.visit'])->prefix('admin')->
     Route::put('/residents/role/{id}', [OfficialController::class, 'updateOfficial'])->name('update.official');
 
     Route::put('/residents/{id}', [ResidentListController::class, 'updateResident'])->name('update.resident');
+    Route::put('/residents/{id}/status', [ResidentListController::class, 'updateResidentStatus'])->name('residents.update.status');
     Route::delete('/residents/{id}', [ResidentListController::class, 'archiveResident'])->name('archive.resident');
     
 
@@ -273,6 +277,10 @@ Route::middleware(['auth', 'role:subadmin', 'log.module.visit'])->group(function
         Route::get('/serviceRequest', [ServiceRequestController::class,'subadminIndex'])->name('serviceRequest');
         Route::post('/service/request', [ServiceRequestController::class, 'store'])->name('service.request.store');
         Route::put('/serviceRequest/{serviceRequest}/status', [ServiceRequestController::class, 'updateStatus'])->name('serviceRequest.status');
+        Route::get('/archives', [ArchiveController::class,'showArchive'])->name('archives');
+        Route::post('/archives/retrieve/{archive}', [ArchiveController::class,'retrieveResident'])->name('archive.retrieve.resident');
+        Route::post('/archives/retrieve/certificate/{archive}', [ArchiveController::class,'retrieveCertificateRequest'])->name('archive.retrieve.certificate');
+        Route::post('/archives/retrieve/activity-log/{archive}', [ArchiveController::class,'retrieveActivityLog'])->name('archive.retrieve.activity-log');
         
 
         Route::post('/complaint', [ComplaintController::class, 'submitComplaint'])->name('submit.complaint');

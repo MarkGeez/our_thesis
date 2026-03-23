@@ -288,6 +288,22 @@
                                                         </section>
                                                     @endif
 
+                                                    @if(filled($blotter->incident_date_time))
+                                                        <section>
+                                                            <h6>Incident Date & Time</h6>
+                                                            <div class="info-box">
+                                                                <div class="row gy-2">
+                                                                    <div class="col-12">
+                                                                        <div class="info-label">Date & Time</div>
+                                                                        <div class="info-value">
+                                                                            {{ \Carbon\Carbon::parse($blotter->incident_date_time)->format('M d, Y g:i A') }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    @endif
+
                                                     <section>
                                                         <h6>Incident Description</h6>
                                                         <div class="info-box">
