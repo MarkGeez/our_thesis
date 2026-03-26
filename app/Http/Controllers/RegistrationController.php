@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ValidatesContactNumbers;
+use App\Mail\NewUserRegistrationAlertMail;
 use App\Models\User;
 use App\Models\Resident;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
@@ -99,7 +101,28 @@ class RegistrationController extends Controller
             ]);
         }
 
+        $this->notifyAdminsOfNewRegistration($user);
+
 
         return redirect()->route('login')->with('auth_success', 'Registration successful. Please wait up to 3 working days while officials review your registration request.');
+    }
+
+    private function notifyAdminsOfNewRegistration(User $user): void
+    {
+        $adminEmails = User::query()
+            ->where('role', 'admin')
+            ->where('status', 'approved')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($adminEmails)) {
+            return;
+        }
+
+        Mail::to($adminEmails)->send(new NewUserRegistrationAlertMail($user));
     }
 }

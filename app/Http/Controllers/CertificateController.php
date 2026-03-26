@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewCertificateRequestAlertMail;
 use App\Mail\CertificateStatusUpdateMail;
 use App\Models\CertificateRequest;
 use App\Models\Official;
 use App\Models\Resident;
+use App\Models\User;
 use App\Services\ArchiveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -108,7 +110,7 @@ class CertificateController extends Controller
         $data = array_merge($data, $formData);
     }
     
-    CertificateRequest::create([
+    $certificateRequest = CertificateRequest::create([
         'user_id' => $user->id,
         'resident_id' => $resident?->id,
         'certificate_type' => $validated['certificate_type'],
@@ -118,6 +120,8 @@ class CertificateController extends Controller
         'request_data' => $data,
         'status' => 'pending',
     ]);
+
+    $this->notifyAdminsOfNewCertificateRequest($certificateRequest->loadMissing('user', 'resident'));
     
     $route = match ($user->role) {
         'admin' => 'admin.adminCertificate',
@@ -326,6 +330,25 @@ $req->save();
             'declined' => $stats['declined'],
             'pending' => $stats['pending'],
         ]);
+    }
+
+    private function notifyAdminsOfNewCertificateRequest(CertificateRequest $certificateRequest): void
+    {
+        $adminEmails = User::query()
+            ->where('role', 'admin')
+            ->where('status', 'approved')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($adminEmails)) {
+            return;
+        }
+
+        Mail::to($adminEmails)->send(new NewCertificateRequestAlertMail($certificateRequest));
     }
 
     private function certificateView(CertificateRequest $req, bool $forPrint, bool $editable = false): View
