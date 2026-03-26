@@ -186,13 +186,13 @@
 /* Submenu active indication */
 .cat-sub-menu {
     position: relative;
-    padding-left: 8px;
+    padding-left: 4px;
 }
 
 .cat-sub-menu::before {
     content: '';
     position: absolute;
-    left: 20px;
+    left: 16px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -201,7 +201,7 @@
 }
 
 .cat-sub-menu a {
-    padding-left: 45px !important;
+    padding-left: 34px !important;
 }
 
 /* Animations */
@@ -247,9 +247,12 @@
 }
 
 /* Optional: ensure icon has breathing room from the left edge */
-.sidebar-body-menu a .icon,
-.cat-sub-menu a .icon{
+.sidebar-body-menu a .icon{
     margin-left: 6px;
+}
+
+.cat-sub-menu a .icon{
+    margin-left: 2px;
 }
 
 /* If your template makes links inline, this helps padding apply cleanly */
