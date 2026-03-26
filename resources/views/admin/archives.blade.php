@@ -415,8 +415,6 @@
                                     <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
                                         <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
                                         <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
-                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
-                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
                                     </select>
                                     <a href="{{ route($rolePrefix . '.archives', ['tab' => 'residents']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
                                 </div>
@@ -489,10 +487,6 @@
                                     <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
                                         <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
                                         <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
-                                        <option value="type_asc" {{ $activeSort === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
-                                        <option value="type_desc" {{ $activeSort === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
-                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
-                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
                                     </select>
                                     <a href="{{ route($rolePrefix . '.archives', ['tab' => 'certificates']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
                                 </div>
@@ -577,8 +571,6 @@
                                     <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
                                         <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
                                         <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
-                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
-                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
                                     </select>
                                     <a href="{{ route($rolePrefix . '.archives', ['tab' => 'announcements']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
                                 </div>
@@ -641,10 +633,6 @@
                                     <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
                                         <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
                                         <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
-                                        <option value="type_asc" {{ $activeSort === 'type_asc' ? 'selected' : '' }}>Type: A-Z</option>
-                                        <option value="type_desc" {{ $activeSort === 'type_desc' ? 'selected' : '' }}>Type: Z-A</option>
-                                        <option value="archived_by_asc" {{ $activeSort === 'archived_by_asc' ? 'selected' : '' }}>Archived By: A-Z</option>
-                                        <option value="archived_by_desc" {{ $activeSort === 'archived_by_desc' ? 'selected' : '' }}>Archived By: Z-A</option>
                                     </select>
                                     <a href="{{ route($rolePrefix . '.archives', ['tab' => 'activity_logs']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
                                 </div>
@@ -793,4 +781,3 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-

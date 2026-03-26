@@ -20,18 +20,18 @@
     .names{font-family: Arial, Helvetica, sans-serif; font-size:13px;line-height:1.6;color:black;text-align:center}
     .names strong{display:block;margin-top:0px}
     .footer-note{position:absolute;bottom:10px;left:10px;font-size:10px}
-    .right { flex: 1; padding-left: 20px; border-bottom: 6px solid yellow; min-height: 800px; }
+    .right { flex: 1; padding-left: 20px; border-bottom: 6px solid yellow; min-height: 800px; position:relative; }
     .cert-title{text-align:center;font-size:20px;font-weight:bold;margin:35px 0 12px 0}
     .fill-line{display:inline;border:none;border-bottom:1px solid #222;padding:0 4px;font-size:15px;background:transparent;font-family:inherit}
     .fill-line:focus{outline:none}
-    .check-item{display:flex;align-items:center;font-size:14px;margin:8px 0;width:100%}
-    .check-item .check{color:#000000;font-weight:bold;font-size:16px}
-    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:8px;accent-color:#000000;cursor:pointer}
+    .check-item{display:flex;align-items:center;gap:14px;font-size:14px;margin:10px 0;width:100%}
+    .check-item .check{color:#000000;font-weight:bold;font-size:16px;display:inline-block;min-width:18px;text-align:center}
+    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:0;accent-color:#000000;cursor:pointer;flex:0 0 auto}
     .issued{margin-top:20px;font-size:14px}
     .signature{text-align:right;margin-top:40px}
     .signature-line{border-top:1px solid #222;width:250px;margin-left:auto;padding-top:4px}
     .watermark-arc{position:absolute;right:18px;bottom:150px;opacity:0.12;font-size:120px}
-    .brgylogo-arc{position:absolute;right:1px;bottom:375px;opacity:0.12;font-size:120px}
+    .brgylogo-arc{position:absolute;left:50%;top:50%;transform:translate(-50%, -50%);opacity:0.12;font-size:120px;pointer-events:none}
     @media print{ body{background:white} .page{margin:0;box-shadow:none} .no-print{display:none!important;} }
     .check-list {
 display: block;
@@ -41,7 +41,7 @@ margin-top: 6px;
 .check-list .check-item {
 display: flex;
 align-items: center;
-margin: 6px 0;
+margin: 10px 0;
 }
   </style>
 </head>
@@ -66,7 +66,7 @@ margin: 6px 0;
   </div>
 
   <div class="content">
-    @include('certificate.certificateofficials')
+    {{--  @include('certificate.certificateofficials')--}}
     <main class="right">
       <div class="cert-title">CERTIFICATION</div>
       <p style="font-size:14px">This is to certify that

@@ -328,5 +328,87 @@ class ArchiveController extends Controller
     /**
      * Retrieve/restore an archived activity log back to active logs table
      */
-    
+    public function retrieveActivityLog(Archive $archive): RedirectResponse
+    {
+        $recordType = strtolower(trim((string) $archive->record_type));
+        if (!in_array($recordType, ['active_log', 'active_logs', 'activity_log', 'activity_logs'], true)) {
+            return back()->withErrors(['error' => 'Only activity log records can be retrieved here.']);
+        }
+
+        try {
+            $logData = $archive->data;
+            if (!is_array($logData) && is_string($logData)) {
+                $decoded = json_decode($logData, true);
+                $logData = is_array($decoded) ? $decoded : [];
+            }
+
+            if (!is_array($logData) || empty($logData)) {
+                return back()->withErrors(['error' => 'Archived activity log data is missing or invalid.']);
+            }
+
+            $logColumns = array_flip(Schema::getColumnListing('active_logs'));
+            $datetimeColumns = ['created_at', 'updated_at'];
+            $payload = [];
+
+            foreach ($logData as $column => $value) {
+                if (!isset($logColumns[$column])) {
+                    continue;
+                }
+
+                if (in_array($column, $datetimeColumns, true)) {
+                    if ($value === '' || $value === null) {
+                        $payload[$column] = null;
+                        continue;
+                    }
+
+                    if (is_string($value)) {
+                        try {
+                            $payload[$column] = Carbon::parse($value)->format('Y-m-d H:i:s');
+                        } catch (\Throwable $e) {
+                            $payload[$column] = $value;
+                        }
+                        continue;
+                    }
+                }
+
+                if (is_array($value) || is_object($value)) {
+                    $payload[$column] = json_encode($value);
+                    continue;
+                }
+
+                $payload[$column] = $value;
+            }
+
+            if (isset($payload['user_id']) && !empty($payload['user_id'])) {
+                $linkedUserExists = User::whereKey((int) $payload['user_id'])->exists();
+                if (!$linkedUserExists) {
+                    $payload['user_id'] = null;
+                }
+            }
+
+            if (array_key_exists('id', $payload)) {
+                $idAlreadyTaken = ActiveLog::query()->whereKey($payload['id'])->exists();
+                if ($idAlreadyTaken) {
+                    unset($payload['id']);
+                }
+            }
+
+            $now = now();
+            if (isset($logColumns['created_at']) && empty($payload['created_at'])) {
+                $payload['created_at'] = $now;
+            }
+            if (isset($logColumns['updated_at'])) {
+                $payload['updated_at'] = $now;
+            }
+
+            DB::transaction(function () use ($payload, $archive) {
+                DB::table('active_logs')->insert($payload);
+                $archive->delete();
+            });
+
+            return back()->with('success', 'Activity log retrieved successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to retrieve activity log: ' . $e->getMessage()]);
+        }
+    }
 }

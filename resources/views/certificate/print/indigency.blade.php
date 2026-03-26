@@ -40,17 +40,18 @@
       padding-left: 20px;
       border-bottom: 6px solid yellow;
       min-height: 800px;
+      position: relative;
     }
     .cert-title{text-align:center;font-size:20px;font-weight:bold;margin:35px 0 12px 0}
     .fill-line{display:inline;border:none;border-bottom:1px solid #222;padding:0 4px;font-size:15px;background:transparent}
     .fill-line:focus{outline:none}
-    .check-item{display:flex;align-items:center;font-size:14px;margin:8px 0;width:100%}
-    .check-item .check{color:#000000;font-weight:bold;font-size:16px; margin-right:8px;}
-    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:8px;accent-color:#000000;cursor:pointer;margin-right:8px;}
+    .check-item{display:flex;align-items:center;gap:14px;font-size:14px;margin:10px 0;width:100%}
+    .check-item .check{color:#000000;font-weight:bold;font-size:16px;display:inline-block;min-width:18px;text-align:center;}
+    .check-item input[type="checkbox"]{width:16px;height:16px;margin-right:0;accent-color:#000000;cursor:pointer;flex:0 0 auto;}
     .signature{text-align:right;margin-top:40px}
     .signature-line{border-top:1px solid #222;width:250px;margin-left:auto;padding-top:4px}
     .watermark-arc{position:absolute;right:18px;bottom:150px;opacity:0.12}
-    .brgylogo-arc{position:absolute;right:1px;bottom:375px;opacity:0.12}
+    .brgylogo-arc{position:absolute;left:50%;top:50%;transform:translate(-50%, -50%);opacity:0.12;pointer-events:none}
     @media print{ body{background:white} .page{margin:0} .no-print{display:none!important;} }
   </style>
 </head>
@@ -73,7 +74,7 @@
     <img src="{{ asset('images/Brgy-logo-1.png') }}" style="width:80px;height:80px;object-fit:contain" alt="">
   </div>
   <div class="content">
-    @include('certificate.certificateofficials')
+    {{--  @include('certificate.certificateofficials')--}}
     <main class="right">
       <div class="cert-title">CERTIFICATION OF INDIGENCY</div>
       <div class="brgylogo-arc"><img src="{{ asset('images/Brgy-logo-1.png') }}" alt="Barangay Seal" style="width:450px;height:450px;object-fit:contain"></div>

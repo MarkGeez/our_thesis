@@ -89,7 +89,7 @@
   
 
   <div class="content">
-    @include('certificate.certificateofficials')
+    {{--@include('certificate.certificateofficials') --}}
     
     <main class="right">
 
