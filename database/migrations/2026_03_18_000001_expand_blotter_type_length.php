@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement(
             "ALTER TABLE blotters MODIFY COLUMN blotter_type VARCHAR(50) NOT NULL DEFAULT 'regular'"
         );
@@ -14,6 +18,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement(
             "ALTER TABLE blotters MODIFY COLUMN blotter_type VARCHAR(20) NOT NULL DEFAULT 'regular'"
         );
