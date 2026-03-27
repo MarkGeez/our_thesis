@@ -390,7 +390,11 @@
                 <div class="input-group @error('firstName') is-invalid-group @enderror">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                     <input type="text" name="firstName" id="firstName" class="form-control"
-                           placeholder="Juan" value="{{ old('firstName') }}" required>
+                           placeholder="Juan" value="{{ old('firstName') }}"
+                           pattern="^[A-Za-z\s]+$" title="Letters only (A-Z or a-z)." required>
+                </div>
+                <div id="firstNameError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>First name must contain letters only (A-Z or a-z).</div>
                 </div>
                 @error('firstName')
                 <div class="auth-alert auth-alert-error">
@@ -405,7 +409,11 @@
                 <div class="input-group @error('middleName') is-invalid-group @enderror">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                     <input type="text" name="middleName" id="middleName" class="form-control"
-                           placeholder="Santos" value="{{ old('middleName') }}" required>
+                           placeholder="Santos" value="{{ old('middleName') }}"
+                           pattern="^[A-Za-z\s]+$" title="Letters only (A-Z or a-z)." required>
+                </div>
+                <div id="middleNameError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Middle name must contain letters only (A-Z or a-z).</div>
                 </div>
                 @error('middleName')
                 <div class="auth-alert auth-alert-error">
@@ -420,7 +428,11 @@
                 <div class="input-group @error('lastName') is-invalid-group @enderror">
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                     <input type="text" name="lastName" id="lastName" class="form-control"
-                           placeholder="Dela Cruz" value="{{ old('lastName') }}" required>
+                           placeholder="Dela Cruz" value="{{ old('lastName') }}"
+                           pattern="^[A-Za-z\s]+$" title="Letters only (A-Z or a-z)." required>
+                </div>
+                <div id="lastNameError" class="auth-alert auth-alert-error" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Last name must contain letters only (A-Z or a-z).</div>
                 </div>
                 @error('lastName')
                 <div class="auth-alert auth-alert-error">
@@ -539,11 +551,14 @@
                 <div class="proof-notice">
                     <i class="fa-solid fa-circle-info"></i>
                     Submit a clear photo of your valid Government ID or any image proof to verify your residency in Barangay 249.
-                    Accepted formats: JPG, JPEG, PNG.
+                    Accepted formats: JPG, JPEG, PNG. Maximum file size: 4 MB.
                 </div>
                 <div class="input-group @error('proofOfIdentity') is-invalid-group @enderror">
                     <input type="file" name="proofOfIdentity" id="proofOfIdentity"
                            class="form-control" accept=".jpg,.jpeg,.png">
+                </div>
+                <div id="proofSizeError" class="auth-alert auth-alert-error mt-2" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Proof of identity must be 4 MB or smaller.</div>
                 </div>
                 @error('proofOfIdentity')
                 <div class="auth-alert auth-alert-error">
@@ -663,13 +678,23 @@
     const confirmPasswordInput  = document.getElementById('password_confirmation');
     const passwordMismatchError = document.getElementById('passwordMismatchError');
     const passwordError         = document.getElementById('passwordError');
+    const firstNameInput        = document.getElementById('firstName');
+    const middleNameInput       = document.getElementById('middleName');
+    const lastNameInput         = document.getElementById('lastName');
+    const firstNameError        = document.getElementById('firstNameError');
+    const middleNameError       = document.getElementById('middleNameError');
+    const lastNameError         = document.getElementById('lastNameError');
     const contactInput          = document.getElementById('contactNumber');
     const contactError          = document.getElementById('contactError');
+    const proofInput            = document.getElementById('proofOfIdentity');
+    const proofSizeError        = document.getElementById('proofSizeError');
     const submitBtn             = document.getElementById('submitBtn');
     const termsCheckbox         = document.getElementById('terms_accepted');
+    const maxProofSizeBytes     = 4 * 1024 * 1024;
 
     // Password must be at least 8 chars, 1 uppercase, 1 number
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const nameRegex = /^[A-Za-z\s]+$/;
 
     // ── PASSWORD — LIVE STRENGTH + CONFIRM REVEAL ─────────────────
     passwordInput.addEventListener('input', function () {
@@ -732,9 +757,57 @@
         }
     });
 
+    // ── NAME FIELDS — LETTERS ONLY (A-Z / a-z) ───────────────────
+    function validateNameField(input, errorBox, label, allowEmpty) {
+        if (!input || !errorBox) return true;
+
+        input.value = input.value.replace(/[^A-Za-z\s]/g, '');
+        const value = input.value.trim();
+
+        if (allowEmpty && value.length === 0) {
+            errorBox.style.display = 'none';
+            return true;
+        }
+
+        const valid = nameRegex.test(value);
+        errorBox.style.display = valid ? 'none' : 'flex';
+        if (!valid) {
+            errorBox.querySelector('div').textContent = label + ' must contain letters only (A-Z or a-z).';
+        }
+
+        return valid;
+    }
+
+    firstNameInput.addEventListener('input', function () {
+        validateNameField(firstNameInput, firstNameError, 'First name', false);
+    });
+
+    middleNameInput.addEventListener('input', function () {
+        validateNameField(middleNameInput, middleNameError, 'Middle name', false);
+    });
+
+    lastNameInput.addEventListener('input', function () {
+        validateNameField(lastNameInput, lastNameError, 'Last name', false);
+    });
+
     // ── TERMS CHECKBOX — ENABLES SUBMIT ──────────────────────────
     termsCheckbox.addEventListener('change', function () {
         submitBtn.disabled = !this.checked;
+    });
+
+    // ── PROOF OF IDENTITY — FILE SIZE CHECK (4MB) ────────────────
+    proofInput.addEventListener('change', function () {
+        const selectedFile = this.files && this.files.length ? this.files[0] : null;
+
+        if (selectedFile && selectedFile.size > maxProofSizeBytes) {
+            this.value = '';
+            proofSizeError.style.display = 'flex';
+            proofSizeError.querySelector('div').textContent = 'Proof of identity must be 4 MB or smaller.';
+            return;
+        }
+
+        proofSizeError.style.display = 'none';
+        proofSizeError.querySelector('div').textContent = '';
     });
 
     // ── FORM SUBMIT — BLOCK IF LIVE ERRORS EXIST ─────────────────
@@ -742,8 +815,13 @@
         const pwVal      = passwordInput.value;
         const contactVal = contactInput.value;
         const contactRx  = /^\d{11}$/;
+        const selectedFile = proofInput.files && proofInput.files.length ? proofInput.files[0] : null;
+        const proofTooLarge = !!selectedFile && selectedFile.size > maxProofSizeBytes;
+        const firstNameValid = validateNameField(firstNameInput, firstNameError, 'First name', false);
+        const middleNameValid = validateNameField(middleNameInput, middleNameError, 'Middle name', false);
+        const lastNameValid = validateNameField(lastNameInput, lastNameError, 'Last name', false);
 
-        if (!passwordRegex.test(pwVal) || !contactRx.test(contactVal)) {
+        if (!passwordRegex.test(pwVal) || !contactRx.test(contactVal) || proofTooLarge || !firstNameValid || !middleNameValid || !lastNameValid) {
             e.preventDefault();
 
             if (!passwordRegex.test(pwVal)) {
@@ -755,6 +833,11 @@
                 contactError.style.display = 'flex';
                 contactError.querySelector('div').textContent =
                     'Contact number must be exactly 11 digits.';
+            }
+
+            if (proofTooLarge) {
+                proofSizeError.style.display = 'flex';
+                proofSizeError.querySelector('div').textContent = 'Proof of identity must be 4 MB or smaller.';
             }
         }
     });
