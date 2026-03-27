@@ -376,14 +376,7 @@
                                     <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
         </a>
     </li>
-    <li>
-        <a class="{{ Request::routeIs('subadmin.archives') ? 'active' : '' }}" href="{{ route('subadmin.archives') }}">
-            <span class="icon"><i class="fa-solid fa-box-archive"></i></span>Archives
-            @if($sidebarNotifications[\App\Services\SidebarNotificationService::MODULE_ARCHIVES] ?? false)
-                <span class="sidebar-notification-dot" aria-label="New archive entries"></span>
-            @endif
-        </a>
-    </li>
+    
     <li>
         <a class="{{ Request::routeIs('subadmin.aboutus') ? 'active' : '' }}" href="{{ route('subadmin.aboutus') }}">
             <span class="icon"><i class="fa-solid fa-circle-info"></i></span>About Us

@@ -1070,7 +1070,7 @@
                                                                             <span class="detail-label">Email</span>
                                                                             <div class="detail-value">{{ $list->email ?? 'N/A' }}</div>
                                                                         </div>
-                                                                        <div class="col-md-6">
+                                                                        <div class="col-12">
                                                                             <span class="detail-label">Contact Number</span>
                                                                             <div class="detail-value">{{ $list->contactNumber ?? 'N/A' }}</div>
                                                                         </div>
@@ -1136,11 +1136,11 @@
                                                                     <div class="col-md-6">
                                                                         <span class="detail-label">Religion</span>
                                                                         <div class="detail-value">{{ $list->resident->religion ?? 'N/A' }}</div>
-                                                                    </div>
+                                                                    </div>{{--  
                                                                     <div class="col-md-6">
                                                                         <span class="detail-label">Resident Contact</span>
                                                                         <div class="detail-value">{{ $list->resident->contactNo ?? 'N/A' }}</div>
-                                                                    </div>
+                                                                    </div>--}}
                                                                     <div class="col-md-6">
                                                                         <span class="detail-label">Resident Birthday</span>
                                                                         <div class="detail-value">{{ $list->resident->birthday ? \Carbon\Carbon::parse($list->resident->birthday)->format('M d, Y') : 'N/A' }}</div>

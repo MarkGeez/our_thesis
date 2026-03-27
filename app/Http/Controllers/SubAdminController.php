@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ValidatesContactNumbers;
+use App\Mail\ComplaintStatusUpdateMail;
 use App\Models\Announcement;
 use App\Models\Complaints;
 use App\Models\Resident;
@@ -18,6 +19,7 @@ use App\Models\FamilyMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -367,13 +369,14 @@ class SubAdminController extends Controller
             'remarks' => 'nullable|string|max:1000',
         ]);
 
-        $complaint = Complaints::findOrFail($id);
+        $complaint = Complaints::with('complainant')->findOrFail($id);
 
         if ($complaint->status === 'resolved') {
             return back()->with('error', 'Resolved complaints can no longer be updated.');
         }
 
         $complaint->status = $request->input('status');
+        $complaint->respondent_id = Auth::id();
 
         $newRemarks = trim((string) $request->input('remarks'));
         if ($newRemarks !== '') {
@@ -392,6 +395,10 @@ class SubAdminController extends Controller
                 : $existingRemarks . PHP_EOL . $entry;
         }
         $complaint->save();
+
+        if (!empty($complaint->complainant?->email)) {
+            Mail::send(new ComplaintStatusUpdateMail($complaint));
+        }
 
         return back()->with('success', 'Complaint updated successfully.');
     }

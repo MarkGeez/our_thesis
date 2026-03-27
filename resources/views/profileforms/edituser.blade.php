@@ -98,6 +98,23 @@ $user = auth()->user();
         <h6 class="text-muted mb-3">Account Information</h6>
 
         <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">First Name</label>
+                <input type="text" name="firstName" class="form-control form-control-lg" value="{{ old('firstName', $user->firstName) }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Middle Name</label>
+                <input type="text" name="middleName" class="form-control form-control-lg" value="{{ old('middleName', $user->middleName) }}">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="lastName" class="form-control form-control-lg" value="{{ old('lastName', $user->lastName) }}" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Email Address</label>
                 <input type="email" name="email" class="form-control form-control-lg" value="{{ old('email', $user->email) }}" required>
@@ -105,7 +122,7 @@ $user = auth()->user();
 
             <div class="col-md-6">
                 <label class="form-label">Contact Number</label>
-                <input type="text" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
+                <input type="text" id="contactNumber" name="contactNumber" class="form-control form-control-lg" value="{{ old('contactNumber', $user->contactNumber) }}" required>
                 <div id="contactError" class="auth-alert auth-alert-error text-black" style="display: none;"></div>
             </div>
         </div>
@@ -184,23 +201,30 @@ $user = auth()->user();
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Contact number validation
-        const contactInput = document.getElementById('contactNumber');
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function checkBeforeSubmit() {
         const contactError = document.getElementById('contactError');
-        if (contactInput && contactError) {
-            contactInput.addEventListener('input', () => {
-                contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
-                if (contactInput.value.length > 11) {
-                    contactInput.value = contactInput.value.slice(0, 11);
-                }
-                if (contactInput.value.length !== 11) {
-                    contactError.textContent = "Must be exactly 11 digits.";
-                } else {
-                    contactError.textContent = "";
-                }
-            });
+        const passwordError = document.getElementById('passwordError');
+        const passwordMismatchError = document.getElementById('passwordMismatchError');
+
+        const hasContactError = contactError && contactError.style.display !== 'none' && !!contactError.textContent.trim();
+        const hasPasswordPolicyError = passwordError && passwordError.style.display !== 'none' && !!passwordError.textContent.trim();
+        const hasPasswordMismatch = passwordMismatchError && passwordMismatchError.style.display !== 'none';
+
+        if (hasContactError || hasPasswordPolicyError || hasPasswordMismatch) {
+            alert('Please fix errors first.');
+            return false;
         }
+
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
         const birthdayInput = document.getElementById('user_birthday');
         const openDateBtn = document.getElementById('user_openDate');
         const errorDisplay = document.getElementById('birthday_error');
@@ -210,7 +234,7 @@ $user = auth()->user();
         const passwordConfirmationInput = document.getElementById('password_confirmation');
         const passwordError = document.getElementById('passwordError');
         const passwordMismatchError = document.getElementById('passwordMismatchError');
-        const contactInput = document.querySelector('input[name="contactNumber"]');
+        const contactInput = document.getElementById('contactNumber');
         const contactError = document.getElementById('contactError');
         const rawDate = "{{ old('birthday', $user->birthday) }}";
         const hasPasswordErrors = @json($errors->has('password') || $errors->has('password_confirmation'));
@@ -218,6 +242,7 @@ $user = auth()->user();
 
         if (passwordError) {
             passwordError.style.display = 'none';
+            passwordError.textContent = '';
         }
 
         if (passwordMismatchError) {
@@ -226,26 +251,22 @@ $user = auth()->user();
 
         if (contactError) {
             contactError.style.display = 'none';
+            contactError.textContent = '';
         }
 
         if (rawDate && birthdayInput) {
             const d = new Date(rawDate);
             if (!isNaN(d)) {
-                const formattedDate = d.getFullYear() + '-' + 
-                                     String(d.getMonth() + 1).padStart(2, '0') + '-' + 
-                                     String(d.getDate()).padStart(2, '0');
+                const formattedDate = d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0');
                 birthdayInput.value = formattedDate;
             }
         }
 
-        // Validate date on change
-        if (birthdayInput) {
-            birthdayInput.addEventListener('change', function () {
-                validateBirthday();
-            });
-        }
-
         function validateBirthday() {
+            if (!birthdayInput || !errorDisplay) return;
+
             const selectedDate = new Date(birthdayInput.value);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -261,9 +282,7 @@ $user = auth()->user();
         }
 
         function validatePasswordPolicy() {
-            if (!passwordInput || !passwordError) {
-                return;
-            }
+            if (!passwordInput || !passwordError) return;
 
             if (passwordInput.value.length === 0) {
                 passwordError.style.display = 'none';
@@ -278,14 +297,9 @@ $user = auth()->user();
         }
 
         function validatePasswordMatch() {
-            if (!passwordInput || !passwordConfirmationInput || !passwordMismatchError) {
-                return;
-            }
+            if (!passwordInput || !passwordConfirmationInput || !passwordMismatchError) return;
 
-            if (
-                passwordInput.value !== passwordConfirmationInput.value &&
-                passwordConfirmationInput.value.length > 0
-            ) {
+            if (passwordInput.value !== passwordConfirmationInput.value && passwordConfirmationInput.value.length > 0) {
                 passwordMismatchError.style.display = 'block';
             } else {
                 passwordMismatchError.style.display = 'none';
@@ -293,9 +307,7 @@ $user = auth()->user();
         }
 
         function validateContactNumber() {
-            if (!contactInput || !contactError) {
-                return;
-            }
+            if (!contactInput || !contactError) return;
 
             contactInput.value = contactInput.value.replace(/[^0-9]/g, '');
             if (contactInput.value.length > 11) {
@@ -317,6 +329,10 @@ $user = auth()->user();
             }
         }
 
+        if (birthdayInput) {
+            birthdayInput.addEventListener('change', validateBirthday);
+        }
+
         if (openDateBtn && birthdayInput) {
             openDateBtn.addEventListener('click', function () {
                 if (birthdayInput.showPicker) {
@@ -335,15 +351,12 @@ $user = auth()->user();
         }
 
         if (passwordConfirmationInput) {
-            passwordConfirmationInput.addEventListener('input', function () {
-                validatePasswordMatch();
-            });
+            passwordConfirmationInput.addEventListener('input', validatePasswordMatch);
         }
 
         if (contactInput) {
-            contactInput.addEventListener('input', function () {
-                validateContactNumber();
-            });
+            contactInput.addEventListener('input', validateContactNumber);
+            validateContactNumber();
         }
 
         if (togglePasswordSectionBtn && passwordSection) {
@@ -377,34 +390,4 @@ $user = auth()->user();
             });
         }
     });
-
-    function togglePassword(id) {
-        const input = document.getElementById(id);
-        input.type = input.type === 'password' ? 'text' : 'password';
-    }
-// Password validation
-const passwordInput = document.getElementById('password');
-const passwordError = document.getElementById('passwordError');
-const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-if (passwordInput && passwordError) {
-    passwordInput.addEventListener('input', () => {
-        if (!passwordRegex.test(passwordInput.value)) {
-            passwordError.textContent = "Min 8 chars, 1 uppercase, 1 number.";
-        } else {
-            passwordError.textContent = "";
-        }
-    });
-}
-function checkBeforeSubmit() {
-    if (
-        (passwordError && passwordError.textContent) ||
-        (contactError && contactError.textContent)
-    ) {
-        alert("Please fix errors first.");
-        return false;
-    }
-    return true;
-}
-
-// Attach to form
 </script>

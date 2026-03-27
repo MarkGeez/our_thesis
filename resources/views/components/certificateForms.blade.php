@@ -1,5 +1,23 @@
 {{-- Reusable Certificate Forms Component --}}
 {{-- Usage: @include('components.certificateForms', ['formRoute' => 'admin.certificate.request.store']) --}}
+@php
+    $certificateUser = auth()->user();
+    $certificateResident = $certificateUser?->resident;
+    $certificateRequesterName = trim(collect([
+        $certificateUser?->firstName,
+        $certificateUser?->middleName,
+        $certificateUser?->lastName,
+    ])->filter(fn ($value) => filled($value))->implode(' '));
+    $certificateRequesterAge = $certificateResident?->age;
+
+    if (is_null($certificateRequesterAge) && !empty($certificateUser?->birthday)) {
+        try {
+            $certificateRequesterAge = \Carbon\Carbon::parse($certificateUser->birthday)->age;
+        } catch (\Throwable $e) {
+            $certificateRequesterAge = null;
+        }
+    }
+@endphp
 
 <style>
     .action-card {
@@ -269,6 +287,18 @@
                         </div>
                         <div class="col-12" id="solo_child_container"></div>
                         <div class="col-md-6">
+                            <label class="form-label">Age</label>
+                            <input
+                                type="number"
+                                name="request_data[age]"
+                                class="form-control"
+                                value="{{ old('request_data.age', $certificateRequesterAge) }}"
+                                min="0"
+                                readonly
+                            >
+                            <small class="text-muted">Auto-filled from your profile information.</small>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Separated from (Name of Former Partner)</label>
                             <input type="text" name="request_data[separated_from]" class="form-control">
                         </div>
@@ -354,7 +384,7 @@
                             type="text"
                             name="form_data[certificate_name]"
                             class="form-control"
-                            value="{{ old('form_data.certificate_name') }}"
+                            value="{{ old('form_data.certificate_name', $certificateRequesterName) }}"
                             required
                             placeholder="Enter complete name (e.g., Juan Dela Cruz)"
                         >

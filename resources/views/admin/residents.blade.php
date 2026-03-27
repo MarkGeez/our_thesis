@@ -1592,14 +1592,14 @@ document.addEventListener('DOMContentLoaded', function () {
     @error('religion')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
-
+{{--
     <!-- Image -->
     <label for="image_path">Profile Image</label>
     <input type="file" name="image_path" id="image_path" class="form-control @error('image_path') is-invalid @enderror" 
            accept="image/png, image/jpg, image/jpeg">
     @error('image_path')
         <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
+    @enderror--}}
 
     <!-- Emergency Contact Name -->
     <label for="emergencyContactName">Emergency Contact Name</label>

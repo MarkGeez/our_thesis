@@ -21,7 +21,7 @@
     .names strong{display:block;margin-top:0px}
     .footer-note{position:absolute;bottom:10px;left:10px;font-size:10px}
     .right { flex: 1; padding-left: 20px; border-bottom: 6px solid yellow; min-height: 800px; position:relative; }
-    .cert-title{text-align:center;font-size:20px;font-weight:bold;margin:35px 0 12px 0}
+    .cert-title{text-align:center;font-size:30px;font-weight:bold;margin:35px 0 12px 0}
     .fill-line{display:inline;border:none;border-bottom:1px solid #222;padding:0 4px;font-size:15px;background:transparent;font-family:inherit}
     .fill-line:focus{outline:none}
     .check-item{display:flex;align-items:center;gap:14px;font-size:14px;margin:10px 0;width:100%}

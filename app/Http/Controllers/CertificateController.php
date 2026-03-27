@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewCertificateRequestAlertMail;
 use App\Mail\CertificateStatusUpdateMail;
 use App\Models\CertificateRequest;
 use App\Models\Official;
 use App\Models\Resident;
+use App\Models\User;
 use App\Services\ArchiveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,34 @@ use Illuminate\View\View;
 
 class CertificateController extends Controller
 {
+    private function resolveRequesterAge(?User $user, ?Resident $resident): ?int
+    {
+        if ($resident && !is_null($resident->age)) {
+            return (int) $resident->age;
+        }
+
+        if ($user && !empty($user->birthday)) {
+            try {
+                return (int) \Carbon\Carbon::parse($user->birthday)->age;
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveCertificateDisplayName(CertificateRequest $req): string
+    {
+        $data = $req->request_data ?? [];
+
+        if ($req->certificate_type === 'senior' && !empty($data['certificate_name'])) {
+            return ucwords(strtolower(trim((string) $data['certificate_name'])));
+        }
+
+        return ucwords(strtolower($req->requester_name));
+    }
+
     public function archive(CertificateRequest $certificateRequest, ArchiveService $archiveService): RedirectResponse
     {
         if ($certificateRequest->status !== 'picked_up') {
@@ -107,8 +137,21 @@ class CertificateController extends Controller
         $formData = $request->form_data ?? [];
         $data = array_merge($data, $formData);
     }
+
+    if ($validated['certificate_type'] === 'soloparent' && empty($data['age'])) {
+        $resolvedAge = $this->resolveRequesterAge($user, $resident);
+        if (!is_null($resolvedAge)) {
+            $data['age'] = $resolvedAge;
+        }
+    }
+
+    if ($validated['certificate_type'] === 'senior' && empty($data['certificate_name'])) {
+        $data['certificate_name'] = $user
+            ? trim("{$user->firstName} {$user->middleName} {$user->lastName}")
+            : null;
+    }
     
-    CertificateRequest::create([
+    $certificateRequest = CertificateRequest::create([
         'user_id' => $user->id,
         'resident_id' => $resident?->id,
         'certificate_type' => $validated['certificate_type'],
@@ -118,6 +161,8 @@ class CertificateController extends Controller
         'request_data' => $data,
         'status' => 'pending',
     ]);
+
+    $this->notifyAdminsOfNewCertificateRequest($certificateRequest->loadMissing('user', 'resident'));
     
     $route = match ($user->role) {
         'admin' => 'admin.adminCertificate',
@@ -216,7 +261,7 @@ class CertificateController extends Controller
             abort(403, 'Certificate is not yet approved.');
         }
 
-        $name = $request->input('name', ucwords(strtolower($req->requester_name)));
+        $name = $request->input('name', $this->resolveCertificateDisplayName($req));
         $data = $req->request_data ?? [];
         $submitted = $request->input('request_data', []);
 
@@ -328,6 +373,25 @@ $req->save();
         ]);
     }
 
+    private function notifyAdminsOfNewCertificateRequest(CertificateRequest $certificateRequest): void
+    {
+        $adminEmails = User::query()
+            ->where('role', 'admin')
+            ->where('status', 'approved')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($adminEmails)) {
+            return;
+        }
+
+        Mail::to($adminEmails)->send(new NewCertificateRequestAlertMail($certificateRequest));
+    }
+
     private function certificateView(CertificateRequest $req, bool $forPrint, bool $editable = false): View
     {
         $view = match ($req->certificate_type) {
@@ -339,7 +403,7 @@ $req->save();
         };
         $data = $req->request_data ?? [];
 
-        $name = ucwords(strtolower($req->requester_name));
+        $name = $this->resolveCertificateDisplayName($req);
         $address = match ($req->certificate_type) {
             'bonafide', 'indigency' => $req->address ?? $data['address'] ?? $data['postal_address'] ?? null,
             default => $data['former_address'] ?? null,

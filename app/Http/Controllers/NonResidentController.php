@@ -38,7 +38,12 @@ class NonResidentController extends Controller
             abort(403);
         }
 
+        $linkedResident = $user->resident ?: Resident::matchingUser($user)->first();
+
         $rules = [
+            'firstName' => 'required|string|max:70',
+            'middleName' => 'nullable|string|max:70',
+            'lastName' => 'required|string|max:70',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => $this->requiredContactNumberRules(),
             'birthday' => 'required|date|before:today',
@@ -52,15 +57,27 @@ class NonResidentController extends Controller
         }
         
         $validated = $request->validate($rules, $this->contactNumberMessages(['contactNumber']));
+
+        $validated['firstName'] = strtolower(trim((string) $validated['firstName']));
+        $validated['middleName'] = strtolower(trim((string) ($validated['middleName'] ?? '')));
+        $validated['lastName'] = strtolower(trim((string) $validated['lastName']));
         
+        $user->firstName = $validated['firstName'];
+        $user->middleName = $validated['middleName'];
+        $user->lastName = $validated['lastName'];
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
 
-        if ($user->resident) {
-            $user->resident->contactNo = $validated['contactNumber'];
-            $user->resident->birthday = $validated['birthday'];
-            $user->resident->save();
+        if ($linkedResident) {
+            $linkedResident->user_id = $user->id;
+            $linkedResident->firstName = $validated['firstName'];
+            $linkedResident->middleName = $validated['middleName'];
+            $linkedResident->lastName = $validated['lastName'];
+            $linkedResident->contactNo = $validated['contactNumber'];
+            $linkedResident->birthday = $validated['birthday'];
+            $linkedResident->age = \Carbon\Carbon::parse($validated['birthday'])->age;
+            $linkedResident->save();
         }
 
         if (!empty($validated['password'] ?? null)) {
@@ -78,9 +95,9 @@ class NonResidentController extends Controller
             $user->profile_image = $path;
 
             // Keep resident photo in sync with user profile image.
-            if ($user->resident) {
-                $user->resident->image_path = $path;
-                $user->resident->save();
+            if ($linkedResident) {
+                $linkedResident->image_path = $path;
+                $linkedResident->save();
             }
         }
 

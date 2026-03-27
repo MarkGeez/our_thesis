@@ -241,8 +241,12 @@ class UserListController extends Controller
     {
         // Find the user
         $user = User::findOrFail($id);
+        $linkedResident = $user->resident ?: Resident::matchingUser($user)->first();
 
         $rules = [
+            'firstName' => 'required|string|max:70',
+            'middleName' => 'nullable|string|max:70',
+            'lastName' => 'required|string|max:70',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'contactNumber' => 'required|string|max:11|',
             'birthday' => 'required|date|before:today',
@@ -257,18 +261,31 @@ class UserListController extends Controller
 
         // Validate the request
         $validated = $request->validate($rules);
+
+        $validated['firstName'] = strtolower(trim((string) $validated['firstName']));
+        $validated['middleName'] = strtolower(trim((string) ($validated['middleName'] ?? '')));
+        $validated['lastName'] = strtolower(trim((string) $validated['lastName']));
         
         // Update basic info
+        $user->firstName = $validated['firstName'];
+        $user->middleName = $validated['middleName'];
+        $user->lastName = $validated['lastName'];
         $user->email = $validated['email'];
         $user->contactNumber = $validated['contactNumber'];
         $user->birthday = $validated['birthday'];
         
-        // Update linked resident contact number and birthday
-if ($user->resident) {
-    $user->resident->contactNo = $validated['contactNumber'];
-    $user->resident->birthday = $validated['birthday'];
-    $user->resident->save();
-}
+        // Keep the linked resident profile aligned with account-level identity fields.
+        if ($linkedResident) {
+            $linkedResident->user_id = $user->id;
+            $linkedResident->firstName = $validated['firstName'];
+            $linkedResident->middleName = $validated['middleName'];
+            $linkedResident->lastName = $validated['lastName'];
+            $linkedResident->contactNo = $validated['contactNumber'];
+            $linkedResident->birthday = $validated['birthday'];
+            $linkedResident->age = Carbon::parse($validated['birthday'])->age;
+            $linkedResident->save();
+        }
+
         // Update password if provided
         if (!empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
@@ -285,9 +302,9 @@ if ($user->resident) {
             $user->profile_image = $path;
 
             // Keep resident photo in sync with user profile image.
-            if ($user->resident) {
-                $user->resident->image_path = $path;
-                $user->resident->save();
+            if ($linkedResident) {
+                $linkedResident->image_path = $path;
+                $linkedResident->save();
             }
         }
 

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ComplaintStatusUpdateMail;
+use App\Mail\NewComplaintAlertMail;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\Complaints;
@@ -70,7 +74,7 @@ class ComplaintController extends Controller
             $attachmentPath = $request->file('attachment_image')->store('complaints/attachments', 'public');
         }
 
-        Complaints::create([
+        $complaint = Complaints::create([
 
 
             "complainant_id"=> $user->id,
@@ -85,6 +89,8 @@ class ComplaintController extends Controller
             "status" => "pending"
 
         ]);
+
+        $this->notifyAdminsOfNewComplaint($complaint->loadMissing('complainant'));
 
         return redirect()->back()->with('success', 'Complaint submitted successfully!');
 
@@ -161,7 +167,7 @@ class ComplaintController extends Controller
     }
 
     public function updateStatus(Request $request, $id){
-        $complaint = Complaints::findOrFail($id);
+        $complaint = Complaints::with('complainant')->findOrFail($id);
         $respondent = Auth::user()->id;
 
         if ($complaint->status === 'resolved') {
@@ -194,6 +200,10 @@ class ComplaintController extends Controller
         }
 
         $complaint->save();
+
+        if (!empty($complaint->complainant?->email)) {
+            Mail::send(new ComplaintStatusUpdateMail($complaint));
+        }
 
     return redirect()->back()->with('success', 'Complaint updated successfully.');
     }
@@ -295,6 +305,25 @@ class ComplaintController extends Controller
                 })->values(),
             ],
         ]);
+    }
+
+    private function notifyAdminsOfNewComplaint(Complaints $complaint): void
+    {
+        $adminEmails = User::query()
+            ->whereIn('role', ['admin', 'subadmin'])
+            ->where('status', 'approved')
+            ->whereNotNull('email')
+            ->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($adminEmails)) {
+            return;
+        }
+
+        Mail::to($adminEmails)->send(new NewComplaintAlertMail($complaint));
     }
     
 }
