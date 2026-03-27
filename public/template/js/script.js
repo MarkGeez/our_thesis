@@ -534,8 +534,14 @@ if (mobileToggle && sidebar) {
 
 // Prevent duplicate clicks/submits while requests are in-flight.
 (function () {
+  if (window.__formSubmitStopperInstalled) {
+    return;
+  }
+  window.__formSubmitStopperInstalled = true;
+
   var CLICK_LOCK_ATTR = 'data-click-locked';
   var FORM_SUBMITTING_ATTR = 'data-form-submitting';
+  var ORIGINAL_LABEL_ATTR = 'data-original-submit-label';
 
   function lockControl(control) {
     if (!control || control.getAttribute(CLICK_LOCK_ATTR) === '1') return;
@@ -550,6 +556,26 @@ if (mobileToggle && sidebar) {
     control.style.opacity = '0.7';
   }
 
+  function setLoadingLabel(control, form) {
+    if (!control) return;
+
+    var customLabel = control.getAttribute('data-loading-text');
+    var formLabel = form ? form.getAttribute('data-loading-text') : null;
+    var loadingText = customLabel || formLabel || 'Processing...';
+
+    if (control.tagName === 'BUTTON') {
+      if (!control.hasAttribute(ORIGINAL_LABEL_ATTR)) {
+        control.setAttribute(ORIGINAL_LABEL_ATTR, control.innerHTML);
+      }
+      control.innerHTML = loadingText;
+    } else if (control.tagName === 'INPUT' && (control.type === 'submit' || control.type === 'button')) {
+      if (!control.hasAttribute(ORIGINAL_LABEL_ATTR)) {
+        control.setAttribute(ORIGINAL_LABEL_ATTR, control.value);
+      }
+      control.value = loadingText;
+    }
+  }
+
   function unlockControl(control) {
     if (!control || control.getAttribute(CLICK_LOCK_ATTR) !== '1') return;
     control.removeAttribute(CLICK_LOCK_ATTR);
@@ -561,6 +587,18 @@ if (mobileToggle && sidebar) {
 
     control.style.pointerEvents = '';
     control.style.opacity = '';
+
+    if (control.hasAttribute(ORIGINAL_LABEL_ATTR)) {
+      var originalLabel = control.getAttribute(ORIGINAL_LABEL_ATTR);
+
+      if (control.tagName === 'BUTTON') {
+        control.innerHTML = originalLabel;
+      } else if (control.tagName === 'INPUT' && (control.type === 'submit' || control.type === 'button')) {
+        control.value = originalLabel;
+      }
+
+      control.removeAttribute(ORIGINAL_LABEL_ATTR);
+    }
   }
 
   function isExcludedButton(btn) {
@@ -608,6 +646,7 @@ if (mobileToggle && sidebar) {
 
       var submitControls = form.querySelectorAll('button[type="submit"], input[type="submit"]');
       submitControls.forEach(function (ctrl) {
+        setLoadingLabel(ctrl, form);
         lockControl(ctrl);
       });
     }, 0);

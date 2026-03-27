@@ -427,8 +427,8 @@
                                         </div>
                                     @endif
 
-                                    @if($complaints->attachment_path)
-                                        @php $attachmentUrl = asset('storage/' . ltrim($complaints->attachment_path, '/')); @endphp
+                                    @if($complaints->attachment_url)
+                                        @php $attachmentUrl = $complaints->attachment_url; @endphp
                                         <div class="complaint-attachment">
                                             <span class="remarks-label">Image Attachment</span>
                                             <a href="{{ $attachmentUrl }}" target="_blank" rel="noopener noreferrer" class="d-inline-block mb-2 small">View full image</a>

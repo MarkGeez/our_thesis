@@ -467,7 +467,7 @@
                                                     <i class="fa-solid fa-eye"></i> View Full Details
                                                 </button>
                                                 @if($complaint->status !== 'resolved')
-                                                    <button class="btn btn-sm btn-primary px-3" data-bs-toggle="modal" data-bs-target="#complaintActionModal{{ $complaint->id }}">
+                                                    <button class="btn btn-sm btn-primary px-3" data-complaint-manage-btn="1" data-bs-toggle="modal" data-bs-target="#complaintActionModal{{ $complaint->id }}">
                                                         Manage
                                                     </button>
                                                 @else
@@ -518,8 +518,8 @@
                                                 </p>
 
                                                 <div class="section-divider">Image Attachment</div>
-                                                @if($complaint->attachment_path)
-                                                    @php $attachmentUrl = asset('storage/' . ltrim($complaint->attachment_path, '/')); @endphp
+                                                @if($complaint->attachment_url)
+                                                    @php $attachmentUrl = $complaint->attachment_url; @endphp
                                                     <div class="mb-4">
                                                         <a href="{{ $attachmentUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary mb-2">
                                                             <i class="fa-solid fa-up-right-from-square me-1"></i> Open Full Image
@@ -569,7 +569,7 @@
                                                 <h5 class="modal-title">Update Complaint {{ $complaint->formatted_id }}</h5>
                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="POST">
+                                            <form action="{{ route('admin.update.complaint', $complaint->id) }}" method="POST" data-loading-text="Saving complaint update...">
                                                 @csrf @method('PUT')
                                                 <div class="modal-body p-4">
                                                     <label class="fw-bold mb-3 d-block">Select New Status</label>
@@ -591,7 +591,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="btn btn-primary px-4 shadow">Save Update</button>
+                                                    <button type="submit" class="btn btn-primary px-4 shadow" data-loading-text="Saving complaint update...">Save Update</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -787,6 +787,108 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const complaintUpdateForms = document.querySelectorAll('form[action*="update.complaint"]');
+        const manageActionButtons = document.querySelectorAll('[data-complaint-manage-btn="1"]');
+
+        const lockManageButton = function (btn) {
+            btn.setAttribute('data-manage-click-locked', '1');
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+        };
+
+        const unlockManageButton = function (btn) {
+            btn.removeAttribute('data-manage-click-locked');
+            btn.disabled = false;
+            btn.removeAttribute('aria-disabled');
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+        };
+
+        manageActionButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                if (btn.getAttribute('data-manage-click-locked') === '1') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
+                lockManageButton(btn);
+
+                const targetModalSelector = btn.getAttribute('data-bs-target');
+                const targetModal = targetModalSelector ? document.querySelector(targetModalSelector) : null;
+
+                if (targetModal) {
+                    targetModal.addEventListener('hidden.bs.modal', function () {
+                        unlockManageButton(btn);
+                    }, { once: true });
+                } else {
+                    setTimeout(function () {
+                        unlockManageButton(btn);
+                    }, 1200);
+                }
+            }, true);
+        });
+
+        complaintUpdateForms.forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                if (form.getAttribute('data-form-submitting') === '1') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
+                form.setAttribute('data-form-submitting', '1');
+                const submitBtn = e.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+
+                if (submitBtn) {
+                    if (!submitBtn.hasAttribute('data-original-submit-label')) {
+                        if (submitBtn.tagName === 'BUTTON') {
+                            submitBtn.setAttribute('data-original-submit-label', submitBtn.innerHTML);
+                        } else {
+                            submitBtn.setAttribute('data-original-submit-label', submitBtn.value);
+                        }
+                    }
+
+                    const loadingText = submitBtn.getAttribute('data-loading-text') || 'Saving complaint update...';
+                    if (submitBtn.tagName === 'BUTTON') {
+                        submitBtn.innerHTML = loadingText;
+                    } else {
+                        submitBtn.value = loadingText;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.setAttribute('aria-disabled', 'true');
+                    submitBtn.style.pointerEvents = 'none';
+                    submitBtn.style.opacity = '0.7';
+                }
+            }, true);
+        });
+
+        window.addEventListener('pageshow', function () {
+            complaintUpdateForms.forEach(function (form) {
+                form.removeAttribute('data-form-submitting');
+                const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (!submitBtn) return;
+
+                if (submitBtn.hasAttribute('data-original-submit-label')) {
+                    const originalLabel = submitBtn.getAttribute('data-original-submit-label');
+                    if (submitBtn.tagName === 'BUTTON') {
+                        submitBtn.innerHTML = originalLabel;
+                    } else {
+                        submitBtn.value = originalLabel;
+                    }
+                    submitBtn.removeAttribute('data-original-submit-label');
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.removeAttribute('aria-disabled');
+                submitBtn.style.pointerEvents = '';
+                submitBtn.style.opacity = '';
+            });
+        });
+
         const actionModals = document.querySelectorAll('[id^="complaintActionModal"]');
 
         actionModals.forEach(function (modalEl) {

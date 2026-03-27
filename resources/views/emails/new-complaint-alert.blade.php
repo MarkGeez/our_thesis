@@ -75,10 +75,10 @@
             <p style="margin:0;"><strong>Submitted At:</strong> {{ optional($complaint->created_at)->format('F d, Y g:i A') }}</p>
         </div>
 
-        @if(!empty($complaint->attachment_path))
+        @if(!empty($complaint->attachment_url))
             <p style="margin-top: 12px;">
                 <strong>Attachment:</strong>
-                <a href="{{ asset('storage/' . ltrim((string) $complaint->attachment_path, '/')) }}">View uploaded file</a>
+                <a href="{{ $complaint->attachment_url }}">View uploaded file</a>
             </p>
         @endif
 

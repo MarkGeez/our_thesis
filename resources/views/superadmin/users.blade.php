@@ -1195,7 +1195,7 @@
                                                             </h5>
                                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST">
+                                                        <form action="{{ route($user->role . '.update.status', $list->id) }}" method="POST" data-loading-text="Updating user status...">
                                                             @csrf
                                                             @method('PUT')
                                                             <div class="modal-body">
@@ -1242,7 +1242,7 @@
                                                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                                                     Cancel
                                                                 </button>
-                                                                <button type="submit" class="btn btn-primary">
+                                                                <button type="submit" class="btn btn-primary" data-loading-text="Updating user status...">
                                                                     <i class="fas fa-save me-1"></i>Update Status
                                                                 </button>
                                                             </div>

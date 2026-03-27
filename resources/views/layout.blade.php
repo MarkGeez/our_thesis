@@ -7,6 +7,7 @@
     <title>Barangay 249 Information and Management System</title>
 </head>
 <body>
+    @include('components.form-submit-stopper')
     <main>
         {{ $slot }}
     </main>
