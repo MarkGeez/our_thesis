@@ -11,20 +11,33 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+}
 .page-flex {
-  display: flex;
-  flex-direction: row; /* Force horizontal layout */
-  min-height: 100vh;
-  width: 100%;
-  overflow: hidden; /* Prevents double scrollbars */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
 .main-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  background-color: #f4f7fa; /* Matches your screenshot's light gray background */
+    flex-grow: 1;
+    min-width: 0; /* Critical for flexbox children */
+    display: flex;
+    flex-direction: column;
 }
 .main-nav--bg {
   width: 100%;
@@ -116,6 +129,13 @@ object-fit: cover;
 @media (max-width: 768px) {
   .page-flex {
     display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: relative;
+    top: auto;
+    height: auto;
   }
 
   .announcements-grid {
