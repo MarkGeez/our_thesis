@@ -184,6 +184,10 @@ function initializeAddMemberModal() {
         ];
     }
 
+    function isHeadTagged(person) {
+        return normalize(person && person.headOfFamily) === 'yes';
+    }
+
     function formatBirthday(value) {
         if (!value) return 'Birthday: N/A';
 
@@ -262,6 +266,7 @@ function initializeAddMemberModal() {
                     const id = Number(person.id);
                     if (existingMemberIds.has(id)) return false;
                     if (id === currentResidentId) return false;
+                    if (isHeadTagged(person)) return false;
                     return headLastNameNorm && normalize(person.lastName) === headLastNameNorm;
                 })
                 .slice(0, 8);
@@ -273,6 +278,7 @@ function initializeAddMemberModal() {
                 const id = Number(person.id);
                 if (existingMemberIds.has(id)) return false;
                 if (id === currentResidentId) return false;
+                if (isHeadTagged(person)) return false;
 
                 const addressMatch = headHouseKey && residentHouseKey(person) === headHouseKey;
                 // Only suggest residents from the same street + house number.
@@ -313,6 +319,7 @@ function initializeAddMemberModal() {
 
             if (existingMemberIds.has(id)) return false;
             if (id === currentResidentId) return false;
+            if (isHeadTagged(person)) return false;
 
             const searchableNames = buildSearchTerms(person);
 

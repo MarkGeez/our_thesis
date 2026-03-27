@@ -86,7 +86,7 @@ class SubAdminController extends Controller
         $members = FamilyMember::with('resident')->where('encoded_by', $user->id)->get();
         // Include address fields for family-member suggestions (street + house number).
         $residents = Resident::with('households.house.street')
-            ->get(['id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo', 'age'])
+            ->get(['id', 'firstName', 'middleName', 'lastName', 'birthday', 'sex', 'contactNo', 'age', 'headOfFamily'])
             ->map(function (Resident $r) {
                 $household = $r->households->first();
                 $house = $household?->house;
@@ -101,6 +101,7 @@ class SubAdminController extends Controller
                     'age' => $r->age,
                     'sex' => $r->sex,
                     'contactNo' => $r->contactNo,
+                    'headOfFamily' => $r->headOfFamily,
                     'streetId' => $street?->id,
                     'streetName' => $street?->street_name,
                     'houseNo' => $house?->house_no,

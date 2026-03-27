@@ -139,6 +139,7 @@ class AdminController extends Controller
                 'age' => $r->age,
                 'sex' => $r->sex,
                 'contactNo' => $r->contactNo,
+                'headOfFamily' => $r->headOfFamily,
                 'streetId' => $street?->id,
                 'streetName' => $street?->street_name,
                 'houseNo' => $house?->house_no,

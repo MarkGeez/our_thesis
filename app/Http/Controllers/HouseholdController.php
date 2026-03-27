@@ -15,6 +15,23 @@ class HouseholdController extends Controller
 {
     use ValidatesContactNumbers;
 
+    private function resolveAuthenticatedResident()
+    {
+        $user = auth()->user();
+
+        $resident = Resident::where('user_id', $user->id)->first();
+
+        if (!$resident) {
+            $resident = Resident::matchingUser($user)->first();
+
+            if ($resident && !$resident->user_id) {
+                $resident->update(['user_id' => $user->id]);
+            }
+        }
+
+        return $resident;
+    }
+
     public function showHousehold()
     {
         $street = Street::withCount('houses')->get();
@@ -171,15 +188,7 @@ class HouseholdController extends Controller
             $user = auth()->user();
             \Log::info('User: ' . $user->id . ' Role: ' . $user->role);
 
-            // Get logged-in resident - try by user_id first, then by name match
-            $resident = Resident::where('user_id', $user->id)->first();
-
-            if (!$resident) {
-                // For admin who might not have user_id set
-                $resident = Resident::where('firstName', $user->firstName)
-                    ->where('lastName', $user->lastName)
-                    ->first();
-            }
+            $resident = $this->resolveAuthenticatedResident();
 
             if (!$resident) {
                 \Log::warning('Resident not found for user: ' . $user->id);
@@ -198,6 +207,16 @@ class HouseholdController extends Controller
                 return back()->with('error', 'No household found. Please ensure you are assigned to a household first.');
             }
 
+            if (!$householdResident->is_household_head && strtolower((string) ($resident->headOfFamily ?? '')) !== 'yes') {
+                \Log::warning('Non-head attempted to add family member', [
+                    'user_id' => $user->id,
+                    'resident_id' => $resident->id,
+                    'household_id' => $householdResident->household_id,
+                ]);
+
+                return back()->with('error', 'Only household heads can add family members from the profile.');
+            }
+
             $household = $householdResident->household;
             \Log::info('Found household: ' . $household->id);
 
@@ -208,10 +227,17 @@ class HouseholdController extends Controller
             ]);
 
             $selectedId = (int) $validated['resident_id'];
+            $selectedResident = Resident::findOrFail($selectedId);
 
             if ((int) $resident->id === $selectedId) {
                 return back()->withErrors([
                     'resident_id' => 'You cannot add yourself as a family member.',
+                ]);
+            }
+
+            if (strtolower((string) ($selectedResident->headOfFamily ?? '')) === 'yes') {
+                return back()->withErrors([
+                    'resident_id' => 'Residents tagged as head of family cannot be added as household members.',
                 ]);
             }
 

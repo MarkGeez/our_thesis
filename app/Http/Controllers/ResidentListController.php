@@ -489,6 +489,8 @@ public function updateOwnInfo(Request $request, $id)
 
     $validated['contactNo'] = $resident->user->contactNumber ?? $resident->contactNo;
     $validated = $this->normalizeResidentPayload($validated);
+    // Resident type is managed only in the admin residents module.
+    unset($validated['type']);
 
     // Align with encode behavior: blank emergency contact fields are stored as "N/A"
     $validated['emergencyContactNo'] = filled($validated['emergencyContactNo'] ?? null)
@@ -501,10 +503,18 @@ public function updateOwnInfo(Request $request, $id)
     $requestedHeadStatus = $validated['headOfFamily'] ?? $resident->headOfFamily;
 
     DB::transaction(function () use ($request, $resident, $validated, $requestedHeadStatus) {
-        $householdResident = HouseholdResident::where('resident_id', $resident->id)->firstOrFail();
-        $household = Household::findOrFail($householdResident->household_id);
+        $householdResident = HouseholdResident::where('resident_id', $resident->id)->first();
+        $household = $householdResident
+            ? Household::find($householdResident->household_id)
+            : null;
 
         if ($resident->headOfFamily === 'yes' && $requestedHeadStatus === 'no') {
+            if (!$householdResident || !$household) {
+                throw ValidationException::withMessages([
+                    'headOfFamily' => 'Unable to transfer head of family because this resident has no household link. Please contact an administrator.',
+                ]);
+            }
+
             $newHeadId = $request->new_head_id;
 
             if (!$newHeadId) {
@@ -556,7 +566,7 @@ public function updateOwnInfo(Request $request, $id)
                 ->update(['is_household_head' => true]);
         }
 
-        if ($requestedHeadStatus === 'yes') {
+        if ($requestedHeadStatus === 'yes' && $householdResident) {
             $otherResidentIds = HouseholdResident::where('household_id', $householdResident->household_id)
                 ->where('resident_id', '!=', $resident->id)
                 ->pluck('resident_id');
@@ -571,9 +581,11 @@ public function updateOwnInfo(Request $request, $id)
         }
 
         $resident->update(Arr::except($validated, ['new_head_id']));
-        $householdResident->update([
-            'is_household_head' => $requestedHeadStatus === 'yes',
-        ]);
+        if ($householdResident) {
+            $householdResident->update([
+                'is_household_head' => $requestedHeadStatus === 'yes',
+            ]);
+        }
         $this->syncLinkedUserFromResident($resident->fresh('user'), $validated);
     });
 
