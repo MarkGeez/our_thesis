@@ -336,7 +336,7 @@
         // Only active for "My" services, NOT for "Complaints Records"
         $servicesActive = Request::routeIs(
             'subadmin.subadminCertificate*',
-            'subadmin.complaint*'
+            'subadmin.complaint'
         );
     @endphp
 
@@ -355,7 +355,7 @@
             </a>
         </li>
         <li>
-            <a class="{{ Request::routeIs('subadmin.complaint*') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
+            <a class="{{ Request::routeIs('subadmin.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaint') }}">
                 <span class="icon"><i class="fa-solid fa-comments"></i></span>My Complaints
             </a>
         </li>
@@ -372,7 +372,7 @@
         </a>
     </li>
     <li>
-        <a class="{{ Request::routeIs('subadmin.complaintRequest') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
+        <a class="{{ Request::routeIs('subadmin.complaintRequest', 'subadmin.complaints.*', 'subadmin.update.complaint') ? 'active' : '' }}" href="{{ route('subadmin.complaintRequest') }}">
                                     <span class="icon"><i class="fa-solid fa-comments"></i></span> Complaints Records
         </a>
     </li>
