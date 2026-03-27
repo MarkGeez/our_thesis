@@ -307,7 +307,7 @@
             $rolePrefix = auth()->user()->role === 'subadmin' ? 'subadmin' : 'admin';
             $activeTab = request()->query('tab', 'residents');
             $activeSort = request()->query('sort', 'date_desc');
-            if (!in_array($activeTab, ['residents', 'certificates', 'announcements', 'activity_logs'], true)) {
+            if (!in_array($activeTab, ['residents', 'certificates', 'announcements'], true)) {
                 $activeTab = 'residents';
             }
 
@@ -321,10 +321,6 @@
 
             $announcementArchives = $archive->filter(function ($item) {
                 return in_array(strtolower((string) $item->record_type), ['announcement', 'announcements'], true);
-            })->values();
-
-            $activityLogArchives = $archive->filter(function ($item) {
-                return in_array(strtolower((string) $item->record_type), ['active_log', 'active_logs', 'activity_log', 'activity_logs'], true);
             })->values();
 
             $certificateResidentIds = $certificateArchives
@@ -356,21 +352,6 @@
                     $fullName = trim(collect([$user->firstName, $user->middleName, $user->lastName])->filter()->implode(' '));
                     return [$user->id => ($fullName !== '' ? ucwords(strtolower($fullName)) : 'N/A')];
                 });
-
-            $activityUserIds = $activityLogArchives
-                ->pluck('data')
-                ->filter(fn ($data) => is_array($data) && !empty($data['user_id']))
-                ->map(fn ($data) => (int) $data['user_id'])
-                ->unique()
-                ->values();
-
-            $activityUserNameById = \App\Models\User::query()
-                ->when($activityUserIds->isNotEmpty(), fn ($query) => $query->whereIn('id', $activityUserIds))
-                ->get(['id', 'firstName', 'middleName', 'lastName'])
-                ->mapWithKeys(function ($user) {
-                    $fullName = trim(collect([$user->firstName, $user->middleName, $user->lastName])->filter()->implode(' '));
-                    return [$user->id => ($fullName !== '' ? ucwords(strtolower($fullName)) : 'N/A')];
-                });
         @endphp
 
         <div class="records-container">
@@ -390,11 +371,6 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link {{ $activeTab === 'announcements' ? 'active' : '' }}" id="announcements-tab" data-bs-toggle="tab" data-bs-target="#announcements-pane" type="button" role="tab" aria-controls="announcements-pane" aria-selected="{{ $activeTab === 'announcements' ? 'true' : 'false' }}">
                                 Announcements
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $activeTab === 'activity_logs' ? 'active' : '' }}" id="activity-logs-tab" data-bs-toggle="tab" data-bs-target="#activity-logs-pane" type="button" role="tab" aria-controls="activity-logs-pane" aria-selected="{{ $activeTab === 'activity_logs' ? 'true' : 'false' }}">
-                                Activity Logs
                             </button>
                         </li>
                     </ul>
@@ -619,89 +595,6 @@
                         @endif
                     </div>
 
-                    <div class="tab-pane fade {{ $activeTab === 'activity_logs' ? 'show active' : '' }}" id="activity-logs-pane" role="tabpanel" aria-labelledby="activity-logs-tab" tabindex="0">
-                        <div class="archive-filter-bar">
-                            <form method="GET" action="{{ route($rolePrefix . '.archives') }}" class="archive-filter-form">
-                                <input type="hidden" name="tab" value="activity_logs">
-                                <div class="input-group input-group-sm archive-search-group">
-                                    <span class="input-group-text text-muted"><i class="fa fa-search"></i></span>
-                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search activity log ID, module, action, user, or details..." value="{{ request('search') }}">
-                                    <button type="submit" class="btn btn-primary px-3">Search</button>
-                                </div>
-                                <div class="archive-filter-controls">
-                                    <span class="archive-filter-label">Sort</span>
-                                    <select name="sort" class="form-select form-select-sm archive-filter-select" onchange="this.form.submit()">
-                                        <option value="date_desc" {{ $activeSort === 'date_desc' ? 'selected' : '' }}>Date: Newest</option>
-                                        <option value="date_asc" {{ $activeSort === 'date_asc' ? 'selected' : '' }}>Date: Oldest</option>
-                                    </select>
-                                    <a href="{{ route($rolePrefix . '.archives', ['tab' => 'activity_logs']) }}" class="btn btn-outline-secondary btn-sm px-3">Reset</a>
-                                </div>
-                            </form>
-                        </div>
-                        @if($activityLogArchives->isEmpty())
-                            <div class="tab-empty-state">No archived activity logs found on this page.</div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Activity ID</th>
-                                            <th scope="col">User</th>
-                                            <th scope="col">Module / Action</th>
-                                            <th scope="col">Archive Date</th>
-                                            <th scope="col">Archived By</th>
-                                            <th scope="col">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($activityLogArchives as $item)
-                                            @php
-                                                $activityPayload = is_array($item->data) ? $item->data : [];
-                                                $activityId = $activityPayload['id'] ?? $item->record_id;
-                                                $moduleLabel = isset($activityPayload['module'])
-                                                    ? \Illuminate\Support\Str::headline((string) $activityPayload['module'])
-                                                    : 'N/A';
-                                                $actionLabel = isset($activityPayload['action'])
-                                                    ? \Illuminate\Support\Str::headline((string) $activityPayload['action'])
-                                                    : 'N/A';
-                                                $activityUserName = !empty($activityPayload['user_id'])
-                                                    ? ($activityUserNameById->get((int) $activityPayload['user_id']) ?? 'N/A')
-                                                    : 'N/A';
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $activityId ? 'ACTL-' . str_pad((string) $activityId, 6, '0', STR_PAD_LEFT) : 'N/A' }}</td>
-                                                <td class="resident-name-cell">{{ $activityUserName }}</td>
-                                                <td>
-                                                    <div class="fw-semibold">{{ $moduleLabel }}</div>
-                                                    <small class="text-muted">{{ $actionLabel }}</small>
-                                                </td>
-                                                <td>{{ $item->created_at->format('M d, Y h:i A') }}</td>
-                                                <td>
-                                                    {{ $item->user
-                                                        ? ucwords(strtolower($item->user->firstName . ' ' . $item->user->lastName))
-                                                        : 'Unknown'
-                                                    }}
-                                                </td>
-                                                <td>
-                                                    <div class="archive-actions">
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveDetailsModal{{ $item->id }}">
-                                                            <i class="fa-solid fa-eye"></i> View
-                                                        </button>
-                                                        <form action="{{ route($rolePrefix . '.archive.retrieve.activity-log', $item->id) }}" method="post" onsubmit="return confirm('Retrieve this activity log back to active logs?');">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-success">
-                                                                <i class="fa-solid fa-rotate-left"></i> Retrieve
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
                 </div>
 
                 @foreach($archive as $item)

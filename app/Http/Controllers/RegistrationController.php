@@ -25,7 +25,7 @@ class RegistrationController extends Controller
     {
         $request->validate([
             'firstName'       => ['required', 'string', 'max:70', 'regex:/^[A-Za-z\s]+$/'],
-            'middleName'      => ['nullable', 'string', 'max:50', 'regex:/^[A-Za-z\s]+$/'],
+            'middleName'      => ['nullable', 'string', 'max:50', 'regex:/^[A-Za-z\s]*$/'],
             'lastName'        => ['required', 'string', 'max:50', 'regex:/^[A-Za-z\s]+$/'],
             'email'           => 'required|string|email|max:255|unique:users,email',
             'password'        => 'required|string|min:8|max:255',
@@ -34,7 +34,7 @@ class RegistrationController extends Controller
             'proofOfIdentity' => 'required|image|mimes:jpg,png,jpeg|max:4096'
         ], array_merge($this->contactNumberMessages(['contactNumber']), [
             'firstName.regex' => 'First name must contain letters only (A-Z or a-z).',
-            'middleName.regex' => 'Middle name must contain letters only (A-Z or a-z).',
+            'middleName.regex' => 'Middle name is optional, but if provided it must contain letters only (A-Z or a-z).',
             'lastName.regex' => 'Last name must contain letters only (A-Z or a-z).',
         ]));
 
