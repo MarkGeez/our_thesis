@@ -1148,6 +1148,7 @@ document.addEventListener('click', function(e) {
         document.getElementById('profileHistorySection').style.display = 'none';
         document.getElementById('profileHistoryLoading').style.display = 'none';
         document.getElementById('profileHistoryContent').style.display = 'none';
+        document.getElementById('profileImageContainer').innerHTML = '<i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>';
         
         var modal = new bootstrap.Modal(document.getElementById('requesterProfileModal'));
         modal.show();
@@ -1172,6 +1173,8 @@ document.addEventListener('click', function(e) {
                 var imgContainer = document.getElementById('profileImageContainer');
                 if (data.profileImage) {
                     imgContainer.innerHTML = '<img src="' + data.profileImage + '" alt="Profile" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%;">';
+                } else {
+                    imgContainer.innerHTML = '<i class="fas fa-user" style="font-size: 60px; color: #adb5bd;"></i>';
                 }
                 
                 if (data.age) {
