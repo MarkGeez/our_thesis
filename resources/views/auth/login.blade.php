@@ -318,10 +318,15 @@
         </div>
     @endif
 
-    @if(session('status') && !session('auth_success') && !session('auth_error'))
-        <div class="auth-alert auth-alert-info">
-            <i class="fa-solid fa-circle-info"></i>
-            <div>{{ session('status') }}</div>
+    @php
+        $statusMessage = session('status');
+        $statusIsError = $statusMessage && preg_match('/pending|credential|invalid|wrong|inactive|disabled|denied|rejected|not approved/i', $statusMessage);
+    @endphp
+
+    @if($statusMessage && !session('auth_success') && !session('auth_error'))
+        <div class="auth-alert {{ $statusIsError ? 'auth-alert-error' : 'auth-alert-info' }}">
+            <i class="fa-solid {{ $statusIsError ? 'fa-circle-exclamation' : 'fa-circle-info' }}"></i>
+            <div>{{ $statusMessage }}</div>
         </div>
     @endif
 

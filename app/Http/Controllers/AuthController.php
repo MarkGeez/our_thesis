@@ -61,6 +61,21 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)){
             $user = Auth::user();
+
+            if (strtolower((string) $user->status) !== 'approved') {
+                Auth::logout();
+
+                $statusMessage = match (strtolower((string) $user->status)) {
+                    'pending' => 'Your account is still pending approval.',
+                    'declined', 'rejected' => 'Your account was not approved. Please contact the barangay office.',
+                    default => 'Your account does not have access yet.',
+                };
+
+                return back()
+                    ->withInput($request->only('email'))
+                    ->with('status', $statusMessage);
+            }
+
             $resident = $this->resolveLinkedResident($user);
 
             if ($resident && strtolower((string) $resident->status) === 'inactive') {

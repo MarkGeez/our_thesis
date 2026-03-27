@@ -135,9 +135,9 @@
     <input type="text" class="fill-line" name="former_address" value="{{ $address }}" style="width:250px"> 
     has already transferred to Barangay 249 Zone 23 District II Tondo, Manila.
 @else
-    <span class="fill-line">{{ $name }}</span>,
+    <span class="fill-line">{{ ucwords(strtolower($name)) }}</span>,
     legal age, and formerly residing at 
-    <span class="fill-line">{{ $address }}</span> 
+    <span class="fill-line">{{ ucwords(strtolower($address)) }}</span> 
     has already transferred to Barangay 249 Zone 23 District II Tondo, Manila.
 @endif
 

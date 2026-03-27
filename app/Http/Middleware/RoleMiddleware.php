@@ -34,6 +34,20 @@ class RoleMiddleware
             abort(404);
         }
 
+        if (strtolower((string) $user->status) !== 'approved') {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $statusMessage = match (strtolower((string) $user->status)) {
+                'pending' => 'Your account is still pending approval.',
+                'declined', 'rejected' => 'Your account was not approved. Please contact the barangay office.',
+                default => 'Your account does not have access yet.',
+            };
+
+            return redirect()->route('login')->with('status', $statusMessage);
+        }
+
         $linkedResident = $this->resolveLinkedResident($user);
 
         if ($linkedResident && strtolower((string) $linkedResident->status) === 'inactive') {

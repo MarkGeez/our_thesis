@@ -75,7 +75,7 @@ margin: 10px 0;
 at <input type="text" class="fill-line" name="address" value="{{ $address }}" style="width:280px">
 
         @else
-          <span class="fill-line">{{ $name }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address at <span class="fill-line">{{ $address }}</span>.
+          <span class="fill-line">{{ ucwords(strtolower($name)) }}</span> of legal age is a bonafide resident of BARANGAY 249 ZONE 23 with postal address at <span class="fill-line">{{ ucwords(strtolower($address)) }}</span>.
 
 
         @endif

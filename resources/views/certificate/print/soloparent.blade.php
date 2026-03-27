@@ -164,8 +164,8 @@
 
     <div class="content">
         <main class="right">
-            <div class="cert-title">AFFIDAVIT FROM BARANGAY OF</div>
-            <div class="cert-subtitle">SOLO PARENT</div>
+            <div class="cert-title">AFFIDAVIT FROM BARANGAY OF SOLO PARENT</div>
+            
 
             <p class="intro" style="line-height: 35px;">
                 I,
@@ -175,7 +175,7 @@
                   Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
 , after having duly sworn to in accordance with law, hereby depose and state:
                 @else
-                  <span class="fill-line">{{ $name }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
+                  <span class="fill-line">{{ ucwords(strtolower($name)) }}</span>, <span class="fill-line">{{ $data['age'] ?? $req->resident?->age ?? '______' }}</span> years old, Filipino, and
                   single, and a bona fide resident of Barangay 249 Zone 23 District II Tondo,
                   Manila, with postal address at Biak na Bato St. Corner Almeda Tondo, Manila
 {{-- <span class="fill-line">{{ $address }}</span> --}}, after having duly sworn to in accordance with law, hereby depose and state:
@@ -196,7 +196,7 @@
                     @if($editable)
                         <input type="text" class="fill-line" name="request_data[separated_from]" value="{{ $data['separated_from'] ?? '' }}" style="width:240px">
                     @else
-                        <span class="fill-line">{{ $data['separated_from'] ?? '________________________' }}</span>
+                        <span class="fill-line">{{ ucwords(strtolower($data['separated_from'] ?? '________________________')) }}</span>
                     @endif
                     and during our relationship we begot with
                     @php
