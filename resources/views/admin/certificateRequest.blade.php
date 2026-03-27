@@ -1042,6 +1042,7 @@
                             <div class="alert alert-light border" id="detailsPurpose">-</div>
                         </div>
                     </div>
+                    {{--
                     <div class="row" id="additionalDetailsRow" style="display:none;">
                         <div class="col-12">
                             <h6 class="fw-bold text-primary mb-3">
@@ -1052,6 +1053,7 @@
                             </div>
                         </div>
                     </div>
+                    --}}
                 </div>
             </div>
             <div class="modal-footer">
@@ -1330,9 +1332,11 @@ document.addEventListener('click', function(e) {
                 }
                 document.getElementById('detailsStatus').innerHTML = statusBadge;
                 
-                if (data.request_data && Object.keys(data.request_data).length > 0) {
-                    document.getElementById('additionalDetailsRow').style.display = 'block';
-                    var detailsList = document.querySelector('#detailsFormData .data-list');
+                var additionalDetailsRow = document.getElementById('additionalDetailsRow');
+                var detailsList = document.querySelector('#detailsFormData .data-list');
+
+                if (additionalDetailsRow && detailsList && data.request_data && Object.keys(data.request_data).length > 0) {
+                    additionalDetailsRow.style.display = 'block';
                     detailsList.innerHTML = '';
                     for (var key in data.request_data) {
                         var value = data.request_data[key];
@@ -1346,8 +1350,8 @@ document.addEventListener('click', function(e) {
                         `;
                         detailsList.appendChild(item);
                     }
-                } else {
-                    document.getElementById('additionalDetailsRow').style.display = 'none';
+                } else if (additionalDetailsRow) {
+                    additionalDetailsRow.style.display = 'none';
                 }
                 
                 document.getElementById('detailsLoading').style.display = 'none';

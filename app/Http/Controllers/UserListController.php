@@ -210,14 +210,22 @@ class UserListController extends Controller
                 ->where('status', 'pending')
                 ->get();
 
+            // Mark duplicates and update their status to declined
             User::whereIn('id', $duplicatePendingUsers->pluck('id'))
-                ->update(['status' => 'declined']);
+                ->update(['status' => 'declined', 'is_duplicate' => true]);
 
             foreach ($duplicatePendingUsers as $duplicatePendingUser) {
                 $duplicatePendingUser->status = 'declined';
+                $duplicatePendingUser->is_duplicate = true;
                 $this->sendAccountStatusEmail($duplicatePendingUser);
             }
         }
+        
+        // Mark as inactive if user is being declined/rejected
+        if (in_array($newStatus, ['declined', 'rejected'], true)) {
+            $user->is_duplicate = true;
+        }
+        
         $user->status = $newStatus;
         $user->save();
 
