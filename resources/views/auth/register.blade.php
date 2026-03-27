@@ -410,10 +410,10 @@
                     <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                     <input type="text" name="middleName" id="middleName" class="form-control"
                            placeholder="Santos" value="{{ old('middleName') }}"
-                           pattern="^[A-Za-z\s]+$" title="Letters only (A-Z or a-z)." required>
+                              pattern="^[A-Za-z\s]*$" title="Middle name is optional. If provided, letters only (A-Z or a-z)." >
                 </div>
                 <div id="middleNameError" class="auth-alert auth-alert-error" style="display:none;">
-                    <i class="fa-solid fa-circle-exclamation"></i><div>Middle name must contain letters only (A-Z or a-z).</div>
+                    <i class="fa-solid fa-circle-exclamation"></i><div>Middle name is optional</div>
                 </div>
                 @error('middleName')
                 <div class="auth-alert auth-alert-error">
@@ -762,15 +762,16 @@
     function validateNameField(input, errorBox, label, allowEmpty) {
         if (!input || !errorBox) return true;
 
-        input.value = input.value.replace(/[^A-Za-z\s]/g, '');
-        const value = input.value.trim();
+        const rawValue = input.value || '';
+        const value = rawValue.trim();
+        const hasInvalidCharacters = /[^A-Za-z\s]/.test(rawValue);
 
         if (allowEmpty && value.length === 0) {
             errorBox.style.display = 'none';
             return true;
         }
 
-        const valid = nameRegex.test(value);
+        const valid = !hasInvalidCharacters && nameRegex.test(value);
         errorBox.style.display = valid ? 'none' : 'flex';
         if (!valid) {
             errorBox.querySelector('div').textContent = label + ' must contain letters only (A-Z or a-z).';
@@ -784,8 +785,9 @@
     });
 
     middleNameInput.addEventListener('input', function () {
-        validateNameField(middleNameInput, middleNameError, 'Middle name', false);
+        validateNameField(middleNameInput, middleNameError, 'Middle name', true);
     });
+
 
     lastNameInput.addEventListener('input', function () {
         validateNameField(lastNameInput, lastNameError, 'Last name', false);
@@ -819,7 +821,7 @@
         const selectedFile = proofInput.files && proofInput.files.length ? proofInput.files[0] : null;
         const proofTooLarge = !!selectedFile && selectedFile.size > maxProofSizeBytes;
         const firstNameValid = validateNameField(firstNameInput, firstNameError, 'First name', false);
-        const middleNameValid = validateNameField(middleNameInput, middleNameError, 'Middle name', false);
+        const middleNameValid = validateNameField(middleNameInput, middleNameError, 'Middle name', true);
         const lastNameValid = validateNameField(lastNameInput, lastNameError, 'Last name', false);
 
         if (!passwordRegex.test(pwVal) || !contactRx.test(contactVal) || proofTooLarge || !firstNameValid || !middleNameValid || !lastNameValid) {

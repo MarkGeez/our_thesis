@@ -11,6 +11,42 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
     <style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+}
+.page-flex {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch;
+    width: 100vw;
+    min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.main-wrapper {
+    flex-grow: 1;
+    min-width: 0; /* Critical for flexbox children */
+    display: flex;
+    flex-direction: column;
+}
+.main-nav--bg {
+  width: 100%;
+  flex-shrink: 0; /* Prevents the header from squishing */
+}
+.main.users.chart-page {
+  flex: 1;
+}
+
 .announcement-card {
   max-width: 100%;
   border: 1px solid #ddd;
@@ -80,7 +116,7 @@ object-fit: cover;
     inset 0 8px 20px rgba(0, 0, 0, 0.2),
     inset 0 -8px 20px rgba(0, 0, 0, 0.15);
 
-  line-height: 1.5px;
+  line-height: 1.55;
 }
 
 .announcement-details {
@@ -91,6 +127,17 @@ object-fit: cover;
 
 
 @media (max-width: 768px) {
+  .page-flex {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: relative;
+    top: auto;
+    height: auto;
+  }
+
   .announcements-grid {
     grid-template-columns: 1fr; 
   }
@@ -151,7 +198,7 @@ object-fit: cover;
                 <!--Dito lalagay main content-->
     <div class="main-container">
    
-  <div class="d-flex justify-content-between align-items-center">
+  <div class="d-flex justify-content-between align-items-center flex-wrap px-3 py-3 gap-2">
   <h2 style="color:#000000; margin-left: 20px;">Active Announcements</h2>
   <button type="button" class="btn btn-primary me-3"
         data-bs-toggle="modal"
@@ -267,8 +314,6 @@ object-fit: cover;
    </div>
 
 </div>
-</div> 
-    
 </main>
 
 </div>
