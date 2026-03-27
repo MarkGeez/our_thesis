@@ -51,9 +51,26 @@ class OfficialController extends Controller
             ->get()
             ->keyBy('position');
 
-        $residents = Resident::orderBy('lastName')
+        $residents = Resident::with('user:id,contactNumber')
+            ->orderBy('lastName')
             ->orderBy('firstName')
-            ->get(['id', 'firstName', 'middleName', 'lastName', 'image_path']);
+            ->get([
+                'id',
+                'user_id',
+                'firstName',
+                'middleName',
+                'lastName',
+                'birthday',
+                'sex',
+                'contactNo',
+                'image_path',
+            ])
+            ->map(function (Resident $resident) {
+                // Keep resident contact aligned with linked account when available.
+                $resident->contactNo = $resident->user?->contactNumber ?: $resident->contactNo;
+                return $resident;
+            })
+            ->values();
 
         $selectedYear = (int) request()->integer('year', now()->year);
         if ($selectedYear < 1900 || $selectedYear > 2100) {
