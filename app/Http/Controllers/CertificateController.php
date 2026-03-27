@@ -17,6 +17,34 @@ use Illuminate\View\View;
 
 class CertificateController extends Controller
 {
+    private function resolveRequesterAge(?User $user, ?Resident $resident): ?int
+    {
+        if ($resident && !is_null($resident->age)) {
+            return (int) $resident->age;
+        }
+
+        if ($user && !empty($user->birthday)) {
+            try {
+                return (int) \Carbon\Carbon::parse($user->birthday)->age;
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveCertificateDisplayName(CertificateRequest $req): string
+    {
+        $data = $req->request_data ?? [];
+
+        if ($req->certificate_type === 'senior' && !empty($data['certificate_name'])) {
+            return ucwords(strtolower(trim((string) $data['certificate_name'])));
+        }
+
+        return ucwords(strtolower($req->requester_name));
+    }
+
     public function archive(CertificateRequest $certificateRequest, ArchiveService $archiveService): RedirectResponse
     {
         if ($certificateRequest->status !== 'picked_up') {
@@ -108,6 +136,19 @@ class CertificateController extends Controller
     if (in_array($validated['certificate_type'], ['soloparent', 'senior'])) {
         $formData = $request->form_data ?? [];
         $data = array_merge($data, $formData);
+    }
+
+    if ($validated['certificate_type'] === 'soloparent' && empty($data['age'])) {
+        $resolvedAge = $this->resolveRequesterAge($user, $resident);
+        if (!is_null($resolvedAge)) {
+            $data['age'] = $resolvedAge;
+        }
+    }
+
+    if ($validated['certificate_type'] === 'senior' && empty($data['certificate_name'])) {
+        $data['certificate_name'] = $user
+            ? trim("{$user->firstName} {$user->middleName} {$user->lastName}")
+            : null;
     }
     
     $certificateRequest = CertificateRequest::create([
@@ -220,7 +261,7 @@ class CertificateController extends Controller
             abort(403, 'Certificate is not yet approved.');
         }
 
-        $name = $request->input('name', ucwords(strtolower($req->requester_name)));
+        $name = $request->input('name', $this->resolveCertificateDisplayName($req));
         $data = $req->request_data ?? [];
         $submitted = $request->input('request_data', []);
 
@@ -362,7 +403,7 @@ $req->save();
         };
         $data = $req->request_data ?? [];
 
-        $name = ucwords(strtolower($req->requester_name));
+        $name = $this->resolveCertificateDisplayName($req);
         $address = match ($req->certificate_type) {
             'bonafide', 'indigency' => $req->address ?? $data['address'] ?? $data['postal_address'] ?? null,
             default => $data['former_address'] ?? null,

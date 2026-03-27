@@ -98,6 +98,23 @@ $user = auth()->user();
         <h6 class="text-muted mb-3">Account Information</h6>
 
         <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">First Name</label>
+                <input type="text" name="firstName" class="form-control form-control-lg" value="{{ old('firstName', $user->firstName) }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Middle Name</label>
+                <input type="text" name="middleName" class="form-control form-control-lg" value="{{ old('middleName', $user->middleName) }}">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="lastName" class="form-control form-control-lg" value="{{ old('lastName', $user->lastName) }}" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Email Address</label>
                 <input type="email" name="email" class="form-control form-control-lg" value="{{ old('email', $user->email) }}" required>
