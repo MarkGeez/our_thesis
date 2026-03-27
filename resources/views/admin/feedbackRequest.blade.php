@@ -157,6 +157,16 @@
 
                 <div class="records-container">
                     @if ($feedbacks->count() > 0)
+                        <div style="padding: 1rem 1rem 0 1rem; display: flex; justify-content: flex-end; gap: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                            <a href="{{ route('feedbackRequest', ['sort' => 'oldest']) }}" 
+                               class="btn btn-sm {{ $sort === 'oldest' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                <i class="fa-solid fa-arrow-up"></i> Oldest
+                            </a>
+                            <a href="{{ route('feedbackRequest', ['sort' => 'newest']) }}" 
+                               class="btn btn-sm {{ $sort === 'newest' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                <i class="fa-solid fa-arrow-down"></i> Newest
+                            </a>
+                        </div>
                         <div class="feedback-list">
                             @foreach ($feedbacks as $feedback)
                                 <article class="feedback-card">
@@ -165,7 +175,7 @@
                                             <i class="fa-solid fa-user-pen"></i>
                                             <span>
                                                 @if ($feedback->user)
-                                                    {{ ucfirst($feedback->user->firstName) }} {{ ucfirst($feedback->user->lastName) }}
+                                                    {{ ucwords(strtolower($feedback->user->firstName . ' ' . $feedback->user->lastName)) }}
                                                 @else
                                                     Unknown User
                                                 @endif

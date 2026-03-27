@@ -339,8 +339,11 @@ class AdminController extends Controller
     public function feedbackRequest(): View
     {
         $admin = Auth::user();
-        $feedbacks = Feedbacks::with('user:id,firstName,lastName')->oldest()->paginate(10);
-        return view("admin.feedbackRequest", compact('admin', 'feedbacks'));
+        $sort = request('sort', 'oldest');
+        $feedbacks = Feedbacks::with('user:id,firstName,lastName')
+            ->when($sort === 'newest', fn($q) => $q->latest(), fn($q) => $q->oldest())
+            ->paginate(10);
+        return view("admin.feedbackRequest", compact('admin', 'feedbacks', 'sort'));
     }
     
     public function aboutus(): View
