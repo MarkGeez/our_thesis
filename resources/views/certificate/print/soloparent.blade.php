@@ -42,7 +42,7 @@
         }
         .cert-title {
             text-align: center;
-            font-size: 40px;
+            font-size: 30px;
             font-weight: bold;
             margin: 35px 0 5px 0;
         }
