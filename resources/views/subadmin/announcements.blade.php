@@ -13,16 +13,23 @@
     <style>
 .page-flex {
   display: flex;
+  flex-direction: row; /* Force horizontal layout */
   min-height: 100vh;
+  width: 100%;
+  overflow: hidden; /* Prevents double scrollbars */
 }
 
 .main-wrapper {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  background-color: #f4f7fa; /* Matches your screenshot's light gray background */
 }
-
+.main-nav--bg {
+  width: 100%;
+  flex-shrink: 0; /* Prevents the header from squishing */
+}
 .main.users.chart-page {
   flex: 1;
 }
