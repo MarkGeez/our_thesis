@@ -156,17 +156,17 @@
                 </div>
 
                 <div class="records-container">
+                    <div class="d-flex justify-content-end mb-3">
+                        <form method="GET" action="{{ route('admin.feedbackRequest') }}" class="d-flex align-items-center gap-2">
+                            <label for="sort" class=" fw-semibold">Sort by</label>
+                            <select name="sort" id="sort" class="form-select" onchange="this.form.submit()">
+                                <option value="newest" {{ ($sort ?? 'newest') === 'newest' ? 'selected' : '' }}>Newest</option>
+                                <option value="oldest" {{ ($sort ?? 'newest') === 'oldest' ? 'selected' : '' }}>Oldest</option>
+                            </select>
+                        </form>
+                    </div>
+
                     @if ($feedbacks->count() > 0)
-                        <div style="padding: 1rem 1rem 0 1rem; display: flex; justify-content: flex-end; gap: 0.5rem; border-bottom: 1px solid var(--border-color);">
-                            <a href="{{ route('feedbackRequest', ['sort' => 'oldest']) }}" 
-                               class="btn btn-sm {{ $sort === 'oldest' ? 'btn-primary' : 'btn-outline-primary' }}">
-                                <i class="fa-solid fa-arrow-up"></i> Oldest
-                            </a>
-                            <a href="{{ route('feedbackRequest', ['sort' => 'newest']) }}" 
-                               class="btn btn-sm {{ $sort === 'newest' ? 'btn-primary' : 'btn-outline-primary' }}">
-                                <i class="fa-solid fa-arrow-down"></i> Newest
-                            </a>
-                        </div>
                         <div class="feedback-list">
                             @foreach ($feedbacks as $feedback)
                                 <article class="feedback-card">
@@ -175,7 +175,7 @@
                                             <i class="fa-solid fa-user-pen"></i>
                                             <span>
                                                 @if ($feedback->user)
-                                                    {{ ucwords(strtolower($feedback->user->firstName . ' ' . $feedback->user->lastName)) }}
+                                                    {{ ucwords(strtolower(trim(($feedback->user->firstName ?? '') . ' ' . ($feedback->user->lastName ?? '')))) }}
                                                 @else
                                                     Unknown User
                                                 @endif
@@ -221,5 +221,4 @@
 <script src="{{ asset('template/plugins/chart.min.js') }}"></script>
 <script src="{{ asset('template/plugins/feather.min.js') }}"></script>
 <script src="{{ asset('template/js/script.js') }}"></script>
-
 

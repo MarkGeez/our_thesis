@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ValidatesContactNumbers;
-use Illuminate\Http\Request;
 
 use App\Models\Announcement;
 use App\Models\Feedbacks;
@@ -18,6 +17,7 @@ use App\Models\FamilyMember;
 
 
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Archive;
 use App\Models\CertificateRequest;
@@ -336,13 +336,15 @@ class AdminController extends Controller
     return view('admin.announcements', compact('admin', 'announcement'));
 }
 
-    public function feedbackRequest(): View
+    public function feedbackRequest(Request $request): View
     {
         $admin = Auth::user();
-        $sort = request('sort', 'oldest');
+        $sort = $request->query('sort', 'newest');
+
         $feedbacks = Feedbacks::with('user:id,firstName,lastName')
-            ->when($sort === 'newest', fn($q) => $q->latest(), fn($q) => $q->oldest())
+            ->when($sort === 'oldest', fn ($query) => $query->oldest(), fn ($query) => $query->latest())
             ->paginate(10);
+
         return view("admin.feedbackRequest", compact('admin', 'feedbacks', 'sort'));
     }
     
