@@ -531,3 +531,95 @@ if (mobileToggle && sidebar) {
     sidebar.classList.toggle('hidden');
   });
 }
+
+// Prevent duplicate clicks/submits while requests are in-flight.
+(function () {
+  var CLICK_LOCK_ATTR = 'data-click-locked';
+  var FORM_SUBMITTING_ATTR = 'data-form-submitting';
+
+  function lockControl(control) {
+    if (!control || control.getAttribute(CLICK_LOCK_ATTR) === '1') return;
+    control.setAttribute(CLICK_LOCK_ATTR, '1');
+    control.setAttribute('aria-disabled', 'true');
+
+    if ('disabled' in control) {
+      control.disabled = true;
+    }
+
+    control.style.pointerEvents = 'none';
+    control.style.opacity = '0.7';
+  }
+
+  function unlockControl(control) {
+    if (!control || control.getAttribute(CLICK_LOCK_ATTR) !== '1') return;
+    control.removeAttribute(CLICK_LOCK_ATTR);
+    control.removeAttribute('aria-disabled');
+
+    if ('disabled' in control) {
+      control.disabled = false;
+    }
+
+    control.style.pointerEvents = '';
+    control.style.opacity = '';
+  }
+
+  function isExcludedButton(btn) {
+    if (!btn) return true;
+    if (btn.hasAttribute('data-allow-repeat-click')) return true;
+    if (btn.matches('.btn-close, .btn-toggle-pw, .sidebar-toggle, .dropdown-btn, .mobile-toggle')) return true;
+    if (btn.hasAttribute('data-bs-toggle') || btn.hasAttribute('data-bs-dismiss')) return true;
+    return false;
+  }
+
+  document.addEventListener('click', function (event) {
+    var control = event.target.closest('button, input[type="submit"], a[data-disable-on-click]');
+    if (!control) return;
+
+    if (control.getAttribute(CLICK_LOCK_ATTR) === '1') {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (control.matches('a[data-disable-on-click], button[data-disable-on-click]')) {
+      lockControl(control);
+      return;
+    }
+
+    if (control.tagName === 'BUTTON' && control.type !== 'submit' && control.hasAttribute('onclick') && !isExcludedButton(control)) {
+      lockControl(control);
+    }
+  }, true);
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!form || form.tagName !== 'FORM') return;
+
+    if (form.getAttribute(FORM_SUBMITTING_ATTR) === '1') {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    window.setTimeout(function () {
+      if (event.defaultPrevented) return;
+
+      form.setAttribute(FORM_SUBMITTING_ATTR, '1');
+
+      var submitControls = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+      submitControls.forEach(function (ctrl) {
+        lockControl(ctrl);
+      });
+    }, 0);
+  }, true);
+
+  window.addEventListener('pageshow', function () {
+    document.querySelectorAll('[' + CLICK_LOCK_ATTR + '="1"]').forEach(function (control) {
+      unlockControl(control);
+    });
+
+    document.querySelectorAll('form[' + FORM_SUBMITTING_ATTR + '="1"]').forEach(function (form) {
+      form.removeAttribute(FORM_SUBMITTING_ATTR);
+    });
+  });
+})();

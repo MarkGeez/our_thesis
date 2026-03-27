@@ -840,6 +840,30 @@
                 proofSizeError.querySelector('div').textContent = 'Proof of identity must be 4 MB or smaller.';
             }
         }
+
+        if (!e.defaultPrevented) {
+            const form = this;
+            const activeSubmit = e.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+
+            if (activeSubmit) {
+                activeSubmit.disabled = true;
+                activeSubmit.setAttribute('aria-disabled', 'true');
+                activeSubmit.style.pointerEvents = 'none';
+                activeSubmit.style.opacity = '0.7';
+            }
+        }
+    });
+
+    window.addEventListener('pageshow', function () {
+        const form = document.getElementById('registerForm');
+        if (!form) return;
+
+        form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (btn) {
+            btn.disabled = false;
+            btn.removeAttribute('aria-disabled');
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+        });
     });
 
     // ── CURSOR GLOW (desktop only) ────────────────────────────────

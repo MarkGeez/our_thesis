@@ -382,6 +382,32 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // ── ANTI-SPAM SUBMIT GUARD ───────────────────────────────────
+    (function () {
+        const form = document.querySelector('form[action="{{ route('login.attempt') }}"]');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+            if (e.defaultPrevented) return;
+            const submitBtn = e.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!submitBtn) return;
+
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-disabled', 'true');
+            submitBtn.style.pointerEvents = 'none';
+            submitBtn.style.opacity = '0.7';
+        });
+
+        window.addEventListener('pageshow', function () {
+            form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (btn) {
+                btn.disabled = false;
+                btn.removeAttribute('aria-disabled');
+                btn.style.pointerEvents = '';
+                btn.style.opacity = '';
+            });
+        });
+    })();
+
     // ── PASSWORD TOGGLE ───────────────────────────────────────────
     document.querySelectorAll('.btn-toggle-pw').forEach(function (btn) {
         btn.addEventListener('click', function () {
