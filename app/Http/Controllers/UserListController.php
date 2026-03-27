@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserProfileUpdatedMail;
 use App\Mail\UserAccountStatusUpdateMail;
 use Illuminate\Http\Request;
 use App\Models\Resident;
@@ -245,6 +246,15 @@ class UserListController extends Controller
         Mail::send(new UserAccountStatusUpdateMail($user));
     }
 
+    private function sendProfileUpdatedEmail(User $user): void
+    {
+        if (empty($user->email)) {
+            return;
+        }
+
+        Mail::send(new UserProfileUpdatedMail($user));
+    }
+
     public function updateProfile(Request $request, $id)
     {
         // Find the user
@@ -326,6 +336,7 @@ class UserListController extends Controller
         }
         
         $user->save();
+        $this->sendProfileUpdatedEmail($user);
         
         return redirect()->route($user->role . '.profile')->with('success', 'Profile updated successfully.');
     }
