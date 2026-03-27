@@ -327,8 +327,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{
                 @if(!$showControls && $official && $resident)
                     role="button"
                     tabindex="0"
-                    data-bs-toggle="modal"
-                    data-bs-target="#officialDetailsModal"
                     data-official-name="{{ e($publicOfficialName) }}"
                     data-official-position="{{ e($slot) }}"
                     data-official-image="{{ e($avatar) }}"
@@ -497,7 +495,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalImage = document.getElementById('officialModalImage');
     const modalTerm = document.getElementById('officialModalTerm');
     const modalNotes = document.getElementById('officialModalNotes');
+    const modalCloseButtons = officialDetailsModal.querySelectorAll('[data-bs-dismiss="modal"], .btn-close');
     const defaultImage = @json(asset('images/default_profile.jpg'));
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(officialDetailsModal, {
+        backdrop: true,
+        keyboard: true,
+        focus: true
+    });
+
+    // Keep modal at body level to avoid stacking/focus issues inside transformed sections.
+    if (officialDetailsModal.parentElement !== document.body) {
+        document.body.appendChild(officialDetailsModal);
+    }
 
     function populateOfficialModal(card) {
         modalName.textContent = card.getAttribute('data-official-name') || 'Official Name';
@@ -509,17 +518,42 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.querySelectorAll('.official-card.is-clickable').forEach(function (card) {
-        card.addEventListener('click', function () {
+        card.addEventListener('click', function (event) {
+            event.preventDefault();
             populateOfficialModal(card);
+            modalInstance.show();
         });
 
         card.addEventListener('keydown', function (event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 populateOfficialModal(card);
-                bootstrap.Modal.getOrCreateInstance(officialDetailsModal).show();
+                modalInstance.show();
             }
         });
+    });
+
+    modalCloseButtons.forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            modalInstance.hide();
+        }, true);
+    });
+
+    officialDetailsModal.addEventListener('click', function (event) {
+        if (event.target === officialDetailsModal) {
+            modalInstance.hide();
+        }
+    });
+
+    officialDetailsModal.addEventListener('hidden.bs.modal', function () {
+        document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+            backdrop.remove();
+        });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
     });
 });
     </script>

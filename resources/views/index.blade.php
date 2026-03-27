@@ -419,6 +419,7 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
+
     </style>
 </head>
 <body>
@@ -708,6 +709,7 @@
                 ? 'var(--accent-gold)' : '';
         });
     });
+
     </script>
 </body>
 </html>
