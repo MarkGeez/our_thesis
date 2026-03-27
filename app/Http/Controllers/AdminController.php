@@ -450,6 +450,13 @@ class AdminController extends Controller
         $resident = Resident::with('households.house.street')
             ->where('user_id', $user->id)
             ->first();
+
+        $profileImage = null;
+        if (!empty($user->profile_image)) {
+            $profileImage = asset('storage/' . ltrim((string) $user->profile_image, '/'));
+        } elseif (!empty($resident?->image_path)) {
+            $profileImage = asset('storage/' . ltrim((string) $resident->image_path, '/'));
+        }
         
         return response()->json([
             'fullName' => trim("{$user->firstName} {$user->middleName} {$user->lastName}"),
@@ -457,7 +464,7 @@ class AdminController extends Controller
             'contact' => $user->contactNumber,
             'birthday' => $user->birthday ? \Carbon\Carbon::parse($user->birthday)->format('F d, Y') : null,
             'role' => $user->role,
-            'profileImage' => $user->profile_image ? asset('storage/' . $user->profile_image) : null,
+            'profileImage' => $profileImage,
             'residentType' => $resident ? $this->formatResidentTypes($resident->type) : null,
             'parentStatus' => $resident?->parent ? ucfirst((string) $resident->parent) : null,
             'enrollmentStatus' => $resident?->enrolled ? ucfirst((string) $resident->enrolled) : null,
@@ -473,6 +480,13 @@ class AdminController extends Controller
     public function getResidentInfo(int $id)
     {
         $resident = Resident::with('households.house.street')->findOrFail($id);
+
+        $profileImage = null;
+        if (!empty($resident->image_path)) {
+            $profileImage = asset('storage/' . ltrim((string) $resident->image_path, '/'));
+        } elseif (!empty($resident->user?->profile_image)) {
+            $profileImage = asset('storage/' . ltrim((string) $resident->user->profile_image, '/'));
+        }
         
         return response()->json([
             'fullName' => trim("{$resident->firstName} {$resident->middleName} {$resident->lastName}"),
@@ -481,7 +495,7 @@ class AdminController extends Controller
             'birthday' => $resident->birthday ? \Carbon\Carbon::parse($resident->birthday)->format('F d, Y') : null,
             'age' => $resident->age,
             'sex' => $resident->sex,
-            'profileImage' => $resident->image_path ? asset('storage/' . $resident->image_path) : null,
+            'profileImage' => $profileImage,
             'residentType' => $this->formatResidentTypes($resident->type),
             'parentStatus' => $resident->parent ? ucfirst((string) $resident->parent) : null,
             'enrollmentStatus' => $resident->enrolled ? ucfirst((string) $resident->enrolled) : null,
