@@ -10,7 +10,29 @@
     .filter-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; }
     .filter-chip { display: inline-flex; align-items: center; background: #e2e8f0; color: #1e293b; border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.75rem; margin: 0.2rem 0.3rem 0.2rem 0; }
     .table thead th { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important; color: #1e293b !important; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.4px; border: none !important; white-space: nowrap; }
-    .table tbody td { vertical-align: middle; }
+    .table tbody td { vertical-align: middle; white-space: normal; word-break: break-word; overflow-wrap: anywhere; }
+    .table td[data-col="details"],
+    .table td[data-col="remarks"],
+    .table td[data-col="message"],
+    .table td[data-col="description"] {
+        vertical-align: top;
+    }
+    .archive-detail-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        white-space: normal;
+    }
+    .archive-detail-line {
+        display: block;
+        line-height: 1.45;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+    .archive-detail-key {
+        font-weight: 700;
+        color: #334155;
+    }
     .col-controls { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; }
     .col-controls-title { font-weight: 700; color: #0f172a; font-size: 0.9rem; margin-bottom: 0.6rem; }
     .col-controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem 0.75rem; }
@@ -455,7 +477,17 @@
                                     <td data-col="reason">{{ $row->reason ?: 'N/A' }}</td>
                                     <td data-col="details">
                                         @if($archiveLines->isNotEmpty())
-                                            <div class="small" style="white-space: pre-line; line-height: 1.4;">{{ $archiveLines->implode("\n") }}</div>
+                                            <div class="small archive-detail-lines">
+                                                @foreach($archiveLines as $archiveLine)
+                                                    @php
+                                                        [$archiveLabel, $archiveValue] = array_pad(explode(': ', (string) $archiveLine, 2), 2, '');
+                                                    @endphp
+                                                    <div class="archive-detail-line">
+                                                        <span class="archive-detail-key">{{ $archiveLabel }}:</span>
+                                                        <span>{{ $archiveValue !== '' ? $archiveValue : 'N/A' }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         @else
                                             N/A
                                         @endif

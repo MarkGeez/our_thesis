@@ -108,11 +108,14 @@
             font-size: 0.85rem;
             color: #374151;
             line-height: 1.5;
+            white-space: normal;
         }
 
         .archive-details .key {
             font-weight: 700;
             color: #1f2937;
+            display: inline-block;
+            margin-right: 0.2rem;
         }
 
         .archive-actions {
@@ -144,6 +147,9 @@
         .modal-details-row {
             border-bottom: 1px solid #f1f5f9;
             padding: 0.55rem 0;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .modal-details-row:last-child {
