@@ -171,23 +171,23 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label">First Name <span class="text-danger">*</span></label>
-                        <input name="plaintiffName" class="form-control" placeholder="John" value="{{ old('plaintiffName') }}">
+                        <input name="plaintiffName" class="form-control js-name-only" placeholder="John" value="{{ old('plaintiffName') }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Middle Name</label>
-                        <input name="plaintiffMiddleName" class="form-control" placeholder="Santos" value="{{ old('plaintiffMiddleName') }}">
+                        <input name="plaintiffMiddleName" class="form-control js-name-only" placeholder="Santos" value="{{ old('plaintiffMiddleName') }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                        <input name="plaintiffLastName" class="form-control" placeholder="Doe" value="{{ old('plaintiffLastName') }}">
+                        <input name="plaintiffLastName" class="form-control js-name-only" placeholder="Doe" value="{{ old('plaintiffLastName') }}">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Age</label>
-                        <input type="number" name="plaintiffAge" class="form-control" placeholder="--" value="{{ old('plaintiffAge') }}">
+                        <input type="number" name="plaintiffAge" class="form-control js-number-only" placeholder="--" value="{{ old('plaintiffAge') }}">
                     </div>
                     <div class="col-md-5">
                         <label class="form-label">Contact Number</label>
-                        <input type="tel" name="plaintiffContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" value="{{ old('plaintiffContactNumber') }}">
+                        <input type="tel" name="plaintiffContactNumber" class="form-control js-number-only" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" value="{{ old('plaintiffContactNumber') }}">
                     </div>
                     <div class="col-md-5">
                         <label class="form-label">Address</label>
@@ -238,15 +238,15 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label">First Name</label>
-                        <input name="defendantName" class="form-control" placeholder="Respondent's name" value="{{ old('defendantName') }}">
+                        <input name="defendantName" class="form-control js-name-only" placeholder="Respondent's name" value="{{ old('defendantName') }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Middle Name</label>
-                        <input name="defendantMiddleName" class="form-control" placeholder="..." value="{{ old('defendantMiddleName') }}">
+                        <input name="defendantMiddleName" class="form-control " placeholder="..." value="{{ old('defendantMiddleName') }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Last Name</label>
-                        <input name="defendantLastName" class="form-control" placeholder="..." value="{{ old('defendantLastName') }}">
+                        <input name="defendantLastName" class="form-control  js-name-only" placeholder="..." value="{{ old('defendantLastName') }}">
                     </div>
                     <div class="col-md-8">
                         <label class="form-label">Last Known Residence</label>
@@ -254,7 +254,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Contact Number <span class="text-muted">(Optional)</span></label>
-                        <input type="tel" name="defendantContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" value="{{ old('defendantContactNumber') }}">
+                        <input type="tel" name="defendantContactNumber" class="form-control js-number-only" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" value="{{ old('defendantContactNumber') }}">
                     </div>
                 </div>
             </div>
@@ -267,11 +267,11 @@
                 <h6 class="form-section-title mb-3" style="font-size: 0.75rem;">Witness</h6>
                 <div class="mb-3">
                     <label class="form-label">Witness Name</label>
-                    <input name="witnessName" class="form-control" placeholder="Full Name">
+                    <input name="witnessName" class="form-control js-name-only" placeholder="Full Name">
                 </div>
                                     <label class="form-label">Witness Contact Number</label>
 
-                <input type="tel" name="witnessContactNumber" class="form-control" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
+                <input type="tel" name="witnessContactNumber" class="form-control js-number-only" placeholder="09170000000" inputmode="numeric" pattern="^09\d{9}$" maxlength="11">
             </div>
         </div>
 
@@ -520,6 +520,72 @@
         }
 
         function initializeBlotterPartySelectors() {
+            function sanitizeName(value) {
+                return String(value || '')
+                    .replace(/[^A-Za-z ]+/g, '')
+                    .replace(/\s{2,}/g, ' ')
+                    .replace(/^\s+/, '');
+            }
+
+            function sanitizeDigits(value) {
+                return String(value || '').replace(/\D+/g, '');
+            }
+
+            function attachNameValidation(input) {
+                input.setAttribute('pattern', '[A-Za-z ]+');
+                input.setAttribute('title', 'Only letters and spaces are allowed.');
+
+                input.addEventListener('input', function () {
+                    const caret = input.selectionStart;
+                    const previousLength = input.value.length;
+                    input.value = sanitizeName(input.value);
+
+                    if (typeof caret === 'number') {
+                        const delta = previousLength - input.value.length;
+                        const nextCaret = Math.max(0, caret - delta);
+                        input.setSelectionRange(nextCaret, nextCaret);
+                    }
+
+                    if (input.value.trim() && !/^[A-Za-z ]+$/.test(input.value.trim())) {
+                        input.setCustomValidity('Only letters and spaces are allowed.');
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                });
+
+                input.addEventListener('blur', function () {
+                    input.value = input.value.replace(/\s{2,}/g, ' ').trim();
+                    if (input.value && !/^[A-Za-z ]+$/.test(input.value)) {
+                        input.setCustomValidity('Only letters and spaces are allowed.');
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                });
+            }
+
+            function attachNumberValidation(input) {
+                input.setAttribute('inputmode', 'numeric');
+
+                input.addEventListener('input', function () {
+                    const caret = input.selectionStart;
+                    const previousLength = input.value.length;
+                    const maxLength = parseInt(input.getAttribute('maxlength') || '0', 10);
+                    let nextValue = sanitizeDigits(input.value);
+
+                    if (maxLength > 0) {
+                        nextValue = nextValue.slice(0, maxLength);
+                    }
+
+                    input.value = nextValue;
+
+                    if (typeof caret === 'number') {
+                        const delta = previousLength - input.value.length;
+                        const nextCaret = Math.max(0, caret - delta);
+                        input.setSelectionRange(nextCaret, nextCaret);
+                    }
+                });
+            }
+
             document.querySelectorAll('.blotter-form').forEach(function (form) {
                 if (form.dataset.partySelectorInitialized === '1') {
                     return;
@@ -528,6 +594,9 @@
                 form.dataset.partySelectorInitialized = '1';
                 initPartySelector(form, 'plaintiff');
                 initPartySelector(form, 'defendant');
+
+                form.querySelectorAll('.js-name-only').forEach(attachNameValidation);
+                form.querySelectorAll('.js-number-only').forEach(attachNumberValidation);
             });
         }
 
