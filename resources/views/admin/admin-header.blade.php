@@ -154,3 +154,108 @@
     </div>
 </nav>
 @include('components.form-submit-stopper')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nameFieldSelector = [
+            'input[type="text"][name="firstName"]',
+            'input[type="text"][name="middleName"]',
+            'input[type="text"][name="lastName"]',
+            'input[type="text"][name="firstname"]',
+            'input[type="text"][name="middlename"]',
+            'input[type="text"][name="lastname"]'
+        ].join(',');
+
+        const namePattern = /^[A-Za-z ]+$/;
+
+        function sanitizeName(value) {
+            return value
+                .replace(/[^A-Za-z ]+/g, '')
+                .replace(/\s{2,}/g, ' ')
+                .replace(/^\s+/, '');
+        }
+
+        function isOptionalMiddleName(field) {
+            const name = (field.getAttribute('name') || '').toLowerCase();
+            return name === 'middlename';
+        }
+
+        function validateNameField(field) {
+            const trimmed = field.value.trim();
+            const optionalField = isOptionalMiddleName(field);
+
+            if (!trimmed && optionalField) {
+                field.setCustomValidity('');
+                return true;
+            }
+
+            if (!trimmed) {
+                field.setCustomValidity('This field is required.');
+                return false;
+            }
+
+            if (!namePattern.test(trimmed)) {
+                field.setCustomValidity('Only letters and spaces are allowed.');
+                return false;
+            }
+
+            field.setCustomValidity('');
+            return true;
+        }
+
+        function setupNameValidation(field) {
+            field.setAttribute('autocomplete', 'off');
+            field.setAttribute('pattern', '[A-Za-z ]+');
+            field.setAttribute('title', 'Only letters and spaces are allowed.');
+
+            field.addEventListener('input', function () {
+                const caret = field.selectionStart;
+                const previousLength = field.value.length;
+                field.value = sanitizeName(field.value);
+
+                if (typeof caret === 'number') {
+                    const delta = previousLength - field.value.length;
+                    const nextCaret = Math.max(0, caret - delta);
+                    field.setSelectionRange(nextCaret, nextCaret);
+                }
+
+                validateNameField(field);
+            });
+
+            field.addEventListener('blur', function () {
+                field.value = field.value.replace(/\s{2,}/g, ' ').trim();
+                validateNameField(field);
+            });
+
+            validateNameField(field);
+        }
+
+        document.querySelectorAll(nameFieldSelector).forEach(setupNameValidation);
+
+        document.querySelectorAll('form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                const fields = form.querySelectorAll(nameFieldSelector);
+                let isValid = true;
+
+                fields.forEach(function (field) {
+                    field.value = field.value.replace(/\s{2,}/g, ' ').trim();
+                    if (!validateNameField(field)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    event.preventDefault();
+                    const firstInvalidField = Array.from(fields).find(function (field) {
+                        return !field.checkValidity();
+                    });
+
+                    if (firstInvalidField) {
+                        firstInvalidField.reportValidity();
+                        firstInvalidField.focus();
+                    }
+                }
+            });
+        });
+    });
+</script>
