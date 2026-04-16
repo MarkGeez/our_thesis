@@ -161,9 +161,11 @@
             'input[type="text"][name="firstName"]',
             'input[type="text"][name="middleName"]',
             'input[type="text"][name="lastName"]',
+            'input[type="text"][name="emergencyContactName"]',
             'input[type="text"][name="firstname"]',
             'input[type="text"][name="middlename"]',
-            'input[type="text"][name="lastname"]'
+            'input[type="text"][name="lastname"]',
+            'input[type="text"][name="emergencycontactname"]'
         ].join(',');
 
         const namePattern = /^[A-Za-z ]+$/;
@@ -175,14 +177,14 @@
                 .replace(/^\s+/, '');
         }
 
-        function isOptionalMiddleName(field) {
+        function isOptionalNameField(field) {
             const name = (field.getAttribute('name') || '').toLowerCase();
-            return name === 'middlename';
+            return name === 'middlename' || name === 'emergencycontactname';
         }
 
         function validateNameField(field) {
             const trimmed = field.value.trim();
-            const optionalField = isOptionalMiddleName(field);
+            const optionalField = isOptionalNameField(field);
 
             if (!trimmed && optionalField) {
                 field.setCustomValidity('');
