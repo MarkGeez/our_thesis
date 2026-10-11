@@ -1,15 +1,27 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement(
-            "ALTER TABLE update_blotters MODIFY COLUMN status ENUM('barangayBlotter', 'first', 'second', 'third', 'brgyHearing', 'coldCase', 'criminalCase', 'referredToPnp', 'resolved') NOT NULL"
-        );
+        Schema::table('update_blotters', function (Blueprint $table) {
+            $table->enum('status', [
+                'barangayBlotter',
+                'first',
+                'second',
+                'third',
+                'brgyHearing',
+                'coldCase',
+                'criminalCase',
+                'referredToPnp',
+                'resolved',
+            ])->change();
+        });
     }
 
     public function down(): void
@@ -18,8 +30,17 @@ return new class extends Migration
             ->where('status', 'barangayBlotter')
             ->update(['status' => 'first']);
 
-        DB::statement(
-            "ALTER TABLE update_blotters MODIFY COLUMN status ENUM('first', 'second', 'third', 'brgyHearing', 'coldCase', 'criminalCase', 'referredToPnp', 'resolved') NOT NULL"
-        );
+        Schema::table('update_blotters', function (Blueprint $table) {
+            $table->enum('status', [
+                'first',
+                'second',
+                'third',
+                'brgyHearing',
+                'coldCase',
+                'criminalCase',
+                'referredToPnp',
+                'resolved',
+            ])->change();
+        });
     }
 };

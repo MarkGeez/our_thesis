@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -10,9 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement(
-            "ALTER TABLE update_blotters MODIFY COLUMN status ENUM('first', 'second', 'third', 'brgyHearing', 'coldCase', 'criminalCase', 'referredToPnp', 'resolved') NOT NULL"
-        );
+        Schema::table('update_blotters', function (Blueprint $table) {
+            $table->enum('status', [
+                'first',
+                'second',
+                'third',
+                'brgyHearing',
+                'coldCase',
+                'criminalCase',
+                'referredToPnp',
+                'resolved',
+            ])->change();
+        });
     }
 
     /**
@@ -20,8 +30,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement(
-            "ALTER TABLE update_blotters MODIFY COLUMN status ENUM('first', 'second', 'third', 'brgyHearing', 'coldCase', 'criminalCase') NOT NULL"
-        );
+        Schema::table('update_blotters', function (Blueprint $table) {
+            $table->enum('status', [
+                'first',
+                'second',
+                'third',
+                'brgyHearing',
+                'coldCase',
+                'criminalCase',
+            ])->change();
+        });
     }
 };

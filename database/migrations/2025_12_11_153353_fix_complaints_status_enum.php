@@ -11,14 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE complaints MODIFY COLUMN status ENUM('pending', 'resolved', 'on-going', 'rejected') NOT NULL DEFAULT 'pending'");
+        Schema::table('complaints', function (Blueprint $table) {
+            $table->enum('status', ['pending', 'resolved', 'on-going', 'rejected'])
+                ->default('pending')
+                ->change();
+        });
     }
 
     /**
-
+     * Reverse the migrations.
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE complaints MODIFY COLUMN status ENUM('pending', 'resolved', 'on-going', 'rejected') NOT NULL DEFAULT 'pending'");
+        Schema::table('complaints', function (Blueprint $table) {
+            $table->enum('status', ['pending', 'resolved', 'on-going', 'rejected'])
+                ->default('pending')
+                ->change();
+        });
     }
 };

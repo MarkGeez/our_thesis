@@ -1,17 +1,29 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE officials MODIFY position VARCHAR(100) NOT NULL");
+        Schema::table('officials', function (Blueprint $table) {
+            $table->string('position', 100)->change();
+        });
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE officials MODIFY position ENUM('Chairman','Kagawad','Secretary','Treasurer','Sk Chairman','Sk Kagawad') NOT NULL");
+        Schema::table('officials', function (Blueprint $table) {
+            $table->enum('position', [
+                'Chairman',
+                'Kagawad',
+                'Secretary',
+                'Treasurer',
+                'Sk Chairman',
+                'Sk Kagawad',
+            ])->change();
+        });
     }
 };
