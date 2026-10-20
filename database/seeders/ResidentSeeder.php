@@ -11,11 +11,11 @@ class ResidentSeeder extends Seeder
     public function run()
     {
         $baseResident = [
-            'firstName' => 'bla',
-            'middleName' => 'bla',
-            'lastName' => 'bla',
+            'firstName' => 'miguel',
+            'middleName' => 'rasta',
+            'lastName' => 'dags',
             'contactNo' => '09216461025',
-            'religion' => 'Irure velit voluptat',
+            'religion' => 'catholic',
             'birthday' => '2026-02-01',
             'emergencyContactNo' => '09216461025',
             'emergencyContactName' => 'dsadsada',
@@ -23,7 +23,7 @@ class ResidentSeeder extends Seeder
             'sex' => 'male',
             'parent' => 'yes',
             'enrolled' => 'yes',
-            'educationalAttainment' => 'Dolorem itaque disti',
+            'educationalAttainment' => 'College',
             'headOfFamily' => 'yes',
             'EncodedBy' => 1,
             'image_path' => null
