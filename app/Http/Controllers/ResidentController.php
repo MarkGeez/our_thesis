@@ -185,12 +185,6 @@ class ResidentController extends Controller
         return view('resident.clearance', compact('resident'));
     }
 
-    public function service()
-    {
-                $resident = auth()->user();
-
-        return view('resident.service', compact('resident'));
-    }
 
     public function complaint()
 {   

@@ -174,6 +174,8 @@ public function searchResidents(Request $request)
             'emergencyContactNo' => 'nullable|string|max:11',
             'emergencyContactName' => 'nullable|string|max:255',
             'age' => 'required|integer|min:0|max:255',
+                        'religion' => 'nullable|string|max:255',
+
             'sex' => 'nullable|in:male,female',
             'parent' => 'nullable|in:yes,no,single',
             'enrolled' => 'nullable|in:yes,no',
@@ -240,6 +242,8 @@ $household = Household::firstOrCreate(['house_id' => $validated['house_id']]);
             'emergencyContactNo' => 'required|string|max:11',
             'emergencyContactName' => 'required|string|max:255',
             'age' => 'required|integer|min:0|max:255',
+                                    'religion' => 'nullable|string|max:255',
+
             'sex' => 'required|in:male,female',
             'parent' => 'required|in:yes,no,single',
             'enrolled' => 'required|in:yes,no',

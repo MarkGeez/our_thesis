@@ -1241,6 +1241,18 @@ document.addEventListener('DOMContentLoaded', function () {
     @error('lastName')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
+    <label>Religion</label>
+                                                        @php
+                                                            $selectedReligion = old('religion', $resident->religion ?? 'Unknown');
+                                                            if (!in_array($selectedReligion, $religionOptions, true)) {
+                                                                $selectedReligion = 'Unknown';
+                                                            }
+                                                        @endphp
+                                                        <select name="religion" class="form-select">
+                                                            @foreach ($religionOptions as $option)
+                                                                <option value="{{ $option }}" {{ $selectedReligion === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endforeach
+                                                        </select>
 
     <!-- Birthday -->
     <label>Birthday</label>
@@ -1287,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </select>
 
 
-    <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE -->
+    <!-- Contact No - REMOVED DUPLICATE, KEPT THIS ONE --> 
     <label for="contactNo">Contact No.</label>
     <input type="text" id="contactNo" name="contactNo" class="form-control @error('contactNo') is-invalid @enderror" 
            value="{{ old('contactNo') }}" placeholder="09xxxxxxxxx" >
