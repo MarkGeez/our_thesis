@@ -362,6 +362,10 @@
             color: #333;
         }
 
+        .required-asterisk {
+            color: #dc3545;
+        }
+
         .invalid-feedback {
             font-weight: 500;
         }
@@ -791,7 +795,7 @@
                                                             @method('PUT')
                                                         @endif
                                                         
-                                                        <label>Select Position</label>
+                                                        <label>Select Position <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                         <select name="position" class="form-select" required>
                                                             <option value="Barangay Chairman" {{ $resident->official && $resident->official->position === 'Barangay Chairman' ? 'selected' : '' }}>Barangay Chairman</option>
                                                             <option value="Barangay Secretary" {{ $resident->official && $resident->official->position === 'Barangay Secretary' ? 'selected' : '' }}>Barangay Secretary</option>
@@ -813,16 +817,16 @@
                                                             <option value="SK Kagawad 7" {{ $resident->official && $resident->official->position === 'SK Kagawad 7' ? 'selected' : '' }}>SK Kagawad 7</option>
                                                         </select>
 
-                                                        <label>Term Description</label>
+                                                        <label>Term Description <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                         <input type="text" name="details" class="form-control" placeholder="e.g. 2023-2026 Term" value="{{ $resident->official ? $resident->official->details : '' }}" required>
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Start Date</label>
+                                                                <label>Start Date <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="text" name="start" class="form-control datetime-picker" placeholder="Select Start Date" value="{{ $resident->official ? $resident->official->start : '' }}" required>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <label>End Date</label>
+                                                                <label>End Date <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="text" name="end" class="form-control datetime-picker" placeholder="Select End Date" value="{{ $resident->official ? $resident->official->end : '' }}" required>
                                                             </div>
                                                         </div>
@@ -852,7 +856,7 @@
 
                                                         <div class="row">
                                                             <div class="col-md-4">
-                                                                <label>First Name</label>
+                                                                <label>First Name <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="text" name="firstName" class="form-control" value="{{ old('firstName', $resident->firstName) }}" required>
                                                             </div>
                                                             <div class="col-md-4">
@@ -860,7 +864,7 @@
                                                                 <input type="text" name="middleName" class="form-control" value="{{ old('middleName', $resident->middleName) }}" >
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <label>Last Name</label>
+                                                                <label>Last Name <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="text" name="lastName" class="form-control" value="{{ old('lastName', $resident->lastName) }}" required>
                                                             </div>
                                                         </div>
@@ -885,7 +889,7 @@
     @endforeach
 </select>
 
-<label class="mt-3">House Number</label>
+<label class="mt-3">House Number <span class="required-asterisk" aria-hidden="true">*</span></label>
 <select name="house_id" class="form-control house-select">
     <option value="">-- Select House Number --</option>
 </select>
@@ -894,7 +898,7 @@
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Birthday</label>
+                                                                <label>Birthday <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <div class="input-group resident-date-group w-100">
                                                                     <input
                                                                         type="date"
@@ -911,21 +915,21 @@
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <label>Age</label>
+                                                                <label>Age <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="number" id="ageEdit{{ $resident->id }}" name="age" class="form-control bg-light" value="{{ old('age', $resident->age) }}" readonly>
                                                             </div>
                                                         </div>
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Sex</label>
+                                                                <label>Sex <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <select name="sex" class="form-select" required>
                                                                     <option value="male" {{ old('sex', $resident->sex) === 'male' ? 'selected' : '' }}>Male</option>
                                                                     <option value="female" {{ old('sex', $resident->sex) === 'female' ? 'selected' : '' }}>Female</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <label>Contact No.</label>
+                                                                <label>Contact No. <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <input type="text" name="contactNo" class="form-control" value="{{ old('contactNo', $resident->contactNo) }}" required>
                                                                 <div id="contactNoErrorEdit{{ $resident->id }}" class="invalid-feedback"></div>
                                                             </div>
@@ -933,7 +937,7 @@
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-    <label>Head of Family</label>
+    <label>Head of Family <span class="required-asterisk" aria-hidden="true">*</span></label>
     <select name="headOfFamily" id="headOfFamilySelect_{{ $resident->id }}" class="form-select head-of-family-trigger" data-resident-id="{{ $resident->id }}" data-original-value="{{ $resident->headOfFamily }}" required>
         <option value="yes" {{ $resident->headOfFamily === 'yes' ? 'selected' : '' }}>Yes</option>
         <option value="no" {{ $resident->headOfFamily === 'no' ? 'selected' : '' }}>No</option>
@@ -1123,7 +1127,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                                                             <div class="col-md-6">
-                                                                <label>Parent Status</label>
+                                                                <label>Parent Status <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <select name="parent" class="form-select" required>
                                                                     <option value="yes" {{ old('parent', $resident->parent) === 'yes' ? 'selected' : '' }}>Yes</option>
                                                                     <option value="no" {{ old('parent', $resident->parent) === 'no' ? 'selected' : '' }}>No</option>
@@ -1134,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                                         <div class="row">
                                                             <div class="col-md-6">
-                                                                <label>Currently Enrolled</label>
+                                                                <label>Currently Enrolled <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                                 <select name="enrolled" class="form-select" required>
                                                                     <option value="yes" {{ old('enrolled', $resident->enrolled) === 'yes' ? 'selected' : '' }}>Yes</option>
                                                                     <option value="no" {{ old('enrolled', $resident->enrolled) === 'no' ? 'selected' : '' }}>No</option>
@@ -1171,10 +1175,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                                         <hr class="mt-4">
 
-                                                        <label for="emergencyContactName{{ $resident->id }}">Emergency Contact Name</label>
+                                                        <label for="emergencyContactName{{ $resident->id }}">Emergency Contact Name <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                         <input type="text" id="emergencyContactName{{ $resident->id }}" name="emergencyContactName" class="form-control @error('emergencyContactName') is-invalid @enderror" value="{{ old('emergencyContactName', $resident->emergencyContactName) }}" placeholder="Enter full name" required>
 
-                                                        <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No.</label>
+                                                        <label for="emergencyContactNo{{ $resident->id }}">Emergency Contact No. <span class="required-asterisk" aria-hidden="true">*</span></label>
                                                         <input type="text" id="emergencyContactNo{{ $resident->id }}" name="emergencyContactNo" class="form-control @error('emergencyContactNo') is-invalid @enderror" value="{{ old('emergencyContactNo', $resident->emergencyContactNo) }}" placeholder="e.g. 09xxxxxxxxx" required>
                                                         <div id="emergencyContactNoError{{ $resident->id }}" class="invalid-feedback"></div>
 
@@ -1219,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @csrf
     
     <!-- First Name -->
-    <label>First Name</label>
+    <label>First Name <span class="required-asterisk" aria-hidden="true">*</span></label>
     <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" 
            placeholder="Enter First Name" value="{{ old('firstName') }}" required>
     @error('firstName')
@@ -1235,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Last Name -->
-    <label>Last Name</label>
+    <label>Last Name <span class="required-asterisk" aria-hidden="true">*</span></label>
     <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" 
            placeholder="Enter Last Name" value="{{ old('lastName') }}" required>
     @error('lastName')
@@ -1255,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         </select>
 
     <!-- Birthday -->
-    <label>Birthday</label>
+    <label>Birthday <span class="required-asterisk" aria-hidden="true">*</span></label>
     <div class="input-group resident-date-group w-100">
         <input
             type="date"
@@ -1276,7 +1280,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Age -->
-    <label>Age</label>
+    <label>Age <span class="required-asterisk" aria-hidden="true">*</span></label>
     <input type="number" id="ageCreate" name="age" class="form-control bg-light @error('age') is-invalid @enderror" 
            value="{{ old('age') }}" readonly>
     @error('age')
@@ -1293,7 +1297,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <option value="{{ $street->id }}">{{ $street->street_name }}</option>
     @endforeach
 </select>
-<label>House Number</label>
+<label>House Number <span class="required-asterisk" aria-hidden="true">*</span></label>
 <select name="house_id" class="form-control house-select">
     <option value="">-- Select House Number --</option>
 </select>
@@ -1309,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Sex (Added missing field) -->
-    <label for="sex">Sex</label>
+    <label for="sex">Sex <span class="required-asterisk" aria-hidden="true">*</span></label>
     <select id="sex" name="sex" class="form-select @error('sex') is-invalid @enderror" required>
         <option value="">Select Sex</option>
         <option value="male" {{ old('sex') === 'male' ? 'selected' : '' }}>Male</option>
@@ -1320,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Parent Status (Added missing field) -->
-    <label for="parent">Parent Status</label>
+    <label for="parent">Parent Status <span class="required-asterisk" aria-hidden="true">*</span></label>
     <select id="parent" name="parent" class="form-select @error('parent') is-invalid @enderror " required>
         <option value="">Select Parent Status</option>
         <option value="yes" {{ old('parent') === 'yes' ? 'selected' : '' }}>Yes</option>
@@ -1332,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Enrolled (Added missing field) -->
-    <label for="enrolled">Enrolled in School</label>
+    <label for="enrolled">Enrolled in School <span class="required-asterisk" aria-hidden="true">*</span></label>
     <select id="enrolled" name="enrolled" class="form-select @error('enrolled') is-invalid @enderror" required>
         <option value="">Select Enrollment Status</option>
         <option value="yes" {{ old('enrolled') === 'yes' ? 'selected' : '' }}>Yes</option>
@@ -1367,7 +1371,7 @@ document.addEventListener('DOMContentLoaded', function () {
     @enderror
 
     <!-- Head of Family -->
-    <label for="headOfFamily">Head of Family</label>
+    <label for="headOfFamily">Head of Family <span class="required-asterisk" aria-hidden="true">*</span></label>
     <select id="headOfFamily" name="headOfFamily" class="form-select @error('headOfFamily') is-invalid @enderror" required>
         <option value="">Select Option</option>
         <option value="yes" {{ old('headOfFamily') === 'yes' ? 'selected' : '' }}>Yes</option>
