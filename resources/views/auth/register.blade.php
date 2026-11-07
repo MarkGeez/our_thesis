@@ -488,7 +488,7 @@
         const passwordError = document.getElementById('passwordError');
         const contactInput = document.getElementById('contactNumber');
         const contactError = document.getElementById('contactError');
-        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        const passwordRegex = /^.{8,}$/;
         const contactRegex = /^\d{0,11}$/;
 
         passwordInput.addEventListener('input', function() {
@@ -504,7 +504,7 @@
             // Password validation
             if (!passwordRegex.test(passwordInput.value)) {
                 passwordError.style.display = 'block';
-                passwordError.textContent = "Mininum 8 chararacters, 1 uppercase, 1 number.";
+                passwordError.textContent = "Mininum 8 chararacters.";
             } else {
                 passwordError.style.display = 'none';
                 passwordError.textContent = "";
