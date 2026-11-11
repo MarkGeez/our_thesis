@@ -36,7 +36,7 @@ use Illuminate\Auth\Events\Login;
 
 
 Route::get('login', [AuthController::class,'showLoginForm'])->name('login');
-Route::post('login', [AuthController::class, 'login'])->name('login.attempt');
+Route::post('login', [AuthController::class, 'login'])->name('login.attempt')->middleware('throttle:5,1');
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::get('register', [RegistrationController::class,'showRegister'])->name('register');
